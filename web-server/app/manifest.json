@@ -1,0 +1,22 @@
+{
+    "schemaVersion": "1.2",
+    "acapPackageConf": {
+        "setup": {
+            "appName": "monkey",
+            "vendor": "Axis Communications",
+            "embeddedSdkVersion": "3.0",
+            "user": {
+                "username": "sdk",
+                "group": "sdk"
+            },
+            "runMode": "never",
+            "version": "1.0.0"
+        },
+        "installation": {
+            "postInstallScript": "postinstall.sh"
+        },
+        "uninstallation": {
+            "preUninstallScript": "preuninstall.sh"
+        }
+    }
+}

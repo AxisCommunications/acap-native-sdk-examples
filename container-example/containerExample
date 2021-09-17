@@ -1,0 +1,18 @@
+#!/bin/sh
+
+stop_containers () {
+  docker compose down
+  exit 0
+}
+
+# cd to script directory
+cd -P -- "$(dirname -- "$0")"
+
+# Trap SIGINT and SIGTERM
+trap 'stop_containers' 2 15
+
+docker compose up
+
+while true; do
+    sleep 1
+done

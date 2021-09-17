@@ -1,0 +1,39 @@
+name: Build licensekey handler Applications
+on:
+  push:
+    paths:
+      - "licensekey/**"
+      - ".github/workflows/licensekey.yml"
+jobs:
+  build:
+    runs-on: self-hosted
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Build licensekey handler application
+        run: |
+          imagetag=licensekey-handler:1.0
+          docker image rm -f $imagetag
+          cd licensekey
+          docker build --no-cache --tag $imagetag .
+          docker cp $(docker create $imagetag):/opt/app ./build
+          cd ..
+          mkdir -p acap4-native/examples/licensekey/build
+          cp licensekey/build/licensekey_handler_1_0_0_armv7hf.eap acap4-native/examples/licensekey/build/licensekey_handler_1_0_0_armv7hf.eap
+          ls acap4-native/examples/licensekey/build
+
+      - name: Run functional tests
+        run: |
+          export WORKSPACE=$(pwd)
+          echo $WORKSPACE
+          git clone "ssh://${{ secrets.GERRIT_SERVICE_USER }}@gittools.se.axis.com:29418/tests/atf/tart/recap.git"
+          cd recap
+          source /github-runner/github-runner/init/atf_init.sh
+          ./test_starter.sh licensekey_handler
+          ls recap/output
+
+      # Save functional test report as artifact
+      - uses: actions/upload-artifact@master
+        with:
+          name: Test report
+          path: recap/recap/output/report.xml

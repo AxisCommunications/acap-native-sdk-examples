@@ -1,0 +1,205 @@
+diff --git a/examples/Makefile b/examples/Makefile
+index 4bcf670f..20aed5ba 100644
+--- a/examples/Makefile
++++ b/examples/Makefile
+@@ -1,7 +1,8 @@
+ CFLAGS += -Wall
+-
+-CFLAGS += $(shell pkg-config --cflags monkey)
+-LDFLAGS += $(shell pkg-config --libs monkey)
++PKGS = glib-2.0 monkey
++CFLAGS += $(shell pkg-config --cflags $(PKGS))
++LDLIBS += $(shell pkg-config --libs $(PKGS)) -ldl
++LDFLAGS += -Wl,--no-as-needed,-rpath,'$$ORIGIN/lib'
+ 
+ .PHONY: all clean first
+ 
+diff --git a/examples/hello.c b/examples/hello.c
+index d54c3dde..d51b7ddf 100644
+--- a/examples/hello.c
++++ b/examples/hello.c
+@@ -1,6 +1,7 @@
+ /* Monkey HTTP Daemon
+  * ------------------
+  * Copyright (C) 2012, Lauri Kasanen <cand@gmx.com>
++ *  Modified 2021, Axis Communications AB, Lund, Sweden
+  *
+  * This program is free software; you can redistribute it and/or modify
+  * it under the terms of the GNU General Public License as published by
+@@ -21,6 +22,8 @@
+ #include <unistd.h>
+ #include <stdlib.h>
+ #include <stdio.h>
++#include <syslog.h>
++#include <glib.h>
+ 
+ /*
+  * This example shows how to start the server, and point it to /tmp.
+@@ -39,30 +42,41 @@ static void write_index() {
+ 	fclose(f);
+ }
+ 
+-int main() {
++int main(int argc, char* argv[]) {
+ 
+-	int ret;
++  	GMainLoop *loop;
++  	int ret;
+ 
+-	write_index();
++	openlog("hello", LOG_PID|LOG_CONS, LOG_USER);
++    syslog(LOG_INFO, "starting  %s", argv[0]);
++  	loop = g_main_loop_new(NULL, FALSE);
++  	write_index();
+ 
+ 	// All defaults. Bind to all interfaces, port 2001, default plugins, /tmp.
+ 	// No callbacks are used.
+ 	mklib_ctx ctx = mklib_init(NULL, 0, 0, "/tmp");
+-	if (!ctx) return 1;
++	if (!ctx) {
++      syslog(LOG_INFO, "mklib_init failed");
++      exit(0);
++	}
++    syslog(LOG_INFO, "mklib_init success");
+ 
+ 	// The default has no index files, let's set index.html as one.
+ 	ret = mklib_config(ctx, MKC_INDEXFILE, "index.html", NULL);
+-	if (!ret) return 1;
++	if (!ret) {
++      syslog(LOG_INFO, "mklib_config failed");
++      exit(0);
++	}
++    syslog(LOG_INFO, "mklib_config success");
+ 
+ 	// Start the server.
+ 	mklib_start(ctx);
++    syslog(LOG_INFO, "mklib_start success");
+ 
+-	// I'm now free to do my own things. I'm just going to wait for a keypress.
+-	printf("All set and running! Visit me, I default to localhost:2001.\n");
+-	printf("Press a key to exit.\n");
+-	getchar();
++  	g_main_loop_run(loop);
+ 
+ 	mklib_stop(ctx);
+ 
++    syslog(LOG_INFO, "Stop Monkey hello");
+ 	return 0;
+ }
+diff --git a/examples/list.c b/examples/list.c
+index 7156fd2c..481951bd 100644
+--- a/examples/list.c
++++ b/examples/list.c
+@@ -1,6 +1,7 @@
+ /* Monkey HTTP Daemon
+  * ------------------
+  * Copyright (C) 2012, Lauri Kasanen <cand@gmx.com>
++ *  Modified 2021, Axis Communications AB, Lund, Sweden
+  *
+  * This program is free software; you can redistribute it and/or modify
+  * it under the terms of the GNU General Public License as published by
+@@ -22,6 +23,8 @@
+ #include <stdlib.h>
+ #include <stdio.h>
+ #include <string.h>
++#include <syslog.h>
++#include <glib.h>
+ 
+ /*
+  * This example shows a directory listing of /tmp, with no access to files. Fun eh?
+@@ -67,23 +70,31 @@ static int list(const mklib_session *sr, const char *vhost, const char *url,
+  * This makes sure the callback function has the right arguments. */
+ static cb_data listf = list;
+ 
+-int main() {
++int main(int argc, char* argv[]) {
++  	GMainLoop *loop;
++
++	openlog("list", LOG_PID|LOG_CONS, LOG_USER);
++    syslog(LOG_INFO, "starting  %s", argv[0]);
++  	loop = g_main_loop_new(NULL, FALSE);
+ 
+ 	// Bind to all interfaces, port 2001, default plugins, no directory.
+ 	// Lacking the directory means that no files can be accessed, just what we want.
+ 	// We use the data callback.
+ 	mklib_ctx ctx = mklib_init(NULL, 0, 0, NULL);
+-	if (!ctx) return 1;
++	if (!ctx) {
++      syslog(LOG_INFO, "mklib_init failed");
++      exit(0);
++	}
++    syslog(LOG_INFO, "mklib_init success");
+ 
+ 	mklib_callback_set(ctx, MKCB_DATA, listf);
++    syslog(LOG_INFO, "mklib_callback_set success");
+ 
+ 	// Start the server.
+ 	mklib_start(ctx);
++    syslog(LOG_INFO, "mklib_start success");
+ 
+-	// I'm now free to do my own things. I'm just going to wait for a keypress.
+-	printf("All set and running! Visit me, I default to localhost:2001.\n");
+-	printf("Press a key to exit.\n");
+-	getchar();
++  	g_main_loop_run(loop);
+ 
+ 	mklib_stop(ctx);
+ 
+diff --git a/examples/quiz.c b/examples/quiz.c
+index 9914cb79..383f841f 100644
+--- a/examples/quiz.c
++++ b/examples/quiz.c
+@@ -1,6 +1,7 @@
+ /* Monkey HTTP Daemon
+  * ------------------
+  * Copyright (C) 2012, Lauri Kasanen <cand@gmx.com>
++ *  Modified 2021, Axis Communications AB, Lund, Sweden
+  *
+  * This program is free software; you can redistribute it and/or modify
+  * it under the terms of the GNU General Public License as published by
+@@ -22,6 +23,8 @@
+ #include <stdlib.h>
+ #include <stdio.h>
+ #include <string.h>
++#include <syslog.h>
++#include <glib.h>
+ 
+ #include "image.h"
+ 
+@@ -100,23 +103,30 @@ static int list(const mklib_session *sr, const char *vhost, const char *url,
+  * This makes sure the callback function has the right arguments. */
+ static cb_data listf = list;
+ 
+-int main() {
++int main(int argc, char* argv[]) {
++  	GMainLoop *loop;
++	openlog("quiz", LOG_PID|LOG_CONS, LOG_USER);
++    syslog(LOG_INFO, "starting  %s", argv[0]);
++  	loop = g_main_loop_new(NULL, FALSE);
+ 
+ 	// Bind to all interfaces, port 2001, default plugins, no directory.
+ 	// Lacking the directory means that no files can be accessed, just what we want.
+ 	// We use the data callback.
+ 	mklib_ctx ctx = mklib_init(NULL, 0, 0, NULL);
+-	if (!ctx) return 1;
++	if (!ctx) {
++      syslog(LOG_INFO, "mklib_init failed");
++      exit(0);
++	}
++    syslog(LOG_INFO, "mklib_init success");
+ 
+ 	mklib_callback_set(ctx, MKCB_DATA, listf);
++    syslog(LOG_INFO, "mklib_callback_set success");
+ 
+ 	// Start the server.
+ 	mklib_start(ctx);
++    syslog(LOG_INFO, "mklib_start success");
+ 
+-	// I'm now free to do my own things. I'm just going to wait for a keypress.
+-	printf("All set and running! Visit me, I default to localhost:2001.\n");
+-	printf("Press a key to exit.\n");
+-	getchar();
++  	g_main_loop_run(loop);
+ 
+ 	mklib_stop(ctx);
+ 

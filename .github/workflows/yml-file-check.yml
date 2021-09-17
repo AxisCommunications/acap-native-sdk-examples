@@ -1,0 +1,38 @@
+name: Check if yml is present
+
+# Controls when the action will run. Triggers the workflow on push or pull request
+# events but only for the master branch
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Verify that all yml files are present
+        run: |
+
+          fail_list=
+          yml_array=( $(ls .github/workflows) )
+          acap_array=( $(ls -d */) )
+          for acap in "${acap_array[@]%?}"
+          do
+             if [[ "${yml_array[@]}" =~ "${acap}" ]]; then
+                 continue
+              else
+                   fail_list+="$acap.yml\n"
+               fi 
+          done
+
+          if [ "$fail_list" ]; then
+              printf "\n\nAPPLICATIONS THAT DONT'T HAVE YML FILE:\n"
+              printf $fail_list
+              printf "\n\n"
+              exit 1
+          else
+              printf "\n\nALL APPLICATIONS HAVE YML FILE\n"
+          fi
