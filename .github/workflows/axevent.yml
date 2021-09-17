@@ -1,0 +1,63 @@
+name: Build Axevent Applications
+on:
+  push:
+    paths:
+      - "axevent/**"
+      - ".github/workflows/axevent.yml"
+jobs:
+  build:
+    runs-on: self-hosted
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Build Send event application
+        run: |
+          imagetag=send-event:1.0
+          docker image rm -f $imagetag
+          cd axevent/send_event
+          docker build --no-cache --tag $imagetag .
+          docker cp $(docker create $imagetag):/opt/app ./build
+          cd ..
+          cd ..
+          mkdir -p acap4-native/examples/axevent/send_event/build
+          cp axevent/send_event/build/send_event_1_0_0_armv7hf.eap acap4-native/examples/axevent/send_event/build/send_event_1_0_0_armv7hf.eap
+
+      - name: Build subscribe to event application
+        run: |
+          imagetag=subscribe-to-event:1.0
+          docker image rm -f $imagetag
+          cd axevent/subscribe_to_event
+          docker build --no-cache --tag $imagetag .
+          docker cp $(docker create $imagetag):/opt/app ./build
+          cd ..
+          cd ..
+          mkdir -p acap4-native/examples/axevent/subscribe_to_event/build
+          cp axevent/subscribe_to_event/build/subscribe_to_event_1_0_0_armv7hf.eap acap4-native/examples/axevent/subscribe_to_event/build/subscribe_to_event_1_0_0_armv7hf.eap
+
+      - name: Build subscribe to events application
+        run: |
+          imagetag=subscribe-to-events:1.0
+          docker image rm -f $imagetag
+          cd axevent/subscribe_to_events
+          docker build --no-cache --tag $imagetag .
+          docker cp $(docker create $imagetag):/opt/app ./build
+          cd ..
+          cd ..
+          mkdir -p acap4-native/examples/axevent/subscribe_to_events/build
+          cp axevent/subscribe_to_events/build/subscribe_to_events_1_0_0_armv7hf.eap acap4-native/examples/axevent/subscribe_to_events/build/subscribe_to_events_1_0_0_armv7hf.eap
+
+      - name: Run functional tests
+        run: |
+          export WORKSPACE=$(pwd)
+          echo $WORKSPACE
+          git clone "ssh://${{ secrets.GERRIT_SERVICE_USER }}@gittools.se.axis.com:29418/tests/atf/tart/recap.git"
+          cd recap
+          source /github-runner/github-runner/init/atf_init.sh
+          ./test_starter.sh axevent
+          ls recap/output
+
+      # Save functional test report as artifact
+      - uses: actions/upload-artifact@master
+        with:
+          name: Test report
+          path: recap/recap/output/report.xml

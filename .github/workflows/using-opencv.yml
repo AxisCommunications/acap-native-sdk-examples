@@ -1,0 +1,36 @@
+name: Build Using Opencv Applications
+on:
+  push:
+    paths:
+      - "using-opencv/**"
+      - ".github/workflows/using-opencv.yml"
+jobs:
+  build:
+    runs-on: self-hosted
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Build using-opencv application
+        run: |
+          imagetag=using-opencv
+          docker image rm -f "${imagetag}:latest"
+          cd using-opencv
+          ./build.sh $imagetag
+          cd ..
+          mkdir -p acap4-native/examples/using-opencv/build
+          cp using-opencv/build/opencv_example_1_0_0_armv7hf.eap acap4-native/examples/using-opencv/build/opencv_example_1_0_0_armv7hf.eap
+
+      - name: Run functional tests
+        run: |
+          export WORKSPACE=$(pwd)
+          echo $WORKSPACE
+          git clone "ssh://${{ secrets.GERRIT_SERVICE_USER }}@gittools.se.axis.com:29418/tests/atf/tart/recap.git"
+          cd recap
+          source /github-runner/github-runner/init/atf_init.sh
+          ./test_starter.sh using_opencv
+
+      # Save functional test report as artifact
+      - uses: actions/upload-artifact@master
+        with:
+          name: Test report
+          path: recap/recap/output/report.xml

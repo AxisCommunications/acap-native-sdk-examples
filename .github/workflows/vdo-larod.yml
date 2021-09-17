@@ -1,0 +1,61 @@
+name: Build vdo larod Applications
+on:
+  push:
+    paths:
+      - "vdo-larod/**"
+      - ".github/workflows/vdo-larod.yml"
+jobs:
+  build:
+    runs-on: self-hosted
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Build VDO larod application to run on CPU
+        run: |
+          imagetag=vdo-larod-cpu:1.0
+          docker image rm -f $imagetag
+          export DOCKER_CONFIG="$WORKSPACE/.docker"
+          mkdir -p "$DOCKER_CONFIG"
+          echo '{"proxies":{ "default":{"httpProxy": "http://wwwproxy.se.axis.com:3128", "httpsProxy": "http://wwwproxy.se.axis.com:3128"}}}' > "$DOCKER_CONFIG/config.json"
+          cd vdo-larod
+          cp app/package.conf.cpu app/package.conf
+          docker build --no-cache --tag $imagetag .
+          docker cp $(docker create $imagetag):/opt/app ./build
+          cd ..
+          pwd
+          mkdir -p vdo-larod/build_cpu/
+          cp vdo-larod/build/vdo_larod_cpu_1_0_0_armv7hf.eap vdo-larod/build_cpu/vdo_larod_cpu_1_0_0_armv7hf.eap
+          ls vdo-larod/build_cpu/
+
+      - name: Build VDO larod application to run on TPU
+        run: |
+          imagetag=vdo-larod-tpu:1.0
+          docker image rm -f $imagetag
+          export DOCKER_CONFIG="$WORKSPACE/.docker"
+          mkdir -p "$DOCKER_CONFIG"
+          echo '{"proxies":{ "default":{"httpProxy": "http://wwwproxy.se.axis.com:3128", "httpsProxy": "http://wwwproxy.se.axis.com:3128"}}}' > "$DOCKER_CONFIG/config.json"
+          cd vdo-larod
+          rm -rf build/
+          cp app/package.conf.edgetpu app/package.conf
+          docker build --no-cache --tag $imagetag .
+          docker cp $(docker create $imagetag):/opt/app ./build
+          cd ..
+          mkdir -p vdo-larod/build_tpu/
+          cp vdo-larod/build/vdo_larod_edgetpu_1_0_0_armv7hf.eap vdo-larod/build_tpu/vdo_larod_edgetpu_1_0_0_armv7hf.eap
+          ls vdo-larod/build_tpu/
+
+      - name: Run functional tests
+        run: |
+          export WORKSPACE=$(pwd)
+          echo $WORKSPACE
+          git clone "ssh://${{ secrets.GERRIT_SERVICE_USER }}@gittools.se.axis.com:29418/tests/atf/tart/recap.git"
+          cd recap
+          source /github-runner/github-runner/init/atf_init.sh
+          ./test_starter.sh vdo-larod
+          ls recap/output
+
+      # Save functional test report as artifact
+      - uses: actions/upload-artifact@master
+        with:
+          name: Test report
+          path: recap/recap/output/report.xml

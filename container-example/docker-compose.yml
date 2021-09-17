@@ -1,0 +1,7 @@
+version: "3.3"
+services:
+  alpine:
+    image: "arm32v7/alpine:3.14.0"
+    command: sh -c "while true ; do printf 'HTTP/1.1 200 OK\\n\\nHello from an ACAP\!' | nc -l -p 80 ; done"
+    ports:
+      - 8080:80

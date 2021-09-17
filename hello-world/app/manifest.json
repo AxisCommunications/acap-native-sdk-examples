@@ -1,0 +1,16 @@
+{
+    "schemaVersion": "1.1",
+    "acapPackageConf": {
+        "setup": {
+            "appName": "hello_world",
+            "vendor": "Axis Communications",
+            "embeddedSdkVersion": "3.0",
+            "user": {
+                "username": "sdk",
+                "group": "sdk"
+            },
+            "runMode": "never",
+            "version": "1.0.0"
+        }
+    }
+}

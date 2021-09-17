@@ -1,0 +1,45 @@
+name: Build Reproducible Package Applications
+on:
+  push:
+     paths:
+      - 'reproducible-package/**'
+      - '.github/workflows/reproducible-package.yml'
+jobs:
+  build:
+
+    runs-on: self-hosted
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Build and test reproducible package application
+      run: |
+        found_error=n
+
+        cd reproducible-package
+        # Make use of utility script and test it at the same time!
+        ./reproducible_package.sh build
+
+        # Check that standard and reproducible packages diff
+        printf "Compare standard package to reproducible package\n"
+        if cmp build1/*.eap build2/*.eap; then
+          printf "Error: Packages are identical which was not expected\n"
+          found_error=y
+        else
+          printf "OK: The packages diff as expected\n"
+        fi
+
+        # Check that the two reproducible packages are identical
+        printf "Compare two reproducible packages\n"
+        if cmp build2/*.eap build3/*.eap; then
+          printf "OK: The packages are identical as expected\n"
+        else
+          printf "Error: The reproducible packages diff which was not expected\n"
+          found_error=y
+        fi
+
+        # Cleanup
+        # Make use of utility script and test it at the same time!
+        printf "Run cleanup of build directories and images\n"
+        ./reproducible_package.sh clean
+
+        [ "$found_error" = n ] || exit 1
