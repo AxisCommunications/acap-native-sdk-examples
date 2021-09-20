@@ -118,13 +118,14 @@ In this example, when start is enabled specific URL file/content will be copied.
 >[!IMPORTANT]
 *> Please make sure SSH is enabled on the device to run the following commands.*
 
-Fetched URL content can be verified using below command to check that the file contains data.
+The fetched file can be verified by computing the checksum and compare it to the expected value.
 
 ```bash
 ssh root@<axis_device_ip>
-ls -la /usr/local/packages/curl_example/localdata/
-cat /usr/local/packages/curl_example/localdata/jquery.min.js 
+echo "8fb8fee4fcc3cc86ff6c724154c49c42  /usr/local/packages/curl_example/localdata/jquery.min.js" | md5sum -c -
 ```
+
+Expected output : /usr/local/packages/curl_example/localdata/jquery.min.js: OK
 
 ## License
 **[Apache License 2.0](../../LICENSE)**
