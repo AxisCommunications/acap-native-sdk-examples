@@ -1,6 +1,6 @@
  *Copyright (C) 2021, Axis Communications AB, Lund, Sweden. All Rights Reserved.*
 
-# A guide to building and running libcurl on ACAP3
+# A guide to building and running libcurl in an ACAP application
 This README file explains how to build libcurl from source and bundle it for the use in an ACAP. The example application uses the libcurl library to fetch data from
 URL and store the data in the application directory on the Camera.
 

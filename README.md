@@ -34,7 +34,7 @@ and [vdo-larod](./vdo-larod) examples.
 * [using-opencv](./using-opencv/)
   * This example covers how to build, bundle and use OpenCV with ACAP4 Native SDK.
 * [utility-libraries](./utility_libraries/)
-  * These examples covers how to build, bundle and use external libraries with ACAP3.
+  * These examples covers how to build, bundle and use external libraries.
 * [vdostream](./vdostream/)
   * The example code is written in C which starts a vdo stream and then illustrates how to continuously capture frames from the vdo service, access the received buffer contents as well as the frame metadata.
 * [vdo-larod](./vdo-larod/)
