@@ -12,7 +12,7 @@ jobs:
     - uses: actions/checkout@v2
     - name: Build container example application
       run: |
-				imagetag=container-example:1.0
+        imagetag=container-example:1.0
         cd container-example
         docker build --tag $imagetag .
         docker cp $(docker create $imagetag .):/opt/app ./build
