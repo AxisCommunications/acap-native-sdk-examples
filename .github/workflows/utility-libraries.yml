@@ -1,0 +1,26 @@
+name: Build utility libraries Application
+on:
+  push:
+    paths:
+      - "utility-libraries/**"
+      - ".github/workflows/utility-libraries.yml"
+jobs:
+  build:
+    runs-on: self-hosted
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Build curl library application
+        run: |
+          imagetag=utility-libraries:1.0
+          docker image rm -f $imagetag
+          export DOCKER_CONFIG="$WORKSPACE/.docker"
+          mkdir -p "$DOCKER_CONFIG"
+          echo '{"proxies":{ "default":{"httpProxy": "http://wwwproxy.se.axis.com:3128", "httpsProxy": "http://wwwproxy.se.axis.com:3128"}}}' > "$DOCKER_CONFIG/config.json"
+          cd utility-libraries/curl_example
+          docker build --no-cache --tag $imagetag .
+          docker cp $(docker create $imagetag):/opt/app/ ./build
+          cd ..
+          cd ..
+          mkdir -p acap3/examples/utility-libraries/curl_example/build
+          cp utility-libraries/curl_example/build/curl_example_1_0_0_armv7hf.eap acap3/examples/utility-libraries/curl_example/build/curl_example_1_0_0_armv7hf.eap
