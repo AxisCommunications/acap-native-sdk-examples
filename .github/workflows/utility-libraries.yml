@@ -6,7 +6,7 @@ on:
       - ".github/workflows/utility-libraries.yml"
 jobs:
   build:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
 
@@ -20,7 +20,3 @@ jobs:
           cd utility-libraries/curl_example
           docker build --no-cache --tag $imagetag .
           docker cp $(docker create $imagetag):/opt/app/ ./build
-          cd ..
-          cd ..
-          mkdir -p acap3/examples/utility-libraries/curl_example/build
-          cp utility-libraries/curl_example/build/curl_example_1_0_0_armv7hf.eap acap3/examples/utility-libraries/curl_example/build/curl_example_1_0_0_armv7hf.eap
