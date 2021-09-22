@@ -25,7 +25,7 @@ jobs:
                  continue
               else
                    fail_list+="$acap.yml\n"
-               fi 
+               fi
           done
 
           if [ "$fail_list" ]; then

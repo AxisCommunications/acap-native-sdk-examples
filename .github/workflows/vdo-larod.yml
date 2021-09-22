@@ -6,17 +6,26 @@ on:
       - ".github/workflows/vdo-larod.yml"
 jobs:
   build:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
+    env:
+      RUN_FUNCTION_TEST: false
     steps:
       - uses: actions/checkout@v2
+
+      - name: Login to dockerhub axis account
+        run: docker login -u ${{ secrets.DOCKERHUB_USER }} --password ${{ secrets.DOCKERHUB_PASS }}
+
+      - name: Configure axis proxy
+        if: ${{ env.RUN_FUNCTION_TEST== 'true' }}
+        run: |
+          export DOCKER_CONFIG="$WORKSPACE/.docker"
+          mkdir -p "$DOCKER_CONFIG"
+          echo '{"proxies":{ "default":{"httpProxy": "http://wwwproxy.se.axis.com:3128", "httpsProxy": "http://wwwproxy.se.axis.com:3128"}}}' > "$DOCKER_CONFIG/config.json"
 
       - name: Build VDO larod application to run on CPU
         run: |
           imagetag=vdo-larod-cpu:1.0
           docker image rm -f $imagetag
-          export DOCKER_CONFIG="$WORKSPACE/.docker"
-          mkdir -p "$DOCKER_CONFIG"
-          echo '{"proxies":{ "default":{"httpProxy": "http://wwwproxy.se.axis.com:3128", "httpsProxy": "http://wwwproxy.se.axis.com:3128"}}}' > "$DOCKER_CONFIG/config.json"
           cd vdo-larod
           cp app/package.conf.cpu app/package.conf
           docker build --no-cache --tag $imagetag .
@@ -31,9 +40,6 @@ jobs:
         run: |
           imagetag=vdo-larod-tpu:1.0
           docker image rm -f $imagetag
-          export DOCKER_CONFIG="$WORKSPACE/.docker"
-          mkdir -p "$DOCKER_CONFIG"
-          echo '{"proxies":{ "default":{"httpProxy": "http://wwwproxy.se.axis.com:3128", "httpsProxy": "http://wwwproxy.se.axis.com:3128"}}}' > "$DOCKER_CONFIG/config.json"
           cd vdo-larod
           rm -rf build/
           cp app/package.conf.edgetpu app/package.conf
@@ -45,6 +51,7 @@ jobs:
           ls vdo-larod/build_tpu/
 
       - name: Run functional tests
+        if: ${{ env.RUN_FUNCTION_TEST== 'true' }}
         run: |
           export WORKSPACE=$(pwd)
           echo $WORKSPACE
@@ -56,6 +63,7 @@ jobs:
 
       # Save functional test report as artifact
       - uses: actions/upload-artifact@master
+        if: ${{ env.RUN_FUNCTION_TEST== 'true' }}
         with:
           name: Test report
           path: recap/recap/output/report.xml

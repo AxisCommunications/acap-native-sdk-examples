@@ -6,9 +6,14 @@ on:
       - ".github/workflows/axevent.yml"
 jobs:
   build:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
+    env:
+      RUN_FUNCTION_TEST: false
     steps:
       - uses: actions/checkout@v2
+
+      - name: Login to dockerhub axis account
+        run: docker login -u ${{ secrets.DOCKERHUB_USER }} --password ${{ secrets.DOCKERHUB_PASS }}
 
       - name: Build Send event application
         run: |
@@ -47,6 +52,7 @@ jobs:
           cp axevent/subscribe_to_events/build/subscribe_to_events_1_0_0_armv7hf.eap acap4-native/examples/axevent/subscribe_to_events/build/subscribe_to_events_1_0_0_armv7hf.eap
 
       - name: Run functional tests
+        if: ${{ env.RUN_FUNCTION_TEST== 'true' }}
         run: |
           export WORKSPACE=$(pwd)
           echo $WORKSPACE
@@ -58,6 +64,7 @@ jobs:
 
       # Save functional test report as artifact
       - uses: actions/upload-artifact@master
+        if: ${{ env.RUN_FUNCTION_TEST== 'true' }}
         with:
           name: Test report
           path: recap/recap/output/report.xml
