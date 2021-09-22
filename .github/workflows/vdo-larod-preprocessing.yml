@@ -6,17 +6,26 @@ on:
       - ".github/workflows/vdo-larod-preprocessing.yml"
 jobs:
   build:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
+    env:
+      RUN_FUNCTION_TEST: false
     steps:
       - uses: actions/checkout@v2
+
+      - name: Login to dockerhub axis account
+        run: docker login -u ${{ secrets.DOCKERHUB_USER }} --password ${{ secrets.DOCKERHUB_PASS }}
+
+      - name: Configure axis proxy
+        if: ${{ env.RUN_FUNCTION_TEST== 'true' }}
+        run: |
+          export DOCKER_CONFIG="$WORKSPACE/.docker"
+          mkdir -p "$DOCKER_CONFIG"
+          echo '{"proxies":{ "default":{"httpProxy": "http://wwwproxy.se.axis.com:3128", "httpsProxy": "http://wwwproxy.se.axis.com:3128"}}}' > "$DOCKER_CONFIG/config.json"
 
       - name: Build vdo-larod-preprocessing application to run on CPU
         run: |
           imagetag=vdo-larod-preprocessing-cpu:1.0
           docker image rm -f $imagetag
-          export DOCKER_CONFIG="$WORKSPACE/.docker"
-          mkdir -p "$DOCKER_CONFIG"
-          echo '{"proxies":{ "default":{"httpProxy": "http://wwwproxy.se.axis.com:3128", "httpsProxy": "http://wwwproxy.se.axis.com:3128"}}}' > "$DOCKER_CONFIG/config.json"
           cd vdo-larod-preprocessing
           cp app/package.conf.cpu app/package.conf
           docker build --no-cache --tag $imagetag .
@@ -32,9 +41,6 @@ jobs:
         run: |
           imagetag=vdo-larod-preprocessing-tpu:1.0
           docker image rm -f $imagetag
-          export DOCKER_CONFIG="$WORKSPACE/.docker"
-          mkdir -p "$DOCKER_CONFIG"
-          echo '{"proxies":{ "default":{"httpProxy": "http://wwwproxy.se.axis.com:3128", "httpsProxy": "http://wwwproxy.se.axis.com:3128"}}}' > "$DOCKER_CONFIG/config.json"
           cd vdo-larod-preprocessing
           rm -rf build/
           cp app/package.conf.edgetpu app/package.conf
@@ -46,17 +52,19 @@ jobs:
           ls vdo-larod-preprocessing/build_tpu_preprocessing/
 
       - name: Run functional tests
+        if: ${{ env.RUN_FUNCTION_TEST== 'true' }}
         run: |
           export WORKSPACE=$(pwd)
           echo $WORKSPACE
           git clone "ssh://${{ secrets.GERRIT_SERVICE_USER }}@gittools.se.axis.com:29418/tests/atf/tart/recap.git"
           cd recap
           source /github-runner/github-runner/init/atf_init.sh
-          ./test_starter.sh tpu_vdo_larod_preprocessing	
+          ./test_starter.sh tpu_vdo_larod_preprocessing
           ls recap/output
 
       # Save functional test report as artifact
       - uses: actions/upload-artifact@master
+        if: ${{ env.RUN_FUNCTION_TEST== 'true' }}
         with:
           name: Test report
           path: recap/recap/output/report.xml
