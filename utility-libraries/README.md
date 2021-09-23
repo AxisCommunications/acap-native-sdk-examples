@@ -1,6 +1,6 @@
  *Copyright (C) 2021, Axis Communications AB, Lund, Sweden. All Rights Reserved.*
 
-# ACAP3 applications interacting with external libraries
+# ACAP applications interacting with external libraries
 This README file lists examples of how to build and use libraries in an application
 
 ## Getting started
@@ -12,7 +12,7 @@ utility_libraries
 └── README.md
 ```
 
-* **curl_example** - Folder containing files for building ACAP3 application "curl_example".
+* **curl_example** - Folder containing files for building ACAP application "curl_example".
 * **README.md** - Step by step instructions on how to use the examples.
 
 ### Example applications

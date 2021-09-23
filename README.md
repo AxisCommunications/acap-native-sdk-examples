@@ -1,16 +1,16 @@
 # What is Axis Camera Application Platform?
 AXIS Camera Application Platform (ACAP) is an open application platform from Axis. It provides a development platform for software-based solutions and systems built around Axis devices. ACAP is available for various types of Axis products such as cameras, speakers and intercoms.
-TODO: add link to documentation on github pages
 
 ## ACAP Native SDK
 The ACAP Native SDK is targeted towards users that want to develop plug-in style, event generating applications that fit well into a VMS centric system. This SDK offers high performance by integrating closely with AXIS OS and hardware. Already existing ACAP users should feel at home using this SDK and migrating from previous version ACAP 3 to this SDK should be straightforward.
-TODO: add link to documentation on github pages
+
+Please check the following guidelines for ACAP 4:
+* [AXIS ACAP 4 SDK Documentation](https://axiscommunications.github.io/acap-documentation/)
+* [Introduction](https://axiscommunications.github.io/acap-documentation/docs/introduction.html)
+* [Getting Started](https://axiscommunications.github.io/acap-documentation/docs/get-started.html)
 
 ## Getting started with the repo
-This repository contains a set of application examples which aims to enrich the
-developers analytics experience. All examples are using Docker framework and has a
-README file in its directory which shows overview, example directory structure and
-step-by-step instructions on how to run applications on the camera.
+This repository contains a set of application examples which aims to enrich the developers analytics experience. All examples are using Docker framework and has a README file in its directory which shows overview, example directory structure and step-by-step instructions on how to run applications on the camera.
 
 ## Example applications
 Below is the list of examples available in the repository.
@@ -33,7 +33,7 @@ greater depth than the [larod](./larod)
 and [vdo-larod](./vdo-larod) examples.
 * [using-opencv](./using-opencv/)
   * This example covers how to build, bundle and use OpenCV with ACAP4 Native SDK.
-* [utility-libraries](./utility_libraries/)
+* [utility-libraries](./utility-libraries/)
   * These examples covers how to build, bundle and use external libraries.
 * [vdostream](./vdostream/)
   * The example code is written in C which starts a vdo stream and then illustrates how to continuously capture frames from the vdo service, access the received buffer contents as well as the frame metadata.
@@ -54,8 +54,7 @@ The ACAP Native SDK image can be used as a basis for custom built images to run 
 If you encounter issues with the examples, make sure your product is running the latest firmware version or one that is compatible with the ACAP SDK used.
 The examples use the ACAP SDK during the build process, of which each version is compatible with a set of firmware versions.
 The specific SDK version that each example is based on is specified in the Dockerfile used to build the application, through the `VERSION` variable.
-The full compatibility schema for ACAP SDK version and firmware version is available at
-TODO: add link to documentation on github pages
+The full compatibility schema for ACAP SDK version and firmware version is available at [Compatibility for Native SDK](https://axiscommunications.github.io/acap-documentation/docs/api/apidocs.html).
 
 If the issue persists with a compatible firmware, please create an issue containing the information specified in the template below.
 
