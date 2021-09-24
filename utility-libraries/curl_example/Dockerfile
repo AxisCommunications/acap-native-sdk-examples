@@ -20,7 +20,7 @@ RUN git clone https://github.com/curl/curl.git
 WORKDIR /opt/build/curl
 RUN . /opt/axis/acapsdk/environment-setup* && \
     autoreconf -fi && \
-    ./configure --prefix=${PWD}/build ${CONFIGURE_FLAGS} --with-openssl && \
+    ./configure --prefix=${PWD}/build ${CONFIGURE_FLAGS} --without-ssl && \
     make && \
     make install
 

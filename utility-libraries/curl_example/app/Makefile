@@ -23,7 +23,7 @@ endif
 
 SHLIB_DIR = ./lib
 LDFLAGS = -L$(SHLIB_DIR) -Wl,--no-as-needed,-rpath,'$$ORIGIN/lib'
-SHLIBS += -lm -lcurl -lssl
+SHLIBS += -lm -lcurl
 
 all:	$(PROGS)
 
