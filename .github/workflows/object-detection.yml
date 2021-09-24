@@ -6,17 +6,26 @@ on:
       - ".github/workflows/object-detection.yml"
 jobs:
   build:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
+    env:
+      RUN_FUNCTION_TEST: false
     steps:
       - uses: actions/checkout@v2
+
+      - name: Login to dockerhub axis account
+        run: docker login -u ${{ secrets.DOCKERHUB_USER }} --password ${{ secrets.DOCKERHUB_PASS }}
+
+      - name: Configure axis proxy
+        if: ${{ env.RUN_FUNCTION_TEST== 'true' }}
+        run: |
+          export DOCKER_CONFIG="$WORKSPACE/.docker"
+          mkdir -p "$DOCKER_CONFIG"
+          echo '{"proxies":{ "default":{"httpProxy": "http://wwwproxy.se.axis.com:3128", "httpsProxy": "http://wwwproxy.se.axis.com:3128"}}}' > "$DOCKER_CONFIG/config.json"
 
       - name: Build object-detection application
         run: |
           imagetag=object-detection-acap:1.0
           docker image rm -f $imagetag
-          export DOCKER_CONFIG="$WORKSPACE/.docker"
-          mkdir -p "$DOCKER_CONFIG"
-          echo '{"proxies":{ "default":{"httpProxy": "http://wwwproxy.se.axis.com:3128", "httpsProxy": "http://wwwproxy.se.axis.com:3128"}}}' > "$DOCKER_CONFIG/config.json"
           cd object-detection
           docker build --no-cache --tag $imagetag .
           docker cp $(docker create $imagetag):/opt/app ./build
@@ -26,6 +35,7 @@ jobs:
           ls acap4-native/examples/object-detection/build/
 
       - name: Run functional tests
+        if: ${{ env.RUN_FUNCTION_TEST== 'true' }}
         run: |
           export WORKSPACE=$(pwd)
           echo $WORKSPACE
@@ -36,6 +46,7 @@ jobs:
 
       # Save functional test report as artifact
       - uses: actions/upload-artifact@master
+        if: ${{ env.RUN_FUNCTION_TEST== 'true' }}
         with:
           name: Test report
           path: recap/recap/output/report.xml

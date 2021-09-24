@@ -24,7 +24,7 @@ curl_example
 ```
 
 * **app/LICENSE**        - File containing the license conditions.
-* **app/Makefile**       - Makefile containing the build and link instructions for building the ACAP3 application.
+* **app/Makefile**       - Makefile containing the build and link instructions for building the ACAP application.
 * **app/manifest.json    - Defines the application and its configuration.
 * **app/curl_example.c** - Example application.
 * **Dockerfile**         - Docker file with the specified Axis toolchain and API container to build the example specified.
@@ -84,7 +84,7 @@ The working dir now contains a build folder with the following files:
 │   ├── curl_example_1_0_0_armv7hf.eap
 │   ├── curl_example_1_0_0_LICENSE.txt
 │   └── curl_example.c
- 
+
 ```
 
 * **build/package.conf** - Defines the application and its configuration.

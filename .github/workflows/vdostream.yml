@@ -6,9 +6,14 @@ on:
       - ".github/workflows/vdostream.yml"
 jobs:
   build:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
+    env:
+      RUN_FUNCTION_TEST: false
     steps:
       - uses: actions/checkout@v2
+
+      - name: Login to dockerhub axis account
+        run: docker login -u ${{ secrets.DOCKERHUB_USER }} --password ${{ secrets.DOCKERHUB_PASS }}
 
       - name: Build vdo stream application
         run: |
@@ -22,6 +27,7 @@ jobs:
           cp vdostream/build/vdoencodeclient_1_0_0_armv7hf.eap acap4-native/examples/vdostream/build/vdoencodeclient_1_0_0_armv7hf.eap
 
       - name: Run functional tests
+        if: ${{ env.RUN_FUNCTION_TEST== 'true' }}
         run: |
           export WORKSPACE=$(pwd)
           echo $WORKSPACE
@@ -33,6 +39,7 @@ jobs:
 
       # Save functional test report as artifact
       - uses: actions/upload-artifact@master
+        if: ${{ env.RUN_FUNCTION_TEST== 'true' }}
         with:
           name: Test report
           path: recap/recap/output/report.xml
