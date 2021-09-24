@@ -19,12 +19,16 @@ Below is the list of examples available in the repository.
   * The example code is written in C which illustrates both how to subscribe to different events and how to send an event.
 * [axoverlay](./axoverlay/)
   * The example code is written in C which illustrates how to draw plain boxes and text as overlays in a stream.
+* [container](./container-example/)
+  * This example demonstrates a way of using containers in a native ACAP application.
 * [hello-world](./hello-world/)
   * The example code is written in C and shows how to build a simple hello world application.
 * [larod](./larod/)
   * The example code is written in C which connects to [larod](./FAQs.md#WhatisLarod?) and loads a model, runs inference on it and then finally deletes the loaded model from [larod](./FAQs.md#WhatisLarod?).
 * [licensekey](./licensekey/)
   * The example code is written in C which illustrates how to check the licensekey status.
+* [object-detection](./object-detection/)
+  * The example code focus on object detection, cropping and saving detected objects into jpeg files.
 * [reproducible-package](./reproducible-package/)
   * An example of how to create a reproducible application package.
 * [tensorflow-to-larod](./tensorflow-to-larod/)
@@ -39,11 +43,12 @@ and [vdo-larod](./vdo-larod) examples.
   * The example code is written in C which starts a vdo stream and then illustrates how to continuously capture frames from the vdo service, access the received buffer contents as well as the frame metadata.
 * [vdo-larod](./vdo-larod/)
   * The example code is written in C and loads an image classification model to [larod](./FAQs.md#WhatisLarod?) and then uses vdo to fetch frames of size WIDTH x HEIGHT in yuv format which are converted to interleaved rgb format and then sent to larod for inference on MODEL.
+* [vdo-larod-preprocessing](./vdo-larod-preprocessing/)
+  * The example code is written in C and loads an image classification model to [larod](./FAQs.md#WhatisLarod?) and then uses vdo to fetch frames of size WIDTH x HEIGHT in yuv format which are sent to larod for preprocessing and inference on MODEL.
 * [vdo-opencl-filtering](./vdo-opencl-filtering/)
   * This example illustrates how to capture frames from the vdo service, access the received buffer, and finally perform a GPU accelerated Sobel filtering with OpenCL.
 * [web-server](./web-server/)
-  * The example code is written in C which runs a Monkey web server on the camera.
-
+  * The example code is written in C which runs a Monkey web server on the camera and exposes an external API with Reverse Proxy configuration in Apache Server.
 
 ### DockerHub Image
 The ACAP Native SDK image can be used as a basis for custom built images to run your application or as a developer environment inside the container.

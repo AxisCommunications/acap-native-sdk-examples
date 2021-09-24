@@ -1,8 +1,16 @@
 # How to use Web Server in ACAP4 Native Application
-This example explains how to build and use [Monkey Web Server](https://github.com/monkey/monkey) in ACAP4 Native SDK with a reverse proxy configuration in Apache server.
+This example explains how to build and use [Monkey Web Server](https://github.com/monkey/monkey) in ACAP4 Native SDK with Reverse Proxy configuration in Apache Server.
 
-The Apache server is configured using post-install and pre-uninstall scripts features in a native ACAP. The post-install script adds a configuration file to apache configuration with reverse configuration for monkey server and applies it to apache, and in the pre-uninstall the configuration is removed.
+## Reverse Proxy configuration in Apache Server
+[Reverse Proxy configuration](https://httpd.apache.org/docs/2.4/howto/reverse_proxy.html) provides a flexible way for an ACAP application to expose an external API through the Apache Server in AxOs system and internally route the requests to a small Web Server running in the ACAP application.
 
+Reverse Proxy is a technique that can be used for exposing many types of network APIs and can e.g. cover same cgi usecases as axHttp API from ACAP3 SDK.
+
+The Apache server is configured using post-install and pre-uninstall scripts features in a native ACAP. The post-install script adds a configuration file to apache configuration with reverse configuration for monkey server and applies it to Apache Server, and in the pre-uninstall the configuration is removed.
+
+The Web Server running in the ACAP application can also be exposed directly to the network by allowing external access to the port in the network configuration for the device. There are some disavantages with exposing Web Server directly to the network such as non standard ports and no reuse of authentication, TLS and other features that comes with Apache Server.
+
+## Monkey Web Server
 Monkey is a fast and lightweight Web Server for Linux. It has been designed to be very scalable with low memory and CPU consumption, the perfect solution for Embedded Linux and high end production environments. Besides the common features as HTTP server, it expose a flexible C API which aims to behave as a fully HTTP development framework, so it can be extended as desired through the plugins interface. The Monkey Web Server [documentation](http://monkey-project.com/documentation/1.5) describes the configuration in detail.
 
 ## Getting started
@@ -79,6 +87,7 @@ the newly built **monkey_1_0_0_armv7hf.eap** > Click **Install** > Run the appli
 
 ## Browse to the web server
 The Web Server can be accessed from a Web Browser eighter directly using a port number (i.e. http://mycamera:2001) or through the Apache Server in the camera using an extension to the camera web URL (i.e http://mycamera/monkey/).
+
 
 ## C API Examples
 Some C API examples are included in the app folder. To build any of the examples, use the build and install procedure as described above after making following changes to the build files:
