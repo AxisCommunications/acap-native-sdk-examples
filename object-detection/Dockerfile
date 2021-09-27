@@ -4,7 +4,7 @@
 ARG http_proxy
 ARG https_proxy
 ARG ARCH=armv7hf
-ARG VERSION=latest
+ARG VERSION=1.0
 ARG UBUNTU_VERSION=20.04
 ARG REPO=axisecp
 ARG SDK=acap-native-sdk
