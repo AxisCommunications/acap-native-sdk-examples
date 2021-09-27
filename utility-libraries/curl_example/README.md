@@ -40,7 +40,7 @@ Standing in your working directory run the following commands:
 > *Depending on the network you are connected to.
 The file that needs those settings is: *~/.docker/config.json.*
 For reference please see: https://docs.docker.com/network/proxy/ and a
-[script for Axis device here](../FAQs.md#HowcanIset-upnetworkproxysettingsontheAxisdevice?).*
+[script for Axis device here](../../FAQs.md#HowcanIset-upnetworkproxysettingsontheAxisdevice?).*
 
 ```bash
 docker build --tag <APP_IMAGE> .
@@ -110,7 +110,7 @@ the newly built **curl_example_1_0_0_armv7hf.eap** > Click **Install** > Run the
 Application curl_example is now available as an application on the device.
 
 ### libcurl application
-The application will fetch the content from "https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js" and store the content at /usr/local/packages/curl_example/localdata/jquery.min.js on the camera.
+The application will fetch the content from "http://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js" and store the content at /usr/local/packages/curl_example/localdata/jquery.min.js on the camera.
 
 #### The expected output
 In this example, when start is enabled specific URL file/content will be copied.

@@ -97,7 +97,7 @@ int main(void)
 
     // Temporary URL is given, later modify with more suitable URL  
     curl_easy_setopt(curl, CURLOPT_URL,
-        "https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js");
+        "http://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js");
 
     // Define our callback to get called when there is data to be written
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, my_fwrite);
