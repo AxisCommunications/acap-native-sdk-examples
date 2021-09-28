@@ -55,10 +55,10 @@ ADD https://github.com/google-coral/test_data/raw/master/ssd_mobilenet_v2_coco_q
 
 # Download the labels
 RUN mkdir -p label
-RUN	curl -L -o label/labels.txt https://github.com/google-coral/test_data/raw/master/coco_labels.txt
+RUN curl -L -o label/labels.txt https://github.com/google-coral/test_data/raw/master/coco_labels.txt
 
 # Setup the model directory
-RUN	mkdir -p model
+RUN mkdir -p model
 RUN cp converted_model_edgetpu.tflite model/converted_model.tflite
 
 

@@ -34,7 +34,7 @@ RUN mkdir -p lib include && \
     ln -s libyuv.so.1 libyuv.so.1.0
 
 # Set up the model file structure
-RUN	mkdir -p model
+RUN mkdir -p model
 RUN cp converted_model_edgetpu.tflite model/converted_model.tflite
 
 # Building the ACAP application
