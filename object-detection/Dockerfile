@@ -31,7 +31,7 @@ RUN apt-get update && apt-get install -y cmake
 RUN git clone --branch 2.0.6 https://github.com/libjpeg-turbo/libjpeg-turbo.git
 WORKDIR /opt/build/libjpeg-turbo/build
 RUN CFLAGS=' -O2 -mthumb -mfpu=neon -mfloat-abi=hard -mcpu=cortex-a9 -fomit-frame-pointer' \
-  CC=arm-linux-gnueabihf-gcc cmake -G"Unix Makefiles" ..
+    CC=arm-linux-gnueabihf-gcc cmake -G"Unix Makefiles" ..
 RUN make
 WORKDIR /opt/app
 RUN mkdir -p lib include
