@@ -1,4 +1,4 @@
- *Copyright (C) 2020, Axis Communications AB, Lund, Sweden. All Rights Reserved.*
+ *Copyright (C) 2021, Axis Communications AB, Lund, Sweden. All Rights Reserved.*
 
 # ACAP4 Native applications interacting with event system on an edge device
 This README file explains how to use the axevent library, which provides an interface to the event system found in Axis device.

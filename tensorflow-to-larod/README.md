@@ -1,4 +1,4 @@
-*Copyright (C) 2020, Axis Communications AB, Lund, Sweden. All Rights Reserved.*
+*Copyright (C) 2021, Axis Communications AB, Lund, Sweden. All Rights Reserved.*
 
 # From Tensorflow model to larod inference on camera
 ## Overview
@@ -45,7 +45,7 @@ tensorflow_to_larod
 │   │   ├── imgprovider.h
 │   │   ├── LICENSE
 │   │   ├── Makefile
-│   │   ├── package.conf
+│   |   ├── manifest.json
 │   │   └── tensorflow_to_larod.c
 │   ├── .dockerignore
 │   ├── build_acap.sh
@@ -66,7 +66,7 @@ tensorflow_to_larod
 - **env/app/imgconverter.c/h** - Implementation of libyuv parts, written in C.
 - **env/app/imgprovider.c/h** - Implementation of vdo parts, written in C.
 - **env/app/Makefile** - Makefile containing the build and link instructions for building the ACAP4 Native application.
-- **env/app/package.conf** - Defines the ACAP and its configuration.
+* **env/app/manifest.json** - Defines the application and its configuration.
 - **env/app/tensorflow_to_larod.c** - The file implementing the core functionality of the ACAP.
 - **env/build_acap.sh** - Builds the ACAP and the .eap file.
 - **env/convert_model.py** - A script used to convert Tensorflow models to quantized Tensorflow Lite models.
@@ -336,9 +336,9 @@ syslog(LOG_INFO, "Person detected: %.2f%% - Car detected: %.2f%%",
 ```
 
 ## Building the algorithm's application
-A packaging file is needed to compile the ACAP. This is found in [app/package.conf](env/app/package.conf). For the scope of this tutorial, the `APPOPTS` and `OTHERFILES` keys are noteworthy. `APPOPTS` allows arguments to be given to the ACAP, which in this case is handled by the `argparse` lib. The argument order, defined by [app/argparse.c](env/app/argparse.c), is `<model_path input_resolution_width input_resolution_height output_size_in_bytes>`. The file(s) specified in `OTHERFILES` simply tell the compiler what files to copy to the ACAP, such as our .tflite model file.
+A packaging file is needed to compile the ACAP. This is found in [app/manifest.json](app/manifest.json). The noteworthy attribute for this tutorial is the `runOptions` attribute. `runOptions` allows arguments to be given to the ACAP, which in this case is handled by the `argparse` lib. The argument order, defined by [app/argparse.c](app/argparse.c), is `<model_path input_resolution_width input_resolution_height output_size_in_bytes>`. We also need to copy our .tflite model file to the ACAP, and this is done by using the -a flag in the acap-build command in the Dockerfile. The -a flag simply tells the compiler what files to copy to the ACAP.
 
-The ACAP is built to specification by the `Makefile` in [app/Makefile](env/app/Makefile).  With the [Makefile](env/app/Makefile) and [package.conf](env/app/package.conf) files set up, the ACAP can be built by running the build script in the example environment:
+The ACAP is built to specification by the `Makefile` in [app/Makefile](env/app/Makefile). With the [Makefile](env/app/Makefile) and [manifest.json](env/app/manifest.json) files set up, the ACAP can be built by running the build script in the example environment:
 
 ```sh
 ./build_acap.sh tensorflow-to-larod-acap:1.0

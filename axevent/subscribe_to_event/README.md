@@ -1,9 +1,9 @@
- *Copyright (C) 2020, Axis Communications AB, Lund, Sweden. All Rights Reserved.*
+ *Copyright (C) 2021, Axis Communications AB, Lund, Sweden. All Rights Reserved.*
 
 # ACAP4 Native application subscribing to an ONVIF event on an edge device
 This README file explains how to build an ACAP4 Native application that uses axevent library for subscribing to an ONVIF event.
 
-It is achieved by using the containerized Axis API and toolchain images.
+It is achieved by using the containerized API and toolchain images.
 
 Together with this README file you should be able to find a directory called app.
 That directory contains the "subscribe_to_event" application source code, which can easily
@@ -17,6 +17,7 @@ subscribe_to_event
 ├── app
 │   ├── LICENSE
 │   ├── Makefile
+│   ├── manifest.json
 │   └── subscribe_to_event.c
 ├── Dockerfile
 └── README.md
@@ -24,6 +25,7 @@ subscribe_to_event
 
 * **app/LICENSE** - Text file which lists all open source licensed source code distributed with the application.
 * **app/Makefile** - Makefile containing the build and link instructions for building the ACAP4 Native application "subscribe_to_event".
+* **app/manifest.json** - Defines the application and its configuration.
 * **app/subscribe_to_event.c** - Application which subscribes for event, written in C.
 * **Dockerfile** - Docker file with the specified Axis toolchain and API container to build the example "subscribe_to_event".
 * **README.md** - Step by step instructions on how to run the example.
@@ -73,6 +75,7 @@ subscribe_to_event
 ├── build
 │   ├── LICENSE
 │   ├── Makefile
+│   ├── manifest.json
 │   ├── package.conf
 │   ├── package.conf.orig
 │   ├── param.conf
@@ -84,6 +87,7 @@ subscribe_to_event
 └── README.md
 ```
 
+* **build/manifest.json** - Defines the application and its configuration.
 * **build/package.conf** - Defines the application and its configuration.
 * **build/package.conf.orig** - Defines the application and its configuration, original file.
 * **build/param.conf** - File containing application parameters.

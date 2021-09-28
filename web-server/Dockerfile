@@ -15,19 +15,19 @@ RUN git clone -b v1.5.6 https://github.com/monkey/monkey &&\
     git apply ../monkey.patch &&\
     . /opt/axis/acapsdk/environment-setup* &&\
     ./configure \
-        --enable-shared \
-        --malloc-libc \
-        --prefix=/usr/local \
-        --bindir=/usr/local/bin \
-        --libdir=/usr/local/lib \
-        --sysconfdir=/usr/local/packages/monkey/html \
-        --datadir=/usr/local/packages/monkey/html \
-        --mandir=/usr/local/man \
-        --logdir=/tmp \
-        --plugdir=/usr/local/packages/monkey/lib \
-        --pidfile=/tmp/monkey.pid \
-        --incdir=/usr/local/include/monkey \
-        --systemddir=/usr/lib/systemd/system &&\
+    --enable-shared \
+    --malloc-libc \
+    --prefix=/usr/local \
+    --bindir=/usr/local/bin \
+    --libdir=/usr/local/lib \
+    --sysconfdir=/usr/local/packages/monkey/html \
+    --datadir=/usr/local/packages/monkey/html \
+    --mandir=/usr/local/man \
+    --logdir=/tmp \
+    --plugdir=/usr/local/packages/monkey/lib \
+    --pidfile=/tmp/monkey.pid \
+    --incdir=/usr/local/include/monkey \
+    --systemddir=/usr/lib/systemd/system &&\
     make &&\
     make install
 

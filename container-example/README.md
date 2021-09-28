@@ -8,9 +8,9 @@
 
 The purpose of this example is to demonstrate a way of using containers in a native ACAP application.
 
-The advantage of using a native ACAP application (i.e. an application distributed as an .eap file) is that the application can be administered via the VAPIX API and the web GUI in AxOS. It also has the advantage that the container images are included in the .eap file so that the entire application is contained in this single, installable file, without any dependency on external image repositories.
+The advantage of using a native ACAP application for this, as opposed to a Computer Vision ACAP application, is that the application can be administered via the VAPIX API and the web GUI in AxOS. It also has the advantage that the container images can be included in the .eap application file so that the entire application is contained in this single, installable file, without any dependency on external image repositories.
 
-The container images that are used in this type of application can be built using the Computer Vision SDK, but this is not a requirement.
+However, the actual container images that are used in this type of application may well have been built using the Computer Vision SDK, but this is not a requirement.
 
 ### How it works
 

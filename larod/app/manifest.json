@@ -1,0 +1,19 @@
+{
+    "schemaVersion": "1.1",
+    "acapPackageConf": {
+        "setup": {
+            "friendlyName": "larod-simple-app",
+            "appName": "larod_simple_app",
+            "vendor": "Axis Communications",
+            "embeddedSdkVersion": "3.0",
+            "user": {
+                "group": "sdk",
+                "username": "sdk"
+            },
+            "runOptions": "/usr/local/packages/larod_simple_app/model/mobilenet_v1_1.0_224_quant.tflite /usr/local/packages/larod_simple_app/input/veiltail-11457_640_RGB_224x224.bin",
+            "vendorUrl": "https://www.axis.com",
+            "runMode": "never",
+            "version": "1.0.0"
+        }
+    }
+}

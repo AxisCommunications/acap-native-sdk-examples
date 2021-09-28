@@ -16,16 +16,10 @@ CFLAGS += -Wall
 # This example is based on larod version 1
 CFLAGS += -DLAROD_API_VERSION_1
 
-all:	$(PROGS) \
-		model/converted_model.tflite
+all:	$(PROGS)
 
 $(PROG1): $(OBJS1)
 	$(CC) $(CFLAGS) $(LDFLAGS) $^ $(LDLIBS) -o $@
-
-model/converted_model.tflite:
-	mkdir -p model
-	cp converted_model_edgetpu.tflite model/converted_model.tflite
-
 
 clean:
 	rm -f $(PROGS) *.o *.eap lib/* include/* model/* label/*
