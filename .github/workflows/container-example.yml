@@ -1,9 +1,9 @@
-name: Build container example application
+name: Build container example applications
 on:
   push:
-     paths:
-      - 'container-example/**'
-      - '.github/workflows/container-example.yml'
+    paths:
+      - "container-example/**"
+      - ".github/workflows/container-example.yml"
 jobs:
   build:
     runs-on: ubuntu-latest

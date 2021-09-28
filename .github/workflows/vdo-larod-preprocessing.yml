@@ -27,8 +27,8 @@ jobs:
           imagetag=vdo-larod-preprocessing-cpu:1.0
           docker image rm -f $imagetag
           cd vdo-larod-preprocessing
-          cp app/package.conf.cpu app/package.conf
-          docker build --no-cache --tag $imagetag .
+          cp app/manifest.json.cpu app/manifest.json
+          docker build --no-cache --build-arg CHIP=cpu --tag $imagetag .
           docker cp $(docker create $imagetag):/opt/app ./build
           cd ..
           pwd
@@ -43,8 +43,8 @@ jobs:
           docker image rm -f $imagetag
           cd vdo-larod-preprocessing
           rm -rf build/
-          cp app/package.conf.edgetpu app/package.conf
-          docker build --no-cache --tag $imagetag .
+          cp app/manifest.json.edgetpu app/manifest.json
+          docker build --no-cache --build-arg CHIP=edgetpu --tag $imagetag .
           docker cp $(docker create $imagetag):/opt/app ./build
           cd ..
           mkdir -p vdo-larod-preprocessing/build_tpu_preprocessing/
