@@ -16,7 +16,7 @@ vdo-opencl-filtering
 ├── app
 │   ├── LICENSE
 │   ├── Makefile
-│   ├── package.conf
+│   ├── manifest.json
 │   ├── sobel_nv12.cl
 │   └── vdo_cl_filter_demo.c
 ├── Dockerfile
@@ -25,7 +25,7 @@ vdo-opencl-filtering
 
 * **app/LICENSE** - License for source code
 * **app/Makefile** - Makefile containing the build and link instructions for building the ACAP4 Native application.
-* **app/package.conf** - Package config for build.
+* **app/manifest.json** - Defines the application and its configuration.
 * **app/sobel_nv12.cl** - OpenCL program containing definitions and operations for Sobel filtering kernels.
 * **app/vdo_cl_filter_demo.c** - Application to capture the frames using vdo service, setting up OpenCL, and processing the image, in C.
 * **Dockerfile** - Docker file with the specified Axis toolchain and API container to build the example specified.
@@ -67,12 +67,13 @@ vdo-opencl-filtering
 ├── app
 │   ├── LICENSE
 │   ├── Makefile
-│   ├── package.conf
+│   ├── manifest.json
 │   ├── sobel_nv12.cl
 │   └── vdo_cl_filter_demo.c
 ├── build
 │   ├── LICENSE
 │   ├── Makefile
+│   ├── manifest.json
 │   ├── package.conf
 │   ├── package.conf.orig
 │   ├── param.conf
@@ -85,6 +86,7 @@ vdo-opencl-filtering
 └── README.md
 ```
 
+* **build/manifest.json** - Defines the application and its configuration.
 * **build/package.conf** - Defines the application and its configuration.
 * **build/package.conf.orig** - Defines the application and its configuration, original file.
 * **build/param.conf** - File containing application parameters.

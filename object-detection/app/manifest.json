@@ -1,0 +1,19 @@
+{
+    "schemaVersion": "1.1",
+    "acapPackageConf": {
+        "setup": {
+            "friendlyName": "object_detection_app",
+            "appName": "object_detection",
+            "vendor": "Axis Communications",
+            "embeddedSdkVersion": "3.0",
+            "user": {
+                "group": "sdk",
+                "username": "sdk"
+            },
+            "runOptions": "/usr/local/packages/object_detection/model/converted_model.tflite 300 300 80 1920 1080 50 /usr/local/packages/object_detection/label/labels.txt -c 4",
+            "vendorUrl": "https://www.axis.com",
+            "runMode": "never",
+            "version": "1.0.0"
+        }
+    }
+}

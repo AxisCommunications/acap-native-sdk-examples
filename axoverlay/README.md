@@ -1,7 +1,7 @@
- *Copyright (C) 2020, Axis Communications AB, Lund, Sweden. All Rights Reserved.*
+ *Copyright (C) 2021, Axis Communications AB, Lund, Sweden. All Rights Reserved.*
 
 # An axoverlay based ACAP4 Native application on an edge device
-This README file explains how to build an ACAP4 Native application that uses the axoverlay API. It is achieved by using the containerized Axis API and toolchain images.
+This README file explains how to build an ACAP4 Native application that uses the axoverlay API. It is achieved by using the containerized API and toolchain images.
 
 Together with this README file, you should be able to find a directory called app. That directory contains the "axoverlay" application source code which can easily be compiled and run with the help of the tools and step by step below.
 
@@ -20,7 +20,8 @@ axoverlay
 ├── app
 │   ├── axoverlay.c
 │   ├── LICENSE
-│   └── Makefile
+│   ├── Makefile
+│   └── manifest.json
 ├── Dockerfile
 └── README.md
 ```
@@ -28,6 +29,7 @@ axoverlay
 * **app/axoverlay.c** - Application to draw overlays using axoverlay in C.
 * **app/LICENSE** - Text file which lists all open source licensed source code distributed with the application.
 * **app/Makefile** - Makefile containing the build and link instructions for building the ACAP4 Native application.
+* **app/manifest.json** - Defines the application and its configuration.
 * **Dockerfile** - Docker file with the specified Axis toolchain and API container to build the example specified.
 * **README.md** - Step by step instructions on how to run the example.
 
@@ -66,7 +68,8 @@ axoverlay
 ├── app
 │   ├── axoverlay.c
 │   ├── LICENSE
-│   └── Makefile
+│   ├── Makefile
+│   └── manifest.json
 ├── build
 │   ├── axoverlay*
 │   ├── axoverlay_1_0_0_armv7hf.eap
@@ -74,6 +77,7 @@ axoverlay
 │   ├── axoverlay.c
 │   ├── LICENSE
 │   ├── Makefile
+│   ├── manifest.json
 │   ├── package.conf
 │   ├── package.conf.orig
 │   └── param.conf
@@ -84,6 +88,7 @@ axoverlay
 * **build/axoverlay*** - Application executable binary file.
 * **build/axoverlay_1_0_0_armv7hf.eap** - Application package .eap file.
 * **build/axoverlay_1_0_0_LICENSE.txt** - Copy of LICENSE file.
+* **build/manifest.json** - Defines the application and its configuration.
 * **build/package.conf** - Defines the application and its configuration.
 * **build/package.conf.orig** - Defines the application and its configuration, original file.
 * **build/param.conf** - File containing application parameters.

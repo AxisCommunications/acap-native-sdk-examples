@@ -1,0 +1,17 @@
+{
+    "schemaVersion": "1.1",
+    "acapPackageConf": {
+        "setup": {
+            "friendlyName": "vdo_cl_filter_demo",
+            "appName": "vdo_cl_filter_demo",
+            "vendor": "Axis Communications",
+            "embeddedSdkVersion": "3.0",
+            "user": {
+                "group": "sdk",
+                "username": "sdk"
+            },
+            "runMode": "never",
+            "version": "1.0.0"
+        }
+    }
+}

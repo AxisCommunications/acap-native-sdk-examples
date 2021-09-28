@@ -1,7 +1,7 @@
- *Copyright (C) 2020, Axis Communications AB, Lund, Sweden. All Rights Reserved.*
+ *Copyright (C) 2021, Axis Communications AB, Lund, Sweden. All Rights Reserved.*
 
 # A licensekey handler based ACAP4 Native application on an edge device
-This README file explains how to build an ACAP4 Native application that uses the licensekey API. It is achieved by using the containerized Axis API and toolchain images.
+This README file explains how to build an ACAP4 Native application that uses the licensekey API. It is achieved by using the containerized API and toolchain images.
 
 Together with this README file, you should be able to find a directory called app. That directory contains the application source code which can easily be compiled and run with the help of the tools and step by step below.
 
@@ -18,7 +18,7 @@ licensekey
 │   ├── LICENSE
 │   ├── licensekey_handler.c
 │   ├── Makefile
-|   └── package.conf
+│   └── manifest.json
 ├── Dockerfile
 └── README.md
 ```
@@ -26,7 +26,7 @@ licensekey
 * **app/LICENSE** - Text file which lists all open source licensed source code distributed with the application.
 * **app/licensekey_handler.c** - Application to check licensekey status in C.
 * **app/Makefile** - Makefile containing the build and link instructions for building the ACAP4 Native application.
-* **app/package.conf** - Defines the application and its configuration.
+* **app/manifest.json** - Defines the application and its configuration.
 * **Dockerfile** - Docker file with the specified Axis toolchain and API container to build the example specified.
 * **README.md** - Step by step instructions on how to run the example.
 
@@ -72,7 +72,7 @@ licensekey
 │   ├── LICENSE
 │   ├── licensekey_handler.c
 │   ├── Makefile
-|   └── package.conf
+│   └── manifest.json
 ├── build
 │   ├── LICENSE
 │   ├── licensekey_handler*
@@ -80,6 +80,7 @@ licensekey
 │   ├── licensekey_handler_1_0_0_LICENSE.txt
 │   ├── licensekey_handler.c
 │   ├── Makefile
+│   ├── manifest.json
 │   ├── package.conf
 │   ├── package.conf.orig
 │   └── param.conf
@@ -90,6 +91,7 @@ licensekey
 * **build/licensekey_handler*** - Application executable binary file.
 * **build/licensekey_handler_1_0_0_armv7hf.eap** - Application package .eap file.
 * **build/licensekey_handler_1_0_0_LICENSE.txt** - Copy of LICENSE file.
+* **build/manifest.json** - Defines the application and its configuration.
 * **build/package.conf.orig** - Defines the application and its configuration, original file.
 * **build/param.conf** - File containing application parameters.
 
@@ -125,7 +127,7 @@ or by clicking on the "**App log**" link in the device GUI.
 
 A valid license key for a registered application ID is only accessible through ACAP Service Portal, see [Online manual](https://help.axis.com/acap-3-developer-guide#acap-service-portal-for-administrators).
 
-Support for installing license key though device web page is available, if LICENSEPAGE is set to "axis" in **package.conf** file, by the following steps:
+Support for installing license key though device web page is available, if acapPackageConf.copyProtection.method is set to "axis" in the **manifest.json** file, by the following steps:
 
 *Goto your device web page above > Click on the tab **Apps** in the device GUI > Click on the installed **licensekey_handler** application > Install the license with the **Install** button in the **Activate the license** part*
 

@@ -1,0 +1,17 @@
+{
+    "schemaVersion": "1.1",
+    "acapPackageConf": {
+        "setup": {
+            "friendlyName": "vdoencodeclient",
+            "appName": "vdoencodeclient",
+            "vendor": "Axis Communications",
+            "embeddedSdkVersion": "3.0",
+            "user": {
+                "group": "sdk",
+                "username": "sdk"
+            },
+            "runMode": "never",
+            "version": "1.0.0"
+        }
+    }
+}

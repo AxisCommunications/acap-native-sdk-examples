@@ -1,4 +1,4 @@
- *Copyright (C) 2020, Axis Communications AB, Lund, Sweden. All Rights Reserved.*
+ *Copyright (C) 2021, Axis Communications AB, Lund, Sweden. All Rights Reserved.*
 
 # ACAP4 Native application sending an ONVIF event on an edge device
 This README file explains how to build an ACAP4 Native application that uses axevent library for sending a stateful ONVIF event.
@@ -12,7 +12,7 @@ https://www.onvif.org/specs/core/ONVIF-Core-Specification.pdf
 
 The ONVIF event is being sent with an updated processor usage value every 10th second.
 
-Building the application is achieved by using the containerized Axis API and toolchain images.
+Building the application is achieved by using the containerized API and toolchain images.
 
 Together with this README file you should be able to find a directory called app.
 That directory contains the "send_event" application source code, which can easily
@@ -26,6 +26,7 @@ send_event
 ├── app
 │   ├── LICENSE
 │   ├── Makefile
+│   ├── manifest.json
 │   └── send_event.c
 ├── Dockerfile
 └── README.md
@@ -33,6 +34,7 @@ send_event
 
 * **app/LICENSE** - Text file which lists all open source licensed source code distributed with the application.
 * **app/Makefile** - Makefile containing the build and link instructions for building the ACAP4 Native application "send_event".
+* **app/manifest.json** - Defines the application and its configuration.
 * **app/send_event.c** - Application which sends events, written in C.
 * **Dockerfile** - Docker file with the specified Axis toolchain and API container to build the example "send_event".
 * **README.md** - Step by step instructions on how to run the example.
@@ -78,10 +80,12 @@ send_event
 ├── app
 │   ├── LICENSE
 │   ├── Makefile
+│   ├── manifest.json
 │   └── send_event.c
 ├── build
 │   ├── LICENSE
 │   ├── Makefile
+│   ├── manifest.json
 │   ├── package.conf
 │   ├── package.conf.orig
 │   ├── param.conf
@@ -93,6 +97,7 @@ send_event
 └── README.md
 ```
 
+* **build/manifest.json** - Defines the application and its configuration.
 * **build/package.conf** - Defines the application and its configuration.
 * **build/package.conf.orig** - Defines the application and its configuration, original file.
 * **build/param.conf** - File containing application parameters.

@@ -22,4 +22,4 @@ $(PROG1): $(OBJS1)
 	$(CC) $(CFLAGS) $(LDFLAGS) $^ $(LDLIBS) -o $@
 
 clean:
-	rm -f $(PROGS) *.o *.eap lib/* include/* model/* label/*
+	rm -f $(PROGS) *.o *.eap lib/* include/*

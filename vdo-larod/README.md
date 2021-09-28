@@ -1,4 +1,4 @@
- *Copyright (C) 2020, Axis Communications AB, Lund, Sweden. All Rights Reserved.*
+ *Copyright (C) 2021, Axis Communications AB, Lund, Sweden. All Rights Reserved.*
 
 # A combined vdo stream and larod based ACAP4 Native application running inference on an edge device
 This README file explains how to build an ACAP4 Native application that uses:
@@ -6,7 +6,7 @@ This README file explains how to build an ACAP4 Native application that uses:
 - a library called libyuv to do image preprocessing
 - [larod API](../FAQs.md#WhatisLarod?) to load a graph model and run classification inferences on it
 
-It is achieved by using the containerized Axis API and toolchain images.
+It is achieved by using the containerized API and toolchain images.
 
 Together with this README file you should be able to find a directory called app. That directory contains the "vdo_larod" application source code, which can easily
 be compiled and run with the help of the tools and step by step below.
@@ -35,8 +35,8 @@ vdo-larod
 │   ├── imgprovider.h
 │   ├── LICENSE
 │   ├── Makefile
-│   ├── package.conf.cpu
-│   ├── package.conf.edgetpu
+│   ├── manifest.json.cpu
+│   ├── manifest.json.edgetpu
 │   └── vdo_larod.c
 ├── Dockerfile
 ├── README.md
@@ -48,8 +48,8 @@ vdo-larod
 * **app/imageprovider.c/h** - Implementation of vdo parts, written in C.
 * **app/LICENSE** - Text file which lists all open source licensed source code distributed with the application.
 * **app/Makefile** - Makefile containing the build and link instructions for building the ACAP4 Native application.
-* **app/package.conf.cpu** - Defines the application and its configuration when building for CPU with TensorFlow Lite.
-* **app/package.conf.edgetpu** - Defines the application and its configuration when building chip and model for Google TPU.
+* **app/manifest.conf.cpu** - Defines the application and its configuration when building for CPU with TensorFlow Lite.
+* **app/manifest.conf.edgetpu** - Defines the application and its configuration when building chip and model for Google TPU.
 * **app/vdo-larod.c** - Application using larod, written in C.
 * **Dockerfile** - Docker file with the specified Axis toolchain and API container to build the example specified.
 * **README.md** - Step by step instructions on how to run the example.
@@ -85,42 +85,40 @@ Depending on selected chip, different model can be used for running larod. Label
 
 Model and label files are downloaded from https://coral.ai/models/, when building the application.
 
-Which model that is used is configured through attributes in package.conf:
-- APPOPTS, which contains the application command line options.
-- OTHERFILES, shows files to be included in the package e.g. model. Files listed here are copied to the application directory during installation.
-- PACKAGENAME, a user friendly package name which is also part of the .eap file name.
+Which model that is used is configured through attributes in manifest.json and the CHIP parameter in the Dockerfile. 
+The attributes in manifest.json that configures model are:
+- runOptions, which contains the application command line options.
+- friendlyName, a user friendly package name which is also part of the .eap file name.
+
+The CHIP argument in the Dockerfile also needs to be changed depending on model. Supported values are cpu and edgetpu. This argument controls which files are to be included in the package e.g. model. These files are copied to the application directory during installation.
 
 Different devices support different chips and models.
 
-Select one of the chip alternatives, CPU or Google TPU, to build an application for that chip:
-
-##### Alternative Chip 2 - CPU with TensorFlow Lite
-Standing in your working directory run the following command, to copy configuration for CPU with TensorFlow Lite:
-
-```
-cp app/package.conf.cpu app/package.conf
-```
-
-##### Alternative Chip 4 - Google TPU
-Standing in your working directory run the following command, to copy configuration for Google TPU:
-
-```
-cp app/package.conf.edgetpu app/package.conf
-```
-
-##### Build steps
+Building is done using the following commands:
 ```bash
-docker build --tag <APP_IMAGE> .
-```
-
-<APP_IMAGE> is the name to tag the image with, e.g., vdo-larod:1.0
-
-Copy the result from the container image to a local directory build:
-
-```bash
+cp app/manifest.conf.<CHIP> app/manifest.json
+docker build --tag <APP_IMAGE> . --build-arg CHIP=<CHIP>
 docker cp $(docker create <APP_IMAGE>):/opt/app ./build
 ```
 
+\<APP_IMAGE\> is the name to tag the image with, e.g., vdo_larod_preprocessing:1.0
+
+\<CHIP\> is the chip type. Supported values are cpu and edgetpu
+
+Following is examples of how to build for both CPU with Tensorflow Lite and Google TPU.
+
+Run the following command standing in your working directory to build larod for a CPU with TensorFlow Lite:
+```bash
+cp app/manifest.conf.cpu app/manifest.json
+docker build --build-arg CHIP=cpu --tag <APP_IMAGE> .
+docker cp $(docker create <APP_IMAGE>):/opt/app ./build
+```
+To build larod for a Google TPU instead, run the following command:
+```bash
+cp app/manifest.json.edgetpu app/manifest.json
+docker build --build-arg CHIP=edgetpu --tag <APP_IMAGE> .
+docker cp $(docker create <APP_IMAGE>):/opt/app ./build
+```
 The working dir now contains a build folder with the following files:
 
 ```bash
@@ -137,12 +135,13 @@ vdo-larod
 │   ├── lib
 │   ├── LICENSE
 │   ├── Makefile
+│   ├── manifest.json
+│   ├── manifest.json.cpu
+│   ├── manifest.json.edgetpu
 │   ├── model
 |   │   ├── mobilenet_v2_1.9_224_quant_edgetpu.tflite
 |   │   └── mobilenet_v2_1.9_224_quant.tflite
 │   ├── package.conf
-│   ├── package.conf.cpu
-│   ├── package.conf.edgetpu
 │   ├── package.conf.orig
 │   ├── param.conf
 │   ├── vdo_larod*
@@ -154,6 +153,7 @@ vdo-larod
 * **build/label** - Folder containing label files used in this application.
 * **build/label/imagenet_labels.txt** - Label file for MobileNet V2 (ImageNet).
 * **build/lib** - Folder containing compiled library files for libyuv.
+* **build/manifest.json** - Defines the application and its configuration.
 * **build/model** - Folder containing models used in this application.
 * **build/model/mobilenet_v2_1.9_224_quant_edgetpu.tflite** - Model file for MobileNet V2 (ImageNet), used for Google TPU.
 * **build/model/mobilenet_v2_1.9_224_quant.tflite** - Model file for MobileNet V2 (ImageNet), used for CPU with TensorFlow Lite.

@@ -1,0 +1,21 @@
+{
+    "schemaVersion": "1.1",
+    "acapPackageConf": {
+        "setup": {
+            "friendlyName": "licensekey_handler",
+            "appName": "licensekey_handler",
+            "appId": "0",
+            "vendor": "-",
+            "embeddedSdkVersion": "3.0",
+            "user": {
+                "group": "sdk",
+                "username": "sdk"
+            },
+            "runMode": "never",
+            "version": "1.0.0"
+        },
+        "copyProtection": {
+            "method": "axis"
+        }
+    }
+}

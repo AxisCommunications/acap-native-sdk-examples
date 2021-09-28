@@ -1,7 +1,7 @@
- *Copyright (C) 2020, Axis Communications AB, Lund, Sweden. All Rights Reserved.*
+ *Copyright (C) 2021, Axis Communications AB, Lund, Sweden. All Rights Reserved.*
 
 # An ACAP4 Native application subscribing to multiple events
-This README file explains how to build an ACAP4 Native application that uses the axevent API. It is achieved by using the containerized Axis API and toolchain images.
+This README file explains how to build an ACAP4 Native application that uses the axevent API. It is achieved by using the containerized API and toolchain images.
 
 Together with this README file, you should be able to find a directory called app. That directory contains the "subscribe_to_events" application source code which can easily
 be compiled and run with the help of the tools and step by step below.
@@ -16,6 +16,7 @@ subscribe_to_events
 ├── app
 │   ├── LICENSE
 │   ├── Makefile
+│   ├── manifest.json
 │   └── subscribe_to_events.c
 ├── Dockerfile
 └── README.md
@@ -23,6 +24,7 @@ subscribe_to_events
 
 * **app/LICENSE** - File containing the license conditions.
 * **app/Makefile** - Makefile containing the build and link instructions for building the ACAP4 Native application.
+* **app/manifest.json** - Defines the application and its configuration.
 * **app/subscribe_to_events.c** - Example application.
 * **Dockerfile** - Docker file with the specified Axis toolchain and API container to build the example specified.
 * **README.md** - Step by step instructions on how to run the example.
@@ -69,10 +71,12 @@ subscribe_to_events
 ├── app
 │   ├── LICENSE
 │   ├── Makefile
+│   ├── manifest.json
 │   └── subscribe_to_events.c
 ├── build
 │   ├── LICENSE
 │   ├── Makefile
+│   ├── manifest.json
 │   ├── package.conf
 │   ├── package.conf.orig
 │   ├── param.conf
@@ -85,6 +89,7 @@ subscribe_to_events
 └── README.md
 ```
 
+* **build/manifest.json** - Defines the application and its configuration.
 * **build/package.conf** - Defines the application and its configuration.
 * **build/package.conf.orig** - Defines the application and its configuration, original file.
 * **build/param.conf** - File containing application parameters.

@@ -1,4 +1,4 @@
-*Copyright (C) 2020, Axis Communications AB, Lund, Sweden. All Rights Reserved.*
+*Copyright (C) 2021, Axis Communications AB, Lund, Sweden. All Rights Reserved.*
 
 # Object Detection Example
 ## Overview
@@ -182,9 +182,9 @@ jpeg_to_file(file_name, jpeg_buffer, jpeg_size);
 
 ## Building the application
 
-Similar with [tensorflow-to-larod](https://github.com/AxisCommunications/acap4-native-sdk-examples-staging/tree/master/tensorflow-to-larod), a packaging file is needed to compile the ACAP. This is found in [app/package.conf](app/package.conf). For the scope of this tutorial, the `APPOPTS` and `OTHERFILES` keys are noteworthy. `APPOPTS` allows arguments to be given to the ACAP, which in this case is handled by the `argparse` lib. The argument order, defined by [app/argparse.c](app/argparse.c), is `<model_path input_resolution_width input_resolution_height output_size_in_bytes raw_video_resolution_width raw_video_resolution_height threshold>`. The file(s) specified in `OTHERFILES` simply tell the compiler what files to copy to the ACAP, such as our .tflite model file.
+Similar with [tensorflow-to-larod](https://github.com/AxisCommunications/acap4-native-sdk-examples-staging/tree/master/tensorflow-to-larod), a packaging file is needed to compile the ACAP. This is found in [app/manifest.json](app/manifest.json). The noteworthy attribute for this tutorial is the `runOptions` attribute. `runOptions` allows arguments to be given to the ACAP, which in this case is handled by the `argparse` lib. The argument order, defined by [app/argparse.c](app/argparse.c), is `<model_path input_resolution_width input_resolution_height output_size_in_bytes raw_video_resolution_width raw_video_resolution_height threshold>`. We also need to copy our .tflite model file to the ACAP, and this is done by using the -a flag in the acap-build command in the Dockerfile. The -a flag simply tells the compiler what files to copy to the ACAP.
 
-The ACAP is built to specification by the `Makefile` in [app/Makefile](app/Makefile). With the [Makefile](app/Makefile) and [package.conf](app/package.conf) files set up, the ACAP can be built by running the build script in the example environment:
+The ACAP is built to specification by the `Makefile` in [app/Makefile](app/Makefile). With the [Makefile](app/Makefile) and [manifest.json](app/manifest.json) files set up, the ACAP can be built by running the build script in the example environment:
 
 ```sh
 ./build_acap.sh object_detection_acap:1.0

@@ -12,9 +12,9 @@ ENV TF_FORCE_GPU_ALLOW_GROWTH true
 # Get docker to be able to build ACAP inside this container
 RUN apt-get update
 RUN apt-get install -y apt-transport-https \
-                       ca-certificates \
-                       curl \
-                       software-properties-common
+    ca-certificates \
+    curl \
+    software-properties-common
 RUN curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
 RUN add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu bionic stable"
 RUN apt-get update && apt-get install docker-ce -y

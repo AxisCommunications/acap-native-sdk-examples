@@ -5,7 +5,7 @@ This README file explains how to build an ACAP4 Native application that uses:
 - vdo to fetch frames from e.g. a camera
 - larod API to load a graph model and run preprocessing and classification inferences
 
-It is achieved by using the containerized Axis API and toolchain docker images.
+It is achieved by using the containerized API and toolchain docker images.
 
 Together with this README file you should be able to find a directory called app. That directory contains the "vdo_larod_preprocessing" application source code, which can easily be compiled and run with the help of the tools and step by step below.
 
@@ -44,8 +44,8 @@ vdo-larod-preprocessing
 │   ├── larod-vdo-utils.h
 │   ├── LICENSE
 │   ├── Makefile
-│   ├── package.conf.cpu
-│   ├── package.conf.edgetpu
+│   ├── manifest.json.cpu
+│   ├── manifest.json.edgetpu
 │   └── vdo_larod_preprocessing.c
 ├── Dockerfile
 └── README.md
@@ -55,8 +55,8 @@ vdo-larod-preprocessing
 * **app/larod-vdo-utils.h/.c** - Larod VDO support files.
 * **app/LICENSE** - Text file which lists all open source licensed source code distributed with the application.
 * **app/Makefile** - Makefile containing the build and link instructions for building the ACAP4 Native application.
-* **app/package.conf.cpu** - Defines the application and its configuration when building for CPU with TensorFlow Lite.
-* **app/package.conf.edgetpu** - Defines the application and its configuration when building chip and model for Google TPU.
+* **app/manifest.json.cpu** - Defines the application and its configuration when building for CPU with TensorFlow Lite.
+* **app/manifest.json.edgetpu** - Defines the application and its configuration when building chip and model for Google TPU.
 * **app/vdo_larod_preprocessing.c** - Application using larod, written in C.
 * **Dockerfile** - Docker file with the specified Axis toolchain and API container to build the example specified.
 * **README.md** - Step by step instructions on how to run the example.
@@ -81,42 +81,40 @@ Depending on selected chip, different model can be used for running larod. Label
 
 Model and label files are downloaded from https://coral.ai/models/, when building the application.
 
-Which model that is used is configured through attributes in package.conf:
-- APPOPTS, which contains the application command line options.
-- OTHERFILES, shows files to be included in the package e.g. model. Files listed here are copied to the application directory during installation.
-- PACKAGENAME, a user friendly package name which is also part of the .eap file name.
+Which model that is used is configured through attributes in manifest.json and the CHIP parameter in the Dockerfile. 
+The attributes in manifest.json that configures model are:
+- runOptions, which contains the application command line options.
+- friendlyName, a user friendly package name which is also part of the .eap file name.
+
+The CHIP argument in the Dockerfile also needs to be changed depending on model. Supported values are cpu and edgetpu. This argument controls which files are to be included in the package e.g. model. These files are copied to the application directory during installation.
 
 Different devices support different chips and models.
 
-Select one of the chip alternatives, CPU or Google TPU, to build an application for that chip:
-
-## CPU with TensorFlow Lite
-Standing in your working directory run the following command, to copy configuration for CPU with TensorFlow Lite:
-
-```
-cp app/package.conf.cpu app/package.conf
-```
-
-## Google TPU
-Standing in your working directory run the following command, to copy configuration for Google TPU:
-
-```
-cp app/package.conf.edgetpu app/package.conf
-```
-
-## Build steps
+Building is done using the following commands:
 ```bash
-docker build --tag <APP_IMAGE> .
-```
-
-<APP_IMAGE> is the name to tag the image with, e.g., vdo_larod_preprocessing:1.0
-
-Copy the result from the container image to a local directory build:
-
-```bash
+cp app/manifest.conf.<CHIP> app/manifest.json
+docker build --tag <APP_IMAGE> . --build-arg CHIP=<CHIP>
 docker cp $(docker create <APP_IMAGE>):/opt/app ./build
 ```
 
+\<APP_IMAGE\> is the name to tag the image with, e.g., vdo_larod_preprocessing:1.0
+
+\<CHIP\> is the chip type. Supported values are cpu and edgetpu.
+
+Following is examples of how to build for both CPU with Tensorflow Lite and Google TPU.
+
+To build a package for CPU with Tensorflow Lite, run the following command standing in your working directory:
+```bash
+cp app/manifest.conf.cpu app/manifest.json
+docker build --build-arg CHIP=cpu --tag <APP_IMAGE> .
+docker cp $(docker create <APP_IMAGE>):/opt/app ./build
+```
+To build a package for Google TPU instead, run the following command:
+```bash
+cp app/manifest.json.edgetpu app/manifest.json
+docker build --build-arg CHIP=edgetpu --tag <APP_IMAGE> .
+docker cp $(docker create <APP_IMAGE>):/opt/app ./build
+```
 The working dir now also contains a build folder with the following content:
 
 ```bash
@@ -131,9 +129,10 @@ vdo_larod_preprocessing
 │   ├── larod-vod-utils.h
 │   ├── LICENSE
 │   ├── Makefile
+│   ├── manifest.json
+│   ├── manifest.json.cpu
+│   ├── manifest.json.edgetpu
 │   ├── package.conf
-│   ├── package.conf.cpu
-│   ├── package.conf.edgetpu
 │   ├── package.conf.orig
 │   ├── param.conf
 │   ├── vdo_larod_preprocessing

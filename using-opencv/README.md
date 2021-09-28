@@ -1,4 +1,4 @@
- *Copyright (C) 2020, Axis Communications AB, Lund, Sweden. All Rights Reserved.*
+ *Copyright (C) 2021, Axis Communications AB, Lund, Sweden. All Rights Reserved.*
 
 # A guide to building and running OpenCV in ACAP4 Native
 This guide explains how to build OpenCV from source and bundle it for use in an ACAP. The example application
@@ -17,7 +17,7 @@ building-opencv
 │   ├── imgprovider.h - imgprovider headers
 │   ├── LICENSE
 │   ├── Makefile - The Makefile specifying how the ACAP should be built
-│   └── package.conf - A file specifying execution-related options for the ACAP
+│   └── manifest.json - A file specifying execution-related options for the ACAP
 ├── build.sh - A convenience script for building the ACAP
 ├── Dockerfile - Specification of the container used to build the ACAP
 ├── README.md
