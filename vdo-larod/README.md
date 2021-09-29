@@ -48,8 +48,8 @@ vdo-larod
 * **app/imageprovider.c/h** - Implementation of vdo parts, written in C.
 * **app/LICENSE** - Text file which lists all open source licensed source code distributed with the application.
 * **app/Makefile** - Makefile containing the build and link instructions for building the ACAP4 Native application.
-* **app/manifest.conf.cpu** - Defines the application and its configuration when building for CPU with TensorFlow Lite.
-* **app/manifest.conf.edgetpu** - Defines the application and its configuration when building chip and model for Google TPU.
+* **app/manifest.json.cpu** - Defines the application and its configuration when building for CPU with TensorFlow Lite.
+* **app/manifest.json.edgetpu** - Defines the application and its configuration when building chip and model for Google TPU.
 * **app/vdo-larod.c** - Application using larod, written in C.
 * **Dockerfile** - Docker file with the specified Axis toolchain and API container to build the example specified.
 * **README.md** - Step by step instructions on how to run the example.
@@ -96,7 +96,7 @@ Different devices support different chips and models.
 
 Building is done using the following commands:
 ```bash
-cp app/manifest.conf.<CHIP> app/manifest.json
+cp app/manifest.json.<CHIP> app/manifest.json
 docker build --tag <APP_IMAGE> . --build-arg CHIP=<CHIP>
 docker cp $(docker create <APP_IMAGE>):/opt/app ./build
 ```
@@ -109,7 +109,7 @@ Following is examples of how to build for both CPU with Tensorflow Lite and Goog
 
 Run the following command standing in your working directory to build larod for a CPU with TensorFlow Lite:
 ```bash
-cp app/manifest.conf.cpu app/manifest.json
+cp app/manifest.json.cpu app/manifest.json
 docker build --build-arg CHIP=cpu --tag <APP_IMAGE> .
 docker cp $(docker create <APP_IMAGE>):/opt/app ./build
 ```
