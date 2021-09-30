@@ -92,7 +92,7 @@ Different devices support different chips and models.
 
 Building is done using the following commands:
 ```bash
-cp app/manifest.conf.<CHIP> app/manifest.json
+cp app/manifest.json.<CHIP> app/manifest.json
 docker build --tag <APP_IMAGE> . --build-arg CHIP=<CHIP>
 docker cp $(docker create <APP_IMAGE>):/opt/app ./build
 ```
@@ -105,7 +105,7 @@ Following is examples of how to build for both CPU with Tensorflow Lite and Goog
 
 To build a package for CPU with Tensorflow Lite, run the following command standing in your working directory:
 ```bash
-cp app/manifest.conf.cpu app/manifest.json
+cp app/manifest.json.cpu app/manifest.json
 docker build --build-arg CHIP=cpu --tag <APP_IMAGE> .
 docker cp $(docker create <APP_IMAGE>):/opt/app ./build
 ```
