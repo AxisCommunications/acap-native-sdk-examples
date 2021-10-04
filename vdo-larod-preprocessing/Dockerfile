@@ -1,13 +1,13 @@
 # Put a proxy URL in the docker_proxy environment variable if needed
-ARG DOCKER_PROXY
-ARG http_proxy=$DOCKER_PROXY
-ARG https_proxy=$DOCKER_PROXY
+ARG http_proxy
+ARG https_proxy=$http_proxy
 
 ARG ARCH=armv7hf
 ARG VERSION=1.0
 ARG UBUNTU_VERSION=20.04
 ARG REPO=axisecp
 ARG SDK=acap-native-sdk
+
 FROM ${REPO}/${SDK}:${VERSION}-${ARCH}-ubuntu${UBUNTU_VERSION}
 
 # Download model
@@ -25,10 +25,10 @@ ARG CHIP=
 # Building the ACAP application
 RUN if [ "$CHIP" = cpu ]; then \
     . /opt/axis/acapsdk/environment-setup* && acap-build . \
-    -a 'model/mobilenet_v2_1.0_224_quant.tflite'; \
+    -a 'model/mobilenet_v2_1.0_224_quant.tflite' -a 'model/imagenet_labels.txt' ; \
     elif [ "$CHIP" = edgetpu ]; then \
     . /opt/axis/acapsdk/environment-setup* && acap-build . \
-    -a 'model/mobilenet_v2_1.0_224_quant_edgetpu.tflite'; \
+    -a 'model/mobilenet_v2_1.0_224_quant_edgetpu.tflite' -a 'model/imagenet_labels.txt' ; \
     else \
     printf "Error: '%s' is not a valid value for the CHIP variable\n", "$CHIP"; \
     exit 1; \

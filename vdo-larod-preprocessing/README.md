@@ -12,26 +12,19 @@ Together with this README file you should be able to find a directory called app
 ## Detailed outline of example application
 This application opens a client to vdo and starts fetching frames (in a new thread) in the yuv format. It tries to find the smallest VDO stream resolution that fits the WIDTH and HEIGHT required by the neural network. The thread fetching frames is written so that it always tries to provide a frame as new as possible even if not all previous frames have been processed by larod.
 
-This is a simple example found in vdo_larod_preprocessing.c that utilizes VDO, larod and larod-vdo-utils libs to:
+This is a simple example found in vdo_larod_preprocessing.c that utilizes VDO and larod to:
 1. Fetch image data from VDO.
-2. Preprocess the images (crop, scale and color convert) using larod with
-   either the libyuv or VProc backend (depending on platform).
-3. Run MobileNetV2 inferences with the preprocessing output as input on a larod
-   backend specified by a command line argument.
-4. Sort the classification scores output by the MobileNetV2 inferences and
-   print the top scores along with corresponding indices and [ImageNet][1]
-   labels to stdout.
+2. Preprocess the images (crop, scale and color convert) using larod with either the libyuv or VProc backend (depending on platform).
+3. Run MobileNetV2 inferences with the preprocessing output as input on a larod backend specified by a command line argument.
+4. Sort the classification scores output by the MobileNetV2 inferences and print the top scores along with corresponding indices and [ImageNet][1] labels to stdout.
 
 It will run steps 1-4 `NUM_ROUNDS` (defaulted to 5) times.
 
 ## Which backends and models are supported?
 
-Unless you modify the app to your own needs you should only use a MobileNetV2
-model that takes 224x224 RGB images as input, and that outputs an array of
-1001 classification scores of type UINT8 or FLOAT32.
+Unless you modify the app to your own needs you should only use a MobileNetV2 model that takes 224x224 RGB images as input, and that outputs an array of 1001 classification scores of type UINT8 or FLOAT32.
 
-You can run the example with any inference backend as long as you can provide it
-with a model as described above.
+You can run the example with any inference backend as long as you can provide it with a model as described above.
 
 ## Getting started
 These instructions will guide you on how to execute the code. Below is the structure and scripts used in the example:
@@ -39,9 +32,8 @@ These instructions will guide you on how to execute the code. Below is the struc
 ```bash
 vdo-larod-preprocessing
 ├── app
-│   ├── imagenet-labels.h
-│   ├── larod-vdo-utils.c
-│   ├── larod-vdo-utils.h
+│   ├── imgprovider.c
+│   ├── imgprovider.h
 │   ├── LICENSE
 │   ├── Makefile
 │   ├── manifest.json.cpu
@@ -51,8 +43,7 @@ vdo-larod-preprocessing
 └── README.md
 ```
 
-* **app/imagenet-labels.h** - List of model labels.
-* **app/larod-vdo-utils.h/.c** - Larod VDO support files.
+* **app/imgprovider.c/h** - Implementation of vdo parts, written in C.
 * **app/LICENSE** - Text file which lists all open source licensed source code distributed with the application.
 * **app/Makefile** - Makefile containing the build and link instructions for building the ACAP4 Native application.
 * **app/manifest.json.cpu** - Defines the application and its configuration when building for CPU with TensorFlow Lite.
@@ -62,7 +53,7 @@ vdo-larod-preprocessing
 * **README.md** - Step by step instructions on how to run the example.
 
 ## Limitations
-* ARTPEC-7 based device with edge TPU.
+* ARTPEC-7 based device.
 * This application was not written to optimize performance.
 * MobileNet is good for classification, but it requires that the object you want to classify should cover almost all the frame.
 
@@ -81,7 +72,7 @@ Depending on selected chip, different model can be used for running larod. Label
 
 Model and label files are downloaded from https://coral.ai/models/, when building the application.
 
-Which model that is used is configured through attributes in manifest.json and the CHIP parameter in the Dockerfile. 
+Which model that is used is configured through attributes in manifest.json and the CHIP parameter in the Dockerfile.
 The attributes in manifest.json that configures model are:
 - runOptions, which contains the application command line options.
 - friendlyName, a user friendly package name which is also part of the .eap file name.
@@ -106,48 +97,59 @@ Following is examples of how to build for both CPU with Tensorflow Lite and Goog
 To build a package for CPU with Tensorflow Lite, run the following command standing in your working directory:
 ```bash
 cp app/manifest.json.cpu app/manifest.json
-docker build --build-arg CHIP=cpu --tag <APP_IMAGE> .
+docker build . --build-arg CHIP=cpu --tag <APP_IMAGE>
 docker cp $(docker create <APP_IMAGE>):/opt/app ./build
 ```
 To build a package for Google TPU instead, run the following command:
 ```bash
 cp app/manifest.json.edgetpu app/manifest.json
-docker build --build-arg CHIP=edgetpu --tag <APP_IMAGE> .
+docker build . --build-arg CHIP=edgetpu --tag <APP_IMAGE>
 docker cp $(docker create <APP_IMAGE>):/opt/app ./build
 ```
-The working dir now also contains a build folder with the following content:
+The working dir now contains a build folder with the following files of importance:
 
 ```bash
 vdo_larod_preprocessing
 ├── build
-│   ├── model
-|   │   ├── imagenet_labels.txt
-|   │   ├── mobilenet_v2_1.9_224_quant_edgetpu.tflite
-|   │   └── mobilenet_v2_1.9_224_quant.tflite
-│   ├── imagenet-labels.h
-│   ├── larod-vdo-utils.c
-│   ├── larod-vod-utils.h
+│   ├── imgprovider.c
+│   ├── imgprovider.h
+│   ├── label
+|   │   └── imagenet_labels.txt
+│   ├── lib
 │   ├── LICENSE
 │   ├── Makefile
 │   ├── manifest.json
 │   ├── manifest.json.cpu
 │   ├── manifest.json.edgetpu
+│   ├── model
+|   │   ├── imagenet_labels.txt
+|   │   ├── mobilenet_v2_1.0_224_quant_edgetpu.tflite
+|   │   └── mobilenet_v2_1.0_224_quant.tflite
 │   ├── package.conf
 │   ├── package.conf.orig
 │   ├── param.conf
-│   ├── vdo_larod_preprocessing
+│   ├── vdo_larod*
 │   ├── vdo_larod_preprocessing_cpu_1_0_0_armv7hf.eap / vdo_larod_preprocessing_edgetpu_1_0_0_armv7hf.eap
-│   └── vdo_larod_preprocessing.c
+│   ├── vdo_larod_preprocessing_cpu_1_0_0_LICENSE.txt / vdo_larod_preprocessing_edgetpu_1_0_0_LICENSE.txt
+│   └── vdo_larod.c
 ```
 
-Explanation of some files in the build folder:
+* **build/manifest.json** - Defines the application and its configuration.
+* **build/model** - Folder containing models used in this application.
 * **build/model/imagenet_labels.txt** - Label file for MobileNet V2 (ImageNet).
-* **build/model/mobilenet_v2_1.9_224_quant_edgetpu.tflite** - Model file for MobileNet V2 (ImageNet), used for Google TPU.
-* **build/model/mobilenet_v2_1.9_224_quant.tflite** - Model file for MobileNet V2 (ImageNet), used for CPU with TensorFlow Lite.
-* **build/vdo_larod_preprocessing_cpu_1_0_0_armv7hf.eap** - Application package .eap file,
+* **build/model/mobilenet_v2_1.0_224_quant_edgetpu.tflite** - Model file for MobileNet V2 (ImageNet), used for Google TPU.
+* **build/model/mobilenet_v2_1.0_224_quant.tflite** - Model file for MobileNet V2 (ImageNet), used for CPU with TensorFlow Lite.
+* **build/package.conf** - Defines the application and its configuration.
+* **build/package.conf.orig** - Defines the application and its configuration, original file.
+* **build/param.conf** - File containing application parameters.
+* **build/vdo_larod** - Application executable binary file.
   if alternative chip 2 has been built.
-* **build/vdo_larod_preprocessing_edgetpu_1_0_0_armv7hf.eap** - Application package .eap file,
+* **build/vdo_larod_preprocessing_cpu_1_0_0_armv7hf.eap** - Application package .eap file.
+* **build/vdo_larod_preprocessing_cpu_1_0_0_LICENSE.txt** - Copy of LICENSE file.
+
   if alternative chip 4 has been built.
+* **build/vdo_larod_preprocessing_edgetpu_1_0_0_armv7hf.eap** - Application package .eap file.
+* **build/vdo_larod_preprocessing_edgetpu_1_0_0_LICENSE.txt** - Copy of LICENSE file.
 
 ## Install your application
 Installing your application on an Axis video device is as simple as:
@@ -158,11 +160,9 @@ Browse to the following page (replace <axis_device_ip> with the IP number of you
 http://<axis_device_ip>/#settings/apps
 ```
 
-*Go to your device web page above > Click on the tab **App** in the device GUI > Add **(+)** sign and browse to
-the newly built **vdo_larod_preprocessing_cpu_1_0_0_armv7hf.eap** or **vdo_larod_preprocessing_edgetpu_1_0_0_armv7hf.eap** > Click **Install** > Run the application by enabling the **Start** switch*
+*Go to your device web page above > Click on the tab **App** in the device GUI > Add **(+)** sign and browse to the newly built **vdo_larod_preprocessing_cpu_1_0_0_armv7hf.eap** or **vdo_larod_preprocessing_edgetpu_1_0_0_armv7hf.eap** > Click **Install** > Run the application by enabling the **Start** switch*
 
-Application vdo_larod_preprocessing is now available as an application on the device,
-using the friendly name "vdo_larod_proprocessing_cpu" or "vdo_larod_preprocessing_edgetpu".
+Application vdo_larod_preprocessing is now available as an application on the device, using the friendly name "vdo_larod_proprocessing_cpu" or "vdo_larod_preprocessing_edgetpu".
 
 ## The expected output
 Application log can be found directly at:
@@ -190,33 +190,49 @@ Depending on selected chip, different output is received. The label file is used
 ```
 ----- Contents of SYSTEM_LOG for 'vdo_larod_preprocessing' -----
 
-vdo_larod_preprocessing[0]: starting vdo_larod_preprocessing
-vdo_larod_preprocessing[20004]: Connecting to larod
-vdo_larod_preprocessing[20004]: Setting up inference model
-vdo_larod_preprocessing[20004]: Setting up preprocessing model
-vdo_larod_preprocessing[20004]: Setting up and starting VDO stream
-vdo_larod_preprocessing[20004]: Starting to run larod jobs
-vdo_larod_preprocessing[20004]:  ===== Top 3 inference scores =====
-vdo_larod_preprocessing[20004]: 1. idx 955 labeled "banana" with score 0.81
-vdo_larod_preprocessing[20004]: 2. idx 115 labeled "slug" with score 0.53
-vdo_larod_preprocessing[20004]: 3. idx 97 labeled "toucan" with score 0.51
-vdo_larod_preprocessing[20004]:  ===== Top 3 inference scores =====
-vdo_larod_preprocessing[20004]: 1. idx 955 labeled "banana" with score 0.80
-vdo_larod_preprocessing[20004]: 2. idx 115 labeled "slug" with score 0.54
-vdo_larod_preprocessing[20004]: 3. idx 943 labeled "butternut squash" with score 0.49
-vdo_larod_preprocessing[20004]:  ===== Top 3 inference scores =====
-vdo_larod_preprocessing[20004]: 1. idx 955 labeled "banana" with score 0.82
-vdo_larod_preprocessing[20004]: 2. idx 115 labeled "slug" with score 0.54
-vdo_larod_preprocessing[20004]: 3. idx 943 labeled "butternut squash" with score 0.50
-vdo_larod_preprocessing[20004]:  ===== Top 3 inference scores =====
-vdo_larod_preprocessing[20004]: 1. idx 955 labeled "banana" with score 0.81
-vdo_larod_preprocessing[20004]: 2. idx 115 labeled "slug" with score 0.53
-vdo_larod_preprocessing[20004]: 3. idx 97 labeled "toucan" with score 0.51
-vdo_larod_preprocessing[20004]:  ===== Top 3 inference scores =====
-vdo_larod_preprocessing[20004]: 1. idx 955 labeled "banana" with score 0.80
-vdo_larod_preprocessing[20004]: 2. idx 115 labeled "slug" with score 0.53
-vdo_larod_preprocessing[20004]: 3. idx 97 labeled "toucan" with score 0.50
-vdo_larod_preprocessing[20004]: Exit /usr/local/packages/vdo_larod_preprocessing/vdo_larod_preprocessing
+Starting /usr/local/packages/vdo_larod_preprocessing/vdo_larod_preprocessing
+vdo_larod_preprocessing[1670]: 'buffer.strategy': <uint32 3>
+vdo_larod_preprocessing[1670]: 'channel': <uint32 1>
+vdo_larod_preprocessing[1670]: 'format': <uint32 3>
+vdo_larod_preprocessing[1670]: 'height': <uint32 240>
+vdo_larod_preprocessing[1670]: 'width': <uint32 320>
+vdo_larod_preprocessing[1670]: Creating VDO image provider and creating stream 320 x 240
+vdo_larod_preprocessing[1670]: Dump of vdo stream settings map =====
+vdo_larod_preprocessing[1670]: chooseStreamResolution: We select stream w/h=320 x 240 based on VDO channel info.
+vdo_larod_preprocessing[1670]: Calculate crop image
+vdo_larod_preprocessing[1670]: Create larod models
+vdo_larod_preprocessing[1670]: Create preprocessing maps
+vdo_larod_preprocessing[1670]: Crop VDO image X=40 Y=0 (240 x 240)
+vdo_larod_preprocessing[1670]: Setting up larod connection with chip 2 and model /usr/local/packages/vdo_larod_preprocessing/model/mobilenet_v2_1.0_224_quant.tflite
+vdo_larod_preprocessing[1670]: 10: Axis Compute Engine
+vdo_larod_preprocessing[1670]: 11: CPU with libyuv
+vdo_larod_preprocessing[1670]: 13: Image processing using OpenCL
+vdo_larod_preprocessing[1670]: 2: CPU with TensorFlow Lite
+vdo_larod_preprocessing[1670]: 4: Google TPU
+vdo_larod_preprocessing[1670]: Available chip ids:
+vdo_larod_preprocessing[1670]: Allocate memory for input/output buffers
+vdo_larod_preprocessing[1670]: Connect tensors to file descriptors
+vdo_larod_preprocessing[1670]: Create input/output tensors
+vdo_larod_preprocessing[1670]: Create job requests
+vdo_larod_preprocessing[1670]: Determine tensor buffer sizes
+vdo_larod_preprocessing[1670]: Start fetching video frames from VDO
+vdo_larod_preprocessing[1670]: Converted image in 6 ms
+vdo_larod_preprocessing[1670]: Ran inference for 293 ms
+vdo_larod_preprocessing[1670]: Top result:  955  banana with score 77.20%
+vdo_larod_preprocessing[1670]: Converted image in 5 ms
+vdo_larod_preprocessing[1670]: Ran inference for 224 ms
+vdo_larod_preprocessing[1670]: Top result:  955  banana with score 76.80%
+vdo_larod_preprocessing[1670]: Converted image in 5 ms
+vdo_larod_preprocessing[1670]: Ran inference for 217 ms
+vdo_larod_preprocessing[1670]: Top result:  955  banana with score 76.00%
+vdo_larod_preprocessing[1670]: Converted image in 10 ms
+vdo_larod_preprocessing[1670]: Ran inference for 213 ms
+vdo_larod_preprocessing[1670]: Top result:  955  banana with score 75.60%
+vdo_larod_preprocessing[1670]: Converted image in 5 ms
+vdo_larod_preprocessing[1670]: Ran inference for 221 ms
+vdo_larod_preprocessing[1670]: Stop streaming video from VDO
+vdo_larod_preprocessing[1670]: Top result:  955  banana with score 75.20%
+vdo_larod_preprocessing[1670]: Exit /usr/local/packages/vdo_larod_preprocessing/vdo_larod_preprocessing
 ```
 
 ## Output Alternative Chip 4 - Google TPU
@@ -224,34 +240,49 @@ vdo_larod_preprocessing[20004]: Exit /usr/local/packages/vdo_larod_preprocessing
 ```
 ----- Contents of SYSTEM_LOG for 'vdo_larod_preprocessing' -----
 
-vdo_larod_preprocessing[0]: starting vdo_larod_preprocessing
-vdo_larod_preprocessing[17701]: Connecting to larod
-vdo_larod_preprocessing[17701]: Setting up inference model
-vdo_larod_preprocessing[17701]: Setting up preprocessing model
-vdo_larod_preprocessing[17701]: Setting up and starting VDO stream
-vdo_larod_preprocessing[17701]: Starting to run larod jobs
-vdo_larod_preprocessing[17701]:  ===== Top 3 inference scores =====
-vdo_larod_preprocessing[17701]: 1. idx 955 labeled "banana" with score 1.00
-vdo_larod_preprocessing[17701]: 2. idx 0 labeled "unknown" with score 0.00
-vdo_larod_preprocessing[17701]: 3. idx 1 labeled "tench" with score 0.00
-vdo_larod_preprocessing[17701]:  ===== Top 3 inference scores =====
-vdo_larod_preprocessing[17701]: 1. idx 955 labeled "banana" with score 1.00
-vdo_larod_preprocessing[17701]: 2. idx 0 labeled "unknown" with score 0.00
-vdo_larod_preprocessing[17701]: 3. idx 1 labeled "tench" with score 0.00
-vdo_larod_preprocessing[17701]:  ===== Top 3 inference scores =====
-vdo_larod_preprocessing[17701]: 1. idx 955 labeled "banana" with score 1.00
-vdo_larod_preprocessing[17701]: 2. idx 0 labeled "unknown" with score 0.00
-vdo_larod_preprocessing[17701]: 3. idx 1 labeled "tench" with score 0.00
-vdo_larod_preprocessing[17701]:  ===== Top 3 inference scores =====
-vdo_larod_preprocessing[17701]: 1. idx 955 labeled "banana" with score 1.00
-vdo_larod_preprocessing[17701]: 2. idx 0 labeled "unknown" with score 0.00
-vdo_larod_preprocessing[17701]: 3. idx 1 labeled "tench" with score 0.00
-vdo_larod_preprocessing[17701]:  ===== Top 3 inference scores =====
-vdo_larod_preprocessing[17701]: 1. idx 955 labeled "banana" with score 1.00
-vdo_larod_preprocessing[17701]: 2. idx 0 labeled "unknown" with score 0.00
-vdo_larod_preprocessing[17701]: 3. idx 1 labeled "tench" with score 0.00
-vdo_larod_preprocessing[17701]: Exit /usr/local/packages/vdo_larod_preprocessing/vdo_larod_preprocessing
-```
+ Starting /usr/local/packages/vdo_larod_preprocessing/vdo_larod_preprocessing
+vdo_larod_preprocessing[31476]: 'buffer.strategy': <uint32 3>
+vdo_larod_preprocessing[31476]: 'channel': <uint32 1>
+vdo_larod_preprocessing[31476]: 'format': <uint32 3>
+vdo_larod_preprocessing[31476]: 'height': <uint32 240>
+vdo_larod_preprocessing[31476]: 'width': <uint32 320>
+vdo_larod_preprocessing[31476]: Creating VDO image provider and creating stream 320 x 240
+vdo_larod_preprocessing[31476]: Dump of vdo stream settings map =====
+vdo_larod_preprocessing[31476]: chooseStreamResolution: We select stream w/h=320 x 240 based on VDO channel info.
+vdo_larod_preprocessing[31476]: Calculate crop image
+vdo_larod_preprocessing[31476]: Create larod models
+vdo_larod_preprocessing[31476]: Create preprocessing maps
+vdo_larod_preprocessing[31476]: Crop VDO image X=40 Y=0 (240 x 240)
+vdo_larod_preprocessing[31476]: Setting up larod connection with chip 4 and model /usr/local/packages/vdo_larod_preprocessing/model/mobilenet_v2_1.0_224_quant_edgetpu.tflite
+vdo_larod_preprocessing[31476]: 10: Axis Compute Engine
+vdo_larod_preprocessing[31476]: 11: CPU with libyuv
+vdo_larod_preprocessing[31476]: 13: Image processing using OpenCL
+vdo_larod_preprocessing[31476]: 2: CPU with TensorFlow Lite
+vdo_larod_preprocessing[31476]: 4: Google TPU
+vdo_larod_preprocessing[31476]: Available chip ids:
+vdo_larod_preprocessing[31476]: Allocate memory for input/output buffers
+vdo_larod_preprocessing[31476]: Connect tensors to file descriptors
+vdo_larod_preprocessing[31476]: Create input/output tensors
+vdo_larod_preprocessing[31476]: Create job requests
+vdo_larod_preprocessing[31476]: Determine tensor buffer sizes
+vdo_larod_preprocessing[31476]: Start fetching video frames from VDO
+vdo_larod_preprocessing[31476]: Converted image in 6 ms
+vdo_larod_preprocessing[31476]: Ran inference for 22 ms
+vdo_larod_preprocessing[31476]: Top result:  955  banana with score 97.20%
+vdo_larod_preprocessing[31476]: Converted image in 5 ms
+vdo_larod_preprocessing[31476]: Ran inference for 5 ms
+vdo_larod_preprocessing[31476]: Top result:  955  banana with score 98.40%
+vdo_larod_preprocessing[31476]: Converted image in 6 ms
+vdo_larod_preprocessing[31476]: Ran inference for 8 ms
+vdo_larod_preprocessing[31476]: Top result:  955  banana with score 99.20%
+vdo_larod_preprocessing[31476]: Converted image in 4 ms
+vdo_larod_preprocessing[31476]: Ran inference for 5 ms
+vdo_larod_preprocessing[31476]: Top result:  955  banana with score 99.20%
+vdo_larod_preprocessing[31476]: Converted image in 6 ms
+vdo_larod_preprocessing[31476]: Ran inference for 4 ms
+vdo_larod_preprocessing[31476]: Stop streaming video from VDO
+vdo_larod_preprocessing[31476]: Top result:  955  banana with score 99.20%
+vdo_larod_preprocessing[31476]: Exit /usr/local/packages/vdo_larod_preprocessing/vdo_larod_preprocessing```
 
 ## A note on performance
 
@@ -271,6 +302,7 @@ improve performance, but with some added complexity to the program.
 
 ## Conclusion
 - This is an example of test data, which is dependent on selected device and chip.
+- One full-screen banana has been used for testing.
 - Running inference is much faster on chip Google TPU than CPU with TensorFlow Lite.
 - Converting images takes almost the same time on both chips.
 - Objects with score less than 60% are generally not good enough to be used as classification results.
