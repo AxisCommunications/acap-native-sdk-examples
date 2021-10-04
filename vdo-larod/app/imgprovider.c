@@ -429,6 +429,7 @@ static void* threadEntry(void* data) {
         pthread_cond_signal(&provider->frameDeliverCond);
         pthread_mutex_unlock(&provider->frameMutex);
     }
+    return NULL;
 }
 
 bool startFrameFetch(ImgProvider_t* provider) {

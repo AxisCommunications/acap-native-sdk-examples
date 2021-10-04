@@ -16,7 +16,7 @@ CFLAGS += -Wall
 # This example is based on larod version 1
 CFLAGS += -DLAROD_API_VERSION_1
 
-all:	$(PROGS)
+all: $(PROGS)
 
 $(PROG1): $(OBJS1)
 	$(CC) $(CFLAGS) $(LDFLAGS) $^ $(LDLIBS) -o $@

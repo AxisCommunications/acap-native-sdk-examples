@@ -6,10 +6,9 @@ This README file explains how to build an ACAP4 Native application that uses:
 - a library called libyuv to do image preprocessing
 - [larod API](../FAQs.md#WhatisLarod?) to load a graph model and run classification inferences on it
 
-It is achieved by using the containerized API and toolchain images.
+It is achieved by using the containerized API and toolchain docker images.
 
-Together with this README file you should be able to find a directory called app. That directory contains the "vdo_larod" application source code, which can easily
-be compiled and run with the help of the tools and step by step below.
+Together with this README file you should be able to find a directory called app. That directory contains the "vdo_larod" application source code, which can easily be compiled and run with the help of the tools and step by step below.
 
 ## Detailed outline of example application
 This application opens a client to vdo and starts fetching frames (in a new thread) in the yuv format. It tries to match twice the WIDTH and HEIGHT that is required by the neural network. The thread fetching frames is written so that it always tries to provide a frame as new as possible even if not all previous frames have been processed by libyuv and larod. The implementation of the vdo specific parts of the app can be found in file "imgprovider.c".
@@ -44,8 +43,8 @@ vdo-larod
 ```
 
 * **app/argparse.c/h** - Implementation of argument parser, written in C.
-* **app/imageconverter.c/h** - Implementation of libyuv parts, written in C.
-* **app/imageprovider.c/h** - Implementation of vdo parts, written in C.
+* **app/imgconverter.c/h** - Implementation of libyuv parts, written in C.
+* **app/imgprovider.c/h** - Implementation of vdo parts, written in C.
 * **app/LICENSE** - Text file which lists all open source licensed source code distributed with the application.
 * **app/Makefile** - Makefile containing the build and link instructions for building the ACAP4 Native application.
 * **app/manifest.json.cpu** - Defines the application and its configuration when building for CPU with TensorFlow Lite.
@@ -65,15 +64,15 @@ vdo-larod
 
 * **yuv/0001-Create-a-shared-library.patch** - Patch, which is needed to support building an .so file, for the shared library libyuv.
 
-### Limitations
+## Limitations
 * ARTPEC-7 based device.
 * This application was not written to optimize performance.
 * MobileNet is good for classification, but it requires that the object you want to classify should cover almost all the frame.
 
-### How to run the code
+## How to run the code
 Below is the step by step instructions on how to execute the program. So basically starting with the generation of the .eap file to running it on a device:
 
-#### Build the application
+## Build the application
 
 > [!IMPORTANT]
 > *Depending on the network you are connected to,
@@ -85,7 +84,7 @@ Depending on selected chip, different model can be used for running larod. Label
 
 Model and label files are downloaded from https://coral.ai/models/, when building the application.
 
-Which model that is used is configured through attributes in manifest.json and the CHIP parameter in the Dockerfile. 
+Which model that is used is configured through attributes in manifest.json and the CHIP parameter in the Dockerfile.
 The attributes in manifest.json that configures model are:
 - runOptions, which contains the application command line options.
 - friendlyName, a user friendly package name which is also part of the .eap file name.
@@ -103,23 +102,23 @@ docker cp $(docker create <APP_IMAGE>):/opt/app ./build
 
 \<APP_IMAGE\> is the name to tag the image with, e.g., vdo_larod_preprocessing:1.0
 
-\<CHIP\> is the chip type. Supported values are cpu and edgetpu
+\<CHIP\> is the chip type. Supported values are cpu and edgetpu.
 
 Following is examples of how to build for both CPU with Tensorflow Lite and Google TPU.
 
-Run the following command standing in your working directory to build larod for a CPU with TensorFlow Lite:
+To build a package for CPU with Tensorflow Lite, run the following command standing in your working directory:
 ```bash
 cp app/manifest.json.cpu app/manifest.json
-docker build --build-arg CHIP=cpu --tag <APP_IMAGE> .
+docker build . --build-arg CHIP=cpu --tag <APP_IMAGE>
 docker cp $(docker create <APP_IMAGE>):/opt/app ./build
 ```
-To build larod for a Google TPU instead, run the following command:
+To build a package for Google TPU instead, run the following command:
 ```bash
 cp app/manifest.json.edgetpu app/manifest.json
-docker build --build-arg CHIP=edgetpu --tag <APP_IMAGE> .
+docker build . --build-arg CHIP=edgetpu --tag <APP_IMAGE>
 docker cp $(docker create <APP_IMAGE>):/opt/app ./build
 ```
-The working dir now contains a build folder with the following files:
+The working dir now contains a build folder with the following files of importance:
 
 ```bash
 vdo-larod
@@ -139,14 +138,14 @@ vdo-larod
 │   ├── manifest.json.cpu
 │   ├── manifest.json.edgetpu
 │   ├── model
-|   │   ├── mobilenet_v2_1.9_224_quant_edgetpu.tflite
-|   │   └── mobilenet_v2_1.9_224_quant.tflite
+|   │   ├── mobilenet_v2_1.0_224_quant_edgetpu.tflite
+|   │   └── mobilenet_v2_1.0_224_quant.tflite
 │   ├── package.conf
 │   ├── package.conf.orig
 │   ├── param.conf
 │   ├── vdo_larod*
 │   ├── vdo_larod_cpu_1_0_0_armv7hf.eap / vdo_larod_edgetpu_1_0_0_armv7hf.eap
-│   ├── vdo_larod_1_0_0_LICENSE.txt
+│   ├── vdo_larod_cpu_1_0_0_LICENSE.txt / vdo_larod_edgetpu_1_0_0_LICENSE.txt
 │   └── vdo_larod.c
 ```
 
@@ -155,17 +154,18 @@ vdo-larod
 * **build/lib** - Folder containing compiled library files for libyuv.
 * **build/manifest.json** - Defines the application and its configuration.
 * **build/model** - Folder containing models used in this application.
-* **build/model/mobilenet_v2_1.9_224_quant_edgetpu.tflite** - Model file for MobileNet V2 (ImageNet), used for Google TPU.
-* **build/model/mobilenet_v2_1.9_224_quant.tflite** - Model file for MobileNet V2 (ImageNet), used for CPU with TensorFlow Lite.
+* **build/model/mobilenet_v2_1.0_224_quant_edgetpu.tflite** - Model file for MobileNet V2 (ImageNet), used for Google TPU.
+* **build/model/mobilenet_v2_1.0_224_quant.tflite** - Model file for MobileNet V2 (ImageNet), used for CPU with TensorFlow Lite.
 * **build/package.conf** - Defines the application and its configuration.
 * **build/package.conf.orig** - Defines the application and its configuration, original file.
 * **build/param.conf** - File containing application parameters.
 * **build/vdo_larod** - Application executable binary file.
-* **build/vdo_larod_cpu_1_0_0_armv7hf.eap** - Application package .eap file,
   if alternative chip 2 has been built.
-* **build/vdo_larod_edgetpu_1_0_0_armv7hf.eap** - Application package .eap file,
+* **build/vdo_larod_cpu_1_0_0_armv7hf.eap** - Application package .eap file.
+* **build/vdo_larod_cpu_1_0_0_LICENSE.txt** - Copy of LICENSE file.
   if alternative chip 4 has been built.
-* **build/vdo_larod_1_0_0_LICENSE.txt** - Copy of LICENSE file.
+* **build/vdo_larod_edgetpu_1_0_0_armv7hf.eap** - Application package .eap file,
+* **build/vdo_larod_edgetpu_1_0_0_LICENSE.txt** - Copy of LICENSE file.
 
 #### Install your application
 Installing your application on an Axis video device is as simple as:
@@ -176,13 +176,11 @@ Browse to the following page (replace <axis_device_ip> with the IP number of you
 http://<axis_device_ip>/#settings/apps
 ```
 
-*Goto your device web page above > Click on the tab **App** in the device GUI > Add **(+)** sign and browse to
-the newly built **vdo_larod_cpu_1_0_0_armv7hf.eap** or **vdo_larod_edgetpu_1_0_0_armv7hf.eap** > Click **Install** > Run the application by enabling the **Start** switch*
+*Goto your device web page above > Click on the tab **App** in the device GUI > Add **(+)** sign and browse to the newly built **vdo_larod_cpu_1_0_0_armv7hf.eap** or *vdo_larod_edgetpu_1_0_0_armv7hf.eap** > Click **Install** > Run the application by enabling the **Start** switch*
 
-Application vdo_larod is now available as an application on the device,
-using the friendly name "vdo_larod_cpu" or "vdo_larod_edgetpu".
+Application vdo_larod is now available as an application on the device, using the friendly name "vdo_larod_cpu" or "vdo_larod_edgetpu".
 
-#### The expected output
+## The expected output
 Application log can be found directly at:
 
 ```
@@ -203,7 +201,7 @@ head -50 info.log
 
 Depending on selected chip, different output is received. The label file is used for identifying objects.
 
-##### Output Alternative Chip 2 - CPU with TensorFlow Lite
+## Output Alternative Chip 2 - CPU with TensorFlow Lite
 
 ```
 ----- Contents of SYSTEM_LOG for 'vdo_larod' -----
@@ -224,7 +222,7 @@ vdo_larod[13021]: Ran inference for 356 ms
 vdo_larod[13021]: Top result:  955  banana with score 85.60%
 ```
 
-##### Output Alternative Chip 4 - Google TPU
+## Output Alternative Chip 4 - Google TPU
 
 ```
 ----- Contents of SYSTEM_LOG for 'vdo_larod' -----
@@ -245,8 +243,8 @@ vdo_larod[27814]: Ran inference for 17 ms
 vdo_larod[27814]: Top result:  955  banana with score 93.60%
 ```
 
-##### Conclusion
-- This is an example of test data, which is dependant on selected device and chip.
+## Conclusion
+- This is an example of test data, which is dependent on selected device and chip.
 - One full-screen banana has been used for testing.
 - Running inference is much faster on chip Google TPU than CPU with TensorFlow Lite.
 - Converting images takes almost the same time on both chips.
