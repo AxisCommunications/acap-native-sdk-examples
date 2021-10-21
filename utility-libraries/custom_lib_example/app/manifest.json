@@ -1,0 +1,16 @@
+{
+    "schemaVersion": "1.1",
+    "acapPackageConf": {
+        "setup": {
+            "appName": "customlib_example",
+            "vendor": "Axis Communications",
+            "embeddedSdkVersion": "3.0",
+            "user": {
+                "group": "sdk",
+                "username": "sdk"
+            },
+            "runMode": "never",
+            "version": "1.0.0"
+        }
+    }
+}

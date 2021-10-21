@@ -7,12 +7,14 @@ This README file lists examples of how to build and use libraries in an applicat
 Below is the structure of the files and folders on the top level:
 
 ```bash
-utility_libraries
+utility-libraries
 ├── curl_example
+├── custom_lib_example
 └── README.md
 ```
 
 * **curl_example** - Folder containing files for building ACAP application "curl_example".
+* **custom_lib_example** - Folder containing files for building ACAP application "custom_lib_example".
 * **README.md** - Step by step instructions on how to use the examples.
 
 ### Example applications
@@ -21,6 +23,8 @@ Below is the list of examples available in the repository.
 
 * [Curl Example](./curl_example/README.md)
   * The example shows how to build curl as a library and make use of it in an application.
+* [Custom lib Example](./custom_lib_example/README.md)
+  * The example shows how to build custom library and make use of it in an application.
 
 ## License
 **[Apache License 2.0](../LICENSE)**

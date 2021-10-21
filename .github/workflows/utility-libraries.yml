@@ -16,3 +16,10 @@ jobs:
           cd utility-libraries/curl_example
           docker build --no-cache --tag $imagetag .
           docker cp $(docker create $imagetag):/opt/app/ ./build
+
+      - name: Build custom library application
+        run: |
+          imagetag=utility-libraries:1.0
+          cd utility-libraries/custom_lib_example
+          docker build --no-cache --tag $imagetag .
+          docker cp $(docker create $imagetag):/opt/app/ ./build
