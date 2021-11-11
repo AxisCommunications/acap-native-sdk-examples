@@ -59,7 +59,7 @@ jobs:
           git clone "ssh://${{ secrets.GERRIT_SERVICE_USER }}@gittools.se.axis.com:29418/tests/atf/tart/recap.git"
           cd recap
           source /github-runner/github-runner/init/atf_init.sh
-          ./test_starter.sh tpu_vdo_larod_preprocessing
+          ./test_starter.sh vdo-larod-preprocessing
           ls recap/output
 
       # Save functional test report as artifact
