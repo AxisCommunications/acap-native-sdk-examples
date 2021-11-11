@@ -12,9 +12,6 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: Login to dockerhub axis account
-        run: docker login -u ${{ secrets.DOCKERHUB_USER }} --password ${{ secrets.DOCKERHUB_PASS }}
-
       - name: Build vdo-opencl-filtering application
         run: |
           imagetag=vdo_cl_filter_demo:1.0
