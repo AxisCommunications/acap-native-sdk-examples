@@ -12,9 +12,6 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: Login to dockerhub axis account
-        run: docker login -u ${{ secrets.DOCKERHUB_USER }} --password ${{ secrets.DOCKERHUB_PASS }}
-
       - name: Configure axis proxy
         if: ${{ env.RUN_FUNCTION_TEST== 'true' }}
         run: |
@@ -26,7 +23,6 @@ jobs:
         run: |
           imagetag=larod-simple-app:1.0
           docker image rm -f $imagetag
-          docker login -u ${{ secrets.DOCKERHUB_USER }} --password ${{ secrets.DOCKERHUB_PASS }}
           cd larod
           docker build --no-cache --tag $imagetag .
           docker cp $(docker create $imagetag):/opt/app ./build
