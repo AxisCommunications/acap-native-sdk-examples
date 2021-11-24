@@ -27,7 +27,7 @@
  * order: format frames output.
  *
  * First argument, format, is a string describing the video compression format.
- * Possible values are h264 (default), h265 and jpeg.
+ * Possible values are h264 (default), h265, jpeg, nv12, and y800.
  *
  * Second argument, frames, is an integer for number of captured frames.
  *
@@ -95,6 +95,9 @@ print_frame(VdoFrame* frame)
         case VDO_FRAME_TYPE_JPEG:
             frame_type = "jpeg";
             break;
+        case VDO_FRAME_TYPE_YUV:
+            frame_type = "yuv";
+            break;
         default:
             frame_type = "NA";
     }
@@ -115,6 +118,12 @@ set_format(VdoMap *settings, gchar *format, GError **error)
         vdo_map_set_uint32(settings, "format", VDO_FORMAT_H265);
     } else if(g_strcmp0(format, "jpeg") == 0) {
         vdo_map_set_uint32(settings, "format", VDO_FORMAT_JPEG);
+    } else if(g_strcmp0(format, "nv12") == 0) {
+        vdo_map_set_uint32(settings, "format", VDO_FORMAT_YUV);
+        vdo_map_set_string(settings, "subformat", "NV12");
+    } else if(g_strcmp0(format, "y800") == 0) {
+        vdo_map_set_uint32(settings, "format", VDO_FORMAT_YUV);
+        vdo_map_set_string(settings, "subformat", "Y800");
     } else {
         g_set_error(error, VDO_CLIENT_ERROR, VDO_ERROR_NOT_FOUND,
                     "Format \"%s\" is not supported\n", format);
@@ -127,7 +136,7 @@ set_format(VdoMap *settings, gchar *format, GError **error)
 /**
  * Main function that starts a stream with the following options:
  *
- * --format [h264, h265, jpeg]
+ * --format [h264, h265, jpeg, nv12, y800]
  * --frames [number of frames]
  * --output [output filename]
  */
@@ -143,7 +152,7 @@ main(int argc, char* argv[])
     openlog(NULL, LOG_PID, LOG_USER);
 
     GOptionEntry options[] = {
-        {"format", 't', 0, G_OPTION_ARG_STRING, &format, "format (h264, h265, jpeg)", NULL},
+        {"format", 't', 0, G_OPTION_ARG_STRING, &format, "format (h264, h265, jpeg, nv12, y800)", NULL},
         {"frames", 'n', 0, G_OPTION_ARG_INT, &frames, "number of frames", NULL},
         {"output", 'o', 0, G_OPTION_ARG_FILENAME, &output_file, "output filename", NULL},
         {NULL, 0, 0, 0, NULL, NULL, NULL,}
