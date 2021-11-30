@@ -6,7 +6,10 @@ stop_containers () {
 }
 
 # cd to script directory
-cd -P -- "$(dirname -- "$0")"
+cd -P -- "$(dirname -- "$0")" || {
+  echo "Error: Could not change directory"
+  exit 1
+}
 
 # Trap SIGINT and SIGTERM
 trap 'stop_containers' 2 15

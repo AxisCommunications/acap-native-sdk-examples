@@ -1,11 +1,13 @@
- *Copyright (C) 2021, Axis Communications AB, Lund, Sweden. All Rights Reserved.*
+*Copyright (C) 2021, Axis Communications AB, Lund, Sweden. All Rights Reserved.*
 
 # A hello-world ACAP application using manifest
+
 This README file explains how to build a simple Hello World manifest ACAP application. It is achieved by using the containerized API and toolchain images.
 
 Together with this README file, you should be able to find a directory called app. That directory contains the "hello-world" application source code which can easily be compiled and run with the help of the tools and step by step below.
 
 ## Getting started
+
 These instructions will guide you on how to execute the code. Below is the structure and scripts used in the example:
 
 ```bash
@@ -27,15 +29,17 @@ hello-world
 * **README.md** - Step by step instructions on how to run the example.
 
 ### How to run the code
+
 Below is the step by step instructions on how to execute the program. So basically starting with the generation of the .eap file to running it on a device:
 
 #### Build the application
+
 Standing in your working directory run the following commands:
 
 > [!IMPORTANT]
 > *Depending on the network you are connected to,
-The file that needs those settings is: *~/.docker/config.json.*
-For reference please see: https://docs.docker.com/network/proxy/ and a
+The file that needs those settings is:* ~/.docker/config.json. *For
+reference please see: <https://docs.docker.com/network/proxy/> and a
 [script for Axis device here](../FAQs.md#HowcanIset-upnetworkproxysettingsontheAxisdevice?).*
 
 ```bash
@@ -47,6 +51,7 @@ docker build --tag <APP_IMAGE> .
 Default architecture is **armv7hf**. To build for **aarch64** it's possible to
 update the *ARCH* variable in the Dockerfile or to set it in the docker build
 command via build argument:
+
 ```bash
 docker build --build-arg ARCH=aarch64 --tag <APP_IMAGE> .
 ```
@@ -90,6 +95,7 @@ hello-world
 * **build/param.conf** - File containing application parameters.
 
 #### Install your application
+
 Installing your application on an Axis video device is as simple as:
 
 Browse to the following page (replace <axis_device_ip> with the IP number of your Axis video device)
@@ -102,9 +108,10 @@ http://<axis_device_ip>/#settings/apps
 the newly built **hello_world_1_0_0_armv7hf.eap** > Click **Install** > Run the application by enabling the **Start** switch*
 
 #### The expected output
+
 Application log can be found directly at:
 
-```
+```sh
 http://<axis_device_ip>/axis-cgi/admin/systemlog.cgi?appname=hello_world
 ```
 
@@ -117,7 +124,7 @@ or by clicking on the "**App log**" link in the device GUI or by extracting the 
 tail -f /var/log/info.log | grep hello_world
 ```
 
-```
+```sh
 ----- Contents of SYSTEM_LOG for 'hello_world' -----
 
 14:13:07.412 [ INFO ] hello_world[6425]: Hello World!
@@ -125,4 +132,5 @@ tail -f /var/log/info.log | grep hello_world
 ```
 
 ## License
+
 **[Apache License 2.0](../LICENSE)**

@@ -9,7 +9,9 @@ FROM ${REPO}/${SDK}:${VERSION}-${ARCH}-ubuntu${UBUNTU_VERSION}
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
     autoconf \
     libtool \
-    automake
+    automake && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
 WORKDIR /opt/build
 RUN git clone https://github.com/curl/curl.git
@@ -18,9 +20,12 @@ RUN git clone https://github.com/curl/curl.git
 # - Source the SDK environment script to get links to cross compiler through
 # - CONFIGURE_FLAGS environment variable
 WORKDIR /opt/build/curl
+
+# CONFIGURE_FLAGS need to be split
+# hadolint ignore=SC2086
 RUN . /opt/axis/acapsdk/environment-setup* && \
     autoreconf -fi && \
-    ./configure --prefix=${PWD}/build ${CONFIGURE_FLAGS} --without-ssl && \
+    ./configure --prefix="${PWD}"/build ${CONFIGURE_FLAGS} --without-ssl && \
     make && \
     make install
 

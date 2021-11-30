@@ -1,42 +1,30 @@
-name: Build vdostream Application
+name: Build vdostream application
 on:
   push:
     paths:
-      - "vdostream/**"
-      - ".github/workflows/vdostream.yml"
+      - 'vdostream/**'
+      - '!vdostream/README.md'
+      - '.github/workflows/vdostream.yml'
 jobs:
   build:
     runs-on: ubuntu-latest
     env:
-      RUN_FUNCTION_TEST: false
+      EXNAME: vdostream
+      EAPNAME: vdoencodeclient
+      EXDIR: acap/examples/$EXNAME
     steps:
       - uses: actions/checkout@v2
 
-      - name: Build vdo stream application
+      - name: Build ${{ env.example }} application
+        env:
+          example: ${{ env.EXNAME }}
+          imagetag: ${{ env.EXNAME }}:1.0
+          eapfile: ${{ env.EAPNAME }}_1_0_0_armv7hf.eap
         run: |
-          imagetag=vdoencodeclient:1.0
           docker image rm -f $imagetag
-          cd vdostream
+          cd $EXNAME
           docker build --no-cache --tag $imagetag .
           docker cp $(docker create $imagetag):/opt/app ./build
           cd ..
-          mkdir -p acap4-native/examples/vdostream/build
-          cp vdostream/build/vdoencodeclient_1_0_0_armv7hf.eap acap4-native/examples/vdostream/build/vdoencodeclient_1_0_0_armv7hf.eap
-
-      - name: Run functional tests
-        if: ${{ env.RUN_FUNCTION_TEST== 'true' }}
-        run: |
-          export WORKSPACE=$(pwd)
-          echo $WORKSPACE
-          git clone "ssh://${{ secrets.GERRIT_SERVICE_USER }}@gittools.se.axis.com:29418/tests/atf/tart/recap.git"
-          cd recap
-          source /github-runner/github-runner/init/atf_init.sh
-          ./test_starter.sh vdo_stream
-          ls recap/output
-
-      # Save functional test report as artifact
-      - uses: actions/upload-artifact@master
-        if: ${{ env.RUN_FUNCTION_TEST== 'true' }}
-        with:
-          name: Test report
-          path: recap/recap/output/report.xml
+          mkdir -p $EXDIR/build
+          cp $EXNAME/build/$eapfile $EXDIR/build/$eapfile

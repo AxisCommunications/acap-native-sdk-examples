@@ -1,67 +1,48 @@
-name: Build vdo-larod-preprocessing Applications
+name: Build vdo-larod-preprocessing applications
 on:
   push:
     paths:
-      - "vdo-larod-preprocessing/**"
-      - ".github/workflows/vdo-larod-preprocessing.yml"
+      - 'vdo-larod-preprocessing/**'
+      - '!vdo-larod-preprocessing/README.md'
+      - '.github/workflows/vdo-larod-preprocessing.yml'
 jobs:
   build:
     runs-on: ubuntu-latest
     env:
-      RUN_FUNCTION_TEST: false
+      EXNAME: vdo-larod-preprocessing
+      EAPNAME: vdo_larod_preprocessing
     steps:
       - uses: actions/checkout@v2
 
-      - name: Configure axis proxy
-        if: ${{ env.RUN_FUNCTION_TEST== 'true' }}
+      - name: Build ${{ env.example }} application
+        env:
+          example: ${{ env.EXNAME }}-cpu
+          imagetag: ${{ env.EXNAME }}-cpu:1.0
+          eapfile: ${{ env.EAPNAME }}_cpu_1_0_0_armv7hf.eap
+          exdir: ${{ env.EXNAME }}/build_cpu_preprocessing
         run: |
-          export DOCKER_CONFIG="$WORKSPACE/.docker"
-          mkdir -p "$DOCKER_CONFIG"
-          echo '{"proxies":{ "default":{"httpProxy": "http://wwwproxy.se.axis.com:3128", "httpsProxy": "http://wwwproxy.se.axis.com:3128"}}}' > "$DOCKER_CONFIG/config.json"
-
-      - name: Build vdo-larod-preprocessing application to run on CPU
-        run: |
-          imagetag=vdo-larod-preprocessing-cpu:1.0
           docker image rm -f $imagetag
-          cd vdo-larod-preprocessing
+          cd $EXNAME
           cp app/manifest.json.cpu app/manifest.json
           docker build --no-cache --build-arg CHIP=cpu --tag $imagetag .
           docker cp $(docker create $imagetag):/opt/app ./build
           cd ..
-          pwd
-          mkdir -p vdo-larod-preprocessing/build_cpu_preprocessing/
-          ls vdo-larod-preprocessing/build/
-          cp vdo-larod-preprocessing/build/vdo_larod_preprocessing_cpu_1_0_0_armv7hf.eap vdo-larod-preprocessing/build_cpu_preprocessing/vdo_larod_preprocessing_cpu_1_0_0_armv7hf.eap
-          ls vdo-larod-preprocessing/build_cpu_preprocessing/
+          mkdir -p $exdir
+          cp $EXNAME/build/$eapfile $exdir/$eapfile
 
-      - name: Build vdo-larod-preprocessing application to run on TPU
+      - name: Build ${{ env.example }} application
+        env:
+          example: ${{ env.EXNAME }}-tpu
+          imagetag: ${{ env.EXNAME }}-tpu:1.0
+          eapfile: ${{ env.EAPNAME }}_edgetpu_1_0_0_armv7hf.eap
+          exdir: ${{ env.EXNAME }}/build_tpu_preprocessing
         run: |
-          imagetag=vdo-larod-preprocessing-tpu:1.0
           docker image rm -f $imagetag
-          cd vdo-larod-preprocessing
+          cd $EXNAME
           rm -rf build/
           cp app/manifest.json.edgetpu app/manifest.json
           docker build --no-cache --build-arg CHIP=edgetpu --tag $imagetag .
           docker cp $(docker create $imagetag):/opt/app ./build
           cd ..
-          mkdir -p vdo-larod-preprocessing/build_tpu_preprocessing/
-          cp vdo-larod-preprocessing/build/vdo_larod_preprocessing_edgetpu_1_0_0_armv7hf.eap vdo-larod-preprocessing/build_tpu_preprocessing/vdo_larod_preprocessing_edgetpu_1_0_0_armv7hf.eap
-          ls vdo-larod-preprocessing/build_tpu_preprocessing/
-
-      - name: Run functional tests
-        if: ${{ env.RUN_FUNCTION_TEST== 'true' }}
-        run: |
-          export WORKSPACE=$(pwd)
-          echo $WORKSPACE
-          git clone "ssh://${{ secrets.GERRIT_SERVICE_USER }}@gittools.se.axis.com:29418/tests/atf/tart/recap.git"
-          cd recap
-          source /github-runner/github-runner/init/atf_init.sh
-          ./test_starter.sh vdo-larod-preprocessing
-          ls recap/output
-
-      # Save functional test report as artifact
-      - uses: actions/upload-artifact@master
-        if: ${{ env.RUN_FUNCTION_TEST== 'true' }}
-        with:
-          name: Test report
-          path: recap/recap/output/report.xml
+          mkdir -p $exdir
+          cp $EXNAME/build/$eapfile $exdir/$eapfile

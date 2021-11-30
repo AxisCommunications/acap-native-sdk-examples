@@ -1,66 +1,48 @@
-name: Build vdo larod Applications
+name: Build vdo-larod applications
 on:
   push:
     paths:
-      - "vdo-larod/**"
-      - ".github/workflows/vdo-larod.yml"
+      - 'vdo-larod/**'
+      - '!vdo-larod/README.md'
+      - '.github/workflows/vdo-larod.yml'
 jobs:
   build:
     runs-on: ubuntu-latest
     env:
-      RUN_FUNCTION_TEST: false
+      EXNAME: vdo-larod
+      EAPNAME: vdo_larod
     steps:
       - uses: actions/checkout@v2
 
-      - name: Configure axis proxy
-        if: ${{ env.RUN_FUNCTION_TEST== 'true' }}
+      - name: Build ${{ env.example }} application
+        env:
+          example: ${{ env.EXNAME }}-cpu
+          imagetag: ${{ env.EXNAME }}-cpu:1.0
+          eapfile: ${{ env.EAPNAME }}_cpu_1_0_0_armv7hf.eap
+          exdir: ${{ env.EXNAME }}/build_cpu
         run: |
-          export DOCKER_CONFIG="$WORKSPACE/.docker"
-          mkdir -p "$DOCKER_CONFIG"
-          echo '{"proxies":{ "default":{"httpProxy": "http://wwwproxy.se.axis.com:3128", "httpsProxy": "http://wwwproxy.se.axis.com:3128"}}}' > "$DOCKER_CONFIG/config.json"
-
-      - name: Build VDO larod application to run on CPU
-        run: |
-          imagetag=vdo-larod-cpu:1.0
           docker image rm -f $imagetag
-          cd vdo-larod
+          cd $EXNAME
           cp app/manifest.json.cpu app/manifest.json
           docker build --no-cache --build-arg CHIP=cpu --tag $imagetag .
           docker cp $(docker create $imagetag):/opt/app ./build
           cd ..
-          pwd
-          mkdir -p vdo-larod/build_cpu/
-          cp vdo-larod/build/vdo_larod_cpu_1_0_0_armv7hf.eap vdo-larod/build_cpu/vdo_larod_cpu_1_0_0_armv7hf.eap
-          ls vdo-larod/build_cpu/
+          mkdir -p $exdir
+          cp $EXNAME/build/$eapfile $exdir/$eapfile
 
-      - name: Build VDO larod application to run on TPU
+      - name: Build ${{ env.example }} application
+        env:
+          example: ${{ env.EXNAME }}-tpu
+          imagetag: ${{ env.EXNAME }}-tpu:1.0
+          eapfile: ${{ env.EAPNAME }}_edgetpu_1_0_0_armv7hf.eap
+          exdir: ${{ env.EXNAME }}/build_tpu
         run: |
-          imagetag=vdo-larod-tpu:1.0
           docker image rm -f $imagetag
-          cd vdo-larod
+          cd $EXNAME
           rm -rf build/
           cp app/manifest.json.edgetpu app/manifest.json
           docker build --no-cache --build-arg CHIP=edgetpu --tag $imagetag .
           docker cp $(docker create $imagetag):/opt/app ./build
           cd ..
-          mkdir -p vdo-larod/build_tpu/
-          cp vdo-larod/build/vdo_larod_edgetpu_1_0_0_armv7hf.eap vdo-larod/build_tpu/vdo_larod_edgetpu_1_0_0_armv7hf.eap
-          ls vdo-larod/build_tpu/
-
-      - name: Run functional tests
-        if: ${{ env.RUN_FUNCTION_TEST== 'true' }}
-        run: |
-          export WORKSPACE=$(pwd)
-          echo $WORKSPACE
-          git clone "ssh://${{ secrets.GERRIT_SERVICE_USER }}@gittools.se.axis.com:29418/tests/atf/tart/recap.git"
-          cd recap
-          source /github-runner/github-runner/init/atf_init.sh
-          ./test_starter.sh vdo-larod
-          ls recap/output
-
-      # Save functional test report as artifact
-      - uses: actions/upload-artifact@master
-        if: ${{ env.RUN_FUNCTION_TEST== 'true' }}
-        with:
-          name: Test report
-          path: recap/recap/output/report.xml
+          mkdir -p $exdir
+          cp $EXNAME/build/$eapfile $exdir/$eapfile

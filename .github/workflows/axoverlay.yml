@@ -1,43 +1,30 @@
-name: Build axoverlay Applications
+name: Build axoverlay application
 on:
   push:
     paths:
-      - "axoverlay/**"
-      - ".github/workflows/axoverlay.yml"
+      - 'axoverlay/**'
+      - '!axoverlay/README.md'
+      - '.github/workflows/axoverlay.yml'
 jobs:
   build:
     runs-on: ubuntu-latest
     env:
-      RUN_FUNCTION_TEST: false
+      EXNAME: axoverlay
+      EAPNAME: axoverlay
+      EXDIR: acap/examples/$EXNAME
     steps:
       - uses: actions/checkout@v2
 
-      - name: Build Axoverlay application
+      - name: Build ${{ env.example }} application
+        env:
+          example: ${{ env.EXNAME }}
+          imagetag: ${{ env.EXNAME }}:1.0
+          eapfile: ${{ env.EAPNAME }}_1_0_0_armv7hf.eap
         run: |
-          imagetag=axoverlay:1.0
           docker image rm -f $imagetag
-          cd axoverlay
+          cd $EXNAME
           docker build --no-cache --tag $imagetag .
-          docker cp $(docker create $imagetag .):/opt/app ./build
+          docker cp $(docker create $imagetag):/opt/app ./build
           cd ..
-          mkdir -p acap4-native/examples/axoverlay/build
-          cp axoverlay/build/axoverlay_1_0_0_armv7hf.eap acap4-native/examples/axoverlay/build/axoverlay_1_0_0_armv7hf.eap
-          ls acap4-native/examples/axoverlay/build
-
-      - name: Run functional tests
-        if: ${{ env.RUN_FUNCTION_TEST== 'true' }}
-        run: |
-          export WORKSPACE=$(pwd)
-          echo $WORKSPACE
-          git clone "ssh://${{ secrets.GERRIT_SERVICE_USER }}@gittools.se.axis.com:29418/tests/atf/tart/recap.git"
-          cd recap
-          source /github-runner/github-runner/init/atf_init.sh
-          ./test_starter.sh axoverlay
-          ls recap/output
-
-      # Save functional test report as artifact
-      - uses: actions/upload-artifact@master
-        if: ${{ env.RUN_FUNCTION_TEST== 'true' }}
-        with:
-          name: Test report
-          path: recap/recap/output/report.xml
+          mkdir -p $EXDIR/build
+          cp $EXNAME/build/$eapfile $EXDIR/build/$eapfile

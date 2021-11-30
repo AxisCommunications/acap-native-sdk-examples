@@ -1,15 +1,17 @@
  *Copyright (C) 2021, Axis Communications AB, Lund, Sweden. All Rights Reserved.*
 
 # A guide to building and running libcurl in an ACAP application
+
 This README file explains how to build libcurl from source and bundle it for the use in an ACAP. The example application uses the libcurl library to fetch data from
 URL and store the data in the application directory on the Camera.
 
 Together with this README file, you should be able to find a directory called app. That directory contains the "curl_example" application source code which can easily
 be compiled and run with the help of the tools and step by step below.
 
-APIs specification is available on https://curl.se/libcurl/c
+APIs specification is available on <https://curl.se/libcurl/c>
 
 ## Getting started
+
 These instructions will guide you on how to execute the code. Below is the structure and scripts used in the example:
 
 ```bash
@@ -31,15 +33,17 @@ curl_example
 * **README.md**          - Step by step instructions on how to run the example.
 
 ### How to run the code
+
 Below is the step by step instructions on how to execute the program. So basically starting with the generation of the .eap file to running it on a device:
 
 #### Build the application
+
 Standing in your working directory run the following commands:
 
 > [!IMPORTANT]
 > *Depending on the network you are connected to.
-The file that needs those settings is: *~/.docker/config.json.*
-For reference please see: https://docs.docker.com/network/proxy/ and a
+The file that needs those settings is:* ~/.docker/config.json. *For
+reference please see: <https://docs.docker.com/network/proxy/> and a
 [script for Axis device here](../../FAQs.md#HowcanIset-upnetworkproxysettingsontheAxisdevice?).*
 
 ```bash
@@ -51,11 +55,13 @@ docker build --tag <APP_IMAGE> .
 Default architecture is **armv7hf**. To build for **aarch64** it's possible to
 update the *ARCH* variable in the Dockerfile or to set it in the docker build
 command via build argument:
+
 ```bash
 docker build --build-arg ARCH=aarch64 --tag <APP_IMAGE> .
 ```
 
 If the device is inside a network with a proxy, then it can be passed on as a build argument:
+
 ```bash
 docker build --build-arg CURL_PROXY=<my_proxy> --tag <APP_IMAGE> .
 ```
@@ -96,6 +102,7 @@ The working dir now contains a build folder with the following files:
 * **build/curl_example_1_0_0_LICENSE.txt** - Copy of LICENSE file.
 
 #### Install your application
+
 Installing your application on an Axis device is as simple as:
 
 Browse to the following page (replace <axis_device_ip> with the IP number of your Axis device)
@@ -110,9 +117,11 @@ the newly built **curl_example_1_0_0_armv7hf.eap** > Click **Install** > Run the
 Application curl_example is now available as an application on the device.
 
 ### libcurl application
-The application will fetch the content from "http://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js" and store the content at /usr/local/packages/curl_example/localdata/jquery.min.js on the camera.
+
+The application will fetch the content from "<http://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js>" and store the content at /usr/local/packages/curl_example/localdata/jquery.min.js on the camera.
 
 #### The expected output
+
 In this example, when start is enabled specific URL file/content will be copied.
 
 >[!IMPORTANT]
@@ -128,4 +137,5 @@ echo "8fb8fee4fcc3cc86ff6c724154c49c42  /usr/local/packages/curl_example/localda
 Expected output : /usr/local/packages/curl_example/localdata/jquery.min.js: OK
 
 ## License
+
 **[Apache License 2.0](../../LICENSE)**

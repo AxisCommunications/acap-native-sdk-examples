@@ -1,0 +1,11 @@
+# Extends the default conf from
+# https://yamllint.readthedocs.io/en/stable/configuration.html#default-configuration
+
+extends: default
+
+rules:
+  document-start: disable
+  line-length: disable
+  new-line-at-end-of-file: disable
+  truthy:
+    allowed-values: ['true', 'false', 'on']

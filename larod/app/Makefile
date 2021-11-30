@@ -9,7 +9,7 @@ CFLAGS += -Wall -Wextra -Werror
 CFLAGS += -DLAROD_API_VERSION_1
 
 .PHONY: all
-all: larod_simple_app
+all: larod_simple_app 
 
 .PHONY: clean
 clean:
