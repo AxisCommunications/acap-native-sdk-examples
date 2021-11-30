@@ -1,25 +1,43 @@
-name: Build utility libraries Application
+name: Build utility-libraries applications
 on:
   push:
     paths:
-      - "utility-libraries/**"
-      - ".github/workflows/utility-libraries.yml"
+      - 'utility-libraries/**'
+      - '!utility-libraries/**/README.md'
+      - '.github/workflows/utility-libraries.yml'
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      EXNAME: utility-libraries
+      EXDIR: acap/examples/$EXNAME
     steps:
       - uses: actions/checkout@v2
 
-      - name: Build curl library application
+      - name: Build ${{ env.example }} application
+        env:
+          example: curl_example
+          imagetag: curl-example:1.0
+          eapfile: curl_example_1_0_0_armv7hf.eap
         run: |
-          imagetag=utility-libraries:1.0
-          cd utility-libraries/curl_example
+          docker image rm -f $imagetag
+          cd $EXNAME/$example
           docker build --no-cache --tag $imagetag .
-          docker cp $(docker create $imagetag):/opt/app/ ./build
+          docker cp $(docker create $imagetag):/opt/app ./build
+          cd ../..
+          mkdir -p $EXDIR/$example/build
+          cp $EXNAME/$example/build/$eapfile $EXDIR/$example/build/$eapfile
 
-      - name: Build custom library application
+      - name: Build ${{ env.example }} application
+        env:
+          example: custom_lib_example
+          imagetag: custom-lib-example:1.0
+          eapfile: customlib_example_1_0_0_armv7hf.eap
         run: |
-          imagetag=utility-libraries:1.0
-          cd utility-libraries/custom_lib_example
+          docker image rm -f $imagetag
+          cd $EXNAME/$example
           docker build --no-cache --tag $imagetag .
-          docker cp $(docker create $imagetag):/opt/app/ ./build
+          docker cp $(docker create $imagetag):/opt/app ./build
+          cd ../..
+          mkdir -p $EXDIR/$example/build
+          cp $EXNAME/$example/build/$eapfile $EXDIR/$example/build/$eapfile

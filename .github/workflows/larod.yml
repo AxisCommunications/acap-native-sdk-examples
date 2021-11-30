@@ -1,49 +1,30 @@
-name: Build larod Applications
+name: Build larod application
 on:
   push:
     paths:
-      - "larod/**"
-      - ".github/workflows/larod.yml"
+      - 'larod/**'
+      - '!larod/README.md'
+      - '.github/workflows/larod.yml'
 jobs:
   build:
     runs-on: ubuntu-latest
     env:
-      RUN_FUNCTION_TEST: false
+      EXNAME: larod
+      EAPNAME: larod-simple-app
+      EXDIR: acap/examples/$EXNAME
     steps:
       - uses: actions/checkout@v2
 
-      - name: Configure axis proxy
-        if: ${{ env.RUN_FUNCTION_TEST== 'true' }}
+      - name: Build ${{ env.example }} application
+        env:
+          example: ${{ env.EXNAME }}
+          imagetag: ${{ env.EXNAME }}:1.0
+          eapfile: ${{ env.EAPNAME }}_1_0_0_armv7hf.eap
         run: |
-          export DOCKER_CONFIG="$WORKSPACE/.docker"
-          mkdir -p "$DOCKER_CONFIG"
-          echo '{"proxies":{ "default":{"httpProxy": "http://wwwproxy.se.axis.com:3128", "httpsProxy": "http://wwwproxy.se.axis.com:3128"}}}' > "$DOCKER_CONFIG/config.json"
-
-      - name: Build larod application
-        run: |
-          imagetag=larod-simple-app:1.0
           docker image rm -f $imagetag
-          cd larod
+          cd $EXNAME
           docker build --no-cache --tag $imagetag .
           docker cp $(docker create $imagetag):/opt/app ./build
           cd ..
-          mkdir -p acap4-native/examples/larod/build
-          cp larod/build/larod-simple-app_1_0_0_armv7hf.eap acap4-native/examples/larod/build/larod-simple-app_1_0_0_armv7hf.eap
-
-      - name: Run functional tests
-        if: ${{ env.RUN_FUNCTION_TEST== 'true' }}
-        run: |
-          export WORKSPACE=$(pwd)
-          echo $WORKSPACE
-          git clone "ssh://${{ secrets.GERRIT_SERVICE_USER }}@gittools.se.axis.com:29418/tests/atf/tart/recap.git"
-          cd recap
-          source /github-runner/github-runner/init/atf_init.sh
-          ./test_starter.sh larod
-          ls recap/output
-
-      # Save functional test report as artifact
-      - uses: actions/upload-artifact@master
-        if: ${{ env.RUN_FUNCTION_TEST== 'true' }}
-        with:
-          name: Test report
-          path: recap/recap/output/report.xml
+          mkdir -p $EXDIR/build
+          cp $EXNAME/build/$eapfile $EXDIR/build/$eapfile

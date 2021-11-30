@@ -1,12 +1,14 @@
  *Copyright (C) 2021, Axis Communications AB, Lund, Sweden. All Rights Reserved.*
 
-# A larod based ACAP4 Native application running inference on an edge device
-This README file explains how to build an ACAP4 Native application that uses the [larod API](../FAQs.md#WhatisLarod?). It is achieved by using the containerized API and toolchain images.
+# A larod based ACAP application running inference on an edge device
+
+This README file explains how to build an ACAP application that uses the [larod API](../FAQs.md#WhatisLarod?). It is achieved by using the containerized API and toolchain images.
 
 Together with this README file, you should be able to find a directory called app. That directory contains the "larod_simple_app" application source code which can easily
 be compiled and run with the help of the tools and step by step below.
 
 ## Getting started
+
 These instructions will guide you on how to execute the code. Below is the structure and scripts used in the example:
 
 ```bash
@@ -26,26 +28,29 @@ larod
 * **app/input/veiltail-11457_640_RGB_224x224.bin** - 224x224 raw bitmap image of a goldfish to run inference on.
 * **app/larod_simple_app.c** - Example application to load a model and run inference on it.
 * **app/LICENSE** - Text file which lists all open source licensed source code distributed with the application.
-* **app/Makefile** - Makefile containing the build and link instructions for building the ACAP4 Native application.
+* **app/Makefile** - Makefile containing the build and link instructions for building the ACAP application.
 * **app/manifest.json** - Defines the application and its configuration.
 * **Dockerfile** - Docker file with the specified Axis toolchain and API container to build the example specified.
 * **extract_analyze_output.sh** - The script shows the matched class in the output.
 * **README.md** - Step by step instructions on how to run the example.
 
 ### Limitations
+
 * ARTPEC-7 based device with video support is required
 * In order to change the binary name, it has to be done in the Makefile.
 
 ### How to run the code
+
 Below is the step by step instructions on how to execute the program. So basically starting with the generation of the .eap file to running it on a device:
 
 #### Build the application
+
 Standing in your working directory run the following commands:
 
 > [!IMPORTANT]
 > *Depending on the network you are connected to,
-The file that needs those settings is: *~/.docker/config.json.*
-For reference please see: https://docs.docker.com/network/proxy/ and a
+The file that needs those settings is:* ~/.docker/config.json. *For
+reference please see: <https://docs.docker.com/network/proxy/> and a
 [script for Axis device here](../FAQs.md#HowcanIset-upnetworkproxysettingsontheAxisdevice?).*
 
 ```bash
@@ -60,7 +65,7 @@ Copy the result from the container image to a local directory build:
 docker cp $(docker create <APP_IMAGE>):/opt/app ./build
 ```
 
-Model and label files are downloaded from https://coral.ai/models/, when building the application.
+Model and label files are downloaded from <https://coral.ai/models/>, when building the application.
 
 The working dir now contains a build folder with the following files:
 
@@ -74,21 +79,21 @@ larod
 │   ├── Makefile
 │   └── manifest.json
 ├── build
-│	├── input
-│	│   └── veiltail-11457_640_RGB_224x224.bin
-│	├── larod_simple_app*
-│	├── larod-simple-app_1_0_0_armv7hf.eap
-│	├── larod-simple-app_1_0_0_LICENSE.txt
-│	├── larod_simple_app.c
-│	├── LICENSE
-│	├── Makefile
+│   ├── input
+│   │   └── veiltail-11457_640_RGB_224x224.bin
+│   ├── larod_simple_app*
+│   ├── larod-simple-app_1_0_0_armv7hf.eap
+│   ├── larod-simple-app_1_0_0_LICENSE.txt
+│   ├── larod_simple_app.c
+│   ├── LICENSE
+│   ├── Makefile
 │   ├── manifest.json
-│	├── model
-│	│	├── labels_mobilenet_quant_v1_224.txt
-│	│	└── mobilenet_v1_1.0_224_quant.tflite
-│	│── package.conf
-│	├── package.conf.orig
-│	└── param.conf
+│   ├── model
+│   │   ├── labels_mobilenet_quant_v1_224.txt
+│   │   └── mobilenet_v1_1.0_224_quant.tflite
+│   │── package.conf
+│   ├── package.conf.orig
+│   └── param.conf
 ├── Dockerfile
 ├── extract_analyze_output.sh
 └── README.md
@@ -105,6 +110,7 @@ larod
 * **build/param.conf** - File containing application parameters.
 
 #### Install your application
+
 Installing your application on an Axis video device is as simple as:
 
 Browse to the following page (replace <axis_device_ip> with the IP number of your Axis video device)
@@ -117,6 +123,7 @@ http://<axis_device_ip>/#settings/apps
 the newly built **larod_simple_app_1_0_0_armv7hf.eap** > Click **Install** > Run the application by enabling the **Start** switch*
 
 #### The expected output
+
 In order to see the output, please copy the file with the output (veiltail-11457_640_RGB_224x224.bin.out) from the device into your host
 application directory.
 > [!IMPORTANT]
@@ -135,7 +142,7 @@ The script will prompt the password required to access the device.
 ```
 
 The model class PATH for objects matching is located in the
-*/home/user/Workspace/acap4-native-examples/larod/build/model/labels_mobilenet_quant_v1_224.txt*
+*larod/build/model/labels_mobilenet_quant_v1_224.txt*
 
 The matched class will be printed below:
 
@@ -146,4 +153,5 @@ The matched class will be printed below:
 tensor, whereas larod itself supports any number of either.*
 
 ## License
+
 **[Apache License 2.0](../LICENSE)**

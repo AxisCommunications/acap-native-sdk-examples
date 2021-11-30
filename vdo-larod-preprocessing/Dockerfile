@@ -1,7 +1,3 @@
-# Put a proxy URL in the docker_proxy environment variable if needed
-ARG http_proxy
-ARG https_proxy=$http_proxy
-
 ARG ARCH=armv7hf
 ARG VERSION=1.0
 ARG UBUNTU_VERSION=20.04

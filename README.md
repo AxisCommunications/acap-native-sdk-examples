@@ -1,18 +1,23 @@
 # What is Axis Camera Application Platform?
+
 AXIS Camera Application Platform (ACAP) is an open application platform from Axis. It provides a development platform for software-based solutions and systems built around Axis devices. ACAP is available for various types of Axis products such as cameras, speakers and intercoms.
 
 ## ACAP Native SDK
+
 The ACAP Native SDK is targeted towards users that want to develop plug-in style, event generating applications that fit well into a VMS centric system. This SDK offers high performance by integrating closely with AXIS OS and hardware. Already existing ACAP users should feel at home using this SDK and migrating from previous version ACAP 3 to this SDK should be straightforward.
 
 Please check the following guidelines for ACAP 4:
+
 * [AXIS ACAP 4 SDK Documentation](https://axiscommunications.github.io/acap-documentation/)
 * [Introduction](https://axiscommunications.github.io/acap-documentation/docs/introduction.html)
 * [Getting Started](https://axiscommunications.github.io/acap-documentation/docs/get-started.html)
 
 ## Getting started with the repo
+
 This repository contains a set of application examples which aims to enrich the developers analytics experience. All examples are using Docker framework and has a README file in its directory which shows overview, example directory structure and step-by-step instructions on how to run applications on the camera.
 
 ## Example applications
+
 Below is the list of examples available in the repository.
 
 * [axevent](./axevent/)
@@ -51,11 +56,13 @@ and [vdo-larod](./vdo-larod) examples.
   * The example code is written in C which runs a Monkey web server on the camera and exposes an external API with Reverse Proxy configuration in Apache Server.
 
 ### DockerHub Image
+
 The ACAP Native SDK image can be used as a basis for custom built images to run your application or as a developer environment inside the container.
 
 * [ACAP Native SDK](https://hub.docker.com/r/axisecp/acap-native-sdk) This image is based on Ubuntu and contains the environment needed for building an AXIS Camera Application Platform (ACAP) Native application. This includes all tools for building and packaging an ACAP Native application as well as API components (header and library files) needed for accessing different parts of the camera firmware.
 
 # Issues
+
 If you encounter issues with the examples, make sure your product is running the latest firmware version or one that is compatible with the ACAP SDK used.
 The examples use the ACAP SDK during the build process, of which each version is compatible with a set of firmware versions.
 The specific SDK version that each example is based on is specified in the Dockerfile used to build the application, through the `VERSION` variable.
@@ -63,7 +70,8 @@ The full compatibility schema for ACAP SDK version and firmware version is avail
 
 If the issue persists with a compatible firmware, please create an issue containing the information specified in the template below.
 
-### Issue template
+## Issue template
+
 *Axis product/device (e.g. Q1615 Mk III):*
 
 *Device firmware version:*
@@ -71,7 +79,9 @@ If the issue persists with a compatible firmware, please create an issue contain
 *Issue description:*
 
 # Frequently asked questions
+
 Please visit [FAQs page](FAQs.md) for frequently asked questions.
 
 # License
+
 [Apache 2.0](LICENSE)

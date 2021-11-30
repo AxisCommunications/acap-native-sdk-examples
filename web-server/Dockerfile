@@ -10,9 +10,9 @@ FROM ${REPO}/${SDK}:${VERSION}-${ARCH}-ubuntu${UBUNTU_VERSION}
 WORKDIR /opt
 COPY monkey.patch .
 
-RUN git clone -b v1.5.6 https://github.com/monkey/monkey &&\
-    cd monkey &&\
-    git apply ../monkey.patch &&\
+RUN git clone -b v1.5.6 https://github.com/monkey/monkey
+WORKDIR /opt/monkey
+RUN git apply ../monkey.patch &&\
     . /opt/axis/acapsdk/environment-setup* &&\
     ./configure \
     --enable-shared \
@@ -37,8 +37,8 @@ RUN cp /usr/local/bin/monkey .
 
 # Build examples
 RUN . /opt/axis/acapsdk/environment-setup* &&\
-    mkdir -p $SDKTARGETSYSROOT/usr/local &&\
-    cp -r /usr/local $SDKTARGETSYSROOT/usr &&\
+    mkdir -p "$SDKTARGETSYSROOT"/usr/local &&\
+    cp -r /usr/local "$SDKTARGETSYSROOT"/usr &&\
     mkdir -p lib &&\
     cp /usr/local/lib/libmonkey.so.1.5 /usr/local/packages/monkey/lib/*.so -t lib/ &&\
     cp -r /usr/local/packages/monkey/html . &&\

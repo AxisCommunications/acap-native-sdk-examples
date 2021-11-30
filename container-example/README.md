@@ -14,7 +14,7 @@ However, the actual container images that are used in this type of application m
 
 ### How it works
 
-This example works by taking advantage of the option to include post-install and pre-uninstall scripts in a native ACAP. In the post-install script we load the container image(s) to the local image store on the device, and in the pre-uninstall script we remove them from the store. The actual application executable is a shell script that runs "docker compose up" when starting and "docker compose down" before exiting. This requires that a Docker compose file has been written, describing how to run the container(s). 
+This example works by taking advantage of the option to include post-install and pre-uninstall scripts in a native ACAP. In the post-install script we load the container image(s) to the local image store on the device, and in the pre-uninstall script we remove them from the store. The actual application executable is a shell script that runs "docker compose up" when starting and "docker compose down" before exiting. This requires that a Docker compose file has been written, describing how to run the container(s).
 
 In order for this to work, we need to have docker compose functionality included in the device, which means another ACAP must first be installed: the [Docker Compose ACAP](https://github.com/AxisCommunications/docker-compose-acap)
 
@@ -25,6 +25,7 @@ In this way we are able to construct a native ACAP that consists of one or sever
 This minimal example consist of an Alpine Linux container that executes a script where the nc (netcat) program displays a text on a simple web page on port 80. Port 80 in the container is then mapped to port 8080 on the device.  
 
 ## Prerequisites
+
 * An Axis camera with edge container functionality
 * AxOS 10.7 or later
 * The [Docker Compose ACAP](https://github.com/AxisCommunications/docker-compose-acap) must be installed on the device
@@ -39,6 +40,7 @@ Standing in your working directory run the following commands:
 docker pull arm32v7/alpine:3.14.0
 docker save -o alpine.tar arm32v7/alpine:3.14.0
 ```
+
 If you have a device with an aarch64 architecture you need to change arm32v7 to arm64v8 above.
 
 ### Build the ACAP
@@ -50,6 +52,7 @@ docker build --tag eap-container-example .
 ```
 
 ### Extract the .eap file from the container
+
 ```bash
 docker cp $(docker create eap-container-example:latest):/opt/app/Container_Example_1_0_0_armv7hf.eap .
 ```
@@ -68,10 +71,13 @@ the newly built **Container_Example_1_0_0_armv7hf.eap** > Click **Install** > Ru
 ## Test the application
 
 Use a web browser to browse to
-```
+
+```html
 http://<axis_device_ip>:8080
 ```
+
 The page should display the text "Hello from an ACAP!"
 
 ## License
+
 **[Apache License 2.0](../LICENSE)**

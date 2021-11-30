@@ -1,14 +1,15 @@
  *Copyright (C) 2021, Axis Communications AB, Lund, Sweden. All Rights Reserved.*
 
-# ACAP4 Native application sending an ONVIF event on an edge device
-This README file explains how to build an ACAP4 Native application that uses axevent library for sending a stateful ONVIF event.
+# ACAP application sending an ONVIF event on an edge device
+
+This README file explains how to build an ACAP application that uses axevent library for sending a stateful ONVIF event.
 
 An ONVIF event is using the namespace "tns1" as the namespace.
 Different namespaces is used for a custom defined stateful event. Axis is using namespace "tnsaxis" for Axis defined events.
 
 This example shows an ProcessorUsage ONVIF event with topic namespace "tns1:Monitoring/ProcessorUsage",
 according to chapter "8.8.1 Processor Usage" in
-https://www.onvif.org/specs/core/ONVIF-Core-Specification.pdf
+<https://www.onvif.org/specs/core/ONVIF-Core-Specification.pdf>
 
 The ONVIF event is being sent with an updated processor usage value every 10th second.
 
@@ -19,6 +20,7 @@ That directory contains the "send_event" application source code, which can easi
 be compiled and run with the help of the tools and step by step below.
 
 ## Getting started
+
 These instructions will guide you on how to execute the code. Below is the structure and scripts used in the example:
 
 ```bash
@@ -33,25 +35,28 @@ send_event
 ```
 
 * **app/LICENSE** - Text file which lists all open source licensed source code distributed with the application.
-* **app/Makefile** - Makefile containing the build and link instructions for building the ACAP4 Native application "send_event".
+* **app/Makefile** - Makefile containing the build and link instructions for building the ACAP application "send_event".
 * **app/manifest.json** - Defines the application and its configuration.
 * **app/send_event.c** - Application which sends events, written in C.
 * **Dockerfile** - Docker file with the specified Axis toolchain and API container to build the example "send_event".
 * **README.md** - Step by step instructions on how to run the example.
 
 ### Limitations
+
 * The example is done for the armv7hf architecture, but it is possible to update to aarch64 architecture.
 
 ### How to run the code
+
 Below is the step by step instructions on how to execute the program. So basically starting with the generation of the .eap files to running it on a device:
 
 #### Build the application
+
 Standing in your working directory run the following commands:
 
 > [!IMPORTANT]
 > *Depending on the network you are connected to.
-The file that needs those settings is: *~/.docker/config.json.*
-For reference please see: https://docs.docker.com/network/proxy/ and a
+The file that needs those settings is:* ~/.docker/config.json. *For
+reference please see: <https://docs.docker.com/network/proxy/> and a
 [script for Axis device here](../FAQs.md#HowcanIset-upnetworkproxysettingsontheAxisdevice?).*
 
 ```bash
@@ -63,6 +68,7 @@ docker build --tag <APP_IMAGE> .
 Default architecture is **armv7hf**. To build for **aarch64** it's possible to
 update the *ARCH* variable in the Dockerfile or to set it in the docker build
 command via build argument:
+
 ```bash
 docker build --build-arg ARCH=aarch64 --tag <APP_IMAGE> .
 ```
@@ -106,6 +112,7 @@ send_event
 * **build/send_event_1_0_0_LICENSE.txt** - Copy of LICENSE file.
 
 #### Install your application
+
 Installing your application on an Axis video device is as simple as:
 
 Browse to the following page (replace <axis_device_ip> with the IP number of your Axis video device)
@@ -120,9 +127,10 @@ the newly built **send_event_1_0_0_armv7hf.eap** > Click **Install** > Run the a
 Application is now available as an application on the device and has been started to send events.
 
 #### The expected output
+
 Application log can be found directly at:
 
-```
+```sh
 http://<axis_device_ip>/axis-cgi/admin/systemlog.cgi?appname=send_event
 ```
 
@@ -132,13 +140,13 @@ in the terminal.
 *> Please make sure SSH is enabled on the device to run the
 following commands.*
 
-```
+```sh
 ssh root@<axis_device_ip>
 cd /var/log/
 head -200 info.log
 ```
 
-```
+```sh
 ----- Contents of SYSTEM_LOG for 'send_event' -----
 
 16:23:56.628 [ INFO ] send_event[0]: starting send_event
@@ -151,11 +159,13 @@ head -200 info.log
 A stateful event will be sent every 10th second, changing its value.
 
 ### Find events using wrapper
+
 See general information about wrapper "get_eventlist.py" in [README](../README.md).
 
 Replace <onvifuser>, <onvifpassword> and <axis_device_ip> with the ONVIF user, ONVIF password and IP number of your Axis video device.
 
 #### Find declared events using wrapper
+
 The wrapper helps you save the declared eventlist to an XML-file.
 
 ```bash
@@ -169,11 +179,11 @@ In this case ONVIF API is used and an ONVIF username and password needs to be ad
 ```
 
 This output could be compared to the ONVIF event specification chapter "8.8.1 Processor Usage" in
-https://www.onvif.org/specs/core/ONVIF-Core-Specification.pdf
+<https://www.onvif.org/specs/core/ONVIF-Core-Specification.pdf>
 
 XML file "onviflist.xml.new" contains:
 
-```
+```xml
         <tns1:Monitoring>
           <ProcessorUsage wstop:topic="true">
             <tt:MessageDescription IsProperty="true">
@@ -189,9 +199,10 @@ XML file "onviflist.xml.new" contains:
 ```
 
 #### Find sent events using wrapper
+
 The wrapper helps you save the sent eventlist to an XML-file.
 
-```bash
+```sh
 ../get_eventlist.py getsent -h
 ```
 
@@ -203,7 +214,7 @@ In this case ONVIF APIs are used, which means that an ONVIF username and passwor
 
 XML file "sentonviflist.xml.new" contains:
 
-```
+```xml
       <wsnt:NotificationMessage>
         <wsnt:Topic Dialect="http://docs.oasis-open.org/wsn/t-1/TopicExpression/Simple">tns1:Monitoring/ProcessorUsage</wsnt:Topic>
         <wsnt:ProducerReference>
@@ -224,18 +235,19 @@ XML file "sentonviflist.xml.new" contains:
 ```
 
 ### Find events using GStreamer
+
 See general information about GStreamer tools in [README](../README.md).
 
 If using GStreamer tools for monitoring events
 (replace <user>, <password> and <axis_device_ip> with the username, password and IP number of your Axis video device).
 
-```bash
+```sh
 gst-launch-1.0 rtspsrc location="rtsp://<user>:<password>@<axis_device_ip>/axis-media/media.amp?video=0&audio=0&event=on" ! fdsink
 ```
 
 Output in XML, which has been formatted manually to show topic "tns1:Monitoring/ProcessorUsage":
 
-```
+```xml
 <?xml version="1.0" encoding="UTF-8"?>
 <tt:MetadataStream xmlns:tt="http://www.onvif.org/ver10/schema">
    <tt:Event>
@@ -261,4 +273,5 @@ Output in XML, which has been formatted manually to show topic "tns1:Monitoring/
 ```
 
 ## License
+
 **[Apache License 2.0](../../LICENSE)**

@@ -1,5 +1,3 @@
-ARG http_proxy
-ARG https_proxy
 ARG ARCH=armv7hf
 ARG REPO=axisecp
 ARG SDK=acap-native-sdk
@@ -8,35 +6,34 @@ ARG VERSION=1.0
 
 FROM ${REPO}/${SDK}:${VERSION}-${ARCH}-ubuntu${UBUNTU_VERSION}
 
-# Add a sources.list file that contains the armhf repositories
-COPY sources.list /etc/apt
-RUN apt-get update
-
-ENV DEBIAN_FRONTEND=noninteractive
 ARG OPENCV_VERSION=4.5.1
 ARG TARGET_ROOT=/target-root
-ENV ARCHDIR=arm-linux-gnueabihf
 
+# Add a sources.list file that contains the armhf repositories
 # Get crosscompilation toolchain
-RUN dpkg --add-architecture armhf
-RUN apt-get update && apt-get install -yf --no-install-recommends \
+ENV DEBIAN_FRONTEND=noninteractive
+COPY sources.list /etc/apt
+RUN apt-get update && \
+    dpkg --add-architecture armhf && \
+    apt-get update && apt-get install -yf --no-install-recommends \
     ca-certificates \
     crossbuild-essential-armhf \
     cmake \
     curl \
-    pkg-config \
-    && update-ca-certificates \
-    && apt-get clean
+    pkg-config && \
+    update-ca-certificates && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
+ENV ARCHDIR=arm-linux-gnueabihf
 ENV PKG_CONFIG_LIBDIR=/usr/share/pkgconfig:/usr/lib/$ARCHDIR/pkgconfig:/usr/lib/$ARCHDIR/pkgconfig
 
-WORKDIR /workspace
-
 # Download OpenCV
+WORKDIR /workspace
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 RUN curl -fsSL https://github.com/opencv/opencv/archive/$OPENCV_VERSION.tar.gz | tar -xz
 
 WORKDIR /workspace/opencv-$OPENCV_VERSION/build
-
 # Configure OpenCV
 # Platform specific optimizations in the form of NEON and VFPV3 are enabled
 RUN cmake -D CMAKE_TOOLCHAIN_FILE=../platforms/linux/arm-gnueabi.toolchain.cmake \
@@ -60,12 +57,10 @@ RUN cmake -D CMAKE_TOOLCHAIN_FILE=../platforms/linux/arm-gnueabi.toolchain.cmake
     -D WITH_JASPER=OFF \
     -D BUILD_PROTOBUF=OFF \
     -D OPENCV_GENERATE_PKGCONFIG=ON \
-    ..
+    .. && \
+    # Build openCV libraries and other tools
+    make -j 2 install
 
-# Build openCV libraries and other tools
-RUN make -j 2 install
-
-COPY app/ /build/src/
-WORKDIR /build/src
-RUN cp /opt/axis/acapsdk/sysroots/x86_64-pokysdk-linux/usr/bin/acap-build .
+COPY app/ /opt/app
+WORKDIR /opt/app
 RUN . /opt/axis/acapsdk/environment-setup* && acap-build .
