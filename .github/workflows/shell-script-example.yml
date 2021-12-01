@@ -1,0 +1,30 @@
+name: Build shell-script-example application
+on:
+  push:
+    paths:
+      - 'shell-script-example/**'
+      - '!shell-script-example/README.md'
+      - '.github/workflows/shell-script-example.yml'
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      EXNAME: shell-script-example
+      EAPNAME: shell_script_example
+      EXDIR: acap/examples/$EXNAME
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Build ${{ env.example }} application
+        env:
+          example: ${{ env.EXNAME }}
+          imagetag: ${{ env.EXNAME }}:1.0
+          eapfile: ${{ env.EAPNAME }}_1_0_0_armv7hf.eap
+        run: |
+          docker image rm -f $imagetag
+          cd $EXNAME
+          docker build --no-cache --tag $imagetag .
+          docker cp $(docker create $imagetag):/opt/app ./build
+          cd ..
+          mkdir -p $EXDIR/build
+          cp $EXNAME/build/$eapfile $EXDIR/build/$eapfile

@@ -1,0 +1,12 @@
+{
+    "schemaVersion": "1.2",
+    "acapPackageConf": {
+        "setup": {
+            "appName": "shell_script_example",
+            "vendor": "Axis Communications",
+            "embeddedSdkVersion": "3.0",
+            "runMode": "never",
+            "version": "1.0.0"
+        }
+    }
+}

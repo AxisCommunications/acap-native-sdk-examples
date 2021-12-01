@@ -36,12 +36,14 @@ Below is the list of examples available in the repository.
   * The example code focus on object detection, cropping and saving detected objects into jpeg files.
 * [reproducible-package](./reproducible-package/)
   * An example of how to create a reproducible application package.
+* [shell-script-example](./shell-script-example)
+  * A simple hello world application written in shell script.
 * [tensorflow-to-larod](./tensorflow-to-larod/)
   * This example covers model conversion, model quantization, image formats and custom models in
 greater depth than the [larod](./larod)
 and [vdo-larod](./vdo-larod) examples.
 * [using-opencv](./using-opencv/)
-  * This example covers how to build, bundle and use OpenCV with ACAP4 Native SDK.
+  * This example covers how to build, bundle and use OpenCV in an application.
 * [utility-libraries](./utility-libraries/)
   * These examples covers how to build, bundle and use external libraries.
 * [vdostream](./vdostream/)

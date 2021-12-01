@@ -1,0 +1,3 @@
+#!/bin/sh
+PROCESS_ID=$(pidof shell_script_example)
+logger -t "shell_script_example[$PROCESS_ID]" -p INFO "Hello World!"
