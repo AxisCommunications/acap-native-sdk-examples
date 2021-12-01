@@ -1,12 +1,12 @@
-# How to use Web Server in ACAP4 Native Application
+# How to use Web Server in an ACAP application
 
-This example explains how to build and use [Monkey Web Server](https://github.com/monkey/monkey) in ACAP4 Native SDK with Reverse Proxy configuration in Apache Server.
+This example explains how to build and use [Monkey Web Server](https://github.com/monkey/monkey) in ACAP Native SDK with Reverse Proxy configuration in Apache Server.
 
 ## Reverse Proxy configuration in Apache Server
 
-[Reverse Proxy configuration](https://httpd.apache.org/docs/2.4/howto/reverse_proxy.html) provides a flexible way for an ACAP application to expose an external API through the Apache Server in AxOs system and internally route the requests to a small Web Server running in the ACAP application.
+[Reverse Proxy configuration](https://httpd.apache.org/docs/2.4/howto/reverse_proxy.html) provides a flexible way for an ACAP application to expose an external API through the Apache Server in AXIS OS and internally route the requests to a small Web Server running in the ACAP application.
 
-Reverse Proxy is a technique that can be used for exposing many types of network APIs and can e.g. cover same cgi usecases as axHttp API from ACAP4 Native SDK.
+Reverse Proxy is a technique that can be used for exposing many types of network APIs and can e.g. cover same cgi usecases as axHttp API.
 
 The Apache server is configured using post-install and pre-uninstall scripts features in a native ACAP. The post-install script adds a configuration file to apache configuration with reverse configuration for monkey server and applies it to Apache Server, and in the pre-uninstall the configuration is removed.
 
@@ -28,7 +28,7 @@ web-server
 │   ├── postinstall.sh - Shell script for adding configration to apache
 │   ├── preuninstall.sh - Shell script for removing  configration to apache
 │   └── reverseproxy.conf - Configuration for reverse proxy
-├── Dockerfile - Docker file with the specified Axis toolchain and API container to build the example specified
+├── Dockerfile - Docker file with the specified Axis container image to build the example specified
 ├── monkey.patch - Patch for using monkey examples in a native ACAP
 └── README.md - Step by step instructions on how to run the example
 ```
