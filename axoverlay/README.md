@@ -90,10 +90,10 @@ axoverlay
 └── README.md
 ```
 
-* **build/manifest.json** - Defines the application and its configuration.
 * **build/axoverlay*** - Application executable binary file.
 * **build/axoverlay_1_0_0_armv7hf.eap** - Application package .eap file.
 * **build/axoverlay_1_0_0_LICENSE.txt** - Copy of LICENSE file.
+* **build/manifest.json** - Defines the application and its configuration.
 * **build/package.conf** - Defines the application and its configuration.
 * **build/package.conf.orig** - Defines the application and its configuration, original file.
 * **build/param.conf** - File containing application parameters.

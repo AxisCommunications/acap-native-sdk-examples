@@ -1,6 +1,6 @@
  *Copyright (C) 2020, Axis Communications AB, Lund, Sweden. All Rights Reserved.*
 
-# An example of how to use containers in a native ACAP4 application
+# An example of how to use containers in a native ACAP application
 
 ## Overview
 
@@ -22,7 +22,7 @@ In this way we are able to construct a native ACAP that consists of one or sever
 
 ### The application
 
-This minimal example consist of an Alpine Linux container that executes a script where the nc (netcat) program displays a text on a simple web page on port 80. Port 80 in the container is then mapped to port 8080 on the device.  
+This minimal example consist of an Alpine Linux container that executes a script where the nc (netcat) program displays a text on a simple web page on port 80. Port 80 in the container is then mapped to port 8080 on the device.
 
 ## Prerequisites
 
