@@ -24,7 +24,7 @@ Below is the list of examples available in the repository.
   * The example code is written in C which illustrates both how to subscribe to different events and how to send an event.
 * [axoverlay](./axoverlay/)
   * The example code is written in C which illustrates how to draw plain boxes and text as overlays in a stream.
-* [container](./container-example/)
+* [container-example](./container-example/)
   * This example demonstrates a way of using containers in a native ACAP application.
 * [hello-world](./hello-world/)
   * The example code is written in C and shows how to build a simple hello world application.
@@ -46,14 +46,14 @@ and [vdo-larod](./vdo-larod) examples.
   * This example covers how to build, bundle and use OpenCV in an application.
 * [utility-libraries](./utility-libraries/)
   * These examples covers how to build, bundle and use external libraries.
-* [vdostream](./vdostream/)
-  * The example code is written in C which starts a vdo stream and then illustrates how to continuously capture frames from the vdo service, access the received buffer contents as well as the frame metadata.
 * [vdo-larod](./vdo-larod/)
   * The example code is written in C and loads an image classification model to [larod](./FAQs.md#WhatisLarod?) and then uses vdo to fetch frames of size WIDTH x HEIGHT in yuv format which are converted to interleaved rgb format and then sent to larod for inference on MODEL.
 * [vdo-larod-preprocessing](./vdo-larod-preprocessing/)
   * The example code is written in C and loads an image classification model to [larod](./FAQs.md#WhatisLarod?) and then uses vdo to fetch frames of size WIDTH x HEIGHT in yuv format which are sent to larod for preprocessing and inference on MODEL.
 * [vdo-opencl-filtering](./vdo-opencl-filtering/)
   * This example illustrates how to capture frames from the vdo service, access the received buffer, and finally perform a GPU accelerated Sobel filtering with OpenCL.
+* [vdostream](./vdostream/)
+  * The example code is written in C which starts a vdo stream and then illustrates how to continuously capture frames from the vdo service, access the received buffer contents as well as the frame metadata.
 * [web-server](./web-server/)
   * The example code is written in C which runs a Monkey web server on the camera and exposes an external API with Reverse Proxy configuration in Apache Server.
 

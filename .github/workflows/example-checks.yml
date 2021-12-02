@@ -1,0 +1,60 @@
+name: Example repository checks
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Verify that all examples have a workflow .yml file
+        run: |
+          fail_list=
+          yml_array=( $(ls .github/workflows) )
+          acap_array=( $(ls -d */) )
+          for acap in "${acap_array[@]%?}"
+          do
+             if [[ "${yml_array[@]}" =~ "${acap}" ]]; then
+                 continue
+              else
+                   fail_list+="$acap.yml\n"
+               fi
+          done
+
+          if [ "$fail_list" ]; then
+              printf "\n\nERROR: Applications that dont't have yml file:\n$fail_list\n\n"
+              exit 1
+          else
+              printf "\n\nAll applications have yml file.\n"
+          fi
+
+      - name: Verify that all examples have an entry in top-README
+        run: |
+          # Find directories that do not start with dot
+          acap_list="$(find . -maxdepth 1 -type d -printf '%f\n' |grep -v '^[.]' | sort)"
+          # Find lines starting with '* ['
+          # The grep removes anything but '[*]', then remove entries with space
+          # or capital letter and finally removes the brackets.
+          readme_examples="$(sed -n '/* \[/p' README.md | grep -oe '\[.*\]' | grep -v '[A-Z ]' | grep -oe '[0-9a-z-]*')"
+
+          # Control that all examples have an entry in README
+          common=$(printf "${acap_list}\n${readme_examples}" | sort | uniq -d)
+          unique=$(printf "${acap_list}\n${readme_examples}" | sort | uniq -u)
+          [ -z "$unique" ] || {
+            printf "\n\nERROR: Mismatch between example directories and entries in README.md:\n$unique\n\n"
+            exit 1
+          }
+          printf "\n\nAll example directories have entries in README.md:\n$common\n\n"
+
+          # Control that the README entries are sorted alphabetically ascending
+          sorted_list="$(printf "$readme_examples" | sort)"
+          [ "$readme_examples" = "$sorted_list" ] || {
+            printf "\n\nERROR: The list of example entries in README.md is not sorted alphabetically(left column has current order):\n"
+            diff -y <(echo "$readme_examples") <(echo "$sorted_list")
+            exit 1
+          }
+          printf "\n\nAll examples are sorted in alphabetical order in README.md."
