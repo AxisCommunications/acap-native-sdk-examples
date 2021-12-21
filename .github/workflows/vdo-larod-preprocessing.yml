@@ -9,6 +9,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     env:
+      EXREPO: acap-native-examples
       EXNAME: vdo-larod-preprocessing
       EAPNAME: vdo_larod_preprocessing
     steps:
@@ -17,7 +18,7 @@ jobs:
       - name: Build ${{ env.example }} application
         env:
           example: ${{ env.EXNAME }}-cpu
-          imagetag: ${{ env.EXNAME }}-cpu:1.0
+          imagetag: ${{ env.EXREPO }}_${{ env.EXNAME }}-cpu:1.0
           eapfile: ${{ env.EAPNAME }}_cpu_1_0_0_armv7hf.eap
           exdir: ${{ env.EXNAME }}/build_cpu_preprocessing
         run: |
@@ -29,11 +30,12 @@ jobs:
           cd ..
           mkdir -p $exdir
           cp $EXNAME/build/$eapfile $exdir/$eapfile
+          docker image rm -f $imagetag
 
       - name: Build ${{ env.example }} application
         env:
           example: ${{ env.EXNAME }}-tpu
-          imagetag: ${{ env.EXNAME }}-tpu:1.0
+          imagetag: ${{ env.EXREPO }}_${{ env.EXNAME }}-tpu:1.0
           eapfile: ${{ env.EAPNAME }}_edgetpu_1_0_0_armv7hf.eap
           exdir: ${{ env.EXNAME }}/build_tpu_preprocessing
         run: |
@@ -46,3 +48,4 @@ jobs:
           cd ..
           mkdir -p $exdir
           cp $EXNAME/build/$eapfile $exdir/$eapfile
+          docker image rm -f $imagetag
