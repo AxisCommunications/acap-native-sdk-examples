@@ -2,9 +2,9 @@
 
 # A guide to building and running a custom library in an ACAP application
 
-This README file explains how to build a user defined custom library from source files and bundle it for use in an ACAP. The example application uses the custom library and prints "Hello World!" in the AXIS Camera application platform.
+This README file explains how to build a user defined custom library from source files and bundle it for use in an ACAP. The example application uses the custom library and prints "Hello World!" to the syslog of the device.
 
-Together with this README file, you should be able to find a directory called app. That directory contains the "custom_lib_example" application source code which can easily
+Together with this README file, you should be able to find a directory called app. That directory contains the custom_lib_example application source code which can easily
 be compiled and run with the help of the tools.
 
 ## Getting started
