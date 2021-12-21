@@ -3,16 +3,16 @@
 # A guide to building and running libcurl in an ACAP application
 
 This README file explains how to build libcurl from source and bundle it for the use in an ACAP. The example application uses the libcurl library to fetch data from
-URL and store the data in the application directory on the Camera.
+URL and store the data in the application directory on the camera.
 
-Together with this README file, you should be able to find a directory called app. That directory contains the "curl_example" application source code which can easily
-be compiled and run with the help of the tools and step by step below.
+Together with this README file, you should be able to find a directory called app. That directory contains the curl_example application source code which can easily
+be compiled and run with the help of the tools and step-by-step instructions below.
 
-APIs specification is available on <https://curl.se/libcurl/c>
+The API specification is available on <https://curl.se/libcurl/c>.
 
 ## Getting started
 
-These instructions will guide you on how to execute the code. Below is the structure and scripts used in the example:
+Below is the structure and scripts used in the example:
 
 ```bash
 curl_example
@@ -25,20 +25,20 @@ curl_example
 └── README.md
 ```
 
-* **app/LICENSE**        - File containing the license conditions.
+* **app/LICENSE**        - License
 * **app/Makefile**       - Makefile containing the build and link instructions for building the ACAP application.
-* **app/manifest.json    - Defines the application and its configuration.
+* **app/manifest.json**  - Defines the application and its configuration.
 * **app/curl_example.c** - Example application.
 * **Dockerfile**         - Docker file with the specified Axis toolchain and API container to build the example specified.
-* **README.md**          - Step by step instructions on how to run the example.
+* **README.md**          - Step-by-step instructions for how to run the example.
 
 ### How to run the code
 
-Below is the step by step instructions on how to execute the program. So basically starting with the generation of the .eap file to running it on a device:
+Below are the step-by-step instructions on how to execute the program, starting with the generation of the .eap file to running it on a device:
 
 #### Build the application
 
-Standing in your working directory run the following commands:
+Standing in your working directory, run the following commands:
 
 > [!IMPORTANT]
 > *Depending on the network you are connected to.
@@ -50,7 +50,7 @@ reference please see: <https://docs.docker.com/network/proxy/> and a
 docker build --tag <APP_IMAGE> .
 ```
 
-<APP_IMAGE> is the name to tag the image with, e.g., curl_example:1.0
+<APP_IMAGE> is the name to tag the image with, e.g. curl_example:1.0
 
 Default architecture is **armv7hf**. To build for **aarch64** it's possible to
 update the *ARCH* variable in the Dockerfile or to set it in the docker build
@@ -97,7 +97,7 @@ The working dir now contains a build folder with the following files:
 * **build/package.conf.orig** - Defines the application and its configuration, original file.
 * **build/param.conf** - File containing application parameters.
 * **build/curl_example*** - Application executable binary file.
-* **build/lib** - Folder containing compiled library files for libcurl
+* **build/lib** - Folder containing compiled library files for libcurl.
 * **build/curl_example_1_0_0_armv7hf.eap** - Application package .eap file.
 * **build/curl_example_1_0_0_LICENSE.txt** - Copy of LICENSE file.
 
