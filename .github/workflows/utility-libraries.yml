@@ -9,6 +9,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     env:
+      EXREPO: acap-native-examples
       EXNAME: utility-libraries
       EXDIR: acap/examples/$EXNAME
     steps:
@@ -17,7 +18,7 @@ jobs:
       - name: Build ${{ env.example }} application
         env:
           example: curl_example
-          imagetag: curl-example:1.0
+          imagetag: ${{ env.EXREPO }}_curl-example:1.0
           eapfile: curl_example_1_0_0_armv7hf.eap
         run: |
           docker image rm -f $imagetag
@@ -27,11 +28,12 @@ jobs:
           cd ../..
           mkdir -p $EXDIR/$example/build
           cp $EXNAME/$example/build/$eapfile $EXDIR/$example/build/$eapfile
+          docker image rm -f $imagetag
 
       - name: Build ${{ env.example }} application
         env:
           example: custom_lib_example
-          imagetag: custom-lib-example:1.0
+          imagetag: ${{ env.EXREPO }}_custom-lib-example:1.0
           eapfile: customlib_example_1_0_0_armv7hf.eap
         run: |
           docker image rm -f $imagetag
@@ -41,3 +43,4 @@ jobs:
           cd ../..
           mkdir -p $EXDIR/$example/build
           cp $EXNAME/$example/build/$eapfile $EXDIR/$example/build/$eapfile
+          docker image rm -f $imagetag

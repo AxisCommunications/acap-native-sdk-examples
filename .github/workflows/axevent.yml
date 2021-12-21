@@ -9,6 +9,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     env:
+      EXREPO: acap-native-examples
       EXNAME: axevent
       EXDIR: acap/examples/$EXNAME
     steps:
@@ -17,7 +18,7 @@ jobs:
       - name: Build ${{ env.example }} application
         env:
           example: send_event
-          imagetag: send-event:1.0
+          imagetag: ${{ env.EXREPO }}_send-event:1.0
           eapfile: send_event_1_0_0_armv7hf.eap
         run: |
           docker image rm -f $imagetag
@@ -27,11 +28,12 @@ jobs:
           cd ../..
           mkdir -p $EXDIR/$example/build
           cp $EXNAME/$example/build/$eapfile $EXDIR/$example/build/$eapfile
+          docker image rm -f $imagetag
 
       - name: Build ${{ env.example }} application
         env:
           example: subscribe_to_event
-          imagetag: subscribe-to-event:1.0
+          imagetag: ${{ env.EXREPO }}_subscribe-to-event:1.0
           eapfile: subscribe_to_event_1_0_0_armv7hf.eap
         run: |
           docker image rm -f $imagetag
@@ -41,11 +43,12 @@ jobs:
           cd ../..
           mkdir -p $EXDIR/$example/build
           cp $EXNAME/$example/build/$eapfile $EXDIR/$example/build/$eapfile
+          docker image rm -f $imagetag
 
       - name: Build ${{ env.example }} application
         env:
           example: subscribe_to_events
-          imagetag: subscribe-to-events:1.0
+          imagetag: ${{ env.EXREPO }}_subscribe-to-events:1.0
           eapfile: subscribe_to_events_1_0_0_armv7hf.eap
         run: |
           docker image rm -f $imagetag
@@ -55,3 +58,4 @@ jobs:
           cd ../..
           mkdir -p $EXDIR/$example/build
           cp $EXNAME/$example/build/$eapfile $EXDIR/$example/build/$eapfile
+          docker image rm -f $imagetag
