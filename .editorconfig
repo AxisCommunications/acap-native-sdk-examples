@@ -1,0 +1,18 @@
+# EditorConfig is awesome: http://EditorConfig.org
+
+[*]
+# Unix-style newlines at the bottom of every file
+end_of_line = lf
+charset = utf-8
+
+# Remove any whitespace characters preceding newline characters
+trim_trailing_whitespace = true
+
+[{*.sh,containerExample,shell_script_example}]
+# Tab indentation
+indent_style = space
+indent_size = 2
+switch_case_indent = true
+keep_padding       = true
+space_redirects    = true
+

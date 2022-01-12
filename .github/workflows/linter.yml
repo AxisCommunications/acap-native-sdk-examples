@@ -28,6 +28,7 @@ jobs:
           VALIDATE_BASH: true
           VALIDATE_DOCKERFILE_HADOLINT: true
           VALIDATE_MARKDOWN: true
+          VALIDATE_SHELL_SHFMT: true
           VALIDATE_YAML: true
 
       - name: Check that linter symbolic links exist in top directory

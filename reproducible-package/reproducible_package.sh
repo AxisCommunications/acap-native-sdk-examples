@@ -58,8 +58,7 @@ clean_reproducible_test_env() {
   local dockrepo=rep
   local builddir=build
 
-  for i in 1 2 3
-  do
+  for i in 1 2 3; do
     echo "Remove build direcory: ${builddir}$i"
     [ -d ${builddir}$i ] && rm -rf ${builddir}$i
 
@@ -67,7 +66,6 @@ clean_reproducible_test_env() {
     docker image rm -f ${dockrepo}:$i
   done
 }
-
 
 #-------------------------------------------------------------------------------
 # Options
@@ -88,4 +86,3 @@ case $1 in
     exit 0
     ;;
 esac
-

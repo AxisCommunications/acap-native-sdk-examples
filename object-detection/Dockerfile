@@ -16,7 +16,7 @@ RUN git checkout ${libyuv_version}
 COPY yuv/*.patch /opt/build/libyuv
 RUN git apply ./*.patch && \
     CXXFLAGS=' -O2 -mthumb -mfpu=neon -mfloat-abi=hard -mcpu=cortex-a9 -fomit-frame-pointer' \
-    make -f linux.mk CXX=arm-linux-gnueabihf-g++ CC=arm-linux-gnueabihf-gcc && \
+    make -j -f linux.mk CXX=arm-linux-gnueabihf-g++ CC=arm-linux-gnueabihf-gcc && \
     arm-linux-gnueabihf-strip --strip-unneeded libyuv.so*
 
 # Build libjpeg-turbo
@@ -28,7 +28,7 @@ RUN git clone --branch 2.0.6 https://github.com/libjpeg-turbo/libjpeg-turbo.git
 WORKDIR /opt/build/libjpeg-turbo/build
 RUN CFLAGS=' -O2 -mthumb -mfpu=neon -mfloat-abi=hard -mcpu=cortex-a9 -fomit-frame-pointer' \
     CC=arm-linux-gnueabihf-gcc cmake -G"Unix Makefiles" .. && \
-    make
+    make -j
 WORKDIR /opt/app
 RUN mkdir -p lib include && \
     cp /opt/build/libjpeg-turbo/build/*.so* lib/ && \
