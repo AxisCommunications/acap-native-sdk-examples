@@ -3,7 +3,7 @@
 # This is a helper script for analyzing and visualizing the
 # output from running this example on an Axis device.
 
-# Usage: 
+# Usage:
 # $1   -----   <IP-ADRESS of device>
 # $2   -----   <path to matching labelsfile for classification>
 #
@@ -47,9 +47,9 @@ while [ -z "$eof" ]; do
         # Get the class from the labels file
         class=$(awk 'NR=='$line'' "$2")
         # Recalculate as a probability percentage
-        prob=$(((value/255)*100 ))
+        prob=$(((value / 255) * 100))
         # Print the result
         echo "The model has found that with a probability of $prob % the picture represents a $class"
     fi
-fi
+  fi
 done < result.txt

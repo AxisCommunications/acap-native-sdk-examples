@@ -1,6 +1,6 @@
 #!/bin/sh
 
-stop_containers () {
+stop_containers()  {
   docker compose down
   exit 0
 }
@@ -17,5 +17,5 @@ trap 'stop_containers' 2 15
 docker compose up
 
 while true; do
-    sleep 1
+  sleep 1
 done

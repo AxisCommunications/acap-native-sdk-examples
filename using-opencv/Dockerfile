@@ -59,7 +59,7 @@ RUN cmake -D CMAKE_TOOLCHAIN_FILE=../platforms/linux/arm-gnueabi.toolchain.cmake
     -D OPENCV_GENERATE_PKGCONFIG=ON \
     .. && \
     # Build openCV libraries and other tools
-    make -j 2 install
+    make -j "$(nproc)" install
 
 COPY app/ /opt/app
 WORKDIR /opt/app

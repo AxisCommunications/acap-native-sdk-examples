@@ -1,4 +1,4 @@
-#!/bin/bash -e
+#!/bin/sh -e
 
 # Make sure a environment name was given
 [ $# -eq 1 ] || {
