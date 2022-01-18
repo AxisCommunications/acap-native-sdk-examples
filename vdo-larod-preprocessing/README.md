@@ -41,6 +41,7 @@ vdo-larod-preprocessing
 │   ├── imgprovider.h
 │   ├── LICENSE
 │   ├── Makefile
+│   ├── manifest.json.artpec8
 │   ├── manifest.json.cpu
 │   ├── manifest.json.edgetpu
 │   └── vdo_larod_preprocessing.c
@@ -51,6 +52,7 @@ vdo-larod-preprocessing
 - **app/imgprovider.c/h** - Implementation of vdo parts, written in C.
 - **app/LICENSE** - Text file which lists all open source licensed source code distributed with the application.
 - **app/Makefile** - Makefile containing the build and link instructions for building the ACAP application.
+- **app/manifest.json.artpec8** - Defines the application and its configuration when building for DLPU with TensorFlow Lite.
 - **app/manifest.json.cpu** - Defines the application and its configuration when building for CPU with TensorFlow Lite.
 - **app/manifest.json.edgetpu** - Defines the application and its configuration when building chip and model for Google TPU.
 - **app/vdo_larod_preprocessing.c** - Application using larod, written in C.
@@ -60,6 +62,7 @@ vdo-larod-preprocessing
 ## Limitations
 
 - ARTPEC-7 based device with edge TPU.
+- ARTPEC-8
 - This application was not written to optimize performance.
 - MobileNet is good for classification, but it requires that the object you want to classify should cover almost all the frame.
 
@@ -67,7 +70,7 @@ vdo-larod-preprocessing
 
 Below is the step by step instructions on how to execute the program. So basically starting with the generation of the .eap file to running it on a device:
 
-## Build the application
+### Build the application
 
 > [!IMPORTANT]
 > *Depending on the network you are connected to,
@@ -75,49 +78,65 @@ The file that needs those settings is:* ~/.docker/config.json. *For
 reference please see: <https://docs.docker.com/network/proxy/> and a
 [script for Axis device here](../FAQs.md#HowcanIset-upnetworkproxysettingsontheAxisdevice?).*
 
-Depending on selected chip, different model can be used for running larod. Label file is used for identifying objects in the video stream.
+Depending on selected chip, different models can be used for running larod.
+Label file is used for identifying objects in the video stream. In this
+example, model and label files are downloaded from <https://coral.ai/models/>,
+when building the application. Which model that is used is configured through
+attributes in manifest.json and the *CHIP* parameter in the Dockerfile.
 
-Model and label files are downloaded from <https://coral.ai/models/>, when building the application.
-
-Which model that is used is configured through attributes in manifest.json and the CHIP parameter in the Dockerfile.
 The attributes in manifest.json that configures model are:
 
 - runOptions, which contains the application command line options.
 - friendlyName, a user friendly package name which is also part of the .eap file name.
 
-The CHIP argument in the Dockerfile also needs to be changed depending on model. Supported values are cpu and edgetpu. This argument controls which files are to be included in the package e.g. model. These files are copied to the application directory during installation.
+The **CHIP** argument in the Dockerfile also needs to be changed depending on
+model. This argument controls which files are to be included in the package,
+e.g. model files. These files are copied to the application directory during
+installation.
 
-Different devices support different chips and models.
+> Different devices support different chips and models.
 
 Building is done using the following commands:
 
 ```bash
-cp app/manifest.json.<CHIP> app/manifest.json
-docker build --tag <APP_IMAGE> . --build-arg CHIP=<CHIP>
+docker build --tag <APP_IMAGE> --build-arg CHIP=<CHIP> .
 docker cp $(docker create <APP_IMAGE>):/opt/app ./build
 ```
 
-\<APP_IMAGE\> is the name to tag the image with, e.g., vdo_larod_preprocessing:1.0
+- \<APP_IMAGE\> is the name to tag the image with, e.g., vdo_larod_preprocessing:1.0
+- \<CHIP\> is the chip type. Supported values are *artpec8*, *cpu* and *edgetpu*.
+- \<ARCH\> is the architecture. Supported values are armv7hf (default) and aarch64
 
-\<CHIP\> is the chip type. Supported values are cpu and edgetpu.
+See the following sections for build commands for each chip.
 
-Following is examples of how to build for both CPU with Tensorflow Lite and Google TPU.
+#### Build for ARTPEC-8 with Tensorflow Lite
 
-To build a package for CPU with Tensorflow Lite, run the following command standing in your working directory:
+To build a package for ARTPEC-8 with Tensorflow Lite, run the following commands standing in your working directory:
 
 ```bash
-cp app/manifest.json.cpu app/manifest.json
+docker build --build-arg ARCH=aarch64 --build-arg CHIP=artpec8 --tag <APP_IMAGE> .
+docker cp $(docker create <APP_IMAGE>):/opt/app ./build
+```
+
+#### Build for CPU with Tensorflow Lite
+
+To build a package for CPU with Tensorflow Lite, run the following commands standing in your working directory:
+
+```bash
 docker build --build-arg CHIP=cpu --tag <APP_IMAGE> .
 docker cp $(docker create <APP_IMAGE>):/opt/app ./build
 ```
 
-To build a package for Google TPU instead, run the following command:
+#### Build for Google TPU
+
+To build a package for Google TPU instead, run the following commands standing in your working directory:
 
 ```bash
-cp app/manifest.json.edgetpu app/manifest.json
 docker build --build-arg CHIP=edgetpu --tag <APP_IMAGE> .
 docker cp $(docker create <APP_IMAGE>):/opt/app ./build
 ```
+
+#### Build output
 
 The working directory now contains a build folder with the following files of importance:
 
@@ -132,6 +151,7 @@ vdo_larod_preprocessing
 │   ├── LICENSE
 │   ├── Makefile
 │   ├── manifest.json
+│   ├── manifest.json.artpec8
 │   ├── manifest.json.cpu
 │   ├── manifest.json.edgetpu
 │   ├── model
@@ -142,8 +162,8 @@ vdo_larod_preprocessing
 │   ├── package.conf.orig
 │   ├── param.conf
 │   ├── vdo_larod*
-│   ├── vdo_larod_preprocessing_cpu_1_0_0_armv7hf.eap / vdo_larod_preprocessing_edgetpu_1_0_0_armv7hf.eap
-│   ├── vdo_larod_preprocessing_cpu_1_0_0_LICENSE.txt / vdo_larod_preprocessing_edgetpu_1_0_0_LICENSE.txt
+│   ├── vdo_larod_preprocessing_{cpu,edgetpu}_1_0_0_armv7hf.eap / vdo_larod_preprocessing_artpec8_1_0_0_aarch64.eap
+│   ├── vdo_larod_preprocessing_{cpu,edgetpu}_1_0_0_LICENSE.txt / vdo_larod_preprocessing_artpec8_1_0_0_LICENSE.txt
 │   └── vdo_larod.c
 ```
 
@@ -151,20 +171,25 @@ vdo_larod_preprocessing
 - **build/model** - Folder containing models used in this application.
 - **build/model/imagenet_labels.txt** - Label file for MobileNet V2 (ImageNet).
 - **build/model/mobilenet_v2_1.0_224_quant_edgetpu.tflite** - Model file for MobileNet V2 (ImageNet), used for Google TPU.
-- **build/model/mobilenet_v2_1.0_224_quant.tflite** - Model file for MobileNet V2 (ImageNet), used for CPU with TensorFlow Lite.
+- **build/model/mobilenet_v2_1.0_224_quant.tflite** - Model file for MobileNet V2 (ImageNet), used for ARTPEC-8 and CPU with TensorFlow Lite.
 - **build/package.conf** - Defines the application and its configuration.
 - **build/package.conf.orig** - Defines the application and its configuration, original file.
 - **build/param.conf** - File containing application parameters.
 - **build/vdo_larod** - Application executable binary file.
-  if alternative chip 2 has been built.
+
+  If chip `artpec8` has been built.
+- **build/vdo_larod_preprocessing_artpec8_1_0_0_aarch64.eap** - Application package .eap file.
+- **build/vdo_larod_preprocessing_artpec8_1_0_0_LICENSE.txt** - Copy of LICENSE file.
+
+  If chip `cpu` has been built.
 - **build/vdo_larod_preprocessing_cpu_1_0_0_armv7hf.eap** - Application package .eap file.
 - **build/vdo_larod_preprocessing_cpu_1_0_0_LICENSE.txt** - Copy of LICENSE file.
 
-  if alternative chip 4 has been built.
+  If chip `edgetpu` has been built.
 - **build/vdo_larod_preprocessing_edgetpu_1_0_0_armv7hf.eap** - Application package .eap file.
 - **build/vdo_larod_preprocessing_edgetpu_1_0_0_LICENSE.txt** - Copy of LICENSE file.
 
-## Install your application
+### Install your application
 
 Installing your application on an Axis video device is as simple as:
 
@@ -174,11 +199,18 @@ Browse to the following page (replace <axis_device_ip> with the IP number of you
 http://<axis_device_ip>/#settings/apps
 ```
 
-*Go to your device web page above > Click on the tab **App** in the device GUI > Add **(+)** sign and browse to the newly built **vdo_larod_preprocessing_cpu_1_0_0_armv7hf.eap** or **vdo_larod_preprocessing_edgetpu_1_0_0_armv7hf.eap** > Click **Install** > Run the application by enabling the **Start** switch*
+*Go to your device web page above >
+ Click on the tab **App** in the device GUI >
+ Add **(+)** sign and browse to the newly built
+ **vdo_larod_preprocessing_artpec8_1_0_0_aarch64.eap** or
+ **vdo_larod_preprocessing_cpu_1_0_0_armv7hf.eap** or
+ **vdo_larod_preprocessing_edgetpu_1_0_0_armv7hf.eap** >
+ Click **Install** >
+ Run the application by enabling the **Start** switch*
 
-Application vdo_larod_preprocessing is now available as an application on the device, using the friendly name "vdo_larod_proprocessing_cpu" or "vdo_larod_preprocessing_edgetpu".
+The application is now installed on the device and named "vdo_larod_preprocessing_<CHIP>".
 
-## The expected output
+### The expected output
 
 Application log can be found directly at:
 
@@ -200,7 +232,66 @@ head -50 info.log
 
 Depending on selected chip, different output is received. The label file is used for identifying objects.
 
-## Output Alternative Chip 2 - CPU with TensorFlow Lite
+In the system log the chip is sometimes only mentioned as a number, they are mapped as follows:
+
+| Number | Chip |
+| --- | --- |
+| 2 | CPU with TensorFlow Lite |
+| 4 | Google TPU |
+| 12 | ARTPEC-8 DLPU |
+
+#### Output - ARTPEC-8 with TensorFlow Lite
+
+```sh
+----- Contents of SYSTEM_LOG for 'vdo_larod_preprocessing' -----
+
+
+vdo_larod_preprocessing[4165]: Starting /usr/local/packages/vdo_larod_preprocessing/vdo_larod_preprocessing
+vdo_larod_preprocessing[4165]: 'buffer.strategy': <uint32 3>
+vdo_larod_preprocessing[4165]: 'channel': <uint32 1>
+vdo_larod_preprocessing[4165]: 'format': <uint32 3>
+vdo_larod_preprocessing[4165]: 'height': <uint32 240>
+vdo_larod_preprocessing[4165]: 'width': <uint32 320>
+vdo_larod_preprocessing[4165]: Creating VDO image provider and creating stream 320 x 240
+vdo_larod_preprocessing[4165]: Dump of vdo stream settings map =====
+vdo_larod_preprocessing[4165]: chooseStreamResolution: We select stream w/h=320 x 240 based on VDO channel info.
+vdo_larod_preprocessing[4165]: Calculate crop image
+vdo_larod_preprocessing[4165]: Create larod models
+vdo_larod_preprocessing[4165]: Create preprocessing maps
+vdo_larod_preprocessing[4165]: Crop VDO image X=40 Y=0 (240 x 240)
+vdo_larod_preprocessing[4165]: Setting up larod connection with chip 12 and model /usr/local/packages/vdo_larod_preprocessing/model/mobilenet_v2_1.0_224_quant.tflite
+vdo_larod_preprocessing[4165]: 10: Axis Compute Engine
+vdo_larod_preprocessing[4165]: 11: CPU with libyuv
+vdo_larod_preprocessing[4165]: 12: ARTPEC-8 DLPU with TensorFlow Lite (experimental)
+vdo_larod_preprocessing[4165]: 13: Image processing using OpenCL
+vdo_larod_preprocessing[4165]: 2: CPU with TensorFlow Lite
+vdo_larod_preprocessing[4165]: Available chip ids:
+vdo_larod_preprocessing[4165]: Allocate memory for input/output buffers
+vdo_larod_preprocessing[4165]: Connect tensors to file descriptors
+vdo_larod_preprocessing[4165]: Create input/output tensors
+vdo_larod_preprocessing[4165]: Create job requests
+vdo_larod_preprocessing[4165]: Determine tensor buffer sizes
+vdo_larod_preprocessing[4165]: Start fetching video frames from VDO
+vdo_larod_preprocessing[4165]: Converted image in 6 ms
+vdo_larod_preprocessing[4165]: Ran inference for 8 ms
+vdo_larod_preprocessing[4165]: Top result:  955  banana with score 96.20%
+vdo_larod_preprocessing[4165]: Converted image in 2 ms
+vdo_larod_preprocessing[4165]: Ran inference for 7 ms
+vdo_larod_preprocessing[4165]: Top result:  955  banana with score 97.40%
+vdo_larod_preprocessing[4165]: Converted image in 3 ms
+vdo_larod_preprocessing[4165]: Ran inference for 7 ms
+vdo_larod_preprocessing[4165]: Top result:  955  banana with score 97.80%
+vdo_larod_preprocessing[4165]: Converted image in 2 ms
+vdo_larod_preprocessing[4165]: Ran inference for 7 ms
+vdo_larod_preprocessing[4165]: Top result:  955  banana with score 98.20%
+vdo_larod_preprocessing[4165]: Converted image in 2 ms
+vdo_larod_preprocessing[4165]: Ran inference for 7 ms
+vdo_larod_preprocessing[4165]: Stop streaming video from VDO
+vdo_larod_preprocessing[4165]: Top result:  955  banana with score 98.00%
+vdo_larod_preprocessing[4165]: Exit /usr/local/packages/vdo_larod_preprocessing/vdo_larod_preprocessing
+```
+
+#### Output - CPU with TensorFlow Lite
 
 ```sh
 ----- Contents of SYSTEM_LOG for 'vdo_larod_preprocessing' -----
@@ -250,7 +341,7 @@ vdo_larod_preprocessing[1670]: Top result:  955  banana with score 75.20%
 vdo_larod_preprocessing[1670]: Exit /usr/local/packages/vdo_larod_preprocessing/vdo_larod_preprocessing
 ```
 
-## Output Alternative Chip 4 - Google TPU
+#### Output - Google TPU
 
 ```sh
 ----- Contents of SYSTEM_LOG for 'vdo_larod_preprocessing' -----
@@ -298,8 +389,9 @@ vdo_larod_preprocessing[31476]: Ran inference for 4 ms
 vdo_larod_preprocessing[31476]: Stop streaming video from VDO
 vdo_larod_preprocessing[31476]: Top result:  955  banana with score 99.20%
 vdo_larod_preprocessing[31476]: Exit /usr/local/packages/vdo_larod_preprocessing/vdo_larod_preprocessing```
+```
 
-## A note on performance
+#### A note on performance
 
 Buffers are allocated and tracked by VDO and larod. As such they will
 automatically be handled as efficiently as possible. The libyuv backend will
@@ -315,12 +407,12 @@ uses the synchronous liblarod API call `larodRunJob()` in the interest of
 simplicity. One could implement pipelining using `larodRunJobAsync()` and thus
 improve performance, but with some added complexity to the program.
 
-## Conclusion
+#### Conclusion
 
 - This is an example of test data, which is dependent on selected device and chip.
 - One full-screen banana has been used for testing.
-- Running inference is much faster on chip Google TPU than CPU with TensorFlow Lite.
-- Converting images takes almost the same time on both chips.
+- Running inference is much faster on ARTPEC-8 and Google TPU in comparison to CPU.
+- Converting images takes almost the same time on all chips.
 - Objects with score less than 60% are generally not good enough to be used as classification results.
 
 ## License

@@ -14,14 +14,26 @@ WORKDIR /opt/build/libyuv
 ARG libyuv_version=5b6042fa0d211ebbd8b477c7f3855977c7973048
 RUN git checkout ${libyuv_version}
 COPY yuv/*.patch /opt/build/libyuv
-RUN git apply ./*.patch && \
-    CXXFLAGS=' -O2 -mthumb -mfpu=neon -mfloat-abi=hard -mcpu=cortex-a9 -fomit-frame-pointer' \
-    make -j -f linux.mk CXX=arm-linux-gnueabihf-g++ CC=arm-linux-gnueabihf-gcc && \
-    arm-linux-gnueabihf-strip --strip-unneeded libyuv.so*
+
+ARG ARCH
+RUN if [ "$ARCH" = armv7hf ]; then \
+        git apply ./*.patch && \
+        CXXFLAGS=' -O2 -mthumb -mfpu=neon -mfloat-abi=hard -mcpu=cortex-a9 -fomit-frame-pointer' \
+        make -j -f linux.mk CXX=arm-linux-gnueabihf-g++ CC=arm-linux-gnueabihf-gcc && \
+        arm-linux-gnueabihf-strip --strip-unneeded libyuv.so*; \
+    elif [ "$ARCH" = aarch64 ]; then \
+        git apply ./*.patch && \
+        CXXFLAGS=' -O2 ' \
+        make -j -f linux.mk CXX=/usr/bin/aarch64-linux-gnu-g++ CC=/usr/bin/aarch64-linux-gnu-gcc && \
+        aarch64-linux-gnu-strip --strip-unneeded libyuv.so*; \
+    else \
+        printf "Error: '%s' is not a valid value for the ARCH variable\n", "$ARCH"; \
+        exit 1; \
+    fi
 
 # Copy the library to application folder
 WORKDIR /opt/app
-COPY ./app /opt/app/
+COPY ./app .
 ARG BUILDDIR=/opt/build/libyuv
 RUN mkdir -p lib include && \
     cp ${BUILDDIR}/libyuv.so* lib/ && \
@@ -44,13 +56,15 @@ RUN mkdir -p label && \
 
 ARG CHIP=
 # Building the ACAP application
-RUN if [ "$CHIP" = cpu ]; then \
-    . /opt/axis/acapsdk/environment-setup* && acap-build . \
-    -a 'label/imagenet_labels.txt' -a 'model/mobilenet_v2_1.0_224_quant.tflite'; \
+RUN if [ "$CHIP" = cpu ] || [ "$CHIP" = artpec8 ]; then \
+        cp /opt/app/manifest.json.${CHIP} /opt/app/manifest.json && \
+        . /opt/axis/acapsdk/environment-setup* && acap-build . \
+        -a 'label/imagenet_labels.txt' -a 'model/mobilenet_v2_1.0_224_quant.tflite'; \
     elif [ "$CHIP" = edgetpu ]; then \
-    . /opt/axis/acapsdk/environment-setup* && acap-build . \
-    -a 'label/imagenet_labels.txt' -a 'model/mobilenet_v2_1.0_224_quant_edgetpu.tflite'; \
+        cp /opt/app/manifest.json.${CHIP} /opt/app/manifest.json && \
+        . /opt/axis/acapsdk/environment-setup* && acap-build . \
+        -a 'label/imagenet_labels.txt' -a 'model/mobilenet_v2_1.0_224_quant_edgetpu.tflite'; \
     else \
-    printf "Error: '%s' is not a valid value for the CHIP variable\n", "$CHIP"; \
-    exit 1; \
+        printf "Error: '%s' is not a valid value for the CHIP variable\n", "$CHIP"; \
+        exit 1; \
     fi

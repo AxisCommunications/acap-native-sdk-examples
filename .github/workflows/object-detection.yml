@@ -24,7 +24,7 @@ jobs:
         run: |
           docker image rm -f $imagetag
           cd $EXNAME
-          docker build --no-cache --tag $imagetag .
+          docker build --no-cache --build-arg CHIP=edgetpu --tag $imagetag .
           docker cp $(docker create $imagetag):/opt/app ./build
           cd ..
           mkdir -p $EXDIR/build

@@ -19,13 +19,15 @@ COPY ./app .
 
 ARG CHIP=
 # Building the ACAP application
-RUN if [ "$CHIP" = cpu ]; then \
-    . /opt/axis/acapsdk/environment-setup* && acap-build . \
-    -a 'model/mobilenet_v2_1.0_224_quant.tflite' -a 'model/imagenet_labels.txt' ; \
+RUN if [ "$CHIP" = cpu ] || [ "$CHIP" = artpec8 ]; then \
+        cp /opt/app/manifest.json.${CHIP} /opt/app/manifest.json && \
+        . /opt/axis/acapsdk/environment-setup* && acap-build . \
+        -a 'model/mobilenet_v2_1.0_224_quant.tflite' -a 'model/imagenet_labels.txt' ; \
     elif [ "$CHIP" = edgetpu ]; then \
-    . /opt/axis/acapsdk/environment-setup* && acap-build . \
-    -a 'model/mobilenet_v2_1.0_224_quant_edgetpu.tflite' -a 'model/imagenet_labels.txt' ; \
+        cp /opt/app/manifest.json.${CHIP} /opt/app/manifest.json && \
+        . /opt/axis/acapsdk/environment-setup* && acap-build . \
+        -a 'model/mobilenet_v2_1.0_224_quant_edgetpu.tflite' -a 'model/imagenet_labels.txt' ; \
     else \
-    printf "Error: '%s' is not a valid value for the CHIP variable\n", "$CHIP"; \
-    exit 1; \
+        printf "Error: '%s' is not a valid value for the CHIP variable\n", "$CHIP"; \
+        exit 1; \
     fi
