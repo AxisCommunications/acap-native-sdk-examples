@@ -52,13 +52,13 @@ base for different file types:
 
 ```sh
 # Lint Dockerfile files
-hadolint -c .hadolint.yml $(find -type f -name "Dockerfile*")
+hadolint $(find -type f -name "Dockerfile*")
 
 # Lint Markdown files
-markdownlint -c .markdownlint.yml .
+markdownlint .
 
 # Lint YAML files
-yamllint -c .yamllint.yml .
+yamllint .
 
 # Lint shell script files
 shellcheck $(shfmt -f .)
