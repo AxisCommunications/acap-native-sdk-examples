@@ -4,7 +4,7 @@
 
 ## Overview
 
-This example focuses on the application of object detection on an Axis camera equipped with an Edge TPU. A pretrained Edge TPU model [MobileNet SSD v2 (COCO)] is used to detect the location of 90 types of different objects. The model is downloaded through the dockerfile from the google-coral repository. The detected objects are saved in /tmp folder for further usage.
+This example focuses on the application of object detection on an Axis camera equipped with an Edge TPU, but can also be easily configured to run on CPU or ARTPEC8 cameras (DLPU). A pretrained model [MobileNet SSD v2 (COCO)] is used to detect the location of 90 types of different objects. The model is downloaded through the dockerfile from the google-coral repository. The detected objects are saved in /tmp folder for further usage.
 
 ## Prerequisites
 
@@ -18,16 +18,21 @@ The following instructions can be executed to simply run the example.
 1. Compile the ACAP:
 
     ```sh
-    ./build_acap.sh object_detection_acap:1.0
+    docker build --build-arg ARCH=<ARCH> --build-arg CHIP=<CHIP> --tag obj_detect:1.0 .
+    docker cp $(docker create obj_detect:1.0):/opt/app ./build
     ```
+
+    where the values are found:
+    - \<CHIP\> is the chip type. Supported values are *artpec8*, *cpu* and *edgetpu*.
+    - \<ARCH\> is the architecture. Supported values are armv7hf (default) and aarch64
 
 2. Find the ACAP `.eap` file
 
     ```sh
-    build/object_detection_app_1_0_0_armv7hf.eap
+    build/object_detection_app_1_0_0_<ARCH>.eap
     ```
 
-3. Install and start the ACAP on your camera through the GUI
+3. Install and start the ACAP on your camera through the camera web GUI
 
 4. SSH to the camera
 
@@ -193,19 +198,47 @@ jpeg_to_file(file_name, jpeg_buffer, jpeg_size);
 
 ## Building the application
 
-Similar with [tensorflow-to-larod](../tensorflow-to-larod), a packaging file is needed to compile the ACAP. This is found in [app/manifest.json](app/manifest.json). The noteworthy attribute for this tutorial is the `runOptions` attribute. `runOptions` allows arguments to be given to the ACAP, which in this case is handled by the `argparse` lib. The argument order, defined by [app/argparse.c](app/argparse.c), is `<model_path input_resolution_width input_resolution_height output_size_in_bytes raw_video_resolution_width raw_video_resolution_height threshold>`. We also need to copy our .tflite model file to the ACAP, and this is done by using the -a flag in the acap-build command in the Dockerfile. The -a flag simply tells the compiler what files to copy to the ACAP.
+Similar with [tensorflow-to-larod](../tensorflow-to-larod), a packaging file is
+needed to compile the ACAP. This is found in
+[app/manifest.json](app/manifest.json). The noteworthy attribute for this
+tutorial is the `runOptions` attribute. `runOptions` allows arguments to be
+given to the ACAP, which in this case is handled by the `argparse` lib. The
+argument order, defined by [app/argparse.c](app/argparse.c), is `<model_path
+input_resolution_width input_resolution_height output_size_in_bytes
+raw_video_resolution_width raw_video_resolution_height threshold>`.
 
-The ACAP is built to specification by the `Makefile` in [app/Makefile](app/Makefile). With the [Makefile](app/Makefile) and [manifest.json](app/manifest.json) files set up, the ACAP can be built by running the build script in the example environment:
+Additionally, it is possible to edit the chip where this runs: by default Edge
+TPU (`-c 4`), but can be changed to ARTPEC8 (`-c 12`) or CPU (`-c 2`). We also
+need to copy our .tflite model file to the ACAP, and this is done by using the
+-a flag in the acap-build command in the Dockerfile. The -a flag simply tells
+the compiler what files to copy to the ACAP.
+
+The ACAP is built to specification by the `Makefile` in
+[app/Makefile](app/Makefile). With the [Makefile](app/Makefile) and
+[manifest.json](app/manifest.json) files set up, the ACAP can be built from the
+application folder:
 
 ```sh
-./build_acap.sh object_detection_acap:1.0
+docker build --build-arg ARCH=<ARCH> --build-arg CHIP=<CHIP> --tag obj_detect:1.0 .
+docker cp $(docker create obj_detect:1.0):/opt/app ./build
 ```
 
-After running this script, the `build` directory should have been populated. Inside it is an `.eap` file, which is your stand-alone ACAP build.
+where the parameters are:
+
+- \<CHIP\> is the chip type. Supported values are *artpec8*, *cpu* and *edgetpu*.
+- \<ARCH\> is the architecture. Supported values are armv7hf (default) and aarch64
+
+> N.b. The selected architecture and chip must match the targeted device.
+
+The installable `.eap` file is found under:
+
+```sh
+build/object_detection_app_1_0_0_<ARCH>.eap
+```
 
 ## Installing the application
 
-To install an ACAP, the `.eap` file in the `build` directory needs to be uploaded to the camera and installed. This can be done through the camera GUI. Then go to your camera -> Settings -> Apps -> Add -> Browse to `object_detection.eap` and press Install.
+To install an ACAP, the `.eap` file in the `build` directory needs to be uploaded to the camera and installed. This can be done through the camera GUI. Then go to your camera -> Settings -> Apps -> Add -> Browse to the `.eap` file and press Install.
 
 ## Running the application
 
