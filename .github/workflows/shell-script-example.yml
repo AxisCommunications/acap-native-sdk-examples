@@ -20,7 +20,7 @@ jobs:
         env:
           example: ${{ env.EXNAME }}
           imagetag: ${{ env.EXREPO }}_${{ env.EXNAME }}:1.0
-          eapfile: ${{ env.EAPNAME }}_1_0_0_armv7hf.eap
+          eapfile: ${{ env.EAPNAME }}_1_0_0_all.eap
         run: |
           docker image rm -f $imagetag
           cd $EXNAME
