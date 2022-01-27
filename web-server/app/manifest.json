@@ -17,6 +17,9 @@
         },
         "uninstallation": {
             "preUninstallScript": "preuninstall.sh"
+        },
+        "configuration": {
+            "settingPage": "index.html"
         }
     }
 }

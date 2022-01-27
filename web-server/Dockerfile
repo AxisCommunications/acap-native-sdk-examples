@@ -43,3 +43,6 @@ RUN . /opt/axis/acapsdk/environment-setup* &&\
     cp /usr/local/lib/libmonkey.so.1.5 /usr/local/packages/monkey/lib/*.so -t lib/ &&\
     cp -r /usr/local/packages/monkey/html . &&\
     acap-build . -a reverseproxy.conf
+
+ENV PATH="${PATH}:/opt/axis/acapsdk/sysroots/x86_64-pokysdk-linux/usr/bin"
+ENTRYPOINT [ "/bin/bash" ]
