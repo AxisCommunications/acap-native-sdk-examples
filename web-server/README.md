@@ -37,67 +37,48 @@ web-server
 
 * Apache Reverse Proxy can not translate content with absolute addresses (i.e. /image.png) in the HTML page. Use only relative content (i.e. image.png or ../image.png)). More information how to handle relative urls correctly with a reverse proxy [here](https://serverfault.com/questions/561892/how-to-handle-relative-urls-correctly-with-a-reverse-proxy).
 
-## How to build the code
+## Proxy settings
 
-> [!IMPORTANT]
-> *Depending on the network you are connected to,
-The file that needs those settings is:*~/.docker/config.json.*
-For reference please see: https://docs.docker.com/network/proxy/ and a
-[script for Axis device here](../FAQs.md#HowcanIset-upnetworkproxysettingsontheAxisdevice?).*
+Depending on the network, you might need proxy settings in the following file: *~/.docker/config.json
+
+For reference please see: https://docs.docker.com/network/proxy/.
+
+## How to build the code
 
 Standing in your working directory run the following commands:
 
 ```bash
-docker build --tag <APP_IMAGE> .
-```
+# Set your device IP address and architecture
+export ARCH=<armv7hf or aarch64>
+export DEVICE_IP=<device IP address>
+export PASS=<device password>
 
-<APP_IMAGE> is the name to tag the image with, e.g., vdoencodeclient:1.0
-
-Default architecture is **armv7hf**. To build for **aarch64** it's possible to
-update the *ARCH* variable in the Dockerfile or to set it in the docker build
-command via build argument:
-
-```bash
-docker build --build-arg ARCH=aarch64 --tag <APP_IMAGE> .
-```
-
-Copy the result from the container image to a local directory build:
-
-```bash
-docker cp $(docker create <APP_IMAGE>):/opt/monkey/examples ./build
-```
-
-A build subfolder now contains the following files:
-
-```bash
-web-server
-├── build/
-│   ├── monkey* - Application executable binary file.
-│   ├── monkey_1_0_0_armv7hf.eap - Application package .eap file.
-│   ├── monkey_1_0_0_LICENSE.txt - Copy of LICENSE file.
-│   ├── package.conf - Defines the application and its configuration.
-│   ├── package.conf.orig - Defines the application and its configuration, original file.
-│   ├── param.conf - File containing application parameters.
-│   └── ...
-└── ...
+docker build . --build-arg ARCH --tag web-server:$ARCH
 ```
 
 ## Install your application
 
 Installing your application on an Axis video device is as simple as:
 
-Browse to the following page (replace <axis_device_ip> with the IP number of your Axis video device)
-
 ```bash
-http://<axis_device_ip>/#settings/apps
+docker run --rm web-server:$ARCH eap-install.sh $DEVICE_IP $PASS install
 ```
 
-Goto your device web page above > Click on the tab **App** in the device GUI > Add **(+)** sign and browse to
-the newly built **monkey_1_0_0_armv7hf.eap** > Click **Install** > Run the application by enabling the **Start** switch
+# Start your application using a web browser
 
-## Browse to the web server
+Goto your device web page > Click on the tab **Apps** in the device GUI and locate the application. Run the application by enabling the **Start** switch.
 
-The Web Server can be accessed from a Web Browser eighter directly using a port number (i.e. http://mycamera:2001) or through the Apache Server in the camera using an extension to the camera web URL (i.e http://mycamera/monkey/).
+The Web Server can be accessed from a Web Browser eighter directly using a port number (i.e. http://<device-ip>:2001) or through the Apache Server in the device using an extension to the device web URL (i.e http://<device-ip>/monkey/index.html) or by using the Open button in the application page in the **Apps** tab.
+
+# Start your application from command line
+
+As an alternative the application can be started, stopped and removed from command line using following commands:
+
+```bash
+docker run --rm web-server:$ARCH eap-install.sh $DEVICE_IP $PASS start
+docker run --rm web-server:$ARCH eap-install.sh $DEVICE_IP $PASS stop
+docker run --rm web-server:$ARCH eap-install.sh $DEVICE_IP $PASS remove
+```
 
 ## C API Examples
 
