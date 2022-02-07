@@ -1,0 +1,19 @@
+{
+    "schemaVersion": "1.3",
+    "acapPackageConf": {
+        "setup": {
+            "friendlyName": "tensorflow_to_larod_a8_app",
+            "appName": "tensorflow_to_larod_a8",
+            "vendor": "Axis Communications",
+            "embeddedSdkVersion": "3.0",
+            "user": {
+                "group": "sdk",
+                "username": "sdk"
+            },
+            "runOptions": "/usr/local/packages/tensorflow_to_larod_a8/model/converted_model.tflite 480 270 1 -c 12",
+            "vendorUrl": "https://www.axis.com",
+            "runMode": "never",
+            "version": "1.0.0"
+        }
+    }
+}

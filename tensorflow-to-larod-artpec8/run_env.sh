@@ -18,4 +18,4 @@ for arg in "$@"; do
 done
 
 # shellcheck disable=SC2086 # Deliberately word split arguments
-docker run $GPU_FLAG -v /var/run/docker.sock:/var/run/docker.sock --network host --name $ENV_NAME -it tensorflow-to-larod /bin/bash
+docker run $GPU_FLAG -v /var/run/docker.sock:/var/run/docker.sock --network host --name $ENV_NAME -it tensorflow-to-larod-a8 /bin/bash
