@@ -1,0 +1,67 @@
+From bc08920ca528933b8fb8dc56e2856ac94959692d Mon Sep 17 00:00:00 2001
+From: Anders Dellien <andersde@axis.com>
+Date: Tue, 23 Apr 2019 11:28:07 +0200
+Subject: [PATCH] Create a shared library
+
+Change-Id: I8e58b5dbf5df51b642480828a230b672e1389d55
+---
+ linux.mk | 22 ++++++++++++----------
+ 1 file changed, 12 insertions(+), 10 deletions(-)
+
+diff --git a/linux.mk b/linux.mk
+index e9a26a79..688458e0 100644
+--- a/linux.mk
++++ b/linux.mk
+@@ -2,13 +2,15 @@
+ # make -f linux.mk CXX=clang++
+ 
+ CC?=gcc
+-CFLAGS?=-O2 -fomit-frame-pointer
++CFLAGS?=-O2 -fomit-frame-pointer -fPIC
+ CFLAGS+=-Iinclude/
+ 
+ CXX?=g++
+-CXXFLAGS?=-O2 -fomit-frame-pointer
++CXXFLAGS?=-O2 -fomit-frame-pointer -fPIC
+ CXXFLAGS+=-Iinclude/
+ 
++OUT=libyuv.so.1
++
+ LOCAL_OBJ_FILES := \
+ 	source/compare.o           \
+ 	source/compare_common.o    \
+@@ -65,14 +67,14 @@ LOCAL_OBJ_FILES := \
+ .c.o:
+ 	$(CC) -c $(CFLAGS) $*.c -o $*.o
+ 
+-all: libyuv.a yuvconvert cpuid psnr
++all: $(OUT) yuvconvert cpuid psnr
+ 
+-libyuv.a: $(LOCAL_OBJ_FILES)
+-	$(AR) $(ARFLAGS) $@ $(LOCAL_OBJ_FILES)
++$(OUT): $(LOCAL_OBJ_FILES)
++	$(CXX) $(LDFLAGS) -shared -Wl,-soname,$(OUT) -o $@ $(LOCAL_OBJ_FILES)
+ 
+ # A C++ test utility that uses libyuv conversion.
+-yuvconvert: util/yuvconvert.cc libyuv.a
+-	$(CXX) $(CXXFLAGS) -Iutil/ -o $@ util/yuvconvert.cc libyuv.a
++yuvconvert: util/yuvconvert.cc $(OUT)
++	$(CXX) $(CXXFLAGS) -Iutil/ -o $@ util/yuvconvert.cc $(OUT)
+ 
+ # A standalone test utility
+ psnr: util/psnr.cc
+@@ -81,8 +83,8 @@ psnr: util/psnr.cc
+ # A C test utility that uses libyuv conversion from C.
+ # gcc 4.4 and older require -fno-exceptions to avoid link error on __gxx_personality_v0
+ # CC=gcc-4.4 CXXFLAGS=-fno-exceptions CXX=g++-4.4 make -f linux.mk
+-cpuid: util/cpuid.c libyuv.a
+-	$(CC) $(CFLAGS) -o $@ util/cpuid.c libyuv.a
++cpuid: util/cpuid.c $(OUT)
++	$(CC) $(CFLAGS) -o $@ util/cpuid.c $(OUT)
+ 
+ clean:
+-	/bin/rm -f source/*.o *.ii *.s libyuv.a yuvconvert cpuid psnr
++	/bin/rm -f source/*.o *.ii *.s $(OUT) yuvconvert cpuid psnr
+-- 
+2.11.0
+

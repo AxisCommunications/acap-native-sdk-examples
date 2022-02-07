@@ -1,0 +1,40 @@
+name: Build tensorflow-to-larod-artpec8 application
+on:
+  push:
+    paths:
+      - 'tensorflow-to-larod-artpec8/**'
+      - '!tensorflow-to-larod-artpec8/README.md'
+      - '.github/workflows/tensorflow-to-larod-artpec8.yml'
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        arch: ["aarch64"]
+    env:
+      EXREPO: acap-native-examples
+      EXNAME: tensorflow-to-larod-artpec8
+      EAPNAME: tensorflow_to_larod_a8_app
+      EXDIR: acap/examples/$EXNAME
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Build ${{ env.example }} application
+        env:
+          example: ${{ env.EXNAME }}
+          imagetag: ${{ env.EXREPO }}_${{ env.EXNAME }}:1.0
+          eapfile: ${{ env.EAPNAME }}_1_0_0_${{ matrix.arch }}.eap
+        run: |
+          envname=tensorflow-to-larod-a8
+          appimagename=tensorflow-app-image
+          docker image rm -f $imagetag
+          docker image rm -f $envname:latest
+          docker rm -f $appimagename
+          cd $EXNAME
+          ./build_env.sh
+          docker run -v /var/run/docker.sock:/var/run/docker.sock --network host --name $appimagename $envname /bin/bash ./build_acap.sh $imagetag
+          docker cp $appimagename:/env/build ./build
+          docker stop $appimagename
+          docker rm -f $appimagename
+          cd ..
+          docker image rm -f $imagetag
