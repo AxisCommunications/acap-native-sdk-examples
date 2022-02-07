@@ -1,4 +1,7 @@
-build/
-*/build*
-*/*/build*
+// Ignore directories which start with "build", but allow files.
+// N.b. the dot '.' in the regexp is sensitive to being last in []
+**/build/
+**/build[a-z0-9._-]*/
+
+// Ignore linter log files
 super-linter.log*
