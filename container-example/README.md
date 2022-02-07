@@ -27,35 +27,40 @@ This minimal example consist of an Alpine Linux container that executes a script
 ## Prerequisites
 
 * An Axis camera with edge container functionality
-* AxOS 10.7 or later
+* AxOS 10.9 or later
 * The [Docker Compose ACAP](https://github.com/AxisCommunications/docker-compose-acap) must be installed on the device
 
-## Build the application
+Pull and save the Alpine linux container image. Standing in your working directory run the following commands depending on your architecture:
 
-### Pull and save the Alpine linux container image
-
-Standing in your working directory run the following commands:
+## Build the application on armv7hf
 
 ```bash
+
 docker pull arm32v7/alpine:3.14.0
 docker save -o alpine.tar arm32v7/alpine:3.14.0
+docker build --tag <APP_NAME> .
+
 ```
 
-If you have a device with an aarch64 architecture you need to change arm32v7 to arm64v8 above.
-
-### Build the ACAP
-
-Standing in your working directory run the following command:
+## Build the application on aarch64
 
 ```bash
-docker build --tag eap-container-example .
+
+docker pull arm64v8/alpine:3.14.0
+docker save -o alpine.tar arm64v8/alpine:3.14.0
+docker build --tag <APP_NAME> --build-arg ARCH=aarch64 .
+
 ```
 
 ### Extract the .eap file from the container
 
 ```bash
-docker cp $(docker create eap-container-example:latest):/opt/app/Container_Example_1_0_0_armv7hf.eap .
+
+docker cp $(docker create <APP_NAME>):/opt/app/ ./build
+
 ```
+
+The .eap file is contained in the build folder.
 
 ## Install the application
 

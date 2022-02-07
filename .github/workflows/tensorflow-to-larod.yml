@@ -8,6 +8,9 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        arch: ["armv7hf"]
     env:
       EXREPO: acap-native-examples
       EXNAME: tensorflow-to-larod
@@ -20,7 +23,7 @@ jobs:
         env:
           example: ${{ env.EXNAME }}
           imagetag: ${{ env.EXREPO }}_${{ env.EXNAME }}:1.0
-          eapfile: ${{ env.EAPNAME }}_1_0_0_armv7hf.eap
+          eapfile: ${{ env.EAPNAME }}_1_0_0_${{ matrix.arch }}.eap
         run: |
           envname=tensorflow-to-larod
           appimagename=tensorflow-app-image
@@ -34,6 +37,4 @@ jobs:
           docker stop $appimagename
           docker rm -f $appimagename
           cd ..
-          mkdir -p $EXDIR/build
-          cp $EXNAME/build/$eapfile $EXDIR/build/$eapfile
           docker image rm -f $imagetag

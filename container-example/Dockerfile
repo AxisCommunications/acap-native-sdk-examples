@@ -4,8 +4,9 @@ ARG UBUNTU_VERSION=20.04
 ARG REPO=axisecp
 
 FROM ${REPO}/acap-native-sdk:${VERSION}-${ARCH}-ubuntu${UBUNTU_VERSION}
-
+ARG ARCH
 COPY ./* /opt/app/
+COPY ./config/env.${ARCH} /opt/app/env.config
 WORKDIR /opt/app
 RUN . /opt/axis/acapsdk/environment-setup* && \
- acap-build -a alpine.tar -a docker-compose.yml  .
+ acap-build -a alpine.tar -a docker-compose.yml -a env.config .

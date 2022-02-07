@@ -8,6 +8,9 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        arch: ["armv7hf", "aarch64"]
     env:
       EXREPO: acap-native-examples
       EXNAME: hello-world
@@ -20,13 +23,11 @@ jobs:
         env:
           example: ${{ env.EXNAME }}
           imagetag: ${{ env.EXREPO }}_${{ env.EXNAME }}:1.0
-          eapfile: ${{ env.EAPNAME }}_1_0_0_armv7hf.eap
+          eapfile: ${{ env.EAPNAME }}_1_0_0_${{ matrix.arch }}.eap
         run: |
           docker image rm -f $imagetag
           cd $EXNAME
-          docker build --no-cache --tag $imagetag .
+          docker build --no-cache --tag $imagetag --build-arg ARCH=${{ matrix.arch }} .
           docker cp $(docker create $imagetag):/opt/app ./build
           cd ..
-          mkdir -p $EXDIR/build
-          cp $EXNAME/build/$eapfile $EXDIR/build/$eapfile
           docker image rm -f $imagetag

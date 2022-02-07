@@ -7,8 +7,10 @@ on:
       - '.github/workflows/reproducible-package.yml'
 jobs:
   build:
-
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        arch: ["armv7hf", "aarch64"]
     steps:
       - uses: actions/checkout@v2
       - name: Build and test reproducible package application
@@ -17,7 +19,7 @@ jobs:
           cd reproducible-package
 
           # Make use of utility script and test it at the same time!
-          ./reproducible_package.sh build
+          ./reproducible_package.sh build ${{ matrix.arch }}
 
           # Check that standard and reproducible packages diff
           printf "Compare standard package to reproducible package\n"
@@ -40,6 +42,6 @@ jobs:
           # Cleanup
           # Make use of utility script and test it at the same time!
           printf "Run cleanup of build directories and images\n"
-          ./reproducible_package.sh clean
+          ./reproducible_package.sh clean ${{ matrix.arch }}
 
           [ "$found_error" = n ] || exit 1

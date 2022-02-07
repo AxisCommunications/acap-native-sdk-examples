@@ -8,6 +8,9 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        arch: ["armv7hf", "aarch64"]
     env:
       EXREPO: acap-native-examples
       EXNAME: utility-libraries
@@ -19,28 +22,24 @@ jobs:
         env:
           example: curl_example
           imagetag: ${{ env.EXREPO }}_curl-example:1.0
-          eapfile: curl_example_1_0_0_armv7hf.eap
+          eapfile: curl_example_1_0_0_${{ matrix.arch }}.eap
         run: |
           docker image rm -f $imagetag
           cd $EXNAME/$example
-          docker build --no-cache --tag $imagetag .
+          docker build --build-arg ARCH=${{ matrix.arch }} --no-cache --tag $imagetag .
           docker cp $(docker create $imagetag):/opt/app ./build
           cd ../..
-          mkdir -p $EXDIR/$example/build
-          cp $EXNAME/$example/build/$eapfile $EXDIR/$example/build/$eapfile
           docker image rm -f $imagetag
 
       - name: Build ${{ env.example }} application
         env:
           example: custom_lib_example
           imagetag: ${{ env.EXREPO }}_custom-lib-example:1.0
-          eapfile: customlib_example_1_0_0_armv7hf.eap
+          eapfile: customlib_example_1_0_0_${{ matrix.arch }}.eap
         run: |
           docker image rm -f $imagetag
           cd $EXNAME/$example
-          docker build --no-cache --tag $imagetag .
+          docker build --no-cache --build-arg ARCH=${{ matrix.arch }} --tag $imagetag .
           docker cp $(docker create $imagetag):/opt/app ./build
           cd ../..
-          mkdir -p $EXDIR/$example/build
-          cp $EXNAME/$example/build/$eapfile $EXDIR/$example/build/$eapfile
           docker image rm -f $imagetag
