@@ -8,6 +8,15 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - arch: armv7hf
+            chip: cpu
+          - arch: armv7hf
+            chip: edgetpu
+          - arch: aarch64
+            chip: artpec8
     env:
       EXREPO: acap-native-examples
       EXNAME: vdo-larod-preprocessing
@@ -17,35 +26,14 @@ jobs:
 
       - name: Build ${{ env.example }} application
         env:
-          example: ${{ env.EXNAME }}-cpu
-          imagetag: ${{ env.EXREPO }}_${{ env.EXNAME }}-cpu:1.0
-          eapfile: ${{ env.EAPNAME }}_cpu_1_0_0_armv7hf.eap
-          exdir: ${{ env.EXNAME }}/build_cpu_preprocessing
+          example: ${{ env.EXNAME }}-${{ matrix.chip }}
+          imagetag: ${{ env.EXREPO }}_${{ env.EXNAME }}-${{ matrix.chip }}:1.0
+          eapfile: ${{ env.EAPNAME }}_${{ matrix.chip }}_1_0_0_${{ matrix.arch }}.eap
         run: |
           docker image rm -f $imagetag
           cd $EXNAME
-          cp app/manifest.json.cpu app/manifest.json
-          docker build --no-cache --build-arg CHIP=cpu --tag $imagetag .
-          docker cp $(docker create $imagetag):/opt/app ./build
+          cp app/manifest.json.${{ matrix.chip }} app/manifest.json
+          docker build --no-cache --build-arg CHIP=${{ matrix.chip }} --build-arg ARCH=${{ matrix.arch }} --tag $imagetag .
+          docker cp $(docker create $imagetag):/opt/app ./build_${{ matrix.chip }}
           cd ..
-          mkdir -p $exdir
-          cp $EXNAME/build/$eapfile $exdir/$eapfile
-          docker image rm -f $imagetag
-
-      - name: Build ${{ env.example }} application
-        env:
-          example: ${{ env.EXNAME }}-tpu
-          imagetag: ${{ env.EXREPO }}_${{ env.EXNAME }}-tpu:1.0
-          eapfile: ${{ env.EAPNAME }}_edgetpu_1_0_0_armv7hf.eap
-          exdir: ${{ env.EXNAME }}/build_tpu_preprocessing
-        run: |
-          docker image rm -f $imagetag
-          cd $EXNAME
-          rm -rf build/
-          cp app/manifest.json.edgetpu app/manifest.json
-          docker build --no-cache --build-arg CHIP=edgetpu --tag $imagetag .
-          docker cp $(docker create $imagetag):/opt/app ./build
-          cd ..
-          mkdir -p $exdir
-          cp $EXNAME/build/$eapfile $exdir/$eapfile
           docker image rm -f $imagetag

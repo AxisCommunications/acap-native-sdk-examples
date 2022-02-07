@@ -8,6 +8,11 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - arch: armv7hf
+            chip: edgetpu
     env:
       EXREPO: acap-native-examples
       EXNAME: object-detection
@@ -18,15 +23,13 @@ jobs:
 
       - name: Build ${{ env.example }} application
         env:
-          example: ${{ env.EXNAME }}
-          imagetag: ${{ env.EXREPO }}_${{ env.EXNAME }}:1.0
-          eapfile: ${{ env.EAPNAME }}_1_0_0_armv7hf.eap
+          example: ${{ env.EXNAME }}-${{ matrix.chip }}
+          imagetag: ${{ env.EXREPO }}_${{ env.EXNAME }}-${{ matrix.chip }}:1.0
+          eapfile: ${{ env.EAPNAME }}_1_0_0_${{ matrix.arch }}.eap
         run: |
           docker image rm -f $imagetag
           cd $EXNAME
-          docker build --no-cache --build-arg CHIP=edgetpu --tag $imagetag .
+          docker build --no-cache --build-arg CHIP=${{ matrix.chip }} --build-arg ARCH=${{ matrix.arch }} --tag $imagetag .
           docker cp $(docker create $imagetag):/opt/app ./build
           cd ..
-          mkdir -p $EXDIR/build
-          cp $EXNAME/build/$eapfile $EXDIR/build/$eapfile
           docker image rm -f $imagetag
