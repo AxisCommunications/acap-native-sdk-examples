@@ -31,7 +31,6 @@ jobs:
           docker image rm -f $envname:latest
           docker rm -f $appimagename
           cd $EXNAME
-          pwd && ls -la && sleep 2
           ./build_env.sh
           docker run -v /var/run/docker.sock:/var/run/docker.sock --network host --name $appimagename $envname /bin/bash ./build_acap.sh $imagetag
           docker cp $appimagename:/env/build ./build
