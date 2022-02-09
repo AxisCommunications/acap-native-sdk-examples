@@ -3,8 +3,6 @@ TARGET := opencv_app
 
 OBJECTS := example.cpp
 
-STRIP = arm-linux-gnueabihf-strip
-
 PKGS = gio-2.0 vdostream gio-unix-2.0
 
 LDFLAGS += -L$(SDKTARGETSYSROOT)/usr/lib
