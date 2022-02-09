@@ -37,8 +37,16 @@ reference please see: <https://docs.docker.com/network/proxy/> and a
 
 1. Standing in your working directory run the following commands:
 
+   On armv7hf architecture
+
    ```bash
    docker build --tag <APP_IMAGE> .
+   ```
+
+   On aarch64 architecture
+
+   ```bash
+   docker build --tag <APP_IMAGE> --build-arg ARCH=aarch64 .
    ```
 
    <APP_IMAGE> is the name to tag the image with, e.g., opencv-app:1.0
@@ -72,11 +80,11 @@ reference please see: <https://docs.docker.com/network/proxy/> and a
 #### Dockerfile
 
 In our [Dockerfile](Dockerfile) are the instructions which builds OpenCV and our application. As the application is not built on the camera platform, but rather on our host machine for the camera platform, a crosscompilation toolchain needs to be installed. This is done with the
-installation of the `crossbuild-essential-armhf` package, as our camera uses the armv7hf architecture.
+installation of the `crossbuild-essential-{armhf or arm64}` package, depending on the camera architecture.
 
 With the toolchain installed, OpenCV can be retrieved and configured. To make OpenCV build for the armhf platform, the crosscompilation toolchain
 is specified with the `CMAKE_TOOLCHAIN_FILE` option. Other noteworthy options are the ones related to *NEON* and *VFPV3*, which are optimizations
-available for the platform that can greatly speed up CPU operations. The other configuration options are there to make the OpenCV installation quite stripped
+available for the platform that can greatly speed up CPU operations. Those options are implicitly present in the aarch64 compiler implementation, they are therefore explicitly omitted for the aarch64 build. The other configuration options are there to make the OpenCV installation quite stripped
 of functionality not needed for our example application. However, you will likely have to change these options to accommodate your custom
 application.
 
