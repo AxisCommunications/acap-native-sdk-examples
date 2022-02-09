@@ -7,7 +7,7 @@
 In this example, we look at the process of running a Tensorflow model on
 an AXIS ARTPEC-8 camera. We go through the steps needed from the training of the model
 to actually running inference on a camera by interfacing with the
-[larod API](https://axiscommunications.github.io/acap-documentation/docs/api/4.0/api/larod/html/index.html).
+[larod API](https://axiscommunications.github.io/acap-documentation/docs/api/4.1/api/larod/html/index.html).
 This example is somewhat more comprehensive and covers e.g.,
 model conversion, model quantization, image formats and creation and use of a model with multiple output tensors in
 greater depth than the [larod](../larod) and [vdo-larod](../vdo-larod) examples.
