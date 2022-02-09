@@ -2,7 +2,7 @@
     "schemaVersion": "1.1",
     "acapPackageConf": {
         "setup": {
-            "friendlyName": "object_detection_app",
+            "friendlyName": "object_detection_edgetpu",
             "appName": "object_detection",
             "vendor": "Axis Communications",
             "embeddedSdkVersion": "3.0",
