@@ -58,9 +58,9 @@ tensorflow_to_larod-artpec8
 │   ├── training
 │   │   ├── model.py
 │   │   ├── train.py
-│   │   ├── utils.py
-│   ├── yuv
-│   │   ├── 0001-Create-a-shared-library.patch
+│   │   └── utils.py
+│   └── yuv
+│       └── 0001-Create-a-shared-library.patch
 ├── README.md
 └── run_env.sh
 └── models.sha512
@@ -72,9 +72,9 @@ tensorflow_to_larod-artpec8
 - **env/app/imgconverter.c/h** - Implementation of libyuv parts, written in C.
 - **env/app/imgprovider.c/h** - Implementation of vdo parts, written in C.
 - **env/app/Makefile** - Makefile containing the build and link instructions for building the ACAP application.
-- **env/app/manifest.json** - Defines the ACAP and its configuration.
-- **env/app/tensorflow_to_larod_a8.c** - The file implementing the core functionality of the ACAP.
-- **env/build_acap.sh** - Builds the ACAP and the .eap file.
+- **env/app/manifest.json** - Defines the application and its configuration.
+- **env/app/tensorflow_to_larod_a8.c** - The file implementing the core functionality of the ACAP application.
+- **env/build_acap.sh** - Builds the ACAP application and the .eap file.
 - **env/convert_model.py** - A script used to convert Tensorflow models to Tensorflow Lite models.
 - **env/Dockerfile** - Docker file with the specified Axis toolchain and API container to build the example specified.
 - **env/training/model.py** - Defines the Tensorflow model used in this example.
@@ -95,7 +95,7 @@ The following instructions can be executed to simply run the example. Each step 
    ./run_env.sh <a_name_for_your_env>
    ```
 
-2. Train a Tensorflow model _(optional, pre-trained models available in `/env/models`)_:
+2. Train a Tensorflow model *(optional, pre-trained models available in `/env/models`)*:
 
    ```sh
    python training/train.py -i data/images/val2017/ -a data/annotations/instances_val2017.json
@@ -107,24 +107,24 @@ The following instructions can be executed to simply run the example. Each step 
    python convert_model.py -i models/trained_model.pb -o app/converted_model.tflite
    ```
 
-4. Compile the ACAP:
+4. Compile the ACAP application:
 
    ```sh
    ./build_acap.sh tensorflow_to_larod_a8_acap:1.0
    ```
 
-5. In a new terminal, copy the ACAP `.eap` file from the example environment:
+5. In a new terminal, copy the ACAP application `.eap` file from the example environment:
 
    ```sh
-   docker cp <a_name_for_your_env>:/env/build/tensorflow_to_larod_a8_1_0_0_aarch64.eap tensorflow_to_larod_a8.eap
+   docker cp <a_name_for_your_env>:/env/build/tensorflow_to_larod_a8_app_1_0_0_aarch64.eap tensorflow_to_larod_a8.eap
    ```
 
-6. Install and start the ACAP on your camera through the GUI
+6. Install and start the ACAP application on your camera through the GUI
 7. SSH to the camera
-8. View its log to see the ACAP output:
+8. View its log to see the application output:
 
     ```sh
-    tail -f /var/volatile/log/info.log | grep tensorflow_to_larod
+    tail -f /var/volatile/log/info.log | grep tensorflow_to_larod_a8
     ```
 
 ## Environment for building and training
@@ -213,33 +213,33 @@ python convert_model.py -i models/trained_model.pb -o app/converted_model.tflite
 
 Now there should be a converted model called `converted_model.tflite` in the `app` directory.
 
-__All the resulting pre-trained original, converted and compiled models are available in the `env/models` directory, so any step in the process can be skipped.__
+**All the resulting pre-trained original, converted and compiled models are available in the `env/models` directory, so any step in the process can be skipped.**
 
 ## Designing the application
 
 The application is based on the [vdo-larod-preprocessing](../vdo-larod-preprocessing) example. This example uses larod for both preprocessing and inference. Slight modifications have been made to accommodate the
-multiple outputs of the model in the same manner as described in the [tensorflow-to-larod](../tensorflow-to-larod) example for the ARTPEC-7 platform. In that section, we go over the _rough outline_ of what needs to be done to run inference for our model, but again, the full code is available in [/env/app/tensorflow_to_larod_a8.c](env/app/tensorflow_to_larod_a8.c).
+multiple outputs of the model in the same manner as described in the [tensorflow-to-larod](../tensorflow-to-larod) example for the ARTPEC-7 platform. In that section, we go over the *rough outline* of what needs to be done to run inference for our model, but again, the full code is available in [/env/app/tensorflow_to_larod_a8.c](env/app/tensorflow_to_larod_a8.c).
 
 ## Building the algorithm's application
 
-A packaging file is needed to compile the ACAP. This is found in [app/manifest.json](app/manifest.json). The noteworthy attribute for this tutorial is the `runOptions` attribute. `runOptions` allows arguments to be given to the ACAP, which in this case is handled by the `argparse` lib. The argument order, defined by [app/argparse.c](app/argparse.c), is `<model_path input_resolution_width input_resolution_height output_size_in_bytes>`. We also need to copy our .tflite model file to the ACAP, and this is done by using the -a flag in the acap-build command in the Dockerfile. The -a flag simply tells the compiler what files to copy to the ACAP.
+A packaging file is needed to compile the ACAP application. This is found in [app/manifest.json](app/manifest.json). The noteworthy attribute for this tutorial is the `runOptions` attribute. `runOptions` allows arguments to be given to the application, which in this case is handled by the `argparse` lib. The argument order, defined by [app/argparse.c](app/argparse.c), is `<model_path input_resolution_width input_resolution_height output_size_in_bytes>`. We also need to copy our .tflite model file to the ACAP application, and this is done by using the -a flag in the acap-build command in the Dockerfile. The -a flag simply tells the compiler what files to copy to the application.
 
-The ACAP is built to specification by the `Makefile` in [app/Makefile](env/app/Makefile). With the [Makefile](env/app/Makefile) and [manifest.json](env/app/manifest.json) files set up, the ACAP can be built by running the build script in the example environment:
+The ACAP application is built to specification by the `Makefile` in [app/Makefile](env/app/Makefile). With the [Makefile](env/app/Makefile) and [manifest.json](env/app/manifest.json) files set up, the ACAP application can be built by running the build script in the example environment:
 
 ```sh
 ./build_acap.sh tensorflow-to-larod-a8-acap:1.0
 ```
 
-After running this script, the `build` directory should have been populated. Inside it is an `.eap` file, which is your stand-alone ACAP build.
+After running this script, the `build` directory should have been populated. Inside it is an `.eap` file, which is your stand-alone ACAP application build.
 
 ## Installing the algorithm's application
 
-To install an ACAP, the `.eap` file in the `build` directory needs to be uploaded to the camera and installed. This can be done through the camera GUI.
+To install an ACAP application, the `.eap` file in the `build` directory needs to be uploaded to the camera and installed. This can be done through the camera GUI.
 
 Outside of the example environment, extract the `.eap` from the environment by running:
 
 ```sh
-docker cp <a_name_for_your_env>:/env/build/tensorflow_to_larod_a8_1_0_0_aarch64.eap tensorflow_to_larod_a8.eap
+docker cp <a_name_for_your_env>:/env/build/tensorflow_to_larod_a8_app_1_0_0_aarch64.eap tensorflow_to_larod_a8.eap
 ```
 
 where `<a_name_for_your_env>` is the same name as you used to start your environment with the `./run_env.sh` script.
@@ -247,7 +247,7 @@ Then go to your camera -> Settings -> Apps -> Add -> Browse to `tensorflow_to_la
 
 ## Running the algorithm
 
-In the Apps view of the camera, press the icon for your ACAP. A window will pop up which allows you to start the application. Press the Start icon to run the algorithm.
+In the Apps view of the camera, press the icon for your application. A window will pop up which allows you to start the application. Press the Start icon to run the algorithm.
 
 With the algorithm started, we can view the output by either pressing "App log" in the same window, or by SSHing into the camera and viewing the log as below:
 
