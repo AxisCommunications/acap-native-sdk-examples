@@ -33,12 +33,12 @@ RUN mkdir -p /env/app /env/data/images /env/data/annotations /env/models && \
    rm /env/data/annotations_trainval2017.zip
 
 # Get pretrained models
-COPY models.sha512 /env/models.sha512
-RUN curl -o /env/models.zip \
-   https://www.axis.com/techsup/developer_doc/acap3/examples/models.zip && \
-   sha512sum -c /env/models.sha512 && \
-   rm /env/models.sha512 && \
-   unzip -q /env/models.zip -d /env/ && rm /env/models.zip && \
+COPY models.armv7hf.edgetpu.sha512 /env/models.armv7hf.edgetpu.sha512
+RUN curl -o /env/models.armv7hf.edgetpu.zip \
+   https://acap-artifacts.s3.eu-north-1.amazonaws.com/models/models.armv7hf.edgetpu.zip && \
+   sha512sum -c /env/models.armv7hf.edgetpu.sha512 && \
+   rm /env/models.armv7hf.edgetpu.sha512 && \
+   unzip -q /env/models.armv7hf.edgetpu.zip -d /env/ && rm /env/models.armv7hf.edgetpu.zip && \
    cp /env/models/converted_model_edgetpu.tflite /env/app/
 
 # Copy the rest of the local files
