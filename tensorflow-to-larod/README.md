@@ -63,7 +63,7 @@ tensorflow_to_larod
 │       └── 0001-Create-a-shared-library.patch
 ├── README.md
 └── run_env.sh
-└── models.sha512
+└── models.armv7hf.edgetpu.sha512
 ```
 
 - **build_env.sh** - Builds the environment in which this example is run.
@@ -82,7 +82,7 @@ tensorflow_to_larod
 - **env/training/utils.py** - Contains a datagenerator which specifies how data is loaded to the training process.
 - **env/yuv/** - Folder containing patch for building libyuv.
 - **run_env.sh** - Runs the environment in which this example is run.
-- **models.sha512** - The file necessary to download a pretrained model.
+- **models.armv7hf.edgetpu.sha512** - The file necessary to download a pretrained model.
 
 ## Quickstart
 

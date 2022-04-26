@@ -29,12 +29,12 @@ RUN mkdir -p /env/app /env/data/images /env/data/annotations /env/models && \
    rm /env/data/annotations_trainval2017.zip
 
 # Get pretrained models
-COPY models.sha512 /env/models.sha512
-RUN curl -o /env/models.zip \
-   https://acap-artifacts.s3.eu-north-1.amazonaws.com/models/models.zip && \
-   sha512sum -c /env/models.sha512 && \
-   rm /env/models.sha512 && \
-   unzip -q /env/models.zip -d /env/ && rm /env/models.zip && \
+COPY models.aarch64.artpec8.sha512 /env/models.aarch64.artpec8.sha512
+RUN curl -o /env/models.aarch64.artpec8.zip \
+   https://acap-artifacts.s3.eu-north-1.amazonaws.com/models/models.aarch64.artpec8.zip && \
+   sha512sum -c /env/models.aarch64.artpec8.sha512 && \
+   rm /env/models.aarch64.artpec8.sha512 && \
+   unzip -q /env/models.aarch64.artpec8.zip -d /env/ && rm /env/models.aarch64.artpec8.zip && \
    cp /env/models/converted_model.tflite /env/app/
 
 # Copy the rest of the local files
