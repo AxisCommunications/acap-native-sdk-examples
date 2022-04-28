@@ -15,7 +15,7 @@ This example focuses on the application of object detection on an Axis camera eq
 
 The following instructions can be executed to simply run the example.
 
-1. Compile the ACAP:
+1. Compile the ACAP application:
 
     ```sh
     docker build --build-arg ARCH=<ARCH> --build-arg CHIP=<CHIP> --tag obj_detect:1.0 .
@@ -26,17 +26,17 @@ The following instructions can be executed to simply run the example.
     - \<CHIP\> is the chip type. Supported values are *artpec8*, *cpu* and *edgetpu*.
     - \<ARCH\> is the architecture. Supported values are armv7hf (default) and aarch64
 
-2. Find the ACAP `.eap` file
+2. Find the ACAP application `.eap` file
 
     ```sh
     build/object_detection_app_1_0_0_<ARCH>.eap
     ```
 
-3. Install and start the ACAP on your camera through the camera web GUI
+3. Install and start the ACAP application on your camera through the camera web GUI
 
 4. SSH to the camera
 
-5. View its log to see the ACAP output:
+5. View its log to see the ACAP application output:
 
     ```sh
     tail -f /var/volatile/log/info.log | grep object_detection
@@ -198,25 +198,22 @@ jpeg_to_file(file_name, jpeg_buffer, jpeg_size);
 
 ## Building the application
 
-Similar with [tensorflow-to-larod](../tensorflow-to-larod), a packaging file is
-needed to compile the ACAP. This is found in
-[app/manifest.json](app/manifest.json). The noteworthy attribute for this
-tutorial is the `runOptions` attribute. `runOptions` allows arguments to be
-given to the ACAP, which in this case is handled by the `argparse` lib. The
+An ACAP application contains a manifest file defining the package configuration.
+The file is named `manifest.json.<CHIP>` and can be found in the [app](app)
+directory. The Dockerfile will depending on the chip type(see below) copy the
+file to the required name format `manifest.json`. The noteworthy attribute for
+this tutorial is the `runOptions` attribute which allows arguments to be given
+to the application and here is handled by the `argparse` lib. The
 argument order, defined by [app/argparse.c](app/argparse.c), is `<model_path
 input_resolution_width input_resolution_height output_size_in_bytes
 raw_video_resolution_width raw_video_resolution_height threshold>`.
 
-Additionally, it is possible to edit the chip where this runs: by default Edge
-TPU (`-c 4`), but can be changed to ARTPEC8 (`-c 12`) or CPU (`-c 2`). We also
-need to copy our .tflite model file to the ACAP, and this is done by using the
--a flag in the acap-build command in the Dockerfile. The -a flag simply tells
-the compiler what files to copy to the ACAP.
+In the Dockerfile a `.tflite` model file corresponding to the chosen chip is
+downloaded and added to the ACAP application via the -a flag in the
+`acap-build` command.
 
-The ACAP is built to specification by the `Makefile` in
-[app/Makefile](app/Makefile). With the [Makefile](app/Makefile) and
-[manifest.json](app/manifest.json) files set up, the ACAP can be built from the
-application folder:
+The application is built to specification by the `Makefile` and `manifest.json`
+in the [app](app) directory. Standing in the application direcory, run:
 
 ```sh
 docker build --build-arg ARCH=<ARCH> --build-arg CHIP=<CHIP> --tag obj_detect:1.0 .
@@ -238,13 +235,20 @@ build/object_detection_app_1_0_0_<ARCH>.eap
 
 ## Installing the application
 
-To install an ACAP, the `.eap` file in the `build` directory needs to be uploaded to the camera and installed. This can be done through the camera GUI. Then go to your camera -> Settings -> Apps -> Add -> Browse to the `.eap` file and press Install.
+To install an ACAP application, the `.eap` file in the `build` directory needs
+to be uploaded to the camera and installed. This can be done through the camera
+GUI. Then go to your camera -> Settings -> Apps -> Add -> Browse to the `.eap`
+file and press Install.
 
 ## Running the application
 
-In the Apps view of the camera, press the icon for your ACAP. A window will pop up which allows you to start the application. Press the Start icon to run the algorithm.
+In the Apps view of the camera, press the icon for your ACAP application. A
+window will pop up which allows you to start the application. Press the Start
+icon to run the algorithm.
 
-With the algorithm started, we can view the output by either pressing "App log" in the same window, or by SSHing into the camera and viewing the log as below:
+With the algorithm started, we can view the output by either pressing `App log`
+in the same window, or connect with SSH into the device and view the log with
+the following command:
 
 ```sh
 tail -f /var/volatile/log/info.log | grep object_detection
