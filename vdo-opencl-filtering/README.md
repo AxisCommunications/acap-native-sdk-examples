@@ -1,4 +1,4 @@
-*Copyright (C) 2021, Axis Communications AB, Lund, Sweden. All Rights Reserved.*
+*Copyright (C) 2022, Axis Communications AB, Lund, Sweden. All Rights Reserved.*
 
 # VDO stream combined with OpenCL filtering based ACAP application on an edge device
 
@@ -54,10 +54,11 @@ reference please see: <https://docs.docker.com/network/proxy/> and a
 [script for Axis device here](../FAQs.md#HowcanIset-upnetworkproxysettingsontheAxisdevice?).*
 
 ```bash
-docker build --tag <APP_IMAGE> .
+docker build --tag <APP_IMAGE> --build-arg ARCH=<ARCH> .
 ```
 
-<APP_IMAGE> is the name to tag the image with, e.g., vdo_cl_filter_demo:1.0
+* <APP_IMAGE> is the name to tag the image with, e.g., vdo_cl_filter_demo:1.0
+* \<ARCH\> is the architecture of the camera you are using, e.g., armv7hf (default) or aarch64
 
 Copy the result from the container image to a local directory build:
 
@@ -65,7 +66,7 @@ Copy the result from the container image to a local directory build:
 docker cp $(docker create <APP_IMAGE>):/opt/app ./build
 ```
 
-The working dir now contains a build folder with the following files:
+The working direrctory now contains a build folder with the following files:
 
 ```bash
 vdo-opencl-filtering
@@ -84,7 +85,7 @@ vdo-opencl-filtering
 │   ├── param.conf
 │   ├── sobel_nv12.cl
 │   ├── vdo_cl_filter_demo*
-│   ├── vdo_cl_filter_demo_1_0_0_armv7hf.eap
+│   ├── vdo_cl_filter_demo_1_0_0_<ARCH>.eap
 │   ├── vdo_cl_filter_demo_1_0_0_LICENSE.txt
 │   └── vdo_cl_filter_demo.c
 ├── Dockerfile
@@ -96,7 +97,7 @@ vdo-opencl-filtering
 * **build/package.conf.orig** - Defines the application and its configuration, original file.
 * **build/param.conf** - File containing application parameters.
 * **build/vdo_cl_filter_demo*** - Application executable binary file.
-* **build/vdo_cl_filter_demo_1_0_0_armv7hf.eap** - Application package .eap file.
+* **build/vdo_cl_filter_demo_1_0_0_\<ARCH\>.eap** - Application package .eap file.
 * **build/vdo_cl_filter_demo_1_0_0_LICENSE.txt** - Copy of LICENSE file.
 
 #### Install your application
@@ -110,7 +111,7 @@ http://<axis_device_ip>/#settings/apps
 ```
 
 *Goto your device web page above > Click on the tab **App** in the device GUI > Add **(+)** sign and browse to
-the newly built **vdo_cl_filter_demo_1_0_0_armv7hf.eap** > Click **Install** > Run the application by enabling the **Start** switch*
+the newly built **vdo_cl_filter_demo_1_0_0_\<ARCH\>.eap** > Click **Install** > Run the application by enabling the **Start** switch*
 
 #### Program output
 

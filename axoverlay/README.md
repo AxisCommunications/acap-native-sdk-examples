@@ -37,7 +37,7 @@ axoverlay
 
 ### Limitations
 
-* ARTPEC-7 and ARTPEC-6 based devices.
+* ARTPEC-8, ARTPEC-7 and ARTPEC-6 based devices.
 * It is not possible to combine different color spaces for ARTPEC-6.
 
 ### How to run the code
@@ -55,10 +55,11 @@ reference please see: <https://docs.docker.com/network/proxy/> and a
 [script for Axis device here](../FAQs.md#HowcanIset-upnetworkproxysettingsontheAxisdevice?).*
 
 ```bash
-docker build --tag <APP_IMAGE> .
+docker build --tag <APP_IMAGE> --build-arg ARCH=<ARCH> .
 ```
 
-<APP_IMAGE> is the name to tag the image with, e.g., axoverlay:1.0
+* <APP_IMAGE> is the name to tag the image with, e.g., axoverlay:1.0
+* \<ARCH\> is the architecture of the camera you are using, e.g., armv7hf (default) or aarch64
 
 Copy the result from the container image to a local directory build:
 
@@ -77,7 +78,7 @@ axoverlay
 │   └── manifest.json
 ├── build
 │   ├── axoverlay*
-│   ├── axoverlay_1_0_0_armv7hf.eap
+│   ├── axoverlay_1_0_0_<ARCH>.eap
 │   ├── axoverlay_1_0_0_LICENSE.txt
 │   ├── axoverlay.c
 │   ├── LICENSE
@@ -91,7 +92,7 @@ axoverlay
 ```
 
 * **build/axoverlay*** - Application executable binary file.
-* **build/axoverlay_1_0_0_armv7hf.eap** - Application package .eap file.
+* **build/axoverlay_1_0_0_\<ARCH\>.eap** - Application package .eap file.
 * **build/axoverlay_1_0_0_LICENSE.txt** - Copy of LICENSE file.
 * **build/manifest.json** - Defines the application and its configuration.
 * **build/package.conf** - Defines the application and its configuration.
@@ -109,7 +110,7 @@ http://<axis_device_ip>/#settings/apps
 ```
 
 *Goto your device web page above > Click on the tab **App** in the device GUI > Add **(+)** sign and browse to
-the newly built **axoverlay_1_0_0_armv7hf.eap** > Click **Install** > Run the application by enabling the **Start** switch*
+the newly built **axoverlay_1_0_0_\<ARCH\>.eap** > Click **Install** > Run the application by enabling the **Start** switch*
 
 #### The expected output
 
