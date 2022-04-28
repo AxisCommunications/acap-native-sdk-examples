@@ -421,6 +421,7 @@ static void* threadEntry(void* data) {
                 g_clear_error(&error);
             }
         }
+        g_object_unref(newBuffer); // Release the ref from vdo_stream_get_buffer
         pthread_cond_signal(&provider->frameDeliverCond);
         pthread_mutex_unlock(&provider->frameMutex);
     }
