@@ -7,7 +7,7 @@
 In this example, we look at the process of running a Tensorflow model on
 an AXIS camera equipped with an Edge TPU. We go through the steps needed from the training of the model
 to actually running inference on a camera by interfacing with the
-[larod API](https://axiscommunications.github.io/acap-documentation/docs/api/4.1/api/larod/html/index.html).
+[larod API](https://axiscommunications.github.io/acap-documentation/docs/api/src/api/larod/html/index.html).
 This example is somewhat more comprehensive and covers e.g.,
 model conversion, model quantization, image formats and creation and use of a model with multiple output tensors in
 greater depth than the [larod](../larod) and [vdo-larod](../vdo-larod) examples.
@@ -250,7 +250,7 @@ In this section we will go over the *rough outline* of what needs to be done to 
 
 ### Setting up a video stream
 
-First of all, the frame to perform our analytics operation on needs to be retrieved. We do this using the [libvdo](https://axiscommunications.github.io/acap-documentation/docs/api/4.1/api/vdostream/html/index.html) library. First, the most appropriate available stream for our needs is chosen with the [chooseStreamResolution](env/app/imgprovider.c#L221) method. While any stream could be used, selecting the smallest stream which is still greater or equal to our requested resolution ensures that a minimal amount of time is spent on resizing.
+First of all, the frame to perform our analytics operation on needs to be retrieved. We do this using the [libvdo](https://axiscommunications.github.io/acap-documentation/docs/api/src/api/vdostream/html/index.html) library. First, the most appropriate available stream for our needs is chosen with the [chooseStreamResolution](env/app/imgprovider.c#L221) method. While any stream could be used, selecting the smallest stream which is still greater or equal to our requested resolution ensures that a minimal amount of time is spent on resizing.
 
 ```c
 unsigned int streamWidth = 0;
@@ -258,7 +258,7 @@ unsigned int streamHeight = 0;
 chooseStreamResolution(args.width, args.height, &streamWidth, &streamHeight);
 ```
 
-With our stream settings known, a stream can be set up. This is done by creating an ImgProvider, which enables fetching frames from our stream. The stream resolution is fed into the [createImgProvider](env/app/imgprovider.c#L95) method, along with the number of frames to have available to the application and the selected [output format](https://axiscommunications.github.io/acap-documentation/docs/api/4.1/api/vdostream/html/vdo-types_8h.html#a5ed136c302573571bf325c39d6d36246), which in turn returns an ImgProvider.
+With our stream settings known, a stream can be set up. This is done by creating an ImgProvider, which enables fetching frames from our stream. The stream resolution is fed into the [createImgProvider](env/app/imgprovider.c#L95) method, along with the number of frames to have available to the application and the selected [output format](https://axiscommunications.github.io/acap-documentation/docs/api/src/api/vdostream/html/vdo-types_8h.html#a5ed136c302573571bf325c39d6d36246), which in turn returns an ImgProvider.
 
 ```c
 provider = createImgProvider(streamWidth, streamHeight, 2, VDO_FORMAT_YUV);
@@ -266,7 +266,7 @@ provider = createImgProvider(streamWidth, streamHeight, 2, VDO_FORMAT_YUV);
 
 #### Setting up the larod interface
 
-Next, the [larod](https://axiscommunications.github.io/acap-documentation/docs/api/4.1/api/larod/html/index.html) interface needs to be set up. It is through this interface that the model is loaded and inference is performed. The setting up of larod is in part done in the [setupLarod](env/app/tensorflow_to_larod.c#L138) method. This method creates a connection to larod, selects the hardware to use and loads the model.
+Next, the [larod](https://axiscommunications.github.io/acap-documentation/docs/api/src/api/larod/html/index.html) interface needs to be set up. It is through this interface that the model is loaded and inference is performed. The setting up of larod is in part done in the [setupLarod](env/app/tensorflow_to_larod.c#L138) method. This method creates a connection to larod, selects the hardware to use and loads the model.
 
 ```c
 int larodModelFd = -1;
