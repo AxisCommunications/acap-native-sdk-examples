@@ -4,10 +4,18 @@ ENV TF_FORCE_GPU_ALLOW_GROWTH true
 # Get docker to be able to build ACAP inside this container
 ARG DEBIAN_FRONTEND=noninteractive
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+
+RUN rm /etc/apt/sources.list.d/cuda.list && rm /etc/apt/sources.list.d/nvidia-ml.list
+RUN apt-get update && apt-get install -y --no-install-recommends \
+   curl && \
+   apt-get clean && \
+   rm -rf /var/lib/apt/lists/* && \
+   curl --limit-rate 1G -L -O https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64/cuda-keyring_1.0-1_all.deb && \
+   dpkg -i cuda-keyring_1.0-1_all.deb
+
 RUN apt-get update && apt-get install -y --no-install-recommends \
    apt-transport-https \
    ca-certificates \
-   curl \
    software-properties-common && \
    # Install Docker
    curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add - && \
