@@ -66,7 +66,7 @@ Copy the result from the container image to a local directory build:
 docker cp $(docker create <APP_IMAGE>):/opt/app ./build
 ```
 
-The working direrctory now contains a build folder with the following files:
+The working directory now contains a build folder with the following files:
 
 ```bash
 vdo-opencl-filtering
