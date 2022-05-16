@@ -79,7 +79,7 @@ If you're trying to build an ACAP application with a large Docker image, for exa
 
 ## Install application - command line
 
-Install the application to the device from command line by using a tool such as [curl](https://curl.se/docs/):
+Install the application to the device from command line by using a tool such as [curl](https://curl.se):
 
 ```bash
 curl -u <USER:PASS> -F"file=@<APP_FILE_PATH>" <DEVICE_IP>/axis-cgi/applications/upload.cgi
