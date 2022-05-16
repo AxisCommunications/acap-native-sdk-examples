@@ -73,7 +73,8 @@ http://<axis_device_ip>/#settings/apps
 *Goto your device web page above > Click on the tab **App** in the device GUI > Add **(+)** sign and browse to
 the newly built **Container_Example_1_0_0_armv7hf.eap** > Click **Install** > Run the application by enabling the **Start** switch*
 
-### Note: 
+### Note
+
 If you're trying to build the [minimal-ml-example](https://github.com/AxisCommunications/acap-computer-vision-sdk-examples/tree/master/minimal-ml-inference) from [acap-computer-vision-sdk-examples](https://github.com/AxisCommunications/acap-computer-vision-sdk-examples), we suggest you send the application to the camera using the command below:
 
 ```bash
