@@ -73,6 +73,21 @@ http://<axis_device_ip>/#settings/apps
 *Goto your device web page above > Click on the tab **App** in the device GUI > Add **(+)** sign and browse to
 the newly built **Container_Example_1_0_0_armv7hf.eap** > Click **Install** > Run the application by enabling the **Start** switch*
 
+### Size limit
+
+If you're trying to build an ACAP application with a large Docker image, for example the [minimal-ml-example](https://github.com/AxisCommunications/acap-computer-vision-sdk-examples/tree/master/minimal-ml-inference) from [acap-computer-vision-sdk-examples](https://github.com/AxisCommunications/acap-computer-vision-sdk-examples), you might hit a size limit. In this case, we suggest you install the application via [command line](#install-application---command-line).
+
+## Install application - command line
+
+Install the application to the device from command line by using a tool such as [curl](https://curl.se):
+
+```bash
+curl -u <USER:PASS> -F"file=@<APP_FILE_PATH>" <DEVICE_IP>/axis-cgi/applications/upload.cgi
+```
+
+* Further flags for proxy and security might be required, depending on your network.
+* You may also use an API tool like [Postman](https://www.postman.com/) or other command line tools.
+
 ## Test the application
 
 Use a web browser to browse to
