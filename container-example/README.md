@@ -85,8 +85,8 @@ Install the application to the device from command line by using a tool such as 
 curl -u <USER:PASS> -F"file=@<APP_FILE_PATH>" <DEVICE_IP>/axis-cgi/applications/upload.cgi
 ```
 
-- Further flags for proxy and security might be required, depending on your network.
-- You may also use an API tool like [Postman](https://www.postman.com/) or other command line tools.
+* Further flags for proxy and security might be required, depending on your network.
+* You may also use an API tool like [Postman](https://www.postman.com/) or other command line tools.
 
 ## Test the application
 
