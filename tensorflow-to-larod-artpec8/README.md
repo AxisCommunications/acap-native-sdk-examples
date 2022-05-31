@@ -140,6 +140,8 @@ The environment can be started without GPU support by supplying the `--no-gpu` f
 
 Note that the MS COCO 2017 validation dataset is downloaded during the building of the environment. This is roughly 1GB in size which means this could take a few minutes to download.
 
+If your machine doesn't have the hardware requisits, like not enough GPU to train or not enough storage to save the training data, you can take a look at [train-tensorflow-model-using-aws](https://github.com/AxisCommunications/acap-sdk-tools/tree/main/train-tensorflow-model-using-aws), a tool to automatise model training with AWS.
+
 ## The example model
 
 In this example, we'll train a simple model with one input and two outputs. The input to the model is a FP32 RGB image scaled to the [0, 1] range and of shape `(480, 270, 3)`.
