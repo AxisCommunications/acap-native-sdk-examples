@@ -41,3 +41,35 @@ Run on the device:
 
   exit
 ```
+
+## How to enable SSH on an Axis device
+
+You can enable SSH on an Axis device either through the device's web interface or by calling a VAPIX API from command-line.
+
+### Device web interface
+
+Enable SSH in the old web interface:
+
+1. Go to `http://<AXIS_DEVICE_IP>/aca/index.html#settings/system/tools/plainconfig` where <AXIS_DEVICE_IP> is
+the IP number of your Axis device.
+2. Click `Network` in the list.
+3. Under `SSH` select `Enabled`.
+4. Scroll to the bottom of the page and click button `Save`.
+
+Enable SSH in the new web interface:
+
+1. Go to `http://<AXIS_DEVICE_IP>/camera/index.html#/system/plainConfig` where <AXIS_DEVICE_IP> is
+the IP number of your Axis device.
+2. Select the `Network` group from the drop-down menu.
+3. Under `Network / SSH` select `Enabled`.
+4. Scroll to the bottom of the page and click button `Save`.
+
+### Enable SSH from command-line
+
+This is examplified using curl:
+
+```sh
+curl -u <USER>:<PASS> "http://<AXIS_DEVICE_IP>/axis-cgi/admin/param.cgi?action=update&Network.SSH.Enabled=yes"
+```
+
+> More options may be required depending on your network setup.
