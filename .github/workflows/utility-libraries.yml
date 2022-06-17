@@ -20,19 +20,6 @@ jobs:
 
       - name: Build ${{ env.example }} application
         env:
-          example: curl_example
-          imagetag: ${{ env.EXREPO }}_curl-example:1.0
-          eapfile: curl_example_1_0_0_${{ matrix.arch }}.eap
-        run: |
-          docker image rm -f $imagetag
-          cd $EXNAME/$example
-          docker build --build-arg ARCH=${{ matrix.arch }} --no-cache --tag $imagetag .
-          docker cp $(docker create $imagetag):/opt/app ./build
-          cd ../..
-          docker image rm -f $imagetag
-
-      - name: Build ${{ env.example }} application
-        env:
           example: custom_lib_example
           imagetag: ${{ env.EXREPO }}_custom-lib-example:1.0
           eapfile: customlib_example_1_0_0_${{ matrix.arch }}.eap
@@ -40,6 +27,19 @@ jobs:
           docker image rm -f $imagetag
           cd $EXNAME/$example
           docker build --no-cache --build-arg ARCH=${{ matrix.arch }} --tag $imagetag .
+          docker cp $(docker create $imagetag):/opt/app ./build
+          cd ../..
+          docker image rm -f $imagetag
+
+      - name: Build ${{ env.example }} application
+        env:
+          example: openssl_curl_example
+          imagetag: openssl-curl-example:1.0
+          eapfile: openssl_curl_example_1_0_0_armv7hf.eap
+        run: |
+          docker image rm -f $imagetag
+          cd $EXNAME/$example
+          docker build --no-cache --build-arg ARCH=${{ matrix.arch}} --build-arg APP_DEBUG=yes --tag $imagetag .
           docker cp $(docker create $imagetag):/opt/app ./build
           cd ../..
           docker image rm -f $imagetag

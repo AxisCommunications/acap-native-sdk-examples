@@ -1,9 +1,8 @@
 {
-    "schemaVersion": "1.1",
+    "schemaVersion": "1.3",
     "acapPackageConf": {
         "setup": {
-            "friendlyName": "curl_example",
-            "appName": "curl_example",
+            "appName": "openssl_curl_example",
             "vendor": "Axis Communications",
             "embeddedSdkVersion": "3.0",
             "user": {
