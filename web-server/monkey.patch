@@ -1,3 +1,16 @@
+diff --git a/configure b/configure
+index 4286c34..b4301fa 100644
+--- a/configure
++++ b/configure
+@@ -1297,7 +1297,7 @@ fi
+ 
+ [ -n "$relaxed_plugins" ] && DEFS="$DEFS -DRELAXED_PLUGINS"
+ 
+-CFLAGS_GEN=" -std=gnu99 -Wall -Wextra"
++CFLAGS_GEN=" -std=gnu99 -Wall -Wextra -fcommon"
+ if test -z "$debug" ; then
+ 	CFLAGS="$CFLAGS $CFLAGS_GEN -fvisibility=hidden"
+ 
 diff --git a/examples/Makefile b/examples/Makefile
 index 4bcf670f..20aed5ba 100644
 --- a/examples/Makefile
