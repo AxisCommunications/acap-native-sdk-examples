@@ -216,3 +216,23 @@ index 9914cb79..383f841f 100644
  
  	mklib_stop(ctx);
  
+diff --git a/src/mk_server.c b/src/mk_server.c
+index 8c27742..956f7ee 100644
+--- a/src/mk_server.c
++++ b/src/mk_server.c
+@@ -40,11 +40,9 @@
+ unsigned int mk_server_worker_capacity(unsigned short nworkers)
+ {
+     unsigned int max, avl;
+-    struct rlimit lim;
+-
+-    /* Limit by system */
+-    getrlimit(RLIMIT_NOFILE, &lim);
+-    max = lim.rlim_cur;
++    
++    /* Overwrite the value for RLIMIT_NOFILE to avoid unmanagable memory allocation */
++    max = 1048576;
+ 
+     /* Minimum of fds needed by Monkey:
+      * --------------------------------
+ 
