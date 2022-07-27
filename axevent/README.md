@@ -82,7 +82,7 @@ The wrapper also helps you save the sent eventlist to an XML-file called "senton
 <https://gstreamer.freedesktop.org/documentation/installing/on-linux.html?gi-language=c>*
 
 It is also possible to use GStreamer tools for monitoring events, as a complement to the wrapper
-(replace <user>, <password> and <axis_device_ip> with the username, password and IP number of your Axis video device).
+(replace \<user\>, \<password\> and \<axis_device_ip\> with the username, password and IP number of your Axis video device).
 
 ```bash
 gst-launch-1.0 rtspsrc location="rtsp://<user>:<password>@<axis_device_ip>/axis-media/media.amp?video=0&audio=0&event=on" ! fdsink
