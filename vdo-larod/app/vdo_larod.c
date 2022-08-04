@@ -62,6 +62,7 @@
 #include <sys/types.h>
 #include <syslog.h>
 #include <unistd.h>
+#include <math.h>
 
 #include "argparse.h"
 #include "imgconverter.h"
@@ -538,13 +539,23 @@ int main(int argc, char** argv) {
 
         // Covert image data from NV12 format to interleaved uint8_t RGB format.
         gettimeofday(&startTs, NULL);
-        if (!convertCropScaleU8yuvToRGB(nv12Data, streamWidth, streamHeight,
-                                        (uint8_t*) larodInputAddr, args.width,
-                                        args.height)) {
-            syslog(LOG_ERR, "%s: Failed img scale/convert in "
-                   "convertCropScaleU8yuvToRGB() (continue anyway)",
-                   __func__);
+
+        char* inputMode;
+        if (args.chip == 6) {
+            //Special input format for cv25 products.
+            inputMode = "RGB-planar";
+        }else {
+            //Special input format for other products.
+            inputMode = "RGB-interleaved";
         }
+
+        if (!convertCropScaleU8yuvToRGB(nv12Data, streamWidth, streamHeight,
+                                            (uint8_t*) larodInputAddr, args.width,
+                                            args.height,inputMode)) {
+                syslog(LOG_ERR, "%s: Failed img scale/convert in "
+                    "convertCropScaleU8yuvToRGB() (continue anyway)",
+                    __func__);
+            }   
         gettimeofday(&endTs, NULL);
 
         elapsedMs = (unsigned int) (((endTs.tv_sec - startTs.tv_sec) * 1000) +
@@ -573,27 +584,72 @@ int main(int argc, char** argv) {
         syslog(LOG_INFO, "Ran inference for %u ms", elapsedMs);
 
         // Compute the most likely index.
-        uint8_t maxProb = 0;
+        float maxProb = 0;
+        uint8_t maxScore = 0;
         size_t maxIdx = 0;
         uint8_t* outputPtr = (uint8_t*) larodOutputAddr;
-        for (size_t j = 0; j < args.outputBytes; j++) {
-            if (outputPtr[j] > maxProb) {
-                maxProb = outputPtr[j];
-                maxIdx = j;
-            }
+        
+        //The output has to be read differently depending if we are using the cv25 chip or the others
+        //In the case of the cv25, the space per element is 32 bytes, 
+        // and the output is a float padded with zeros
+        //In the cases of artpec7 and artpec8 the space per element is 1 byte 
+        // and the output is an uint8_t that has to be processed with softmax.
+        //This part of the code can be imporved by using better pointer casting, subject to future changes.
+        int spacePerElement;
+        if (args.chip == 6) {
+            spacePerElement = 32;
+            float score;
+            for (size_t j = 0; j < args.outputBytes/spacePerElement; j++) {
+                score = *((float*) (outputPtr + (j*spacePerElement)));
+                if (score > maxProb) {
+                    maxProb = score;
+                    maxIdx = j;
+                }
         }
+        } else {
+            spacePerElement = 1;
+            uint8_t score;
+            for (size_t j = 0; j < args.outputBytes/spacePerElement; j++) {
+                score = *((uint8_t*) (outputPtr + (j*spacePerElement)));
+                if (score > maxScore) {
+                    maxScore = score;
+                    maxIdx = j;
+                }
+            }
+            // Simplifying softmax calculation:
+            // z[i] = outputPtr[i]
+
+            // softmax[i] = e^(z[i]) / sum_i(e^z[i])
+            // To avoid overflow use the equivalent expression:
+            // softmax[i] = e^(z[i]-m) / sum
+            // where m is max{z[0],z[1],z[2] ... z[3]}
+            // and sum is sum_i(e^z[i]-m)
+            // softmax = e^(z[i]-m) / sum 
+            // log(softmax[i]) = log (e^(z[i]-m)) - log(sum)
+            // log(softmax[i]) = z[i] - m - log(sum)
+            // softmax[i] = e^(z[i] - m - log(sum))
+            // Since we are only interested in printing max value and z[i_max] = m
+            // softmax[i_max] = e^(-log(sum)) = 1/sum
+            float sum = 0.0;
+            for (size_t j = 0; j < args.outputBytes/spacePerElement; j++) {
+                score = *((uint8_t*) (outputPtr + (j*spacePerElement)));
+                sum += exp(score - maxScore);
+            }
+            maxProb = 1/sum; 
+        }
+        maxProb*=100; //To have output int %
         if (labels) {
             if (maxIdx < numLabels) {
-                syslog(LOG_INFO, "Top result: %s with score %.2f%%", labels[maxIdx],
-                       (float) maxProb / 2.5f);
+                syslog(LOG_INFO, "Top result: %s with score %.2f%%",
+                labels[maxIdx], maxProb);
             } else {
                 syslog(LOG_INFO, "Top result: index %zu with score %.2f%% (index larger "
                        "than num items in labels file)",
-                       maxIdx, (float) maxProb / 2.5f);
+                       maxIdx, maxProb);
             }
         } else {
-            syslog(LOG_INFO, "Top result: index %zu with score %.2f%%", maxIdx,
-                   (float) maxProb / 2.5f);
+            syslog(LOG_INFO, "Top result: index %zu with score %.2f%%",
+            maxIdx, maxProb);
         }
 
         // Release frame reference to provider.

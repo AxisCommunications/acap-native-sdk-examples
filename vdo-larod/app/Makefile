@@ -19,7 +19,7 @@ CFLAGS += -DLAROD_API_VERSION_1
 all:	$(PROGS)
 
 $(PROG1): $(OBJS1)
-	$(CC) $(CFLAGS) $(LDFLAGS) $^ $(LDLIBS) -o $@
+	$(CC) $(CFLAGS) $(LDFLAGS) $^ $(LDLIBS) -o $@ -lm
 
 clean:
 	rm -f $(PROGS) *.o *.eap lib/* include/*
