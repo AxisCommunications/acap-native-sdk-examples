@@ -305,7 +305,7 @@ path in the Makefile to use the bundled libraries.
 If you don't set the runtime shared library search path for OpenSSL and curl
 libraries, the application may still run and seem to use the correct versions
 of the libraries, see the version logged in the [application
-log](#the-expected-output---application-log). But it might be hard to decide
+log](#application-log). But it might be hard to decide
 which version of `libcrypto.so` that is used since this library is also
 available in AXIS OS.
 
