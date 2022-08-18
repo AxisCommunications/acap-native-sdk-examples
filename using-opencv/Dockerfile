@@ -6,67 +6,45 @@ ARG VERSION=1.2
 
 FROM ${REPO}/${SDK}:${VERSION}-${ARCH}-ubuntu${UBUNTU_VERSION}
 
-ARG OPENCV_VERSION=4.5.1
-ARG TARGET_ROOT=/target-root
-
-# Add a sources.list file that contains the armhf repositories
-# Get crosscompilation toolchain
+# Set general arguments
 ARG ARCH
-ENV DEBIAN_FRONTEND=noninteractive
-COPY sources.list /etc/apt
+ARG SDK_LIB_PATH_BASE=/opt/axis/acapsdk/sysroots/${ARCH}/usr
+ARG BUILD_DIR=/opt/build
 
-RUN if [ "$ARCH" = armv7hf ]; then \
-        apt-get update && \
-        dpkg --add-architecture armhf && \
-        apt-get update && apt-get install -yf --no-install-recommends \
-        ca-certificates \
-        crossbuild-essential-armhf && \
-        apt-get clean && \
-        rm -rf /var/lib/apt/lists/* ; \
-    elif [ "$ARCH" = aarch64 ]; then \
-        apt-get update && \
-        dpkg --add-architecture arm64 && \
-        apt-get update && apt-get install -yf --no-install-recommends \
-        ca-certificates \
-        crossbuild-essential-arm64 && \
-        apt-get clean && \
-        rm -rf /var/lib/apt/lists/* ;\
-    else \
-        printf "Error: '%s' is not a valid value for the ARCH variable\n", "$ARCH"; \
-        exit 1; \
-    fi
+#-------------------------------------------------------------------------------
+# Prepare build environment
+#-------------------------------------------------------------------------------
 
-RUN apt-get update && apt-get install -y -f --no-install-recommends \
+# Install build dependencies for cross compiling OpenCV
+RUN DEBIAN_FRONTEND=noninteractive \
+    apt-get update && apt-get install -y -f --no-install-recommends \
     cmake \
-    curl \
-    pkg-config && \
+    ca-certificates && \
     update-ca-certificates && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-RUN if [ "$ARCH" = armv7hf ]; then \
-        export ARCHDIR=arm-linux-gnueabihf && \
-        export STRIP=arm-linux-gnueabihf-strip; \
-    elif [ "$ARCH" = aarch64 ]; then \
-        export ARCHDIR=g++-aarch64-linux-gnu && \
-        export STRIP=aarch64-linux-gnu-strip ;\
-    else \
-        printf "Error: '%s' is not a valid value for the ARCH variable\n", "$ARCH"; \
-        exit 1; \
-    fi
-ENV PKG_CONFIG_LIBDIR=/usr/share/pkgconfig:/usr/lib/$ARCHDIR/pkgconfig:/usr/lib/$ARCHDIR/pkgconfig
+#-------------------------------------------------------------------------------
+# Build OpenCV libraries
+#-------------------------------------------------------------------------------
 
-# Download OpenCV
-WORKDIR /workspace
+ARG OPENCV_VERSION=4.5.1
+ARG OPENCV_DIR=${BUILD_DIR}/opencv
+ARG OPENCV_SRC_DIR=${OPENCV_DIR}/opencv-${OPENCV_VERSION}
+ARG OPENCV_BUILD_DIR=${OPENCV_DIR}/build
+
+WORKDIR ${OPENCV_DIR}
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 RUN curl -fsSL https://github.com/opencv/opencv/archive/$OPENCV_VERSION.tar.gz | tar -xz
 
-WORKDIR /workspace/opencv-$OPENCV_VERSION/build
-# Configure OpenCV
-# Platform specific optimizations in the form of NEON and VFPV3 are enabled
+WORKDIR ${OPENCV_BUILD_DIR}
+# No need to set NEON and VFP for aarch64 since they are implicitly present in
+# an any standard armv8-a implementation.
 # hadolint ignore=SC2086
-RUN COMMON_CMAKE_FLAGS="-D CMAKE_BUILD_TYPE=RELEASE \
-        -D CMAKE_INSTALL_PREFIX=$TARGET_ROOT/usr \
+RUN COMMON_CMAKE_FLAGS="-S $OPENCV_SRC_DIR \
+        -B $OPENCV_BUILD_DIR \
+        -D CMAKE_INSTALL_PREFIX=$SDK_LIB_PATH_BASE \
+        -D CMAKE_BUILD_TYPE=RELEASE \
         -D WITH_OPENEXR=OFF \
         -D WITH_GTK=OFF \
         -D WITH_V4L=OFF \
@@ -83,25 +61,38 @@ RUN COMMON_CMAKE_FLAGS="-D CMAKE_BUILD_TYPE=RELEASE \
         -D BUILD_PROTOBUF=OFF \
         -D OPENCV_GENERATE_PKGCONFIG=ON " && \
     if [ "$ARCH" = armv7hf ]; then \
-        cmake -D CMAKE_TOOLCHAIN_FILE=../platforms/linux/arm-gnueabi.toolchain.cmake \
-        -D ENABLE_NEON=ON \
+        # Configure build with CMake
+        cmake \
+        -D CMAKE_TOOLCHAIN_FILE=${OPENCV_SRC_DIR}/platforms/linux/arm-gnueabi.toolchain.cmake \
         -D CPU_BASELINE=NEON,VFPV3 \
+        -D ENABLE_NEON=ON \
         -D ENABLE_VFPV3=ON \
-        $COMMON_CMAKE_FLAGS \
-        .. && \
-        # Build openCV libraries and other tools
+        $COMMON_CMAKE_FLAGS && \
+        # Build and install OpenCV
         make -j "$(nproc)" install ; \
     elif [ "$ARCH" = aarch64 ]; then \
-        #Here -D CPU_BASELINE has been removed, OpenCVCompilerOptimizations.cmake does not use any specific option for AARCH64, since, NEON and VFP are implicitly present in an any standard armv8-a implementation 
-        cmake -D CMAKE_TOOLCHAIN_FILE=../platforms/linux/aarch64-gnu.toolchain.cmake \
-        $COMMON_CMAKE_FLAGS \
-        .. && \
-        # Build openCV libraries and other tools
+        # Configure build with CMake
+        cmake \
+        -D CMAKE_TOOLCHAIN_FILE=${OPENCV_SRC_DIR}/platforms/linux/aarch64-gnu.toolchain.cmake \
+        $COMMON_CMAKE_FLAGS && \
+        # Build and install OpenCV
         make -j "$(nproc)" install ; \
     else \
         printf "Error: '%s' is not a valid value for the ARCH variable\n", "$ARCH"; \
         exit 1; \
     fi
-COPY app/ /opt/app
+
+#-------------------------------------------------------------------------------
+# Copy the built library files to application directory
+#-------------------------------------------------------------------------------
+
 WORKDIR /opt/app
+COPY ./app .
+RUN mkdir lib && \
+    cp -P ${OPENCV_BUILD_DIR}/lib/lib*.so* ./lib/
+
+#-------------------------------------------------------------------------------
+# Finally build the ACAP application
+#-------------------------------------------------------------------------------
+
 RUN . /opt/axis/acapsdk/environment-setup* && acap-build .
