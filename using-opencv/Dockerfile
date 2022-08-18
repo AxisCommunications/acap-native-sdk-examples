@@ -18,9 +18,7 @@ ARG BUILD_DIR=/opt/build
 # Install build dependencies for cross compiling OpenCV
 RUN DEBIAN_FRONTEND=noninteractive \
     apt-get update && apt-get install -y -f --no-install-recommends \
-    cmake \
-    ca-certificates && \
-    update-ca-certificates && \
+    cmake && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
