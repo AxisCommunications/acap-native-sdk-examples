@@ -36,10 +36,7 @@ SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 RUN curl -fsSL https://github.com/opencv/opencv/archive/$OPENCV_VERSION.tar.gz | tar -xz
 
 WORKDIR ${OPENCV_BUILD_DIR}
-# No need to set NEON and VFP for aarch64 since they are implicitly present in
-# an any standard armv8-a implementation.
-# hadolint ignore=SC2086
-RUN COMMON_CMAKE_FLAGS="-S $OPENCV_SRC_DIR \
+ENV COMMON_CMAKE_FLAGS="-S $OPENCV_SRC_DIR \
         -B $OPENCV_BUILD_DIR \
         -D CMAKE_INSTALL_PREFIX=$SDK_LIB_PATH_BASE \
         -D CMAKE_BUILD_TYPE=RELEASE \
@@ -57,10 +54,18 @@ RUN COMMON_CMAKE_FLAGS="-S $OPENCV_SRC_DIR \
         -D BUILD_PNG=OFF \
         -D WITH_JASPER=OFF \
         -D BUILD_PROTOBUF=OFF \
-        -D OPENCV_GENERATE_PKGCONFIG=ON " && \
-    if [ "$ARCH" = armv7hf ]; then \
+        -D OPENCV_GENERATE_PKGCONFIG=ON "
+
+# hadolint ignore=SC2086
+RUN if [ "$ARCH" = armv7hf ]; then \
+        # Source SDK environment to get cross compilation tools
+        . /opt/axis/acapsdk/environment-setup* && \
         # Configure build with CMake
         cmake \
+        -D CMAKE_CXX_COMPILER=${CXX%-g++*}-g++ \
+        -D CMAKE_CXX_FLAGS="${CXX#*-g++}" \
+        -D CMAKE_C_COMPILER=${CC%-gcc*}-gcc \
+        -D CMAKE_C_FLAGS="${CC#*-gcc}" \
         -D CMAKE_TOOLCHAIN_FILE=${OPENCV_SRC_DIR}/platforms/linux/arm-gnueabi.toolchain.cmake \
         -D CPU_BASELINE=NEON,VFPV3 \
         -D ENABLE_NEON=ON \
@@ -69,8 +74,16 @@ RUN COMMON_CMAKE_FLAGS="-S $OPENCV_SRC_DIR \
         # Build and install OpenCV
         make -j "$(nproc)" install ; \
     elif [ "$ARCH" = aarch64 ]; then \
+        # Source SDK environment to get cross compilation tools
+        . /opt/axis/acapsdk/environment-setup* && \
         # Configure build with CMake
+        # No need to set NEON and VFP for aarch64 since they are implicitly
+        # present in an any standard armv8-a implementation.
         cmake \
+        -D CMAKE_CXX_COMPILER=${CXX%-g++*}-g++ \
+        -D CMAKE_CXX_FLAGS="${CXX#*-g++}" \
+        -D CMAKE_C_COMPILER=${CC%-gcc*}-gcc \
+        -D CMAKE_C_FLAGS="${CC#*-gcc}" \
         -D CMAKE_TOOLCHAIN_FILE=${OPENCV_SRC_DIR}/platforms/linux/aarch64-gnu.toolchain.cmake \
         $COMMON_CMAKE_FLAGS && \
         # Build and install OpenCV
