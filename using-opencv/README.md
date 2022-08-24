@@ -1,13 +1,11 @@
- *Copyright (C) 2021, Axis Communications AB, Lund, Sweden. All Rights Reserved.*
+*Copyright (C) 2022, Axis Communications AB, Lund, Sweden. All Rights Reserved.*
 
 # A guide to building and running OpenCV in an ACAP application
 
-This guide explains how to build OpenCV from source and bundle it for use in an ACAP. The example application
-runs a background subtraction operation on video from the camera for a very simple motion detection application
- to demonstrate how to integrate OpenCVs broad functionality into the AXIS Camera Application Platform.
-
-The example is written for the ARTPEC-7 platform, which is built on the armhf architecture. However, with
-minor changes to the `Dockerfile`, the code should be usable on any AXIS camera architecture.
+This guide explains how to build OpenCV from source and bundle it for use in an
+ACAP application. The example application runs a background subtraction
+operation on video from the camera for a very simple motion detection
+application to demonstrate how to integrate the broad functionality of OpenCV.
 
 ## File structure
 
@@ -29,11 +27,12 @@ building-opencv
 
 ### Quick start
 
-> [!IMPORTANT]
-> *Depending on the network you are connected to,
-The file that needs those settings is:* ~/.docker/config.json. *For
-reference please see: <https://docs.docker.com/network/proxy/> and a
-[script for Axis device here](../FAQs.md#HowcanIset-upnetworkproxysettingsontheAxisdevice?).*
+> **IMPORTANT**
+> Depending on the network you are connected to, you may need to add proxy
+> settings. The file that needs those settings is ~/.docker/config.json.  For
+> reference go to https://docs.docker.com/network/proxy/ and a [script for
+> Axis device
+> here](../../FAQs.md#how-can-i-set-up-network-proxy-settings-on-the-axis-device).
 
 1. Standing in your working directory run the following commands:
 
@@ -75,39 +74,62 @@ reference please see: <https://docs.docker.com/network/proxy/> and a
    opencv_app[2211]: Motion detected: YES
    ```
 
-### Walkthrough
+### Walk-through of application
 
-#### Dockerfile
+The [Dockerfile](Dockerfile) suits as a good overview of the build process;
 
-In our [Dockerfile](Dockerfile) are the instructions which builds OpenCV and our application. As the application is not built on the camera platform, but rather on our host machine for the camera platform, a crosscompilation toolchain needs to be installed. This is done with the
-installation of the `crossbuild-essential-{armhf or arm64}` package, depending on the camera architecture.
+1. First the OpenCV libraries are built with the help of CMake and the ACAP SDK
+   libraries, especially `libc` and `libstdc++`.
+2. The OpenCV libraries are then copied to the application directory under
+   `lib`.
+3. Finally the ACAP application is built with the build instructions in the
+   [Makefile](app/Makefile) where it links to and bundles the OpenCV libraries
+to the application.
 
-With the toolchain installed, OpenCV can be retrieved and configured. To make OpenCV build for the armhf platform, the crosscompilation toolchain
-is specified with the `CMAKE_TOOLCHAIN_FILE` option. Other noteworthy options are the ones related to *NEON* and *VFPV3*, which are optimizations
-available for the platform that can greatly speed up CPU operations. Those options are implicitly present in the aarch64 compiler implementation, they are therefore explicitly omitted for the aarch64 build. The other configuration options are there to make the OpenCV installation quite stripped
-of functionality not needed for our example application. However, you will likely have to change these options to accommodate your custom
+#### Building OpenCV libraries
+
+OpenCV libraries are built with CMake and some special steps are made to get
+a correct build:
+
+* The ACAP SDK is sourced to get cross compilation variables like `CC` and
+  `CXX` which contains the path to the SDK libraries.
+* To get correct cross compilation settings, `CMAKE_TOOLCHAIN_FILE` is set to the
+  architecture specific file provided by OpenCV.
+* CMake picks up environment variables like `CC` and `CXX` but seems to not
+  work in combination with `CMAKE_TOOLCHAIN_FILE`. To get CMake to pick up the
+cross compiler and SDK library path, these variables are split and set
+explicitly in `CMAKE_{C,CXX}_COMPILER` and `CMAKE_{C,CXX}_FLAGS` respectively.
+
+Other noteworthy options are the ones related to `NEON` and `VFPV3`, which are
+optimizations available for the platform that can greatly speed up CPU
+operations. This is only necessary for armv7hf, in aarch64 these options are
+implicitly present.
+
+The other configuration options are there to make the OpenCV installation quite
+stripped of functionality not needed for the example application. However, you
+will likely have to change these options to accommodate your custom
 application.
 
-OpenCV is built and the output is put in the `/target-root/` directory, as per the `CMAKE_INSTALL_PREFIX` option. This is done in order
-to keep the armhf files separated from the non-armhf files. These files are then copied to
-the `/opt/axis/acapsdk/sysroots/cortexa9hf-neon-poky-linux-gnueabi/` folder as this is used as the root for the application's Makefile.
+#### Building ACAP application
 
-#### Makefile
+The build instructions of the ACAP application are found in the
+[Makefile](app/Makefile).  Note the use of the option
+`-Wl,--no-as-needed,-rpath,'$$ORIGIN/lib'` which will set the *runtime share
+library search path* and is where the bundled libraries will be found when the
+application is installed on a device.
 
-The [Makefile](app/Makefile) in the `app` directory specifies how the application is compiled and packaged. Notable in the Makefile is that the
-OpenCV libraries our application needs are bundled with the application. These are copied to a path, `lib/`, relative to the applications
-root through the `libscopy` target and then located using rpath.
+#### ACAP application using OpenCV
 
-#### OpenCV application
+The example application source code using OpenCV can be seen in
+[example.cpp](app/example.cpp). It is a C++ application which uses the OpenCV
+MOG2 background subtraction and noise filtering to detect changes in the image
+in order to perform motion detection.
 
-The OpenCV application can be seen in [example.cpp](app/example.cpp) in the `app` directory. It is a C++ application
-which uses OpenCV's MOG2 background subtraction and noise filtering to detect changes in the image in order to perform motion detection.
-The code is documented to give a clear understanding of what steps are needed to grab frames from the camera and perform operations on them.
-The output of the application can be seen through the `App log` or by running `journalctl -f` while connected through SSH to the camera.
+The code is documented to give a clear understanding of what steps are needed
+to grab frames from the camera and perform operations on them.
 
-## Notes
-
-Proxy settings for the Docker build are taken from the environment variables `http_proxy` and `https_proxy`.
+The output of the application can be seen through the `App log` or by running
+`journalctl -f` while connected through SSH to the device.
 
 ## License
 
@@ -115,4 +137,4 @@ Proxy settings for the Docker build are taken from the environment variables `ht
 
 ## References
 
-* <https://docs.opencv.org/4.5.1/>
+* <https://docs.opencv.org>
