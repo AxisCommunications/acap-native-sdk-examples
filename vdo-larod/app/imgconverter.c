@@ -30,7 +30,9 @@
 
 #define ARGB_BYTES_PER_PIXEL (4)
 
-static void ARGBtoRAW(const uint8_t* srcARGB, uint8_t* dstRGB, unsigned int w,
+static void BGRAtoRAWPlanar(const uint8_t* srcARGB, uint8_t* dstRGB, unsigned int w,
+                      int unsigned h);
+static void BGRAtoRAWInterleaved(const uint8_t* srcARGB, uint8_t* dstRGB, unsigned int w,
                       int unsigned h);
 
 void convertU8yuvToRGBlibYuv(unsigned int width, unsigned int height,
@@ -160,8 +162,8 @@ void convertU8yuvToFloat32RGB(unsigned int width, unsigned int height,
         }
     }
 }
-
-void ARGBtoRAW(const uint8_t* srcARGB, uint8_t* dstRGB, unsigned int w,
+// Convert from B G R A to RGB interleaved
+void BGRAtoRAWInterleaved(const uint8_t* srcARGB, uint8_t* dstRGB, unsigned int w,
                unsigned int h) {
 
     const uint8_t* src = srcARGB;
@@ -178,10 +180,27 @@ void ARGBtoRAW(const uint8_t* srcARGB, uint8_t* dstRGB, unsigned int w,
         }
     }
 }
+// Convert from B G R A to RGB planar
+void BGRAtoRAWPlanar(const uint8_t* srcARGB, uint8_t* dstRGB, unsigned int w,
+               unsigned int h) {
+
+    const uint8_t* src = srcARGB;
+    uint8_t* dst = dstRGB;
+    // B, G, R, A
+    for (size_t i = 2; i < (w*h*ARGB_BYTES_PER_PIXEL); i+=ARGB_BYTES_PER_PIXEL){
+        *dst++ = src[i];
+    }
+    for (size_t i = 1; i < (w*h*ARGB_BYTES_PER_PIXEL); i+=ARGB_BYTES_PER_PIXEL){
+        *dst++ = src[i];
+    }
+    for (size_t i = 0; i < (w*h*ARGB_BYTES_PER_PIXEL); i+=ARGB_BYTES_PER_PIXEL){
+        *dst++ = src[i];
+    }
+}
 
 bool convertCropScaleU8yuvToRGB(const uint8_t* nv12Data, unsigned int srcWidth,
                                 unsigned int srcHeight, uint8_t* rgbData,
-                                unsigned int dstWidth, unsigned int dstHeight) {
+                                unsigned int dstWidth, unsigned int dstHeight, const char* outputFormat) {
     bool ret = false;
     uint8_t* tempARGBbig = NULL;
     uint8_t* tempARGBsmall = NULL;
@@ -240,7 +259,15 @@ bool convertCropScaleU8yuvToRGB(const uint8_t* nv12Data, unsigned int srcWidth,
         goto end;
     }
 
-    ARGBtoRAW(tempARGBsmall, rgbData, dstWidth, dstHeight);
+    if (!strcmp(outputFormat, "RGB-planar")){
+        BGRAtoRAWPlanar(tempARGBsmall, rgbData, dstWidth, dstHeight);
+    } else if(!strcmp(outputFormat, "RGB-interleaved")){
+        BGRAtoRAWInterleaved(tempARGBsmall, rgbData, dstWidth, dstHeight);
+    } else {
+        syslog(LOG_ERR, "%s: Wrong output format.", __func__);
+        goto end;
+    }
+
 
     ret = true;
 

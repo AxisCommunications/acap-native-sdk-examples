@@ -48,8 +48,9 @@ RUN mkdir -p model && \
     tar -xvf model/mobilenet_v2_1.0_224_quant.tgz -C model && \
     rm -f model/*.tgz model/*.pb* model/*.ckpt* model/*.meta model/*.txt && \
     curl -L -o model/mobilenet_v2_1.0_224_quant_edgetpu.tflite \
-    https://github.com/google-coral/edgetpu/raw/master/test_data/mobilenet_v2_1.0_224_quant_edgetpu.tflite
-
+    https://github.com/google-coral/edgetpu/raw/master/test_data/mobilenet_v2_1.0_224_quant_edgetpu.tflite && \
+    curl -L -o model/mobilenet_v2_cavalry.bin \
+    https://acap-ml-model-storage.s3.amazonaws.com/mobilenetv2_cavalry.bin
 RUN mkdir -p label && \
     curl -L -o label/imagenet_labels.txt \
     https://github.com/google-coral/edgetpu/raw/master/test_data/imagenet_labels.txt
@@ -64,6 +65,10 @@ RUN if [ "$CHIP" = cpu ] || [ "$CHIP" = artpec8 ]; then \
         cp /opt/app/manifest.json.${CHIP} /opt/app/manifest.json && \
         . /opt/axis/acapsdk/environment-setup* && acap-build . \
         -a 'label/imagenet_labels.txt' -a 'model/mobilenet_v2_1.0_224_quant_edgetpu.tflite'; \
+    elif [ "$CHIP" = cv25 ]; then \
+        cp /opt/app/manifest.json.${CHIP} /opt/app/manifest.json && \
+        . /opt/axis/acapsdk/environment-setup* && acap-build . \
+        -a 'label/imagenet_labels.txt' -a 'model/mobilenet_v2_cavalry.bin'; \
     else \
         printf "Error: '%s' is not a valid value for the CHIP variable\n", "$CHIP"; \
         exit 1; \
