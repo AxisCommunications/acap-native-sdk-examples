@@ -75,8 +75,9 @@ void convertU8yuvToRGBnaive(unsigned int width, unsigned int height,
  * param srcHeight Source image height in pixels.
  * param rgbData Start of output scaled RGB image.
  * param dstWidth Destination image width in pixels.
+ * param outputFormat Output format, either RGB-planar or RGB-interleaved
  * param False if any errors occur, otherwise true.
  */
 bool convertCropScaleU8yuvToRGB(const uint8_t* nv12Data, unsigned int srcWidth,
                                 unsigned int srcHeight, uint8_t* rgbData,
-                                unsigned int dstWidth, unsigned int dstHeight);
+                                unsigned int dstWidth, unsigned int dstHeight, const char* outputFormat);

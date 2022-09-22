@@ -24,6 +24,7 @@
 #include <sys/types.h>
 #include <syslog.h>
 #include <unistd.h>
+#include <math.h>
 
 #include "imgprovider.h"
 #include "larod.h"
@@ -113,12 +114,15 @@ void sigintHandler(int sig) {
     syslog(LOG_INFO, "Interrupted, starting graceful termination of app. Another "
            "interrupt signal will cause a forced exit.");
 
-    // Tell the main thread to stop running jobs asap.
+    // Tell the main thread to stop running inferences asap.
     stopRunning = true;
 }
 
 static bool createAndMapTmpFile(char* fileName, size_t fileSize,
                                 void** mappedAddr, int* convFd) {
+                                    syslog(LOG_INFO, "%s: Setting up a temp fd with pattern %s and size %zu", __func__,
+           fileName, fileSize);
+
     int fd = mkstemp(fileName);
     if (fd < 0) {
         syslog(LOG_ERR, "%s: Unable to open temp file %s: %s", __func__, fileName,
@@ -392,6 +396,7 @@ int main(int argc, char** argv) {
     size_t numLabels = 0; // Number of entries in the labels array.
     char* labelFileData =
         NULL; // Buffer holding the complete collection of label strings.
+    larodChip chip = (larodChip)atoi(argv[1]);
 
     // Open the syslog to report messages for "vdo_larod_preprocessing"
     openlog("vdo_larod_preprocessing", LOG_PID|LOG_CONS, LOG_USER);
@@ -457,9 +462,16 @@ int main(int argc, char** argv) {
         syslog(LOG_ERR, "Failed setting preprocessing parameters: %s", error->msg);
         goto end;
     }
-    if (!larodMapSetStr(ppMap, "image.output.format", "rgb-interleaved", &error)) {
-        syslog(LOG_ERR, "Failed setting preprocessing parameters: %s", error->msg);
-        goto end;
+    if(chip!=6){
+        if (!larodMapSetStr(ppMap, "image.output.format", "rgb-interleaved", &error)) {
+            syslog(LOG_ERR, "Failed setting preprocessing parameters: %s", error->msg);
+            goto end;
+        }
+    } else {
+        if (!larodMapSetStr(ppMap, "image.output.format", "rgb-planar", &error)) {
+            syslog(LOG_ERR, "Failed setting preprocessing parameters: %s", error->msg);
+            goto end;
+        }
     }
     if (!larodMapSetIntArr2(ppMap, "image.output.size", INFERENCE_INPUT_WIDTH, INFERENCE_INPUT_HEIGHT, &error)) {
         syslog(LOG_ERR, "Failed setting preprocessing parameters: %s", error->msg);
@@ -484,7 +496,7 @@ int main(int argc, char** argv) {
         goto end;
     }
 
-    larodChip chip = (larodChip)atoi(argv[1]);
+
     syslog(LOG_INFO, "Setting up larod connection with chip %d and model %s", chip,
            argv[2]);
     if (!setupLarod(chip, larodModelFd, &conn, &model)) {
@@ -673,27 +685,62 @@ int main(int argc, char** argv) {
         syslog(LOG_INFO, "Ran inference for %u ms", elapsedMs);
 
         // Compute the most likely index.
-        uint8_t maxProb = 0;
+        float maxProb = 0;
+        uint8_t maxScore = 0;
         size_t maxIdx = 0;
         uint8_t* outputPtr = (uint8_t*) larodOutputAddr;
-        for (size_t j = 0; j < outputBufferSize; j++) {
-            if (outputPtr[j] > maxProb) {
-                maxProb = outputPtr[j];
-                maxIdx = j;
-            }
+
+        // The output has to be read differently depending on chip.
+        // In the case of the cv25, the space per element is 32 bytes and the
+        // output is a float padded with zeros.
+        // In the cases of artpec7 and artpec8 the space per element is 1 byte
+        // and the output is an uint8_t that has to be processed with softmax.
+        // This part of the code can be improved by using better pointer casting,
+        // subject to future changes.
+        int spacePerElement;
+        if (chip == 6) {
+            spacePerElement = 32;
+            float score;
+            for (size_t j = 0; j < outputBufferSize/spacePerElement; j++) {
+                score = *((float*) (outputPtr + (j*spacePerElement)));
+                if (score > maxProb) {
+                    maxProb = score;
+                    maxIdx = j;
+                }
         }
+        } else {
+            spacePerElement = 1;
+            uint8_t score;
+            for (size_t j = 0; j < outputBufferSize/spacePerElement; j++) {
+                score = *((uint8_t*) (outputPtr + (j*spacePerElement)));
+                if (score > maxScore) {
+                    maxScore = score;
+                    maxIdx = j;
+                }
+            }
+
+            float sum = 0.0;
+            for (size_t j = 0; j < outputBufferSize/spacePerElement; j++) {
+                score = *((uint8_t*) (outputPtr + (j*spacePerElement)));
+                sum += exp(score - maxScore);
+            }
+            // Simplifying softmax calculation:
+            // softmax[i_max] = e^(-log(sum)) = 1/sum
+            maxProb = 1/sum;
+        }
+        maxProb*=100; //To have output int %
         if (labels) {
             if (maxIdx < numLabels) {
-                syslog(LOG_INFO, "Top result: %s with score %.2f%%", labels[maxIdx],
-                       (float) maxProb / 2.5f);
+                syslog(LOG_INFO, "Top result: %s with score %.2f%%",
+                labels[maxIdx], maxProb);
             } else {
                 syslog(LOG_INFO, "Top result: index %zu with score %.2f%% (index larger "
                        "than num items in labels file)",
-                       maxIdx, (float) maxProb / 2.5f);
+                       maxIdx, maxProb);
             }
         } else {
-            syslog(LOG_INFO, "Top result: index %zu with score %.2f%%", maxIdx,
-                   (float) maxProb / 2.5f);
+            syslog(LOG_INFO, "Top result: index %zu with score %.2f%%",
+            maxIdx, maxProb);
         }
 
         // Release frame reference to provider.

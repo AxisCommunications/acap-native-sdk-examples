@@ -1,5 +1,5 @@
 {
-    "schemaVersion": "1.1",
+    "schemaVersion": "1.3",
     "acapPackageConf": {
         "setup": {
             "friendlyName": "vdo_larod_preprocessing_artpec8",

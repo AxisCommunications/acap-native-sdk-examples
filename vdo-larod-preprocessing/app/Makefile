@@ -10,6 +10,7 @@ LDFLAGS += -L./lib -Wl,-rpath,'$$ORIGIN/lib'
 
 CFLAGS += $(shell PKG_CONFIG_PATH=$(PKG_CONFIG_PATH) pkg-config --cflags $(PKGS))
 LDLIBS += $(shell PKG_CONFIG_PATH=$(PKG_CONFIG_PATH) pkg-config --libs $(PKGS))
+LDLIBS += -lm
 
 CFLAGS += -Wall
 # This example is based on larod version 2

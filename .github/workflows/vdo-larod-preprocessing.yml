@@ -17,6 +17,8 @@ jobs:
             chip: edgetpu
           - arch: aarch64
             chip: artpec8
+          - arch: aarch64
+            chip: cv25
     env:
       EXREPO: acap-native-examples
       EXNAME: vdo-larod-preprocessing
