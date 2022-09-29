@@ -44,6 +44,8 @@ greater depth than the [larod](./larod)
 and [vdo-larod](./vdo-larod) examples.
 * [tensorflow-to-larod-artpec8](./tensorflow-to-larod-artpec8/)
   * This example is very similar to tensorflow-to-larod, but is designed for AXIS ARTPEC-8 devices.
+* [tensorflow-to-larod-cv25](./tensorflow-to-larod-cv25/)
+  * This example is very similar to tensorflow-to-larod, but is designed for AXIS CV25 devices.
 * [using-opencv](./using-opencv/)
   * This example covers how to build, bundle and use OpenCV in an application.
 * [utility-libraries](./utility-libraries/)
