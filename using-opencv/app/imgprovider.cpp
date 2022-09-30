@@ -238,7 +238,11 @@ bool chooseStreamResolution(unsigned int reqWidth, unsigned int reqHeight,
     g_free(set);
     g_clear_error(&error);
     }
-    set = vdo_channel_get_resolutions(channel, NULL, &error);
+    // We filter on resolutions that are supported for VDO_FORMAT_YUV
+    g_autoptr(VdoMap) filter = vdo_map_new();
+    vdo_map_set_uint32(filter, "format", VDO_FORMAT_YUV);
+    vdo_map_set_string(filter, "select", "all");
+    set = vdo_channel_get_resolutions(channel, filter, &error);
     if (!set) {
         syslog(LOG_ERR, "%s: Failed vdo_channel_get_resolutions(): %s", __func__,
                  (error != NULL) ? error->message : "N/A");
