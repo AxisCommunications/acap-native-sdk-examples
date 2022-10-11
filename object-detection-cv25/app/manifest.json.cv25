@@ -1,0 +1,19 @@
+{
+    "schemaVersion": "1.1",
+    "acapPackageConf": {
+        "setup": {
+            "friendlyName": "object_detection_cv25",
+            "appName": "object_detection",
+            "vendor": "Axis Communications",
+            "embeddedSdkVersion": "3.0",
+            "user": {
+                "group": "sdk",
+                "username": "sdk"
+            },
+            "runOptions": "/usr/local/packages/object_detection/model/converted_model.bin 300 300 20 80 640 360 70 /usr/local/packages/object_detection/label/labels.txt 91 1917 /usr/local/packages/object_detection/model/anchor_boxes.bin -c 6",
+            "vendorUrl": "https://www.axis.com",
+            "runMode": "never",
+            "version": "1.0.0"
+        }
+    }
+}
