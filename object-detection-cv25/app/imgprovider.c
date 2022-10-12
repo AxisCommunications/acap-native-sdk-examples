@@ -236,7 +236,7 @@ bool chooseStreamResolution(unsigned int reqWidth, unsigned int reqHeight,
                  (error != NULL) ? error->message : "N/A");
         goto end;
     }
-
+  
     // We filter on resolutions that are supported for VDO_FORMAT_YUV
     g_autoptr(VdoMap) filter = vdo_map_new();
     vdo_map_set_uint32(filter, "format", VDO_FORMAT_YUV);
