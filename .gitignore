@@ -5,3 +5,6 @@
 
 // Ignore linter log files
 super-linter.log*
+
+// Ignore general files
+.DS_Store
