@@ -32,6 +32,7 @@ greater depth than the [larod](../larod) and [vdo-larod](../vdo-larod) examples.
 - NVIDIA GPU and drivers [compatible with Tensorflow r2.3](https://www.tensorflow.org/install/source#gpu)
 - [Docker](https://docs.docker.com/get-docker/)
 - [NVIDIA container toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/install-guide.html#installing-on-ubuntu-and-debian)
+- Access to Ambarella tools
 
 ## Structure of this example
 
@@ -107,7 +108,10 @@ The following instructions can be executed to simply run the example. Each step 
    python convert_model.py -i models/saved_model -d data/images/val2017 -o models/converted_model.tflite
    ```
 
-4. Compile the model using the [Ambarella toolchain](https://customer.ambarella.com/ng/)
+4. Compile the model using the [Ambarella toolchain](https://www.ambarella.com/technology/#cvflow)
+
+   >[!NOTE]
+   *> It is required to be an Ambarella partner to access Ambarella tools. If you are a partner, visit [this](https://customer.ambarella.com/ng/pre-login) webpage to access the tools.*
 
 5. Compile the ACAP application:
 
