@@ -36,7 +36,7 @@ WORKDIR ${SDK_LIB_PATH_BASE}/lib
 RUN [ -z "$(ls libcrypto.so* libssl.so*)" ] || \
     rm -f libcrypto.so* libssl.so*
 
-WORKDIR ${SDK_LIB_PATH_BASE}/lib/pkgcpnfig
+WORKDIR ${SDK_LIB_PATH_BASE}/lib/pkgconfig
 RUN [ -z "$(ls libssl.pc libcrypto.pc openssl.pc)" ] || \
     rm -f libssl.pc libcrypto.pc openssl.pc
 
