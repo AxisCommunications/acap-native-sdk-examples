@@ -82,7 +82,7 @@ docker run --rm web-server:$ARCH eap-install.sh $DEVICE_IP $PASS remove
 
 ## C API Examples
 
-Some C API examples are included in the app folder. To build any of the examples, use the build and install procedure as described above after making following changes to the build files:
+When you build the code, Some C API examples shall be copied into the app directory inside the build container. To build any of the examples, use the build and install procedure as described above after making following changes to the build files:
 
 1. app/manifest.json: Replace AppName "monkey" with the name of the example: hello, list or quiz
 2. Dockerfile: Replace monkey in /usr/local/packages/monkey with the name of the example: hello, list or quiz
