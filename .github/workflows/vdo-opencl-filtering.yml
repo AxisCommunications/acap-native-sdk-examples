@@ -10,7 +10,11 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        arch: ["armv7hf", "aarch64"]
+        include:
+          - arch: armv7hf
+            chip: cpu
+          - arch: aarch64
+            chip: artpec8
     env:
       EXREPO: acap-native-examples
       EXNAME: vdo-opencl-filtering

@@ -10,7 +10,9 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        arch: ["aarch64"]
+        include:
+          - arch: aarch64
+            chip: cv25
     env:
       EXREPO: acap-native-examples
       EXNAME: tensorflow-to-larod-cv25
