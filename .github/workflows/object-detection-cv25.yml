@@ -8,6 +8,11 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - arch: aarch64
+            chip: cv25
     env:
       EXREPO: acap-native-examples
       EXNAME: object-detection-cv25
@@ -17,21 +22,14 @@ jobs:
 
       - name: Build ${{ env.example }} application
         env:
-          example: ${{ env.EXNAME }}-cv25
-          imagetag: ${{ env.EXREPO }}_${{ env.EXNAME }}-cv25:1.0
-          eapfile: ${{ env.EAPNAME }}_cv25_1_0_0_aarch64.eap
+          example: ${{ env.EXNAME }}-${{ matrix.chip }}
+          imagetag: ${{ env.EXREPO }}_${{ env.EXNAME }}-${{ matrix.chip }}:1.0
+          eapfile: ${{ env.EAPNAME }}_${{ matrix.chip }}_1_0_0_${{ matrix.arch }}.eap
         run: |
           docker image rm -f $imagetag
           cd $EXNAME
-          cp app/manifest.json.cv25 app/manifest.json
+          cp app/manifest.json.${{ matrix.chip }} app/manifest.json
           docker build --no-cache --tag $imagetag .
           docker cp $(docker create $imagetag):/opt/app ./build_${{ matrix.chip }}
           cd ..
           docker image rm -f $imagetag
-
-
-      # Save functional test report as artifact
-      - uses: actions/upload-artifact@master
-        with:
-          name: Test report
-          path: recap/recap/output/report.xml
