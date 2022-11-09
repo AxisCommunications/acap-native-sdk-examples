@@ -1,5 +1,6 @@
 name: Build vdo-larod applications
 on:
+  workflow_dispatch:
   push:
     paths:
       - 'vdo-larod/**'

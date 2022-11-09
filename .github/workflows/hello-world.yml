@@ -1,5 +1,6 @@
 name: Build hello-world application
 on:
+  workflow_dispatch:
   push:
     paths:
       - 'hello-world/**'

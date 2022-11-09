@@ -1,5 +1,6 @@
 name: Build licensekey application
 on:
+  workflow_dispatch:
   push:
     paths:
       - 'licensekey/**'
