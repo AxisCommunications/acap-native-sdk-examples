@@ -1,5 +1,6 @@
 name: Build utility-libraries applications
 on:
+  workflow_dispatch:
   push:
     paths:
       - 'utility-libraries/**'

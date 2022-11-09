@@ -1,5 +1,6 @@
 name: Build object-detection application
 on:
+  workflow_dispatch:
   push:
     paths:
       - 'object-detection/**'

@@ -1,5 +1,6 @@
 name: Build Reproducible Package Applications
 on:
+  workflow_dispatch:
   push:
     paths:
       - 'reproducible-package/**'

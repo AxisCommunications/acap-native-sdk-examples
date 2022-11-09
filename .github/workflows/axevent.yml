@@ -1,5 +1,6 @@
 name: Build axevent applications
 on:
+  workflow_dispatch:
   push:
     paths:
       - 'axevent/**'

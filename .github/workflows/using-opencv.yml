@@ -1,5 +1,6 @@
 name: Build using-opencv application
 on:
+  workflow_dispatch:
   push:
     paths:
       - 'using-opencv/**'

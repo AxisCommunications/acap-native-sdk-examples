@@ -1,5 +1,6 @@
 name: Build larod application
 on:
+  workflow_dispatch:
   push:
     paths:
       - 'larod/**'

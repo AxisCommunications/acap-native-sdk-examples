@@ -1,5 +1,6 @@
 name: Build tensorflow-to-larod-cv25 application
 on:
+  workflow_dispatch:
   push:
     paths:
       - 'tensorflow-to-larod-cv25/**'
