@@ -44,7 +44,7 @@ building the ACAP application. That is because the older `libc` from the SDK
 can't find these newer symbols and functions.
 * **Don't depend on all available libraries in SDK** - It's recommended to only
   use `libc` and the documented [ACAP
-API](https://axiscommunications.github.io/acap-documentation/docs/api/native-api.html)
+API](https://axiscommunications.github.io/acap-documentation/docs/api/native-sdk-api.html)
 libraries in the SDK. Don't use other libraries from the SDK in an ACAP
 application.  Instead, download, compile and bundle libraries such as
 `libcrypto.so` and `libssl.so` (OpenSSL) and `libcurl.so` (curl) with the ACAP
@@ -254,7 +254,7 @@ the OpenSSL libraries in the SDK library path. You don't need to remove curl
 since it's not included in the SDK.
 
    Why not remove these libraries from the SDK? The [Licensekey
-API](https://axiscommunications.github.io/acap-documentation/docs/api/native-api.html#license-key-api)
+API](https://axiscommunications.github.io/acap-documentation/docs/api/native-sdk-api.html#license-key-api)
 has a dependency on `libcrypto`.
 
 2. **Build OpenSSL libraries** - The SDK environment is sourced to compile with
