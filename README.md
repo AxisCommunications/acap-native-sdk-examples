@@ -34,6 +34,8 @@ Below is the list of examples available in the repository.
   * The example code is written in C which illustrates how to check the licensekey status.
 * [object-detection](./object-detection/)
   * The example code focus on object detection, cropping and saving detected objects into jpeg files.
+* [object-detection-cv25](./object-detection-cv25/)
+  * This example is very similar to object-detection, but is designed for AXIS CV25 devices.
 * [reproducible-package](./reproducible-package/)
   * An example of how to create a reproducible application package.
 * [shell-script-example](./shell-script-example)
