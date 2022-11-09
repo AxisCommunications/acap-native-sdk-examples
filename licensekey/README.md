@@ -6,7 +6,7 @@ This README file explains how to build an ACAP application that uses the license
 
 Together with this README file, you should be able to find a directory called app. That directory contains the application source code which can easily be compiled and run with the help of the tools and step by step below.
 
-This example illustrates how to check the license key status. A license key is a signed file which has been generated for a specific device ID and application ID. The ACAP Service Portal is maintaining both license keys and application IDs, see [Online manual](https://help.axis.com/acap-3-developer-guide#acap-service-portal-for-administrators)
+This example illustrates how to check the license key status. A license key is a signed file which has been generated for a specific device ID and application ID. The ACAP Service Portal is maintaining both license keys and application IDs, see [Online manual](https://axiscommunications.github.io/acap-documentation/docs/service/acap-service-portal.html)
 
 License key status i.e. valid or invalid is logged in the Application log.
 
@@ -133,13 +133,13 @@ or by clicking on the "**App log**" link in the device GUI.
 10:31:43.058 [ INFO ] licensekey_handler[14660]: Licensekey is invalid
 ```
 
-A valid license key for a registered application ID is only accessible through ACAP Service Portal, see [Online manual](https://help.axis.com/acap-3-developer-guide#acap-service-portal-for-administrators).
+A valid license key for a registered application ID is only accessible through ACAP Service Portal, see [Online manual](https://axiscommunications.github.io/acap-documentation/docs/service/acap-service-portal.html).
 
 Support for installing license key though device web page is available, if acapPackageConf.copyProtection.method is set to "axis" in the **manifest.json** file, by the following steps:
 
 *Goto your device web page above > Click on the tab **Apps** in the device GUI > Click on the installed **licensekey_handler** application > Install the license with the **Install** button in the **Activate the license** part*
 
-More instructions how to install a valid license key is found on [Axis Developer Community](https://help.axis.com/acap-3-developer-guide#developer-community).
+More instructions how to install a valid license key is found on [Axis Developer Community](https://www.axis.com/developer-community).
 
 ## License
 

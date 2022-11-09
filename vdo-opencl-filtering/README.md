@@ -37,7 +37,7 @@ vdo-opencl-filtering
 
 The example is done for a captured video stream in YUV NV12 format. For different stream formats the OpenCL program must be altered.
 
-This example requires OpenCL 1.2 with GPU accelleration, see [SDK user manual](https://help.axis.com/acap-3-developer-guide#open-standard-apis).
+This example requires OpenCL 1.2 with GPU accelleration, see [SDK user manual](https://axiscommunications.github.io/acap-documentation/docs/api/native-sdk-api.html#opencl).
 
 ### How to run the code
 
