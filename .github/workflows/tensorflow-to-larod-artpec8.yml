@@ -20,7 +20,7 @@ jobs:
       EAPNAME: tensorflow_to_larod_a8_app
       EXDIR: acap/examples/$EXNAME
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: Build ${{ env.example }} application
         env:
