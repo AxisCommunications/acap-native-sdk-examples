@@ -1,0 +1,59 @@
+name: Documentation checks
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Verify that the docs don't have links to wrong SDK format
+        run: |
+
+          # Whitelist this file
+          workflowfile=documentation-checks.yml
+
+          # Version specific URL strings
+          acap3_type_urls="help.axis.com/acap-3-developer-guide \
+            www.axis.com/techsup/developer_doc"
+          acap4_type_urls="axiscommunications.github.io/acap-documentation"
+
+          # Decide which SDK version this repo is
+          search_urls=
+          incorrect_sdk_version=
+          repo=${GITHUB_REPOSITORY##*AxisCommunications/}
+          case $repo in
+            *acap-native-sdk-examples*)
+              search_urls=$acap3_type_urls
+              incorrect_sdk_version=3
+              ;;
+            *acap3-examples*)
+              search_urls=$acap4_type_urls
+              incorrect_sdk_version=4
+              ;;
+          esac
+
+          # Check for incorrect URLs
+          set +e
+          found_error=n
+          for doc_url in $search_urls
+          do
+            found_doc_url=$(grep -nir "$doc_url" --exclude $workflowfile)
+            [ -z "$found_doc_url" ] || {
+              printf "\nERROR: $doc_url is an ACAP $incorrect_sdk_version documentation URL found in:\n$found_doc_url\n"
+              found_error=y
+            }
+          done
+          set -e
+
+          if [ $found_error = n ]; then
+            printf "\nNo ACAP $incorrect_sdk_version documentation URL was found -> PASS"
+          else
+          printf "\n\nERROR: No ACAP $incorrect_sdk_version URLs should be found in $GITHUB_REPOSITORY.\n"
+            exit 1
+          fi
