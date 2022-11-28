@@ -12,7 +12,7 @@ COPY monkey.patch .
 
 RUN git clone -b v1.5.6 https://github.com/monkey/monkey
 WORKDIR /opt/monkey
-RUN git apply ../monkey.patch &&\
+RUN git apply --ignore-space-change --ignore-whitespace ../monkey.patch &&\
     . /opt/axis/acapsdk/environment-setup* &&\
     ./configure \
     --enable-shared \
