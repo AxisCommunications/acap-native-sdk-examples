@@ -15,7 +15,7 @@ WORKDIR /opt/build/libyuv
 ARG libyuv_version=5b6042fa0d211ebbd8b477c7f3855977c7973048
 RUN git checkout ${libyuv_version}
 COPY yuv/*.patch /opt/build/libyuv
-RUN git apply ./*.patch && \
+RUN git apply  --ignore-space-change --ignore-whitespace ./*.patch && \
         make -j -f linux.mk CXX=/usr/bin/aarch64-linux-gnu-g++ CC=/usr/bin/aarch64-linux-gnu-gcc && \
         aarch64-linux-gnu-strip --strip-unneeded libyuv.so*
 
