@@ -17,12 +17,12 @@ RUN git checkout ${libyuv_version}
 COPY yuv/*.patch /opt/build/libyuv
 ARG ARCH=armv7hf
 RUN if [ "$ARCH" = armv7hf ]; then \
-        git apply ./*.patch && \
+        git apply --ignore-space-change --ignore-whitespace ./*.patch && \
         CXXFLAGS=' -O2 -mthumb -mfpu=neon -mfloat-abi=hard -mcpu=cortex-a9 -fomit-frame-pointer' \
         make -j -f linux.mk CXX=arm-linux-gnueabihf-g++ CC=arm-linux-gnueabihf-gcc && \
         arm-linux-gnueabihf-strip --strip-unneeded libyuv.so* ; \
     elif [ "$ARCH" = aarch64 ]; then \
-        git apply ./*.patch && \
+        git apply --ignore-space-change --ignore-whitespace ./*.patch && \
         make -j -f linux.mk CXX=/usr/bin/aarch64-linux-gnu-g++ CC=/usr/bin/aarch64-linux-gnu-gcc && \
         aarch64-linux-gnu-strip --strip-unneeded libyuv.so* ; \
     else \
