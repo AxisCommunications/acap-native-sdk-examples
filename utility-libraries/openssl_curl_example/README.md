@@ -248,10 +248,9 @@ head -50 /var/log/info.log
 ## Outline of build steps
 
 1. **Prepare build environment** - We want to build all libraries with the
-   `libc` version of the SDK and avoid using `libssl` or `libcrypto`, which are
-also available in the SDK, by accident.  To achieve this, we recommend removing
-the OpenSSL libraries in the SDK library path. You don't need to remove curl
-since it's not included in the SDK.
+   `libc` version of the SDK and avoid using `libssl`, `libcrypto` or `libcurl`
+which are also available in the SDK, by accident.  To achieve this, we
+recommend removing any OpenSSL or curl libraries in the SDK library path.
 
    Why not remove these libraries from the SDK? The [Licensekey
 API](https://axiscommunications.github.io/acap-documentation/docs/api/native-sdk-api.html#license-key-api)
@@ -334,7 +333,9 @@ objdump -p openssl_curl_example | grep -E "NEEDED|RUNPATH|RPATH"
 ```
 
 > **IMPORTANT**
-> Make sure SSH is enabled on the device before running the following commands.
+> Make sure [SSH is
+> enabled](../../FAQs.md#how-can-i-enable-ssh-on-an-axis-device) on the device
+> to run the following commands.
 
 For even better information on where the application binary will search for
 dependencies, SSH in to the device, and check the installed application binary
@@ -349,9 +350,6 @@ ldd:  libssl.so.1.1 => /usr/local/packages/openssl_curl_example/lib/libssl.so.1.
  libcurl.so.4 => /usr/local/packages/openssl_curl_example/lib/libcurl.so.4 (0x76c95000)
  libc.so.6 => /usr/lib/libc.so.6 (0x76b9a000)
  /lib/ld-linux-armhf.so.3 => /usr/lib/ld-linux-armhf.so.3 (0x76f22000)
- libpthread.so.0 => /usr/lib/libpthread.so.0 (0x76b75000)
- libdl.so.2 => /usr/lib/libdl.so.2 (0x76b62000)
- libz.so.1 => /usr/lib/libz.so.1 (0x76b42000)
 ```
 
 Here you can see that the application binary uses the bundled libraries.

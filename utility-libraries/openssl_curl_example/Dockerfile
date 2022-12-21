@@ -29,20 +29,20 @@ ENV APP_DEBUG ${APP_DEBUG}
 # Prepare build environment
 #-------------------------------------------------------------------------------
 
-# Delete OpenSSL libraries in SDK to avoid linking to them in build time. This
-# is a safety precaution since all shared libraries should use the libc version
-# from the SDK in build time.
+# Delete OpenSSL and curl libraries in SDK to avoid linking to them in build
+# time. This is a safety precaution since all shared libraries should use the
+# libc version from the SDK in build time.
 WORKDIR ${SDK_LIB_PATH_BASE}/lib
-RUN [ -z "$(ls libcrypto.so* libssl.so*)" ] || \
-    rm -f libcrypto.so* libssl.so*
+RUN [ -z "$(ls libcrypto.so* libssl.so* libcurl.so*)" ] || \
+    rm -f libcrypto.so* libssl.so* libcurl.so*
 
 WORKDIR ${SDK_LIB_PATH_BASE}/lib/pkgconfig
-RUN [ -z "$(ls libssl.pc libcrypto.pc openssl.pc)" ] || \
-    rm -f libssl.pc libcrypto.pc openssl.pc
+RUN [ -z "$(ls libssl.pc libcrypto.pc openssl.pc libcurl.pc)" ] || \
+    rm -f libssl.pc libcrypto.pc openssl.pc libcurl.pc
 
 WORKDIR ${SDK_LIB_PATH_BASE}/include
-RUN [ -z "$(ls openssl crypto)" ] || \
-    rm -rf openssl crypto
+RUN [ -z "$(ls openssl crypto curl)" ] || \
+    rm -rf openssl crypto curl
 
 # Install build dependencies for cross compiling OpenSSL and curl
 RUN apt-get update && \
@@ -112,7 +112,12 @@ WORKDIR ${CURL_BUILD_DIR}
 RUN . /opt/axis/acapsdk/environment-setup* && \
     autoreconf -fi && \
     LDFLAGS="${LDFLAGS} -Wl,-rpath,${APP_RPATH}/lib" \
-    ./configure --prefix="${CURL_INSTALL_DIR}" ${CONFIGURE_FLAGS} --with-openssl && \
+    ./configure \
+      --with-openssl \
+      --without-zlib \
+      --without-zstd \
+      --prefix="${CURL_INSTALL_DIR}" \
+      ${CONFIGURE_FLAGS} && \
     make && \
     make install
 
