@@ -110,7 +110,7 @@ The following instructions can be executed to simply run the example. Each step 
 
 4. Compile the model using the [Ambarella toolchain](https://www.ambarella.com/technology/#cvflow)
 
-   >[!NOTE]
+   >NOTE
    *> It is required to be an Ambarella partner to access Ambarella tools. If you are a partner, visit [this](https://customer.ambarella.com/ng/pre-login) webpage to access the tools.*
 
 5. Compile the ACAP application:
@@ -135,7 +135,7 @@ The following instructions can be executed to simply run the example. Each step 
 
 ## Environment for building and training
 
-In this example, we're going to be working within a Docker container environment. This is done as to get the correct version of Tensorflow installed, as well as the needed tools. The `run_env.sh` script also mounts the `env` directory to allow for easier interaction with the container. To start the environment, run the build script and then the run script with what you want to name the environment as an argument. The build script forwards the environment variables `http_proxy` and `https_proxy` to the environment to allow proxy setups. The scripts are run as seen below:
+In this example, we're going to be working within a Docker container environment. This is done to get the correct version of Tensorflow installed, as well as the needed tools. The `run_env.sh` script also mounts the `env` directory to allow for easier interaction with the container. To start the environment, run the build script and then the run script with what you want to name the environment as an argument. The build script forwards the environment variables `http_proxy` and `https_proxy` to the environment to allow proxy setups. The scripts are run as seen below:
 
 ```sh
 ./build_env.sh
@@ -148,7 +148,7 @@ Note that the MS COCO 2017 validation dataset is downloaded during the building 
 
 ## The example model
 
-In this example, we'll train a simple model with one input and two outputs. The input to the model is a scaled FP32 RGB image of shape (256, 256, 3), while both outputs are scalar values. However, the process is the same irrespective of the dimensions or number of inputs or outputs.
+In this example, we'll train a simple model with one input and two outputs. The input to the model is a scaled FP32 RGB image of shape (256, 256, 3), while both outputs are scalar values. However, the process is the same regardless of the dimensions or number of inputs or outputs.
 The two outputs of the model represent the model's confidences for the presence of `person`  and `car`. **Currently (TF2.3), there is a bug in the `.tflite` conversion which orders the model outputs alphabetically based on their name. For this reason, our outputs are named with A and B prefixes, as to retain them in the order our application expects.**
 
 The model primarily consist of convolutional layers.
@@ -179,8 +179,6 @@ accuracy.
 
 To use the model on a camera, it needs to be converted. The conversion from the `SavedModel` model to the camera ready format is divided into two steps:
 
-1. Convert to Tensorflow Lite format (`.tflite`) by using the supplied `convert_model.py` script
-
 **All the resulting pre-trained original, converted and compiled models are available in the `/env/models` directory, so any step in the process can be skipped.**
 
 ### From SavedModel to .tflite
@@ -200,14 +198,11 @@ python convert_model.py -i models/saved_model -d data/images/val2017 -o models/c
 
 This process can take a few minutes as the validation dataset is quite large.
 
-#### Compiling for CV25 DLPU
+### Compiling for CV25 DLPU
 
-After conversion to the `.tflite` format, the `.tflite` model needs to be compiled for the CV25 chip using the [Ambarella toolchain](https://customer.ambarella.com/ng/)
-Together with the tools, you should receive some documents that explain how to compile your model with the Toolchain.
-To convert our .tflite model first we will need an subsample of the train dataset to use for quantization.
-
-We can run the following command where pics is the folder that contains our image dataset.
-Once it is done, we proceed parsing our model:
+After conversion to the `.tflite` format, the `.tflite` model needs to be compiled for the CV25 chip using the [Ambarella toolchain](https://customer.ambarella.com/ng/).
+Together with the tools, you should receive some documents that explain how to compile your model with the toolchain.
+To convert our `.tflite` model first we will need an subsample of the train dataset to use for quantization. We can run the following command:
 
 ```sh
 mkdir dra_image_bin
@@ -223,7 +218,9 @@ gen_image_list.py \
   -bo dra_image_bin/dra_bin_list.txt
 ```
 
-This command reads the .tflite file and reconstruct the model, then optionally it adds pre/post processing nodes (such as reshape, transpose, scale, subtract) quantize ("DRA"), and generate VAS ("VP assembler") code.
+There are first some options to define the input: `-f` is to set the folder that contains our image dataset, `-o` to set the image file list filename, `-e` to define the extension of the image files; and some options to define the output: `-ns` to disable random shuffle, `-c` to set the color format (RGB), `-d` to set the output data format (unsigned 8bit fixed-point), `-r` to set the image resolution, `-bf` to set the output folder to store binary files and `-bo` to set the binary files list filename.
+
+Once it is done, we proceed parsing our model. This command reads the `.tflite` file and reconstructs the model. Then, it optionally adds pre/post processing nodes (such as reshape, transpose, scale, subtract), quantizes ("DRA") or generates VAS ("VP assembler") code.
 
 ```sh
 tfparser.py -p converted_model.tflite \
@@ -236,7 +233,9 @@ tfparser.py -p converted_model.tflite \
 
 ```
 
-This command compiles VAS code generated by tfparser.py.
+The options here are the following: `-o` sets the output filename, `-of` sets the output folder, `-isrc` defines the source string used during compilation, `-odst` sets the multiple output list, `-c` defines the configuration options used during compilation. The values for `-isrc` and `-c` are dependant on the previous step. Specifically for `-isrc`, the format here is `is:<input_shape>|iq|i:<input_list>|ic:<image_scaling>|idf:<input_file_data_format>`. As for the `-c` parameters, they are used to force the activation outputs and coefficients (weights and biases) to 16bit fixed-point.
+
+This next command compiles VAS code generated by `tfparser.py`:
 
 ```sh
   vas \
@@ -245,7 +244,7 @@ This command compiles VAS code generated by tfparser.py.
   out_car_human_model/car_human_model.vas
 ```
 
-And finally we produce the cavalry file car_human_model_cavalry.bin that can be deployed in the camera.
+Finally, we produce the cavalry file `car_human_model_cavalry.bin`, that can be deployed in the camera.
 
 ```sh
  cavalry_gen \
@@ -253,7 +252,7 @@ And finally we produce the cavalry file car_human_model_cavalry.bin that can be 
   -f car_human_model_cavalry.bin
 ```
 
-For more information about how to convert your specific model, please refer to the [Ambarella documentation](https://customer.ambarella.com/ng/)
+For more information about how to convert your specific model, please refer to the [Ambarella documentation](https://customer.ambarella.com/ng/).
 
 ## Designing the application
 
