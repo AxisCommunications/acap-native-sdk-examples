@@ -88,8 +88,9 @@ Below is the step by step instructions on how to execute the program. So basical
 
 ### Build the application
 
-> [!IMPORTANT]
-> *Depending on the network you are connected to,
+> **Note**
+>
+> Depending on the network you are connected to, you may need to add proxy settings.
 The file that needs those settings is:* ~/.docker/config.json. *For
 reference please see: <https://docs.docker.com/network/proxy/> and a
 [script for Axis device here](../FAQs.md#HowcanIset-upnetworkproxysettingsontheAxisdevice?).*
