@@ -62,6 +62,8 @@ and [vdo-larod](./vdo-larod) examples.
   * The example code is written in C which starts a vdo stream and then illustrates how to continuously capture frames from the vdo service, access the received buffer contents as well as the frame metadata.
 * [web-server](./web-server/)
   * The example code is written in C which runs a Monkey web server on the camera and exposes an external API with Reverse Proxy configuration in Apache Server.
+* [web-server-using-fastcgi](./web-server-using-fastcgi/)
+  * This example code is written in C and explains how to build an ACAP application that can handle HTTP requests sent to the Axis device, using the device's own web server.
 
 ### DockerHub Image
 

@@ -1,6 +1,7 @@
-# How to use Web Server in an ACAP application
+# How to run a web server in an ACAP application
 
 This example explains how to build and use [Monkey Web Server](https://github.com/monkey/monkey) in ACAP Native SDK with Reverse Proxy configuration in Apache Server.
+This example addresses a similar problem as the [web-server-using-fastcgi](../web-server-using-fastcgi) example but in a more modular way as the application can have its own web server without need of being strongly integrated with the device.
 
 ## Reverse Proxy configuration in Apache Server
 
