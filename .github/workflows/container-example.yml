@@ -11,16 +11,13 @@ jobs:
     env:
       EXREPO: acap-native-examples
       EXNAME: container-example
-      EAPNAME: Container_Example
       EXDIR: acap/examples/$EXNAME
     steps:
       - uses: actions/checkout@v3
 
-      - name: Build ${{ env.example }} application
+      - name: Build ${{ env.EXNAME }} application
         env:
-          example: ${{ env.EXNAME }}
           imagetag: ${{ env.EXREPO }}_${{ env.EXNAME }}:1.0
-          eapfile: ${{ env.EAPNAME }}_1_0_0_armv7hf.eap
         run: |
           docker image rm -f $imagetag
           cd $EXNAME
@@ -30,5 +27,5 @@ jobs:
           docker cp $(docker create $imagetag):/opt/app ./build
           cd ..
           mkdir -p $EXDIR/build
-          cp $EXNAME/build/$eapfile $EXDIR/build/$eapfile
+          cp $EXNAME/build/*.eap $EXDIR/build/
           docker image rm -f $imagetag

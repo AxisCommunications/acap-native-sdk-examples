@@ -21,7 +21,6 @@ jobs:
     env:
       EXREPO: acap-native-examples
       EXNAME: object-detection
-      EAPNAME: object_detection
     steps:
       - uses: actions/checkout@v3
 
@@ -29,7 +28,6 @@ jobs:
         env:
           example: ${{ env.EXNAME }}-${{ matrix.chip }}
           imagetag: ${{ env.EXREPO }}_${{ env.EXNAME }}-${{ matrix.chip }}:1.0
-          eapfile: ${{ env.EAPNAME }}_${{ matrix.chip }}_1_0_0_${{ matrix.arch }}.eap
         run: |
           docker image rm -f $imagetag
           cd $EXNAME
