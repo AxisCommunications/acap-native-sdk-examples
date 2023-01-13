@@ -23,7 +23,6 @@ jobs:
         env:
           example: send_event
           imagetag: ${{ env.EXREPO }}_send-event:1.0
-          eapfile: send_event_1_0_0_${{ matrix.arch }}.eap
         run: |
           docker image rm -f $imagetag
           cd $EXNAME/$example
@@ -36,7 +35,6 @@ jobs:
         env:
           example: subscribe_to_event
           imagetag: ${{ env.EXREPO }}_subscribe-to-event:1.0
-          eapfile: subscribe_to_event_1_0_0_${{ matrix.arch }}.eap
         run: |
           docker image rm -f $imagetag
           cd $EXNAME/$example
@@ -49,7 +47,6 @@ jobs:
         env:
           example: subscribe_to_events
           imagetag: ${{ env.EXREPO }}_subscribe-to-events:1.0
-          eapfile: subscribe_to_events_1_0_0_${{ matrix.arch }}.eap
         run: |
           docker image rm -f $imagetag
           cd $EXNAME/$example
