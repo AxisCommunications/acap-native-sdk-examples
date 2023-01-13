@@ -1,0 +1,27 @@
+{
+    "schemaVersion": "1.3.1",
+    "acapPackageConf": {
+        "setup": {
+            "friendlyName": "fastcgi_example",
+            "appName": "fastcgi_example",
+            "vendor": "Axis Communications",
+            "embeddedSdkVersion": "3.0",
+            "user": {
+                "group": "sdk",
+                "username": "sdk"
+            },
+            "vendorUrl": "https://www.axis.com",
+            "runMode": "never",
+            "version": "1.0.0"
+        },
+        "configuration": {
+            "httpConfig": [
+                {
+                    "access": "viewer",
+                    "name": "example.cgi",
+                    "type": "fastCgi"
+                }
+            ]
+        }
+    }
+}
