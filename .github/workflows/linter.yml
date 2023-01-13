@@ -26,34 +26,13 @@ jobs:
           DEFAULT_BRANCH: main
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           IGNORE_GITIGNORED_FILES: true
+          # Adapt lint config files to the names that fits editors
+          LINTER_RULES_PATH: /
+          MARKDOWN_CONFIG_FILE: .markdownlint.yml
+          DOCKERFILE_HADOLINT_FILE_NAME: .hadolint.yml
+          YAML_CONFIG_FILE: .yamllint.yml
           VALIDATE_BASH: true
           VALIDATE_DOCKERFILE_HADOLINT: true
           VALIDATE_MARKDOWN: true
           VALIDATE_SHELL_SHFMT: true
           VALIDATE_YAML: true
-
-      - name: Check that linter symbolic links exist in top directory
-        run: |
-          missing_symlinks=""
-          symlinks="\
-            .hadolint.yml \
-            .markdownlint.yml \
-            .yamllint.yml \
-          "
-
-          for syml in $symlinks
-          do
-            [ -L $syml ] && [ -f $syml ] || {
-              missing_symlinks="$syml $missing_symlinks"
-            }
-          done
-
-          [ -z "$missing_symlinks" ] || {
-            echo "ERROR: Missing linter symlinks"
-            echo "The following symlinks are missing in top directory"
-            for msyml in $missing_symlinks
-            do
-              echo "* $msyml"
-            done
-            exit 1
-          }

@@ -1,1 +1,8 @@
-.github/linters/.markdown-lint.yml
+---
+MD013: false
+MD025: false
+MD026: false
+MD033: false
+MD034: false
+MD037: false
+MD041: false

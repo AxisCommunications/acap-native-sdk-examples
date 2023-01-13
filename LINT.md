@@ -25,6 +25,10 @@ To run a number of linters on the code base from command line:
 ```sh
 docker run --rm \
   -v $PWD:/tmp/lint \
+  -e LINTER_RULES_PATH=/ \
+  -e DOCKERFILE_HADOLINT_FILE_NAME=.hadolint.yml \
+  -e MARKDOWN_CONFIG_FILE=.markdownlint.yml \
+  -e YAML_CONFIG_FILE=.yamllint.yml \
   -e RUN_LOCAL=true \
   -e VALIDATE_BASH=true \
   -e VALIDATE_DOCKERFILE_HADOLINT=true \
