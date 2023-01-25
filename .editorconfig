@@ -1,18 +1,35 @@
-# EditorConfig is awesome: http://EditorConfig.org
+root = true
 
 [*]
-# Unix-style newlines at the bottom of every file
-end_of_line = lf
 charset = utf-8
-
-# Remove any whitespace characters preceding newline characters
+end_of_line = lf
+indent_style = space
+insert_finel_newline = true
 trim_trailing_whitespace = true
 
+[*.md]
+indent_size = 4
+
+[*.yml, *.yaml]
+indent_size = 2
+
+[manifest.json*]
+indent_size = 4
+
+[Makefile]
+indent_size = 2
+indent_style = tab
+
 [{*.sh,containerExample,shell_script_example}]
-# Tab indentation
-indent_style = space
 indent_size = 2
 switch_case_indent = true
 keep_padding       = true
 space_redirects    = true
 
+# https://google.github.io/styleguide/cppguide.html
+[*.{py,c,cpp,h}]
+indent_size = 2
+
+# https://google.github.io/styleguide/pyguide.html
+[*.py]
+indent_size = 4
