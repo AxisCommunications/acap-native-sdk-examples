@@ -1,0 +1,12 @@
+{
+    "recommendations": [
+      "DavidAnson.vscode-markdownlint",
+      "editorconfig.editorconfig",
+      "exiasr.hadolint",
+      "timonwong.shellcheck",
+      "foxundermoon.shell-format",
+      "redhat.vscode-yaml",
+      "yzhang.markdown-all-in-one",
+      "streetsidesoftware.code-spell-checker"
+    ]
+  }
