@@ -18,13 +18,13 @@ Axis already has several HW platforms (e.g. the Edge TPU and ARM CPU) providing 
 
 You may need to run the following script on the Axis device depending upon your network requirements.
 
-```bash
+```sh
 ssh root@<axis_device_ip>
 ```
 
 Run on the device:
 
-```bash
+```sh
 #!/bin/sh
 
 # Setup proxy for dockerd

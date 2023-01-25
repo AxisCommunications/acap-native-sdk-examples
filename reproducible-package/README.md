@@ -23,7 +23,7 @@ your application reproducible.
 
 Below is the structure and scripts used in the example:
 
-```bash
+```sh
 reproducible-package
 ├── app
 │   ├── reproducible_package.c
@@ -64,7 +64,7 @@ In all examples the option `--no-cache` is used to ensure that image is rebuilt.
 Start with an ordinary build which will not give a reproducible package and
 copy the result from the container image to a local directory *build1*.
 
-```bash
+```sh
 docker build --no-cache --tag rep:1 .
 docker cp $(docker create rep:1):/opt/app ./build1
 ```
@@ -74,21 +74,21 @@ in turn set [SOURCE_DATE_EPOCH](https://reproducible-builds.org/docs/source-date
 to a fix time. The chosen timestamp here is the latest commit in the current
 git repository. Copy the output to *build2*.
 
-```bash
+```sh
 docker build --no-cache --build-arg TIMESTAMP="$(git log -1 --pretty=%ct)" --tag rep:2 .
 docker cp $(docker create rep:2):/opt/app ./build2
 ```
 
 Build a second reproducible application and copy the output to *build3*.
 
-```bash
+```sh
 docker build --no-cache --build-arg TIMESTAMP="$(git log -1 --pretty=%ct)" --tag rep:3 .
 docker cp $(docker create rep:3):/opt/app ./build3
 ```
 
 Now you will have three eap-files in your working directory
 
-```bash
+```sh
 reproducible-package
 ├── build1
 │   └── reproducible_package_1_0_0_armv7hf.eap
@@ -104,7 +104,7 @@ reproducible-package
 
 Compare the files to see if they are identical or not.
 
-```bash
+```sh
 cmp build1/*.eap build2/*.eap
 build1/reproducible_package_1_0_0_armv7hf.eap build2/reproducible_package_1_0_0_armv7hf.eap differ: byte 13, line 1
 
@@ -114,7 +114,7 @@ cmp build2/*.eap build3/*.eap
 
 All these steps are also available in a utility script
 
-```bash
+```sh
 ./reproducible_package.sh
 ```
 
@@ -123,7 +123,7 @@ All these steps are also available in a utility script
 To get reproducible packages running inside a container, make sure to export the
 environment variable before running build command.
 
-```bash
+```sh
 SOURCE_DATE_EPOCH=$(git log -1 --pretty=%ct) acap-build .
 ```
 

@@ -21,7 +21,7 @@ Monkey is a fast and lightweight Web Server for Linux. It has been designed to b
 
 These instructions will guide you on how to execute the code. Below is the structure and scripts used in the example:
 
-```bash
+```sh
 web-server
 ├── app
 │   ├── LICENSE - Text file which lists all open source licensed source code distributed with the application
@@ -48,7 +48,7 @@ For reference please see: https://docs.docker.com/network/proxy/.
 
 Standing in your working directory run the following commands:
 
-```bash
+```sh
 # Set your device IP address and architecture
 export ARCH=<armv7hf or aarch64>
 export DEVICE_IP=<device IP address>
@@ -61,7 +61,7 @@ docker build . --build-arg ARCH --tag web-server:$ARCH
 
 Installing your application on an Axis video device is as simple as:
 
-```bash
+```sh
 docker run --rm web-server:$ARCH eap-install.sh $DEVICE_IP $PASS install
 ```
 
@@ -75,7 +75,7 @@ The Web Server can be accessed from a Web Browser eighter directly using a port 
 
 As an alternative the application can be started, stopped and removed from command line using following commands:
 
-```bash
+```sh
 docker run --rm web-server:$ARCH eap-install.sh $DEVICE_IP $PASS start
 docker run --rm web-server:$ARCH eap-install.sh $DEVICE_IP $PASS stop
 docker run --rm web-server:$ARCH eap-install.sh $DEVICE_IP $PASS remove

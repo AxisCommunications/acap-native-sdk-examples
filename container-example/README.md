@@ -34,7 +34,7 @@ Pull and save the Alpine linux container image. Standing in your working directo
 
 ## Build the application on armv7hf
 
-```bash
+```sh
 
 docker pull arm32v7/alpine:3.14.0
 docker save -o alpine.tar arm32v7/alpine:3.14.0
@@ -44,7 +44,7 @@ docker build --tag <APP_NAME> .
 
 ## Build the application on aarch64
 
-```bash
+```sh
 
 docker pull arm64v8/alpine:3.14.0
 docker save -o alpine.tar arm64v8/alpine:3.14.0
@@ -54,7 +54,7 @@ docker build --tag <APP_NAME> --build-arg ARCH=aarch64 .
 
 ### Extract the .eap file from the container
 
-```bash
+```sh
 
 docker cp $(docker create <APP_NAME>):/opt/app/ ./build
 
@@ -66,7 +66,7 @@ The .eap file is contained in the build folder.
 
 Browse to the following page (replace <axis_device_ip> with the IP number of your Axis video device)
 
-```bash
+```sh
 http://<axis_device_ip>/#settings/apps
 ```
 
@@ -81,7 +81,7 @@ If you're trying to build an ACAP application with a large Docker image, for exa
 
 Install the application to the device from command line by using a tool such as [curl](https://curl.se):
 
-```bash
+```sh
 curl -u <USER:PASS> -F"file=@<APP_FILE_PATH>" <DEVICE_IP>/axis-cgi/applications/upload.cgi
 ```
 

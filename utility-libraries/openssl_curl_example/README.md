@@ -71,7 +71,7 @@ Documentation of API functions used in this example:
 These instructions show you how to execute the code. Below is the structure and
 the scripts used in the example.
 
-```bash
+```sh
 openssl_curl_example
 ├── app
 │   ├── LICENSE
@@ -106,7 +106,7 @@ the application on a device.
 
 Standing in your working directory run:
 
-```bash
+```sh
 docker build --tag <APP_IMAGE> .
 ```
 
@@ -116,14 +116,14 @@ The default architecture is **armv7hf**. To build for **aarch64** it's possible 
 update the *ARCH* variable in the Dockerfile or to set it in the docker build
 command via build argument:
 
-```bash
+```sh
 docker build --build-arg ARCH=aarch64 --tag <APP_IMAGE> .
 ```
 
 If the device is inside a network with a proxy, then it can be passed on as a
 build argument:
 
-```bash
+```sh
 docker build --build-arg APP_PROXY=<MY_PROXY> --tag <APP_IMAGE> .
 ```
 
@@ -132,19 +132,19 @@ docker build --build-arg APP_PROXY=<MY_PROXY> --tag <APP_IMAGE> .
 
 To get more verbose logging from curl, pass the following build argument:
 
-```bash
+```sh
 docker build --build-arg APP_DEBUG=yes --tag <APP_IMAGE> .
 ```
 
 Copy the result from the container image to a local directory build:
 
-```bash
+```sh
 docker cp $(docker create <APP_IMAGE>):/opt/app ./build
 ```
 
 The working directory now contains a build folder with the following files:
 
-```bash
+```sh
 ├── build
 │   ├── LICENSE
 │   ├── Makefile
@@ -205,7 +205,7 @@ device.
 
 Compare the web page source code to the content of file `www.example.com.txt`.
 
-```bash
+```sh
 ssh root@<AXIS_DEVICE_IP>
 cat /usr/local/packages/openssl_curl_example/localdata/www.example.com.txt
 

@@ -29,7 +29,7 @@ Finally larod will load a neural network model and start processing. It simply t
 
 These instructions will guide you on how to execute the code. Below is the structure and scripts used in the example:
 
-```bash
+```sh
 vdo-larod
 ├── app
 │   ├── argparse.c
@@ -66,7 +66,7 @@ vdo-larod
 
 Below is the patch to build libyuv, remaining details are found in Dockerfile:
 
-```bash
+```sh
 vdo-larod
 ├── yuv
 │   └── 0001-Create-a-shared-library.patch
@@ -115,7 +115,7 @@ installation.
 
 Building is done using the following commands:
 
-```bash
+```sh
 docker build --tag <APP_IMAGE> --build-arg CHIP=<CHIP> .
 docker cp $(docker create <APP_IMAGE>):/opt/app ./build
 ```
@@ -130,7 +130,7 @@ See the following sections for build commands for each chip.
 
 To build a package for ARTPEC-8 with Tensorflow Lite, run the following commands standing in your working directory:
 
-```bash
+```sh
 docker build --build-arg ARCH=aarch64 --build-arg CHIP=artpec8 --tag <APP_IMAGE> .
 docker cp $(docker create <APP_IMAGE>):/opt/app ./build
 ```
@@ -139,7 +139,7 @@ docker cp $(docker create <APP_IMAGE>):/opt/app ./build
 
 To build a package for CPU with Tensorflow Lite, run the following commands standing in your working directory:
 
-```bash
+```sh
 docker build --build-arg CHIP=cpu --tag <APP_IMAGE> .
 docker cp $(docker create <APP_IMAGE>):/opt/app ./build
 ```
@@ -148,7 +148,7 @@ docker cp $(docker create <APP_IMAGE>):/opt/app ./build
 
 To build a package for Google TPU instead, run the following commands standing in your working directory:
 
-```bash
+```sh
 docker build --build-arg CHIP=edgetpu --tag <APP_IMAGE> .
 docker cp $(docker create <APP_IMAGE>):/opt/app ./build
 ```
@@ -157,7 +157,7 @@ docker cp $(docker create <APP_IMAGE>):/opt/app ./build
 
 To build a package for CV25 run the following commands standing in your working directory:
 
-```bash
+```sh
 docker build --build-arg ARCH=aarch64 --build-arg CHIP=cv25 --tag <APP_IMAGE> .
 docker cp $(docker create <APP_IMAGE>):/opt/app ./build
 ```
@@ -166,7 +166,7 @@ docker cp $(docker create <APP_IMAGE>):/opt/app ./build
 
 The working directory now contains a build folder with the following files of importance:
 
-```bash
+```sh
 vdo-larod
 ├── build
 │   ├── argparse.c
@@ -232,7 +232,7 @@ Installing your application on an Axis video device is as simple as:
 
 Browse to the following page (replace <axis_device_ip> with the IP number of your Axis video device)
 
-```bash
+```sh
 http://<axis_device_ip>/#settings/apps
 ```
 

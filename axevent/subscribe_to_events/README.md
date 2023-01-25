@@ -13,7 +13,7 @@ This example illustrates how to subscribe to a number of events in an Axis devic
 
 These instructions will guide you on how to execute the code. Below is the structure and scripts used in the example:
 
-```bash
+```sh
 subscribe_to_events
 ├── app
 │   ├── LICENSE
@@ -51,7 +51,7 @@ The file that needs those settings is:* ~/.docker/config.json. *For
 reference please see: <https://docs.docker.com/network/proxy/> and a
 [script for Axis device here](../FAQs.md#HowcanIset-upnetworkproxysettingsontheAxisdevice?).*
 
-```bash
+```sh
 docker build --tag <APP_IMAGE> .
 ```
 
@@ -61,19 +61,19 @@ Default architecture is **armv7hf**. To build for **aarch64** it's possible to
 update the *ARCH* variable in the Dockerfile or to set it in the docker build
 command via build argument:
 
-```bash
+```sh
 docker build --build-arg ARCH=aarch64 --tag <APP_IMAGE> .
 ```
 
 Copy the result from the container image to a local directory build:
 
-```bash
+```sh
 docker cp $(docker create <APP_IMAGE>):/opt/app ./build
 ```
 
 The working dir now contains a build folder with the following files:
 
-```bash
+```sh
 subscribe_to_events
 ├── app
 │   ├── LICENSE
@@ -110,7 +110,7 @@ Installing your application on an Axis device is as simple as:
 
 Browse to the following page (replace <axis_device_ip> with the IP number of your Axis device)
 
-```bash
+```sh
 http://<axis_device_ip>/#settings/apps
 ```
 
@@ -129,7 +129,7 @@ The application has subscribed to the following events:
 
 Start of by opening the device web page, follow the instruction for each event on how to trigger it.
 
-```bash
+```sh
 http://<axis_device_ip>/#settings/apps
 ```
 
@@ -139,14 +139,14 @@ In this example, when an event take place an INFO status message is printed to t
 
 Open a second web browser window and open the application log, update the web page every time you expect a new event to have occured.
 
-```bash
+```sh
 http://<axis_device_ip>/axis-cgi/admin/systemlog.cgi?appname=subscribe_to_events
 ```
 
 >[!IMPORTANT]
 *> Please make sure SSH is enabled on the device to run the following commands.*
 
-```bash
+```sh
 tail -f /var/log/info.log | grep subscribe_to_events
 ```
 
@@ -178,7 +178,7 @@ In device web page, click on tab **Audio** and click **Allow Audio** > Play arou
 
 See general information about wrapper "get_eventlist.py" in [README](../README.md).
 
-```bash
+```sh
 ../get_eventlist.py getlist --help
 ```
 
