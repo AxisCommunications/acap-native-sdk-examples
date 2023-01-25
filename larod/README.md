@@ -11,7 +11,7 @@ be compiled and run with the help of the tools and step by step below.
 
 These instructions will guide you on how to execute the code. Below is the structure and scripts used in the example:
 
-```bash
+```sh
 larod
 ├── app
 │   ├── input
@@ -54,7 +54,7 @@ The file that needs those settings is:* ~/.docker/config.json. *For
 reference please see: <https://docs.docker.com/network/proxy/> and a
 [script for Axis device here](../FAQs.md#HowcanIset-upnetworkproxysettingsontheAxisdevice?).*
 
-```bash
+```sh
 docker build --tag <APP_IMAGE> .
 ```
 
@@ -62,7 +62,7 @@ docker build --tag <APP_IMAGE> .
 
 Copy the result from the container image to a local directory build:
 
-```bash
+```sh
 docker cp $(docker create <APP_IMAGE>):/opt/app ./build
 ```
 
@@ -70,7 +70,7 @@ Model and label files are downloaded from <https://coral.ai/models/>, when build
 
 The working dir now contains a build folder with the following files:
 
-```bash
+```sh
 larod
 │── app
 │   ├── input
@@ -116,7 +116,7 @@ Installing your application on an Axis video device is as simple as:
 
 Browse to the following page (replace <axis_device_ip> with the IP number of your Axis video device)
 
-```bash
+```sh
 http://<axis_device_ip>/#settings/apps
 ```
 
@@ -131,14 +131,14 @@ application directory.
 *> Please make sure SSH is enabled on the device to run the
 following commands.*
 
-```bash
+```sh
 scp root@<axis_device_ip>:/usr/local/packages/larod_simple_app/input/veiltail-11457_640_RGB_224x224.bin.out .
 ```
 
 Run the script **extract_analyze_output.sh** in the same folder where you copied the output file (veiltail-11457_640_RGB_224x224.bin.out) to see the output.
 The script will prompt the password required to access the device.
 
-```bash
+```sh
 ./extract_analyze_output.sh <axis_device_ip> <Path_to_labels_mobilenet_quant_v1_224.txt>
 ```
 

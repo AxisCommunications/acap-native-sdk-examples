@@ -36,7 +36,7 @@ greater depth than the [larod](../larod) and [vdo-larod](../vdo-larod) examples.
 
 ## Structure of this example
 
-```bash
+```sh
 tensorflow_to_larod-cv25
 ├── build_env.sh
 ├── Dockerfile

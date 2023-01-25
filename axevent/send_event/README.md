@@ -23,7 +23,7 @@ be compiled and run with the help of the tools and step by step below.
 
 These instructions will guide you on how to execute the code. Below is the structure and scripts used in the example:
 
-```bash
+```sh
 send_event
 ├── app
 │   ├── LICENSE
@@ -60,7 +60,7 @@ The file that needs those settings is:* ~/.docker/config.json. *For
 reference please see: <https://docs.docker.com/network/proxy/> and a
 [script for Axis device here](../FAQs.md#HowcanIset-upnetworkproxysettingsontheAxisdevice?).*
 
-```bash
+```sh
 docker build --tag <APP_IMAGE> .
 ```
 
@@ -70,19 +70,19 @@ Default architecture is **armv7hf**. To build for **aarch64** it's possible to
 update the *ARCH* variable in the Dockerfile or to set it in the docker build
 command via build argument:
 
-```bash
+```sh
 docker build --build-arg ARCH=aarch64 --tag <APP_IMAGE> .
 ```
 
 Copy the result from the container image to a local directory build:
 
-```bash
+```sh
 docker cp $(docker create <APP_IMAGE>):/opt/app ./build
 ```
 
 The working dir now contains a build folder with the following files:
 
-```bash
+```sh
 send_event
 ├── app
 │   ├── LICENSE
@@ -118,7 +118,7 @@ Installing your application on an Axis video device is as simple as:
 
 Browse to the following page (replace <axis_device_ip> with the IP number of your Axis video device)
 
-```bash
+```sh
 http://<axis_device_ip>/#settings/apps
 ```
 
@@ -169,13 +169,13 @@ Replace <onvifuser>, <onvifpassword> and <axis_device_ip> with the ONVIF user, O
 
 The wrapper helps you save the declared eventlist to an XML-file.
 
-```bash
+```sh
 ../get_eventlist.py getlist -h
 ```
 
 In this case ONVIF API is used and an ONVIF username and password needs to be added to the device. E.g
 
-```bash
+```sh
 ../get_eventlist.py getlist -u <onvifuser> -p <onvifpassword> -i <axis_device_ip>
 ```
 
@@ -209,7 +209,7 @@ The wrapper helps you save the sent eventlist to an XML-file.
 
 In this case ONVIF APIs are used, which means that an ONVIF username and password needs to be added to the device. E.g
 
-```bash
+```sh
 ../get_eventlist.py getsent -u <onvifuser> -p <onvifpassword> -i <axis_device_ip>
 ```
 

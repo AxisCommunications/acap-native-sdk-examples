@@ -17,7 +17,7 @@ Different stream resolutions are logged in the Application log.
 
 These instructions will guide you on how to execute the code. Below is the structure and scripts used in the example:
 
-```bash
+```sh
 axoverlay
 ├── app
 │   ├── axoverlay.c
@@ -55,7 +55,7 @@ The file that needs those settings is:* ~/.docker/config.json. *For
 reference please see: <https://docs.docker.com/network/proxy/> and a
 [script for Axis device here](../FAQs.md#HowcanIset-upnetworkproxysettingsontheAxisdevice?).*
 
-```bash
+```sh
 docker build --tag <APP_IMAGE> --build-arg ARCH=<ARCH> .
 ```
 
@@ -64,13 +64,13 @@ docker build --tag <APP_IMAGE> --build-arg ARCH=<ARCH> .
 
 Copy the result from the container image to a local directory build:
 
-```bash
+```sh
 docker cp $(docker create <APP_IMAGE>):/opt/app ./build
 ```
 
 The working dir now contains a build folder with the following files:
 
-```bash
+```sh
 axoverlay
 ├── app
 │   ├── axoverlay.c

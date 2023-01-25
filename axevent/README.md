@@ -21,7 +21,7 @@ APIs specification is available on <https://www.onvif.org/specs/core/ONVIF-Core-
 
 Below is the structure and scripts of the files and folders on the top level:
 
-```bash
+```sh
 axevent
 ├── get_eventlist.py
 ├── README.md
@@ -53,7 +53,7 @@ Below is the list of examples available in the repository.
 > [!IMPORTANT]
 > *The wrapper needs an ONVIF user with password in case wrapper is being used. Browse to the following page (replace <axis_device_ip> with the IP number of your Axis video device)*
 >
-> ```bash
+> ```sh
 > http://<axis_device_ip>/#settings/system/security/onvif
 > ```
 
@@ -63,7 +63,7 @@ Below is the list of examples available in the repository.
 
 The wrapper "get_eventlist.py" helps you save the declared eventlist to an XML-file called "onviflist.xml.new".
 
-```bash
+```sh
 ./get_eventlist.py getlist -h
 ```
 
@@ -71,7 +71,7 @@ The wrapper "get_eventlist.py" helps you save the declared eventlist to an XML-f
 
 The wrapper also helps you save the sent eventlist to an XML-file called "sentonviflist.xml.new".
 
-```bash
+```sh
 ./get_eventlist.py getsent -h
 ```
 
@@ -84,7 +84,7 @@ The wrapper also helps you save the sent eventlist to an XML-file called "senton
 It is also possible to use GStreamer tools for monitoring events, as a complement to the wrapper
 (replace \<user\>, \<password\> and \<axis_device_ip\> with the username, password and IP number of your Axis video device).
 
-```bash
+```sh
 gst-launch-1.0 rtspsrc location="rtsp://<user>:<password>@<axis_device_ip>/axis-media/media.amp?video=0&audio=0&event=on" ! fdsink
 ```
 

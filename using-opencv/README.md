@@ -9,7 +9,7 @@ application to demonstrate how to integrate the broad functionality of OpenCV.
 
 ## File structure
 
-```bash
+```sh
 building-opencv
 ├── app
 │   ├── example.cpp - The application running OpenCV code
@@ -38,13 +38,13 @@ building-opencv
 
    On armv7hf architecture
 
-   ```bash
+   ```sh
    docker build --tag <APP_IMAGE> .
    ```
 
    On aarch64 architecture
 
-   ```bash
+   ```sh
    docker build --tag <APP_IMAGE> --build-arg ARCH=aarch64 .
    ```
 
@@ -52,7 +52,7 @@ building-opencv
 
    Copy the result from the container image to a local directory build:
 
-   ```bash
+   ```sh
    docker cp $(docker create <APP_IMAGE>):/opt/app ./build
    ```
 
