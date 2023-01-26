@@ -11,5 +11,44 @@
     "https://json.schemastore.org/github-workflow": [
       "/.github/workflows/*"
     ]
-  }
+  },
+  "cSpell.words": [
+    "axis",
+    "axiscommunications",
+    "acap",
+    "acapsdk",
+    "vapix",
+    "onvif",
+    "aarch64",
+    "armv7hf",
+    "armv",
+    "larod",
+    "vdo",
+    "axisecp",
+    "axevent",
+    "axoverlay",
+    "licensekey",
+    "vdostream",
+    "dlpu",
+    "chipsets",
+    "artpec",
+    "ambarella",
+    "dbus",
+    "videostream",
+    "zipstream",
+    "dewarping",
+    "quickstart",
+    "docker",
+    "git",
+    "ssh",
+    "proto",
+    "protobuf",
+    "tensorflow",
+    "openblas",
+    "opencl",
+    "opencv",
+    "tesseract",
+    "Docker Hub",
+    "GitHub"
+  ]
 }
