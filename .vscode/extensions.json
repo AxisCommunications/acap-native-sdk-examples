@@ -6,6 +6,7 @@
       "timonwong.shellcheck",
       "foxundermoon.shell-format",
       "redhat.vscode-yaml",
+      "dbaeumer.vscode-eslint",
       "yzhang.markdown-all-in-one",
       "streetsidesoftware.code-spell-checker"
     ]

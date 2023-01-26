@@ -32,6 +32,7 @@ docker run --rm \
   -e RUN_LOCAL=true \
   -e VALIDATE_BASH=true \
   -e VALIDATE_DOCKERFILE_HADOLINT=true \
+  -e VALIDATE_JSON=true \
   -e VALIDATE_MARKDOWN=true \
   -e VALIDATE_SHELL_SHFMT=true \
   -e VALIDATE_YAML=true \
@@ -63,6 +64,9 @@ markdownlint .
 
 # Lint YAML files
 yamllint .
+
+# Lint JSON files
+eslint --ext .json .
 
 # Lint shell script files
 shellcheck $(shfmt -f .)
