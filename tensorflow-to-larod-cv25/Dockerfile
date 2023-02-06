@@ -45,7 +45,7 @@ RUN curl -o /env/tensorflow_to_larod_models.cv25.zip \
    sha512sum -c /env/models.cv25.sha512 && \
    rm /env/models.cv25.sha512 && \
    unzip -q /env/tensorflow_to_larod_models.cv25.zip -d /env/ && rm /env/tensorflow_to_larod_models.cv25.zip && \
-   cp /env/models.cv25/models/car_human_model_cavalry.bin /env/app/
+   cp /env/models/car_human_model_cavalry.bin /env/app/
 
 # Copy the rest of the local files
 COPY env/ /env/
