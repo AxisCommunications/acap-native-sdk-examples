@@ -112,6 +112,8 @@ The following instructions can be executed to simply run the example. Each step 
 
    > NOTE > It is required to be an Ambarella partner to access Ambarella tools. Visit [this](https://customer.ambarella.com/ng/login?refid=EAAAALA9%2fIfpWDCn53oQJDd5FKfzsrI0fWXYseVTpgnkJHV1) webpage to access the tools. If you are not an Ambarella partner, you can get login credentials by registering in the same link.
 
+   If you are a partner, visit [this](https://customer.ambarella.com/ng/pre-login) webpage to access the tools.*
+
 5. Compile the ACAP application:
 
    ```sh
