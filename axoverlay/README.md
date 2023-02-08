@@ -28,17 +28,17 @@ axoverlay
 └── README.md
 ```
 
-* **app/axoverlay.c** - Application to draw overlays using axoverlay in C.
-* **app/LICENSE** - Text file which lists all open source licensed source code distributed with the application.
-* **app/Makefile** - Makefile containing the build and link instructions for building the ACAP application.
-* **app/manifest.json** - Defines the application and its configuration.
-* **Dockerfile** - Docker file with the specified Axis toolchain and API container to build the example specified.
-* **README.md** - Step by step instructions on how to run the example.
+- **app/axoverlay.c** - Application to draw overlays using axoverlay in C.
+- **app/LICENSE** - Text file which lists all open source licensed source code distributed with the application.
+- **app/Makefile** - Makefile containing the build and link instructions for building the ACAP application.
+- **app/manifest.json** - Defines the application and its configuration.
+- **Dockerfile** - Docker file with the specified Axis toolchain and API container to build the example specified.
+- **README.md** - Step by step instructions on how to run the example.
 
 ### Limitations
 
-* ARTPEC-8, ARTPEC-7 and ARTPEC-6 based devices.
-* It is not possible to combine different color spaces for ARTPEC-6.
+- ARTPEC-8, ARTPEC-7 and ARTPEC-6 based devices.
+- It is not possible to combine different color spaces for ARTPEC-6.
 
 ### How to run the code
 
@@ -59,8 +59,8 @@ reference please see: <https://docs.docker.com/network/proxy/> and a
 docker build --tag <APP_IMAGE> --build-arg ARCH=<ARCH> .
 ```
 
-* <APP_IMAGE> is the name to tag the image with, e.g., axoverlay:1.0
-* \<ARCH\> is the architecture of the camera you are using, e.g., armv7hf (default) or aarch64
+- <APP_IMAGE> is the name to tag the image with, e.g., axoverlay:1.0
+- \<ARCH\> is the architecture of the camera you are using, e.g., armv7hf (default) or aarch64
 
 Copy the result from the container image to a local directory build:
 
@@ -92,13 +92,13 @@ axoverlay
 └── README.md
 ```
 
-* **build/axoverlay*** - Application executable binary file.
-* **build/axoverlay_1_0_0_\<ARCH\>.eap** - Application package .eap file.
-* **build/axoverlay_1_0_0_LICENSE.txt** - Copy of LICENSE file.
-* **build/manifest.json** - Defines the application and its configuration.
-* **build/package.conf** - Defines the application and its configuration.
-* **build/package.conf.orig** - Defines the application and its configuration, original file.
-* **build/param.conf** - File containing application parameters.
+- **build/axoverlay*** - Application executable binary file.
+- **build/axoverlay_1_0_0_\<ARCH\>.eap** - Application package .eap file.
+- **build/axoverlay_1_0_0_LICENSE.txt** - Copy of LICENSE file.
+- **build/manifest.json** - Defines the application and its configuration.
+- **build/package.conf** - Defines the application and its configuration.
+- **build/package.conf.orig** - Defines the application and its configuration, original file.
+- **build/param.conf** - File containing application parameters.
 
 #### Install your application
 

@@ -1,4 +1,9 @@
 ---
+# The default 'consistent' is a bit confusing and dash/hyphen is easier to have
+# in all Markdown files. It also doesn't conflict with asterisk used for bold.
+MD004:
+  style: dash
+
 MD013: false
 MD025: false
 MD026: false

@@ -14,17 +14,30 @@ greater depth than the [larod](../larod) and [vdo-larod](../vdo-larod) examples.
 
 ## Table of contents
 
-1. [Prerequisites](#prerequisites)
-2. [Structure of this example](#structure-of-this-example)
-3. [Quickstart](#quickstart)
-4. [Environment for building and training](#environment-for-building-and-training)
-5. [The example model](#the-example-model)
-6. [Model training and quantization](#model-training-and-quantization)
-7. [Model conversion](#model-conversion)
-8. [Designing the application](#designing-the-application)
-9. [Building the algorithm's application](#building-the-algorithms-application)
-10. [Installing the algorithm's application](#installing-the-algorithms-application)
-11. [Running the algorithm](#running-the-algorithm)
+<!-- ToC GFM -->
+
+- [Prerequisites](#prerequisites)
+- [Structure of this example](#structure-of-this-example)
+- [Quickstart](#quickstart)
+- [Environment for building and training](#environment-for-building-and-training)
+- [The example model](#the-example-model)
+- [Model training and quantization](#model-training-and-quantization)
+- [Model conversion](#model-conversion)
+  - [From SavedModel to .tflite](#from-savedmodel-to-tflite)
+    - [Compiling for Edge TPU](#compiling-for-edge-tpu)
+      - [Installation](#installation)
+      - [Usage](#usage)
+- [Designing the application](#designing-the-application)
+  - [Setting up a video stream](#setting-up-a-video-stream)
+    - [Setting up the larod interface](#setting-up-the-larod-interface)
+    - [Fetching a frame and performing inference](#fetching-a-frame-and-performing-inference)
+- [Building the algorithm's application](#building-the-algorithms-application)
+- [Installing the algorithm's application](#installing-the-algorithms-application)
+- [Running the algorithm](#running-the-algorithm)
+- [License](#license)
+- [Future possible improvements](#future-possible-improvements)
+
+<!-- /ToC -->
 
 ## Prerequisites
 
@@ -400,7 +413,7 @@ Placing yourself in the middle of the cameras field of view should ideally make 
 
 **[Apache License 2.0](../LICENSE)**
 
-# Future possible improvements
+## Future possible improvements
 
 - Interaction with non-neural network operations (eg NMS)
 - Custom objects

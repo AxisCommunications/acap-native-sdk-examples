@@ -25,13 +25,13 @@ vdo-opencl-filtering
 └── README.md
 ```
 
-* **app/LICENSE** - License for source code
-* **app/Makefile** - Makefile containing the build and link instructions for building the ACAP application.
-* **app/manifest.json** - Defines the application and its configuration.
-* **app/sobel_nv12.cl** - OpenCL program containing definitions and operations for Sobel filtering kernels.
-* **app/vdo_cl_filter_demo.c** - Application to capture the frames using vdo service, setting up OpenCL, and processing the image, in C.
-* **Dockerfile** - Docker file with the specified Axis toolchain and API container to build the example specified.
-* **README.md** - Step by step instructions on how to run the example.
+- **app/LICENSE** - License for source code
+- **app/Makefile** - Makefile containing the build and link instructions for building the ACAP application.
+- **app/manifest.json** - Defines the application and its configuration.
+- **app/sobel_nv12.cl** - OpenCL program containing definitions and operations for Sobel filtering kernels.
+- **app/vdo_cl_filter_demo.c** - Application to capture the frames using vdo service, setting up OpenCL, and processing the image, in C.
+- **Dockerfile** - Docker file with the specified Axis toolchain and API container to build the example specified.
+- **README.md** - Step by step instructions on how to run the example.
 
 ### Limitations
 
@@ -58,8 +58,8 @@ reference please see: <https://docs.docker.com/network/proxy/> and a
 docker build --tag <APP_IMAGE> --build-arg ARCH=<ARCH> .
 ```
 
-* <APP_IMAGE> is the name to tag the image with, e.g., vdo_cl_filter_demo:1.0
-* \<ARCH\> is the architecture of the camera you are using, e.g., armv7hf (default) or aarch64
+- <APP_IMAGE> is the name to tag the image with, e.g., vdo_cl_filter_demo:1.0
+- \<ARCH\> is the architecture of the camera you are using, e.g., armv7hf (default) or aarch64
 
 Copy the result from the container image to a local directory build:
 
@@ -93,13 +93,13 @@ vdo-opencl-filtering
 └── README.md
 ```
 
-* **build/manifest.json** - Defines the application and its configuration.
-* **build/package.conf** - Defines the application and its configuration.
-* **build/package.conf.orig** - Defines the application and its configuration, original file.
-* **build/param.conf** - File containing application parameters.
-* **build/vdo_cl_filter_demo*** - Application executable binary file.
-* **build/vdo_cl_filter_demo_1_0_0_\<ARCH\>.eap** - Application package .eap file.
-* **build/vdo_cl_filter_demo_1_0_0_LICENSE.txt** - Copy of LICENSE file.
+- **build/manifest.json** - Defines the application and its configuration.
+- **build/package.conf** - Defines the application and its configuration.
+- **build/package.conf.orig** - Defines the application and its configuration, original file.
+- **build/param.conf** - File containing application parameters.
+- **build/vdo_cl_filter_demo*** - Application executable binary file.
+- **build/vdo_cl_filter_demo_1_0_0_\<ARCH\>.eap** - Application package .eap file.
+- **build/vdo_cl_filter_demo_1_0_0_LICENSE.txt** - Copy of LICENSE file.
 
 #### Install your application
 

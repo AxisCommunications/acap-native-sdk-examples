@@ -10,9 +10,9 @@ By utilizing the built-in web server, the API can be exposed on the same port as
 
 The FastCGI integration with the device's Apache web server can be used for:
 
-* Serving web pages, e.g. the ACAP application settings
-* Exposing a HTTP API
-* Displaying application output
+- Serving web pages, e.g. the ACAP application settings
+- Exposing a HTTP API
+- Displaying application output
 
 ![Scheme of the example](assets/fcgi.svg)
 
@@ -31,12 +31,12 @@ using-fastcgi
 └── README.md
 ```
 
-* **app/fastcgi_example.c** - The application running FastCGI code.
-* **app/LICENSE** - Text file which lists all open source licensed source code distributed with the application.
-* **app/Makefile** - Makefile containing the build and link instructions for building the ACAP application.
-* **app/manifest.json** - Defines the application and its FastCGI configuration.
-* **Dockerfile** - Docker file with the specified Axis toolchain and API container to build the example specified.
-* **README.md** - Step by step instructions on how to run the example.
+- **app/fastcgi_example.c** - The application running FastCGI code.
+- **app/LICENSE** - Text file which lists all open source licensed source code distributed with the application.
+- **app/Makefile** - Makefile containing the build and link instructions for building the ACAP application.
+- **app/manifest.json** - Defines the application and its FastCGI configuration.
+- **Dockerfile** - Docker file with the specified Axis toolchain and API container to build the example specified.
+- **README.md** - Step by step instructions on how to run the example.
 
 ### Manifest schema HTTP configuration
 
@@ -56,9 +56,9 @@ To correctly set up an application that integrates with the Apache web server it
 }
 ```
 
-* **type** - CGI implementation type. It can assume the values `transferCgi`, `fastCgi`.
-* **name** - CGI path relative to the application web root. Any alphanumeric string is allowed.
-* **access** - Access policy for calling the CGI. It can assume the values `admin`, `viewer`, `operator`.
+- **type** - CGI implementation type. It can assume the values `transferCgi`, `fastCgi`.
+- **name** - CGI path relative to the application web root. Any alphanumeric string is allowed.
+- **access** - Access policy for calling the CGI. It can assume the values `admin`, `viewer`, `operator`.
 
 ### How to run the code
 
@@ -111,13 +111,13 @@ build
 └── fastcgi_example.c
 ```
 
-* **manifest.json** - Defines the application and its configuration.
-* **package.conf** - Defines the application and its configuration.
-* **package.conf.orig** - Defines the application and its configuration, original file.
-* **param.conf** - File containing application parameters.
-* **fastcgi_example*** - Application executable binary file.
-* **fastcgi_example_1_0_0_armv7hf.eap** - Application package .eap file.
-* **fastcgi_example_1_0_0_LICENSE.txt** - Copy of LICENSE file.
+- **manifest.json** - Defines the application and its configuration.
+- **package.conf** - Defines the application and its configuration.
+- **package.conf.orig** - Defines the application and its configuration, original file.
+- **param.conf** - File containing application parameters.
+- **fastcgi_example*** - Application executable binary file.
+- **fastcgi_example_1_0_0_armv7hf.eap** - Application package .eap file.
+- **fastcgi_example_1_0_0_LICENSE.txt** - Copy of LICENSE file.
 
 #### Install your application
 
@@ -149,4 +149,4 @@ The output to the system log in this example is just for debugging.
 
 ## References
 
-* <https://uriparser.github.io/>
+- <https://uriparser.github.io/>

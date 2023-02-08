@@ -91,11 +91,11 @@ to the application.
 OpenCV libraries are built with CMake and some special steps are made to get
 a correct build:
 
-* The ACAP SDK is sourced to get cross compilation variables like `CC` and
+- The ACAP SDK is sourced to get cross compilation variables like `CC` and
   `CXX` which contains the path to the SDK libraries.
-* To get correct cross compilation settings, `CMAKE_TOOLCHAIN_FILE` is set to the
+- To get correct cross compilation settings, `CMAKE_TOOLCHAIN_FILE` is set to the
   architecture specific file provided by OpenCV.
-* CMake picks up environment variables like `CC` and `CXX` but seems to not
+- CMake picks up environment variables like `CC` and `CXX` but seems to not
   work in combination with `CMAKE_TOOLCHAIN_FILE`. To get CMake to pick up the
 cross compiler and SDK library path, these variables are split and set
 explicitly in `CMAKE_{C,CXX}_COMPILER` and `CMAKE_{C,CXX}_FLAGS` respectively.
@@ -137,4 +137,4 @@ The output of the application can be seen through the `App log` or by running
 
 ## References
 
-* <https://docs.opencv.org>
+- <https://docs.opencv.org>
