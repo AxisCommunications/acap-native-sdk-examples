@@ -6,8 +6,8 @@ This README file explains how to use the axevent library, which provides an inte
 
 The purpose is to provide applications a mechanism to send and receive events.
 
-* **Producer** - Application sends events.
-* **Consumer** - Application subscribe events.
+- **Producer** - Application sends events.
+- **Consumer** - Application subscribe events.
 
 Three examples have been added to illustrate some use cases of the event system.
 
@@ -30,23 +30,23 @@ axevent
 └── subscribe_to_events
 ```
 
-* **get_eventlist.py** - Wrapper to find declared and sent events, using ONVIF APIs.
-* **README.md** - Step by step instructions on how to use the examples.
-* **send_event** - Folder containing files for building ACAP application "send_event".
-* **subscribe_to_event** - Folder containing files for building ACAP application "subscribe_to_event".
-* **subscribe_to_events** - Folder containing files for building ACAP application "subscribe_to_events".
+- **get_eventlist.py** - Wrapper to find declared and sent events, using ONVIF APIs.
+- **README.md** - Step by step instructions on how to use the examples.
+- **send_event** - Folder containing files for building ACAP application "send_event".
+- **subscribe_to_event** - Folder containing files for building ACAP application "subscribe_to_event".
+- **subscribe_to_events** - Folder containing files for building ACAP application "subscribe_to_events".
 
 ### Example applications
 
 Each example has as a README file in its directory which shows overview, example directory structure and step-by-step instructions on how to run applications on the device.
 Below is the list of examples available in the repository.
 
-* [Send Event](./send_event/README.md)
-  * The example code is written in C which sends an ONVIF event periodically.
-* [Subscribe to Event](./subscribe_to_event/README.md)
-  * The example code is written in C which subscribe to the ONVIF event sent from application "send_event".
-* [Subscribe to Events](./subscribe_to_events/README.md)
-  * The example code is written in C which subscribes to different predefined events.
+- [Send Event](./send_event/README.md)
+  - The example code is written in C which sends an ONVIF event periodically.
+- [Subscribe to Event](./subscribe_to_event/README.md)
+  - The example code is written in C which subscribe to the ONVIF event sent from application "send_event".
+- [Subscribe to Events](./subscribe_to_events/README.md)
+  - The example code is written in C which subscribes to different predefined events.
 
 ### Find events using wrapper
 

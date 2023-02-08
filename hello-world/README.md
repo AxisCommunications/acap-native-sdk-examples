@@ -21,12 +21,12 @@ hello-world
 └── README.md
 ```
 
-* **app/hello_world.c** - Hello World application which writes to system-log.
-* **app/LICENSE** - Text file which lists all open source licensed source code distributed with the application.
-* **app/Makefile** - Makefile containing the build and link instructions for building the ACAP application.
-* **app/manifest.json** - Defines the application and its configuration.
-* **Dockerfile** - Docker file with the specified Axis toolchain and API container to build the example specified.
-* **README.md** - Step by step instructions on how to run the example.
+- **app/hello_world.c** - Hello World application which writes to system-log.
+- **app/LICENSE** - Text file which lists all open source licensed source code distributed with the application.
+- **app/Makefile** - Makefile containing the build and link instructions for building the ACAP application.
+- **app/manifest.json** - Defines the application and its configuration.
+- **Dockerfile** - Docker file with the specified Axis toolchain and API container to build the example specified.
+- **README.md** - Step by step instructions on how to run the example.
 
 ### How to run the code
 
@@ -87,13 +87,13 @@ hello-world
 └── README.md
 ```
 
-* **build/hello_world*** - Application executable binary file.
-* **build/hello_world_1_0_0_armv7hf.eap** - Application package .eap file.
-* **build/hello_world_1_0_0_LICENSE.txt** - Copy of LICENSE file.
-* **build/manifest.json** - Defines the application and its configuration.
-* **build/package.conf** - Defines the application and its configuration.
-* **build/package.conf.orig** - Defines the application and its configuration, original file.
-* **build/param.conf** - File containing application parameters.
+- **build/hello_world*** - Application executable binary file.
+- **build/hello_world_1_0_0_armv7hf.eap** - Application package .eap file.
+- **build/hello_world_1_0_0_LICENSE.txt** - Copy of LICENSE file.
+- **build/manifest.json** - Defines the application and its configuration.
+- **build/package.conf** - Defines the application and its configuration.
+- **build/package.conf.orig** - Defines the application and its configuration, original file.
+- **build/param.conf** - File containing application parameters.
 
 #### Install your application
 

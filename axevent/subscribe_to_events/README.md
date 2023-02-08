@@ -24,17 +24,17 @@ subscribe_to_events
 └── README.md
 ```
 
-* **app/LICENSE** - File containing the license conditions.
-* **app/Makefile** - Makefile containing the build and link instructions for building the ACAP application.
-* **app/manifest.json** - Defines the application and its configuration.
-* **app/subscribe_to_events.c** - Example application.
-* **Dockerfile** - Docker file with the specified Axis toolchain and API container to build the example specified.
-* **README.md** - Step by step instructions on how to run the example.
+- **app/LICENSE** - File containing the license conditions.
+- **app/Makefile** - Makefile containing the build and link instructions for building the ACAP application.
+- **app/manifest.json** - Defines the application and its configuration.
+- **app/subscribe_to_events.c** - Example application.
+- **Dockerfile** - Docker file with the specified Axis toolchain and API container to build the example specified.
+- **README.md** - Step by step instructions on how to run the example.
 
 ### Limitations
 
-* The example is done for the armv7hf architecture, but it is possible to update to aarch64 architecture.
-* Which events that are available varies between Axis products, but events that will never be sent are possible to subscribe to and does not give any error.
+- The example is done for the armv7hf architecture, but it is possible to update to aarch64 architecture.
+- Which events that are available varies between Axis products, but events that will never be sent are possible to subscribe to and does not give any error.
 
 ### How to run the code
 
@@ -96,13 +96,13 @@ subscribe_to_events
 └── README.md
 ```
 
-* **build/manifest.json** - Defines the application and its configuration.
-* **build/package.conf** - Defines the application and its configuration.
-* **build/package.conf.orig** - Defines the application and its configuration, original file.
-* **build/param.conf** - File containing application parameters.
-* **build/subscribe_to_events*** - Application executable binary file.
-* **build/subscribe_to_events_1_0_0_armv7hf.eap** - Application package .eap file.
-* **build/subscribe_to_events_1_0_0_LICENSE.txt** - Copy of LICENSE file.
+- **build/manifest.json** - Defines the application and its configuration.
+- **build/package.conf** - Defines the application and its configuration.
+- **build/package.conf.orig** - Defines the application and its configuration, original file.
+- **build/param.conf** - File containing application parameters.
+- **build/subscribe_to_events*** - Application executable binary file.
+- **build/subscribe_to_events_1_0_0_armv7hf.eap** - Application package .eap file.
+- **build/subscribe_to_events_1_0_0_LICENSE.txt** - Copy of LICENSE file.
 
 #### Install your application
 
@@ -121,11 +121,11 @@ the newly built **subscribe_to_events_1_0_0_armv7hf.eap** > Click **Install** > 
 
 The application has subscribed to the following events:
 
-* *Manual Trigger* - Sends an event when manually clicking a switch button in device GUI.
-* *Tampering* - Sends a stateless event when image is tampered with, like putting a cloth over camera. (Requires video)
-* *Day/Night* - Sends an event when light conditions change and switching to day/night mode. (Requires video)
-* *PTZ* - Sends an event when any of PTZ (Pan/Tilt/Zoom) channels 1-8 are moving (Requires video and PTZ)
-* *Audio* - Sends an event when audio level pass below or above trigger level (Requires audio)
+- *Manual Trigger* - Sends an event when manually clicking a switch button in device GUI.
+- *Tampering* - Sends a stateless event when image is tampered with, like putting a cloth over camera. (Requires video)
+- *Day/Night* - Sends an event when light conditions change and switching to day/night mode. (Requires video)
+- *PTZ* - Sends an event when any of PTZ (Pan/Tilt/Zoom) channels 1-8 are moving (Requires video and PTZ)
+- *Audio* - Sends an event when audio level pass below or above trigger level (Requires audio)
 
 Start of by opening the device web page, follow the instruction for each event on how to trigger it.
 

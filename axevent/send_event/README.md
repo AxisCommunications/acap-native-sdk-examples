@@ -34,16 +34,16 @@ send_event
 └── README.md
 ```
 
-* **app/LICENSE** - Text file which lists all open source licensed source code distributed with the application.
-* **app/Makefile** - Makefile containing the build and link instructions for building the ACAP application "send_event".
-* **app/manifest.json** - Defines the application and its configuration.
-* **app/send_event.c** - Application which sends events, written in C.
-* **Dockerfile** - Docker file with the specified Axis toolchain and API container to build the example "send_event".
-* **README.md** - Step by step instructions on how to run the example.
+- **app/LICENSE** - Text file which lists all open source licensed source code distributed with the application.
+- **app/Makefile** - Makefile containing the build and link instructions for building the ACAP application "send_event".
+- **app/manifest.json** - Defines the application and its configuration.
+- **app/send_event.c** - Application which sends events, written in C.
+- **Dockerfile** - Docker file with the specified Axis toolchain and API container to build the example "send_event".
+- **README.md** - Step by step instructions on how to run the example.
 
 ### Limitations
 
-* The example is done for the armv7hf architecture, but it is possible to update to aarch64 architecture.
+- The example is done for the armv7hf architecture, but it is possible to update to aarch64 architecture.
 
 ### How to run the code
 
@@ -104,13 +104,13 @@ send_event
 └── README.md
 ```
 
-* **build/manifest.json** - Defines the application and its configuration.
-* **build/package.conf** - Defines the application and its configuration.
-* **build/package.conf.orig** - Defines the application and its configuration, original file.
-* **build/param.conf** - File containing application parameters.
-* **build/send_event*** - Application executable binary file.
-* **build/send_event_1_0_0_armv7hf.eap** - Application package .eap file for "send_event".
-* **build/send_event_1_0_0_LICENSE.txt** - Copy of LICENSE file.
+- **build/manifest.json** - Defines the application and its configuration.
+- **build/package.conf** - Defines the application and its configuration.
+- **build/package.conf.orig** - Defines the application and its configuration, original file.
+- **build/param.conf** - File containing application parameters.
+- **build/send_event*** - Application executable binary file.
+- **build/send_event_1_0_0_armv7hf.eap** - Application package .eap file for "send_event".
+- **build/send_event_1_0_0_LICENSE.txt** - Copy of LICENSE file.
 
 #### Install your application
 

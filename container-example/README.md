@@ -26,9 +26,9 @@ This minimal example consist of an Alpine Linux container that executes a script
 
 ## Prerequisites
 
-* An Axis camera with edge container functionality
-* AxOS 10.9 or later
-* The [Docker Compose ACAP](https://github.com/AxisCommunications/docker-compose-acap) must be installed on the device
+- An Axis camera with edge container functionality
+- AxOS 10.9 or later
+- The [Docker Compose ACAP](https://github.com/AxisCommunications/docker-compose-acap) must be installed on the device
 
 Pull and save the Alpine linux container image. Standing in your working directory run the following commands depending on your architecture:
 
@@ -85,8 +85,8 @@ Install the application to the device from command line by using a tool such as 
 curl -u <USER:PASS> -F"file=@<APP_FILE_PATH>" <DEVICE_IP>/axis-cgi/applications/upload.cgi
 ```
 
-* Further flags for proxy and security might be required, depending on your network.
-* You may also use an API tool like [Postman](https://www.postman.com/) or other command line tools.
+- Further flags for proxy and security might be required, depending on your network.
+- You may also use an API tool like [Postman](https://www.postman.com/) or other command line tools.
 
 ## Test the application
 

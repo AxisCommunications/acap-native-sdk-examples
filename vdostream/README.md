@@ -24,17 +24,17 @@ vdostream
 └── README.md
 ```
 
-* **app/LICENSE** - Text file which lists all open source licensed source code distributed with the application.
-* **app/Makefile** - Makefile containing the build and link instructions for building the ACAP application.
-* **app/manifest.json** - Defines the application and its configuration.
-* **app/vdoencodeclient.c** - Application to capture the frames using vdo service in C.
-* **Dockerfile** - Docker file with the specified Axis toolchain and API container to build the example specified.
-* **README.md** - Step by step instructions on how to run the example.
+- **app/LICENSE** - Text file which lists all open source licensed source code distributed with the application.
+- **app/Makefile** - Makefile containing the build and link instructions for building the ACAP application.
+- **app/manifest.json** - Defines the application and its configuration.
+- **app/vdoencodeclient.c** - Application to capture the frames using vdo service in C.
+- **Dockerfile** - Docker file with the specified Axis toolchain and API container to build the example specified.
+- **README.md** - Step by step instructions on how to run the example.
 
 ### Limitations
 
-* The example is done for the armv7hf architecture, but it is possible to update to aarch64 architecture.
-* Supported video compression formats for an Axis video device are found in the data-sheet of the device.
+- The example is done for the armv7hf architecture, but it is possible to update to aarch64 architecture.
+- Supported video compression formats for an Axis video device are found in the data-sheet of the device.
 
 ### How to run the code
 
@@ -95,13 +95,13 @@ vdostream
 └── README.md
 ```
 
-* **build/manifest.json** - Defines the application and its configuration.
-* **build/package.conf** - Defines the application and its configuration.
-* **build/package.conf.orig** - Defines the application and its configuration, original file.
-* **build/param.conf** - File containing application parameters.
-* **build/vdoencodeclient*** - Application executable binary file.
-* **build/vdoencodeclient_1_0_0_armv7hf.eap** - Application package .eap file.
-* **build/vdoencodeclient_1_0_0_LICENSE.txt** - Copy of LICENSE file.
+- **build/manifest.json** - Defines the application and its configuration.
+- **build/package.conf** - Defines the application and its configuration.
+- **build/package.conf.orig** - Defines the application and its configuration, original file.
+- **build/param.conf** - File containing application parameters.
+- **build/vdoencodeclient*** - Application executable binary file.
+- **build/vdoencodeclient_1_0_0_armv7hf.eap** - Application package .eap file.
+- **build/vdoencodeclient_1_0_0_LICENSE.txt** - Copy of LICENSE file.
 
 #### Install your application
 

@@ -14,27 +14,27 @@ on a device.
 
 <!-- ToC GFM -->
 
-* [Purpose of the example](#purpose-of-the-example)
-* [OpenSSL and curl APIs](#openssl-and-curl-apis)
-* [Getting started](#getting-started)
-* [How to run the code](#how-to-run-the-code)
-  * [Build the application](#build-the-application)
-  * [Install your application](#install-your-application)
-  * [The expected output](#the-expected-output)
-    * [Transferred file](#transferred-file)
-    * [Application log](#application-log)
-* [Outline of build steps](#outline-of-build-steps)
-  * [Runtime shared library search path](#runtime-shared-library-search-path)
-* [Check build dependencies](#check-build-dependencies)
-* [Troubleshooting](#troubleshooting)
-  * [Error CURLE_PEER_FAILED_VERIFICATION (60)](#error-curle_peer_failed_verification-60)
-* [License](#license)
+- [Purpose of the example](#purpose-of-the-example)
+- [OpenSSL and curl APIs](#openssl-and-curl-apis)
+- [Getting started](#getting-started)
+- [How to run the code](#how-to-run-the-code)
+  - [Build the application](#build-the-application)
+  - [Install your application](#install-your-application)
+  - [The expected output](#the-expected-output)
+    - [Transferred file](#transferred-file)
+    - [Application log](#application-log)
+- [Outline of build steps](#outline-of-build-steps)
+  - [Runtime shared library search path](#runtime-shared-library-search-path)
+- [Check build dependencies](#check-build-dependencies)
+- [Troubleshooting](#troubleshooting)
+  - [Error CURLE_PEER_FAILED_VERIFICATION (60)](#error-curle_peer_failed_verification-60)
+- [License](#license)
 
 <!-- /ToC -->
 
 ## Purpose of the example
 
-* **Cross-compilation with SDK** - It's important that the cross-compiled
+- **Cross-compilation with SDK** - It's important that the cross-compiled
   libraries use the correct SDK architecture, for example, armv7hf or aarch64.
 It's also important that they build with the same `libc` version of the SDK,
 with which the application code is compiled. If the libraries are compiled with
@@ -42,17 +42,17 @@ a newer `libc` version than the one used in the SDK, and get dependencies to
 the latest symbols and functions, the result is a compilation error when
 building the ACAP application. That is because the older `libc` from the SDK
 can't find these newer symbols and functions.
-* **Don't depend on all available libraries in SDK** - It's recommended to only
+- **Don't depend on all available libraries in SDK** - It's recommended to only
   use `libc` and the documented [ACAP
 API](https://axiscommunications.github.io/acap-documentation/docs/api/native-sdk-api.html)
 libraries in the SDK. Don't use other libraries from the SDK in an ACAP
 application.  Instead, download, compile and bundle libraries such as
 `libcrypto.so` and `libssl.so` (OpenSSL) and `libcurl.so` (curl) with the ACAP
 application.
-* **Check the runtime dependencies** - Check that the runtime dependencies, and
+- **Check the runtime dependencies** - Check that the runtime dependencies, and
   the location where the built application binary and libraries look for
 dependencies are correct.
-* **OpenSSL and curl** - Two common libraries where curl uses OpenSSL when
+- **OpenSSL and curl** - Two common libraries where curl uses OpenSSL when
   being built. This example shows how to handle such a setup.
 
 For more details on how this is implemented in the example, see [outline of
@@ -63,8 +63,8 @@ build steps](#outline-of-build-steps), or have a look at the
 
 Documentation of API functions used in this example:
 
-* https://www.openssl.org/docs/man1.1.1/man3/
-* https://curl.se/libcurl/c
+- https://www.openssl.org/docs/man1.1.1/man3/
+- https://curl.se/libcurl/c
 
 ## Getting started
 
@@ -82,12 +82,12 @@ openssl_curl_example
 └── README.md
 ```
 
-* **app/LICENSE** - File containing the license conditions.
-* **app/Makefile** - Makefile containing the build and link instructions for building the ACAP application.
-* **app/manifest.json** - Defines the application and its configuration.
-* **app/openssl_curl_example.c** - Application source code.
-* **Dockerfile** - Docker file with the specified Axis toolchain and API container to build the example specified.
-* **README.md** - Step by step instructions on how to run the example.
+- **app/LICENSE** - File containing the license conditions.
+- **app/Makefile** - Makefile containing the build and link instructions for building the ACAP application.
+- **app/manifest.json** - Defines the application and its configuration.
+- **app/openssl_curl_example.c** - Application source code.
+- **Dockerfile** - Docker file with the specified Axis toolchain and API container to build the example specified.
+- **README.md** - Step by step instructions on how to run the example.
 
 ## How to run the code
 
@@ -167,14 +167,14 @@ The working directory now contains a build folder with the following files:
 │   └── param.conf
 ```
 
-* **build/cacert.pem** - CA certificate file for remote server verification.
-* **build/lib** - Folder containing compiled library files for openssl and libcurl.
-* **build/openssl_curl_example** - Application executable binary file.
-* **build/openssl_curl_example_1_0_0_LICENSE.txt** - Copy of LICENSE file.
-* **build/openssl_curl_example_1_0_0_armv7hf.eap** - Application package .eap file.
-* **build/package.conf** - Defines the application and its configuration.
-* **build/package.conf.orig** - Defines the application and its configuration, original file.
-* **build/param.conf** - File containing application parameters.
+- **build/cacert.pem** - CA certificate file for remote server verification.
+- **build/lib** - Folder containing compiled library files for openssl and libcurl.
+- **build/openssl_curl_example** - Application executable binary file.
+- **build/openssl_curl_example_1_0_0_LICENSE.txt** - Copy of LICENSE file.
+- **build/openssl_curl_example_1_0_0_armv7hf.eap** - Application package .eap file.
+- **build/package.conf** - Defines the application and its configuration.
+- **build/package.conf.orig** - Defines the application and its configuration, original file.
+- **build/param.conf** - File containing application parameters.
 
 ### Install your application
 

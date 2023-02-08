@@ -23,13 +23,13 @@ custom_lib_example
 └── README.md
 ```
 
-* **app/LICENSE**             - File containing the license conditions.
-* **app/Makefile**            - Makefile containing the build and link instructions for building the ACAP application.
-* **app/manifest.json**       - Defines the application and its configuration.
-* **app/customlib_example.c** - Example application.
-* **build/custom_build**      - Folder containing custom library source files
-* **Dockerfile**              - Docker file with the specified Axis toolchain and API container to build the example specified.
-* **README.md**               - Step by step instructions on how to run the example.
+- **app/LICENSE**             - File containing the license conditions.
+- **app/Makefile**            - Makefile containing the build and link instructions for building the ACAP application.
+- **app/manifest.json**       - Defines the application and its configuration.
+- **app/customlib_example.c** - Example application.
+- **build/custom_build**      - Folder containing custom library source files
+- **Dockerfile**              - Docker file with the specified Axis toolchain and API container to build the example specified.
+- **README.md**               - Step by step instructions on how to run the example.
 
 ### How to run the code
 
@@ -88,13 +88,13 @@ The working dir now contains a build folder with the following files:
 
 ```
 
-* **build/package.conf** - Defines the application and its configuration.
-* **build/package.conf.orig** - Defines the application and its configuration, original file.
-* **build/param.conf** - File containing application parameters.
-* **build/customlib_example*** - Application executable binary file.
-* **build/lib** - Folder containing compiled library files for custom library
-* **build/customlib_example_1_0_0_armv7hf.eap** - Application package .eap file.
-* **build/customlib_example_1_0_0_LICENSE.txt** - Copy of LICENSE file.
+- **build/package.conf** - Defines the application and its configuration.
+- **build/package.conf.orig** - Defines the application and its configuration, original file.
+- **build/param.conf** - File containing application parameters.
+- **build/customlib_example*** - Application executable binary file.
+- **build/lib** - Folder containing compiled library files for custom library
+- **build/customlib_example_1_0_0_armv7hf.eap** - Application package .eap file.
+- **build/customlib_example_1_0_0_LICENSE.txt** - Copy of LICENSE file.
 
 #### Install your application
 

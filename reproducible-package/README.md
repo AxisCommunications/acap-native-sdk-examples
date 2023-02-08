@@ -9,10 +9,10 @@ Together with this README file, you should be able to find a directory called ap
 The example follows the guidelines in [Reproducible builds practices](https://reproducible-builds.org/)
 and the steps taken in this example are:
 
-* Set *SOURCE_DATE_EPOCH* to a specific date, in Dockerfile for standard
+- Set *SOURCE_DATE_EPOCH* to a specific date, in Dockerfile for standard
   procedure and in connection to build command `acap-build` if running
   interactively.
-* Add a code section in Makefile that if *SOURCE_DATE_EPOCH*  is set, do set
+- Add a code section in Makefile that if *SOURCE_DATE_EPOCH*  is set, do set
   *BUILD_DATE* to the specified date.
 
 **N.b.** These are the steps for a very basic example but might not be enough
@@ -34,16 +34,16 @@ reproducible-package
 └── README.md
 ```
 
-* **app/reproducible_package.c** - Hello World application which writes to system-log.
-* **app/LICENSE** - Text file which lists all open source licensed source code distributed with the application.
-* **app/Makefile** - Makefile containing the build and link instructions for building the ACAP application.
-* **app/manifest.json** - Defines the application and its configuration.
-* **Dockerfile** - Docker file with the specified Axis toolchain and API container to build the example specified.
-* **README.md** - Step by step instructions on how to run the example.
+- **app/reproducible_package.c** - Hello World application which writes to system-log.
+- **app/LICENSE** - Text file which lists all open source licensed source code distributed with the application.
+- **app/Makefile** - Makefile containing the build and link instructions for building the ACAP application.
+- **app/manifest.json** - Defines the application and its configuration.
+- **Dockerfile** - Docker file with the specified Axis toolchain and API container to build the example specified.
+- **README.md** - Step by step instructions on how to run the example.
 
 ### Limitations
 
-* The support to create reproducible packages was introduced in acap-sdk 3.4.
+- The support to create reproducible packages was introduced in acap-sdk 3.4.
 
 ### Build the application
 
@@ -98,9 +98,9 @@ reproducible-package
 │   └── reproducible_package_1_0_0_armv7hf.eap
 ```
 
-* **build1/reproducible_package_1_0_0_armv7hf.eap** - Application package .eap file.
-* **build2/reproducible_package_1_0_0_armv7hf.eap** - Reproducible application package .eap file.
-* **build3/reproducible_package_1_0_0_armv7hf.eap** - Reproducible application package .eap file.
+- **build1/reproducible_package_1_0_0_armv7hf.eap** - Application package .eap file.
+- **build2/reproducible_package_1_0_0_armv7hf.eap** - Reproducible application package .eap file.
+- **build3/reproducible_package_1_0_0_armv7hf.eap** - Reproducible application package .eap file.
 
 Compare the files to see if they are identical or not.
 
