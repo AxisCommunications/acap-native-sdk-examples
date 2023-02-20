@@ -25,6 +25,7 @@ jobs:
       EXNAME: vdo-larod-preprocessing
     steps:
       - uses: actions/checkout@v3
+      - uses: docker/setup-buildx-action@v2
 
       - name: Build ${{ env.example }} application
         env:
