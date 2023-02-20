@@ -17,6 +17,7 @@ jobs:
       chip: cv25
     steps:
       - uses: actions/checkout@v3
+      - uses: docker/setup-buildx-action@v2
 
       - name: Build ${{ env.EXNAME }} application
         env:
