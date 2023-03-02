@@ -14,7 +14,7 @@ LDLIBS += -lm
 
 CFLAGS += -Wall
 # This example is based on larod version 2
-CFLAGS += -DLAROD_API_VERSION_2
+CFLAGS += -DLAROD_API_VERSION_3
 
 all: $(PROGS)
 

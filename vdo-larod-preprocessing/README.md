@@ -252,12 +252,12 @@ Depending on selected chip, different output is received. The label file is used
 
 In the system log the chip is sometimes only mentioned as a number, they are mapped as follows:
 
-| Number | Chip |
-| --- | --- |
-| 2 | CPU with TensorFlow Lite |
-| 4 | Google TPU |
-| 6 | Ambarella CVFlow (NN) |
-| 12 | ARTPEC-8 DLPU |
+| Chips | Larod 1 (int) | Larod 3 (string) |
+|-------|--------------|------------------|
+| CPU with TensorFlow Lite | 2 | cpu-tflite |
+| Google TPU | 4 | google-edge-tpu-tflite |
+| Ambarella CVFlow (NN) | 6 | ambarella-cvflow |
+| ARTPEC-8 DLPU | 12 | axis-a8-dlpu-tflite |
 
 #### Output - ARTPEC-8 with TensorFlow Lite
 
@@ -278,13 +278,15 @@ vdo_larod_preprocessing[4165]: Calculate crop image
 vdo_larod_preprocessing[4165]: Create larod models
 vdo_larod_preprocessing[4165]: Create preprocessing maps
 vdo_larod_preprocessing[4165]: Crop VDO image X=40 Y=0 (240 x 240)
-vdo_larod_preprocessing[4165]: Setting up larod connection with chip 12 and model /usr/local/packages/vdo_larod_preprocessing/model/mobilenet_v2_1.0_224_quant.tflite
-vdo_larod_preprocessing[4165]: 10: Axis Compute Engine
-vdo_larod_preprocessing[4165]: 11: CPU with libyuv
-vdo_larod_preprocessing[4165]: 12: ARTPEC-8 DLPU with TensorFlow Lite (experimental)
-vdo_larod_preprocessing[4165]: 13: Image processing using OpenCL
-vdo_larod_preprocessing[4165]: 2: CPU with TensorFlow Lite
+vdo_larod_preprocessing[4165]: Setting up larod connection with chip axis-a8-dlpu-tflite, model /usr/local/packages/vdo_larod_preprocessing/model/mobilenet_v2_1.0_224_quant.tflite and label file /usr/local/packages/vdo_larod_preprocessing/model
 vdo_larod_preprocessing[4165]: Available chip ids:
+vdo_larod_preprocessing[4165]: Chip: cpu-tflite
+vdo_larod_preprocessing[4165]: Chip: axis-ace-proc
+vdo_larod_preprocessing[4165]: Chip: cpu-proc
+vdo_larod_preprocessing[4165]: Chip: axis-a8-dlpu-tflite
+vdo_larod_preprocessing[4165]: Chip: axis-a8-dlpu-native
+vdo_larod_preprocessing[4165]: Chip: axis-a8-dlpu-proc
+vdo_larod_preprocessing[4165]: Chip: axis-a8-gpu-proc
 vdo_larod_preprocessing[4165]: Allocate memory for input/output buffers
 vdo_larod_preprocessing[4165]: Connect tensors to file descriptors
 vdo_larod_preprocessing[4165]: Create input/output tensors
@@ -328,13 +330,13 @@ vdo_larod_preprocessing[1670]: Calculate crop image
 vdo_larod_preprocessing[1670]: Create larod models
 vdo_larod_preprocessing[1670]: Create preprocessing maps
 vdo_larod_preprocessing[1670]: Crop VDO image X=40 Y=0 (240 x 240)
-vdo_larod_preprocessing[1670]: Setting up larod connection with chip 2 and model /usr/local/packages/vdo_larod_preprocessing/model/mobilenet_v2_1.0_224_quant.tflite
-vdo_larod_preprocessing[1670]: 10: Axis Compute Engine
-vdo_larod_preprocessing[1670]: 11: CPU with libyuv
-vdo_larod_preprocessing[1670]: 13: Image processing using OpenCL
-vdo_larod_preprocessing[1670]: 2: CPU with TensorFlow Lite
-vdo_larod_preprocessing[1670]: 4: Google TPU
+vdo_larod_preprocessing[1670]: Setting up larod connection with chip cpu-tflite, model /usr/local/packages/vdo_larod_preprocessing/model/mobilenet_v2_1.0_224_quant.tflite and label file /usr/local/packages/vdo_larod_preprocessing/model/imagenet_labels.txt
 vdo_larod_preprocessing[1670]: Available chip ids:
+vdo_larod_preprocessing[1670]: Chip: cpu-tflite
+vdo_larod_preprocessing[1670]: Chip: google-edge-tpu-tflite
+vdo_larod_preprocessing[1670]: Chip: axis-ace-proc
+vdo_larod_preprocessing[1670]: Chip: cpu-proc
+vdo_larod_preprocessing[1670]: Chip: axis-a7-gpu-proc
 vdo_larod_preprocessing[1670]: Allocate memory for input/output buffers
 vdo_larod_preprocessing[1670]: Connect tensors to file descriptors
 vdo_larod_preprocessing[1670]: Create input/output tensors
@@ -378,13 +380,14 @@ vdo_larod_preprocessing[31476]: Calculate crop image
 vdo_larod_preprocessing[31476]: Create larod models
 vdo_larod_preprocessing[31476]: Create preprocessing maps
 vdo_larod_preprocessing[31476]: Crop VDO image X=40 Y=0 (240 x 240)
-vdo_larod_preprocessing[31476]: Setting up larod connection with chip 4 and model /usr/local/packages/vdo_larod_preprocessing/model/mobilenet_v2_1.0_224_quant_edgetpu.tflite
-vdo_larod_preprocessing[31476]: 10: Axis Compute Engine
-vdo_larod_preprocessing[31476]: 11: CPU with libyuv
-vdo_larod_preprocessing[31476]: 13: Image processing using OpenCL
-vdo_larod_preprocessing[31476]: 2: CPU with TensorFlow Lite
-vdo_larod_preprocessing[31476]: 4: Google TPU
+vdo_larod_preprocessing[31476]: Setting up larod connection with chip google-edge-tpu-tflite, model /usr/local/packages/vdo_larod_preprocessing/model/mobilenet_v2_1.0_224_quant_edgetpu.tflite and label file /usr/local/packages/vdo_larod_preprocessing/model/imagenet_labels.txt
 vdo_larod_preprocessing[31476]: Available chip ids:
+vdo_larod_preprocessing[31476]: Chip: axis-a7-gpu-tflite
+vdo_larod_preprocessing[31476]: Chip: cpu-tflite
+vdo_larod_preprocessing[31476]: Chip: google-edge-tpu-tflite
+vdo_larod_preprocessing[31476]: Chip: axis-ace-proc
+vdo_larod_preprocessing[31476]: Chip: cpu-proc
+vdo_larod_preprocessing[31476]: Chip: axis-a7-gpu-proc
 vdo_larod_preprocessing[31476]: Allocate memory for input/output buffers
 vdo_larod_preprocessing[31476]: Connect tensors to file descriptors
 vdo_larod_preprocessing[31476]: Create input/output tensors
@@ -430,12 +433,12 @@ vdo_larod_preprocessing[584171]: Calculate crop image
 vdo_larod_preprocessing[584171]: Create larod models
 vdo_larod_preprocessing[584171]: Create preprocessing maps
 vdo_larod_preprocessing[584171]: Crop VDO image X=40 Y=0 (240 x 240)
-vdo_larod_preprocessing[584171]: Setting up larod connection with chip 6 and model /usr/local/packages/vdo_larod_preprocessing/model/mobilenet_v2_cavalry.bin
-vdo_larod_preprocessing[584171]: 11: CPU with libyuv
-vdo_larod_preprocessing[584171]: 2: CPU with TensorFlow Lite
-vdo_larod_preprocessing[584171]: 6: Ambarella CVFlow (NN)
-vdo_larod_preprocessing[584171]: 9: Ambarella CVFlow (proc)
+vdo_larod_preprocessing[584171]: Setting up larod connection with chip ambarella-cvflow, model /usr/local/packages/vdo_larod_preprocessing/model/mobilenet_v2_cavalry.bin and label file /usr/local/packages/vdo_larod_preprocessing/model/imagenet_labels.txt
 vdo_larod_preprocessing[584171]: Available chip ids:
+vdo_larod_preprocessing[584171]: Chip: ambarella-cvflow
+vdo_larod_preprocessing[584171]: Chip: ambarella-cvflow-proc
+vdo_larod_preprocessing[584171]: Chip: cpu-tflite
+vdo_larod_preprocessing[584171]: Chip: cpu-proc
 vdo_larod_preprocessing[584171]: Allocate memory for input/output buffers
 vdo_larod_preprocessing[584171]: Connect tensors to file descriptors
 vdo_larod_preprocessing[584171]: Create input/output tensors
