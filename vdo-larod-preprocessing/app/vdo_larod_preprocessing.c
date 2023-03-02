@@ -72,7 +72,7 @@ static bool createAndMapTmpFile(char* fileName, size_t fileSize,
  * param model Pointer to a larodModel to be obtained.
  * return False if error has occurred, otherwise true.
  */
-static bool setupLarod(const larodChip larodChip, const int larodModelFd,
+static bool setupLarod(const char* chipString, const int larodModelFd,
                        larodConnection** larodConn, larodModel** model);
 
 /**
@@ -167,7 +167,7 @@ error:
     return false;
 }
 
-static bool setupLarod(const larodChip chip, const int larodModelFd,
+static bool setupLarod(const char* chipString, const int larodModelFd,
                        larodConnection** larodConn, larodModel** model) {
     larodError* error = NULL;
     larodConnection* conn = NULL;
@@ -181,26 +181,20 @@ static bool setupLarod(const larodChip chip, const int larodModelFd,
     }
 
     // List available chip id:s
-    larodChip* chipIds = NULL;
-    size_t numChipIds = 0;
-    syslog(LOG_INFO, "Available chip ids:");
-    if (larodListChips(conn, &chipIds, &numChipIds, &error)) {
-        for (size_t i = 0; i < numChipIds; ++i) {
-            syslog(LOG_INFO, "%d: %s", chipIds[i], larodGetChipName(chipIds[i]));;
+    size_t numDevices = 0;
+    syslog(LOG_INFO, "Available chip IDs:");
+    const larodDevice** devices; 
+    devices = larodListDevices(conn, &numDevices, &error);
+    for (size_t i = 0; i < numDevices; ++i) {
+            syslog(LOG_INFO, "%s: %s", "Chip", larodGetDeviceName(devices[i], &error));;
         }
-        free(chipIds);
-    } else {
-        syslog(LOG_ERR, "%s: Failed to list available chip id: %s", __func__, error->msg);
-        larodClearError(&error);
-    }
-
-    loadedModel = larodLoadModel(conn, larodModelFd, chip, LAROD_ACCESS_PRIVATE,
+    const larodDevice* dev = larodGetDevice(conn, chipString, 0, &error);
+    loadedModel = larodLoadModel(conn, larodModelFd, dev, LAROD_ACCESS_PRIVATE,
                                  "Vdo Example App Model", NULL, &error);
     if (!loadedModel) {
         syslog(LOG_ERR, "%s: Unable to load model: %s", __func__, error->msg);
         goto error;
     }
-
     *larodConn = conn;
     *model = loadedModel;
 
@@ -396,12 +390,10 @@ int main(int argc, char** argv) {
     size_t numLabels = 0; // Number of entries in the labels array.
     char* labelFileData =
         NULL; // Buffer holding the complete collection of label strings.
-    larodChip chip = (larodChip)atoi(argv[1]);
-
+    const char* chipString = argv[1];
     // Open the syslog to report messages for "vdo_larod_preprocessing"
     openlog("vdo_larod_preprocessing", LOG_PID|LOG_CONS, LOG_USER);
     syslog(LOG_INFO, "Starting %s", argv[0]);
-
     // Register an interrupt handler which tries to exit cleanly if invoked once
     // but exits immediately if further invoked.
     signal(SIGINT, sigintHandler);
@@ -462,7 +454,7 @@ int main(int argc, char** argv) {
         syslog(LOG_ERR, "Failed setting preprocessing parameters: %s", error->msg);
         goto end;
     }
-    if(chip!=6){
+    if(chipString != "ambarella-cvflow"){
         if (!larodMapSetStr(ppMap, "image.output.format", "rgb-interleaved", &error)) {
             syslog(LOG_ERR, "Failed setting preprocessing parameters: %s", error->msg);
             goto end;
@@ -497,17 +489,21 @@ int main(int argc, char** argv) {
     }
 
 
-    syslog(LOG_INFO, "Setting up larod connection with chip %d and model %s", chip,
-           argv[2]);
-    if (!setupLarod(chip, larodModelFd, &conn, &model)) {
+    syslog(LOG_INFO, "Setting up larod connection with chip %s, model %s and label file %s", chipString, argv[2], argv[3]);
+    if (!setupLarod(chipString, larodModelFd, &conn, &model)) {
         goto end;
     }
 
-    larodChip ppChip = LAROD_CHIP_LIBYUV;
-    ppModel = larodLoadModel(conn, -1, ppChip, LAROD_ACCESS_PRIVATE, "", ppMap, &error);
+    // Use libyuv as image preprocessing backend
+    const char* larodLibyuvPP = "cpu-proc";
+    const larodDevice* dev_pp;
+    dev_pp = larodGetDevice(conn, larodLibyuvPP, 0, &error);
+    ppModel = larodLoadModel(conn, -1, dev_pp, LAROD_ACCESS_PRIVATE, "", ppMap, &error);
     if (!ppModel) {
-        syslog(LOG_ERR, "Unable to load preprocessing model with chip %d: %s", ppChip, error->msg);
-       goto end;
+            syslog(LOG_ERR, "Unable to load preprocessing model with chip %s: %s", larodLibyuvPP, error->msg);
+            goto end;
+    } else {
+           syslog(LOG_INFO, "Loading preprocessing model with chip %s", larodLibyuvPP);
     }
 
     // Create input/output tensors
@@ -698,7 +694,7 @@ int main(int argc, char** argv) {
         // This part of the code can be improved by using better pointer casting,
         // subject to future changes.
         int spacePerElement;
-        if (chip == 6) {
+        if (chipString == "ambarella-cvflow") {
             spacePerElement = 32;
             float score;
             for (size_t j = 0; j < outputBufferSize/spacePerElement; j++) {
@@ -792,8 +788,8 @@ end:
 
     larodDestroyJobRequest(&ppReq);
     larodDestroyJobRequest(&infReq);
-    larodDestroyTensors(&inputTensors, numInputs);
-    larodDestroyTensors(&outputTensors, numOutputs);
+    larodDestroyTensors(conn, &inputTensors, numInputs, &error);
+    larodDestroyTensors(conn, &outputTensors, numOutputs, &error);
     larodClearError(&error);
 
     if (labels) {
