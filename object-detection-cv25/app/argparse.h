@@ -36,7 +36,7 @@ typedef struct args_t {
     unsigned threshold;
     unsigned numLabels;
     unsigned numDetections;
-    larodChip chip;
+    char* chip;
     char* anchorsFile;
 } args_t;
 

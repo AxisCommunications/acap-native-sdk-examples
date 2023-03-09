@@ -62,13 +62,13 @@
 #include <unistd.h>
 
 #include "argparse.h"
-#include "imgconverter.h"
 #include "imgprovider.h"
 #include "imgutils.h"
 #include "larod.h"
 #include "vdo-frame.h"
 #include "vdo-types.h"
 #include "postprocessing.h"
+
 /**
  * @brief Free up resources held by an array of labels.
  *
@@ -78,6 +78,14 @@
 void freeLabels(char** labelsArray, char* labelFileBuffer) {
     free(labelsArray);
     free(labelFileBuffer);
+}
+
+static void padImageWidth(uint8_t* srcimage, uint8_t* dstimage, unsigned int width, unsigned int height, unsigned int padding){
+    for (size_t i = 0; i < height; i++){
+        for (size_t j = 0; j < width; j++){
+            dstimage[i*(width+padding) + j] = srcimage[i*width + j];
+        }
+    }
 }
 
 /**
@@ -243,6 +251,7 @@ void sigintHandler(int sig) {
     stopRunning = true;
 }
 
+
 /**
  * @brief Creates a temporary fd and truncated to correct size and mapped.
  *
@@ -254,7 +263,7 @@ void sigintHandler(int sig) {
  * @param Pointer to the generated fd.
  * @return Positive errno style return code (zero means success).
  */
-bool createAndMapTmpFile(char* fileName, size_t fileSize, void** mappedAddr,
+static bool createAndMapTmpFile(char* fileName, size_t fileSize, void** mappedAddr,
                          int* convFd) {
     syslog(LOG_INFO, "%s: Setting up a temp fd with pattern %s and size %zu", __func__,
             fileName, fileSize);
@@ -311,14 +320,14 @@ error:
  * connection. Then the model file specified by larodModelFd is loaded to the
  * chip, and a corresponding larodModel object is tied to model.
  *
- * @param larodChip Speficier for which larod chip to use.
+ * larodChip Speficier for which larod chip to use.
  * @param larodModelFd Fd for a model file to load.
  * @param larodConn Pointer to a larod connection to be opened.
  * @param model Pointer to a larodModel to be obtained.
  * @return false if error has occurred, otherwise true.
  */
-bool setupLarod(const larodChip larodChip, const int larodModelFd,
-                larodConnection** larodConn, larodModel** model) {
+static bool setupLarod(const char* chipString, const int larodModelFd,
+                       larodConnection** larodConn, larodModel** model) {
     larodError* error = NULL;
     larodConnection* conn = NULL;
     larodModel* loadedModel = NULL;
@@ -330,22 +339,21 @@ bool setupLarod(const larodChip larodChip, const int larodModelFd,
         goto end;
     }
 
-    // Set chip if user has specified non-default action.
-    if (larodChip != 0) {
-        if (!larodSetChip(conn, larodChip, &error)) {
-            syslog(LOG_ERR, "%s: Could not select chip %d: %s", __func__, larodChip,
-                     error->msg);
-            goto error;
+    // List available chip id:s
+    size_t numDevices = 0;
+    syslog(LOG_INFO, "Available chip IDs:");
+    const larodDevice** devices;
+    devices = larodListDevices(conn, &numDevices, &error);
+    for (size_t i = 0; i < numDevices; ++i) {
+            syslog(LOG_INFO, "%s: %s", "Chip", larodGetDeviceName(devices[i], &error));;
         }
-    }
-
-    loadedModel = larodLoadModel(conn, larodModelFd, LAROD_ACCESS_PRIVATE,
-                                 "object_detection", &error);
+    const larodDevice* dev = larodGetDevice(conn, chipString, 0, &error);
+    loadedModel = larodLoadModel(conn, larodModelFd, dev, LAROD_ACCESS_PRIVATE,
+                                 "object_detection", NULL, &error);
     if (!loadedModel) {
         syslog(LOG_ERR, "%s: Unable to load model: %s", __func__, error->msg);
         goto error;
     }
-
     *larodConn = conn;
     *model = loadedModel;
 
@@ -366,7 +374,7 @@ end:
     return ret;
 }
 
-//void get_tensor_information()
+
 /**
  * @brief Main function that starts a stream with different options.
  */
@@ -380,21 +388,33 @@ int main(int argc, char** argv) {
 
     // Name patterns for the temp file we will create.
     char CONV_INP_FILE_PATTERN[] = "/tmp/larod.in.test-XXXXXX";
+    char CONV_PP_FILE_PATTERN[] = "/tmp/larod.pp.test-XXXXXX";
     char CROP_FILE_PATTERN[] = "/tmp/crop.test-XXXXXX";
     char CONV_OUT1_FILE_PATTERN[] = "/tmp/larod.out1.test-XXXXXX";
     char CONV_OUT2_FILE_PATTERN[] = "/tmp/larod.out2.test-XXXXXX";
-
 
     bool ret = false;
     ImgProvider_t* provider = NULL;
     ImgProvider_t* provider_raw = NULL;
     larodError* error = NULL;
     larodConnection* conn = NULL;
+    larodMap* ppMap = NULL;
+    larodMap* cropMap = NULL;
+    larodModel* ppModel = NULL;
+    larodModel* model = NULL;
+    larodTensor** ppInputTensors = NULL;
+    size_t ppNumInputs = 0;
+    larodTensor** ppOutputTensors = NULL;
+    size_t ppNumOutputs = 0;
     larodTensor** inputTensors = NULL;
     size_t numInputs = 0;
     larodTensor** outputTensors = NULL;
     size_t numOutputs = 0;
-    larodInferenceRequest* infReq = NULL;
+    larodJobRequest* ppReq = NULL;
+    larodJobRequest* infReq = NULL;
+    void* ppInputAddr = MAP_FAILED;
+    size_t outputBufferSize = 0;
+    int ppInputFd = -1;
     void* larodInputAddr = MAP_FAILED;
     void* cropAddr = MAP_FAILED;
     void* larodOutput1Addr = MAP_FAILED;
@@ -411,47 +431,62 @@ int main(int argc, char** argv) {
     size_t numLabels = 0; // Number of entries in the labels array.
     char* labelFileData =
         NULL; // Buffer holding the complete collection of label strings.
-    args_t args;
 
     // Open the syslog to report messages for "object_detection"
     openlog("object_detection", LOG_PID|LOG_CONS, LOG_USER);
 
-    syslog(LOG_INFO, "Starting ...");
-
-    // Register an interrupt handler which tries to exit cleanly if invoked once
-    // but exits immediately if further invoked.
-    signal(SIGINT, sigintHandler);
-
+    args_t args;
     if (!parseArgs(argc, argv, &args)) {
         goto end;
     }
 
-    int numberOfDetections = args.numDetections; // number of detections
-    int numberOfClasses= args.numLabels; // number of classes
-    char* anchor_file = args.anchorsFile; // anchors file
+    const char* chipString = args.chip;
+    const char* modelFile = args.modelFile;
+    const char* labelsFile = args.labelsFile;
+    const int inputWidth = args.width;
+    const int inputHeight = args.height;
+    const int rawWidth = args.raw_width;
+    const int rawHeight = args.raw_height;
+    const int threshold = args.threshold;
+    const int quality = args.quality;
+    const int numberOfDetections = args.numDetections; // number of detections
+    const int numberOfClasses= args.numLabels; // number of classes
+    const char* anchorFile = args.anchorsFile;
+    const int padding = args.padding;
 
 
-    syslog(LOG_INFO, "args.width= %d, args.height=%d ",args.width, args.height);
+    syslog(LOG_INFO, "Starting %s", argv[0]);
+    // Register an interrupt handler which tries to exit cleanly if invoked once
+    // but exits immediately if further invoked.
+    signal(SIGINT, sigintHandler);
+
     unsigned int streamWidth = 0;
     unsigned int streamHeight = 0;
-    if (!chooseStreamResolution(args.width, args.height, &streamWidth,
+    if (!chooseStreamResolution(inputWidth, inputHeight, &streamWidth,
                                 &streamHeight)) {
         syslog(LOG_ERR, "%s: Failed choosing stream resolution", __func__);
         goto end;
     }
 
     syslog(LOG_INFO, "Creating VDO image provider and creating stream %d x %d",
-            streamWidth, streamHeight);
+           streamWidth, streamHeight);
     provider = createImgProvider(streamWidth, streamHeight, 2, VDO_FORMAT_YUV);
     if (!provider) {
-      syslog(LOG_ERR, "%s: Failed to create ImgProvider", __func__);
+      syslog(LOG_ERR, "%s: Could not create image provider", __func__);
         goto end;
     }
 
-    syslog(LOG_INFO, "args.raw_width=%d, args.raw_height=%d ", args.raw_width, args.raw_height);
+    syslog(LOG_INFO, "Creating VDO raw image provider and stream %d x %d",
+            rawWidth, rawHeight);
+    provider_raw = createImgProvider(rawWidth, rawHeight, 2, VDO_FORMAT_YUV);
+    if (!provider_raw) {
+      syslog(LOG_ERR, "%s: Could not create raw image provider", __func__);
+    }
+
+    syslog(LOG_INFO, "raw width=%d, raw height=%d ", rawWidth, rawHeight);
     unsigned int cropStreamWidth = 0;
     unsigned int cropStreamHeight = 0;
-    if (!chooseStreamResolution(args.raw_width, args.raw_height, &cropStreamWidth,
+    if (!chooseStreamResolution(rawWidth, rawHeight, &cropStreamWidth,
                                 &cropStreamHeight)) {
         syslog(LOG_ERR, "%s: Failed choosing crop stream resolution", __func__);
         goto end;
@@ -459,61 +494,168 @@ int main(int argc, char** argv) {
 
     syslog(LOG_INFO, "Creating VDO crop image provider and creating stream %d x %d",
             streamWidth, streamHeight);
-    provider_raw = createImgProvider(args.raw_width, args.raw_height, 2, VDO_FORMAT_YUV);
-    if (!provider_raw) {
-      syslog(LOG_ERR, "%s: Failed to create crop ImgProvider", __func__);
+    
+    // Calculate crop image
+    // 1. The crop area shall fill the input image either horizontally or
+    //    vertically.
+    // 2. The crop area shall have the same aspect ratio as the output image.
+    syslog(LOG_INFO, "Calculate crop image");
+    float destWHratio = (float) inputWidth / (float) inputHeight;
+    float cropW = (float) streamWidth;
+    float cropH = cropW / destWHratio;
+    if (cropH > (float) streamHeight) {
+        cropH = (float) streamHeight;
+        cropW = cropH * destWHratio;
+    }
+    unsigned int clipW = (unsigned int)cropW;
+    unsigned int clipH = (unsigned int)cropH;
+    unsigned int clipX = (streamWidth - clipW) / 2;
+    unsigned int clipY = (streamHeight - clipH) / 2;
+    syslog(LOG_INFO, "Crop VDO image X=%d Y=%d (%d x %d)", clipX, clipY, clipW, clipH);
+
+    // Create preprocessing maps
+    syslog(LOG_INFO, "Create preprocessing maps");
+    ppMap = larodCreateMap(&error);
+    if (!ppMap) {
+        syslog(LOG_ERR, "Could not create preprocessing larodMap %s", error->msg);
+        goto end;
+    }
+    if (!larodMapSetStr(ppMap, "image.input.format", "nv12", &error)) {
+        syslog(LOG_ERR, "Failed setting preprocessing parameters: %s", error->msg);
+        goto end;
+    }
+    if (!larodMapSetIntArr2(ppMap, "image.input.size", streamWidth, streamHeight, &error)) {
+        syslog(LOG_ERR, "Failed setting preprocessing parameters: %s", error->msg);
+        goto end;
+    }
+    if(chipString != "ambarella-cvflow"){
+        if (!larodMapSetStr(ppMap, "image.output.format", "rgb-interleaved", &error)) {
+            syslog(LOG_ERR, "Failed setting preprocessing parameters: %s", error->msg);
+            goto end;
+        }
+    } else {
+        if (!larodMapSetStr(ppMap, "image.output.format", "rgb-planar", &error)) {
+            syslog(LOG_ERR, "Failed setting preprocessing parameters: %s", error->msg);
+            goto end;
+        }
+    }
+    if (!larodMapSetIntArr2(ppMap, "image.output.size", inputWidth, inputHeight, &error)) {
+        syslog(LOG_ERR, "Failed setting preprocessing parameters: %s", error->msg);
+        goto end;
+    }
+    cropMap = larodCreateMap(&error);
+    if (!cropMap) {
+        syslog(LOG_ERR, "Could not create preprocessing crop larodMap %s", error->msg);
+        goto end;
+    }
+    if (!larodMapSetIntArr4(cropMap, "image.input.crop", clipX, clipY, clipW, clipH, &error)) {
+        syslog(LOG_ERR, "Failed setting preprocessing parameters: %s", error->msg);
         goto end;
     }
 
-    larodModelFd = open(args.modelFile, O_RDONLY);
+    // Create larod models
+    syslog(LOG_INFO, "Create larod models");
+    larodModelFd = open(modelFile, O_RDONLY);
     if (larodModelFd < 0) {
-        syslog(LOG_ERR, "Unable to open model file %s: %s", args.modelFile,
-                 strerror(errno));
+        syslog(LOG_ERR, "Unable to open model file %s: %s", modelFile,
+               strerror(errno));
         goto end;
     }
 
-    syslog(LOG_INFO, "Setting up larod connection with chip %d and model %s", args.chip,
-            args.modelFile);
-    larodModel* model = NULL;
-    if (!setupLarod(args.chip, larodModelFd, &conn, &model)) {
+
+    syslog(LOG_INFO, "Setting up larod connection with chip %s, model %s and label file %s", chipString, modelFile, labelsFile);
+    if (!setupLarod(chipString, larodModelFd, &conn, &model)) {
         goto end;
     }
 
+    // Use libyuv as image preprocessing backend
+    const char* larodLibyuvPP = "cpu-proc";
+    const larodDevice* dev_pp;
+    dev_pp = larodGetDevice(conn, larodLibyuvPP, 0, &error);
+    ppModel = larodLoadModel(conn, -1, dev_pp, LAROD_ACCESS_PRIVATE, "", ppMap, &error);
+    if (!ppModel) {
+            syslog(LOG_ERR, "Unable to load preprocessing model with chip %s: %s", larodLibyuvPP, error->msg);
+            goto end;
+    } else {
+           syslog(LOG_INFO, "Loading preprocessing model with chip %s", larodLibyuvPP);
+    }
     syslog(LOG_INFO, "Creating temporary files and memmaps for inference input and "
             "output tensors");
 
+    // Create input/output tensors
+    syslog(LOG_INFO, "Create input/output tensors");
+    ppInputTensors = larodCreateModelInputs(ppModel, &ppNumInputs, &error);
+    if (!ppInputTensors) {
+        syslog(LOG_ERR, "Failed retrieving input tensors: %s", error->msg);
+        goto end;
+    }
+    ppOutputTensors = larodCreateModelOutputs(ppModel, &ppNumOutputs, &error);
+    if (!ppOutputTensors) {
+        syslog(LOG_ERR, "Failed retrieving output tensors: %s", error->msg);
+        goto end;
+    }
+    inputTensors = larodCreateModelInputs(model, &numInputs, &error);
+    if (!inputTensors) {
+        syslog(LOG_ERR, "Failed retrieving input tensors: %s", error->msg);
+        goto end;
+    }
+
+    outputTensors = larodCreateModelOutputs(model, &numOutputs, &error);
+    if (!outputTensors) {
+        syslog(LOG_ERR, "Failed retrieving output tensors: %s", error->msg);
+        goto end;
+    }
+
+
+
+    // Determine tensor buffer sizes
+    syslog(LOG_INFO, "Determine tensor buffer sizes");
+    const larodTensorPitches* ppInputPitches = larodGetTensorPitches(ppInputTensors[0], &error);
+    if (!ppInputPitches) {
+        syslog(LOG_ERR, "Could not get pitches of tensor: %s", error->msg);
+        goto end;
+    }
+    size_t yuyvBufferSize = ppInputPitches->pitches[0];
+    const larodTensorPitches* outputPitches = larodGetTensorPitches(outputTensors[0], &error);
+    if (!outputPitches) {
+        syslog(LOG_ERR, "Could not get pitches of tensor: %s", error->msg);
+        goto end;
+    }
+    outputBufferSize = outputPitches->pitches[0];
 
     // Allocate space for input tensor
+    syslog(LOG_INFO, "Allocate memory for input/output buffers");
     if (!createAndMapTmpFile(CONV_INP_FILE_PATTERN,
-                             (args.width+args.padding) * args.height * CHANNELS,
+                             (inputWidth + padding) * inputHeight * CHANNELS,
                              &larodInputAddr, &larodInputFd)) {
         goto end;
     }
-
-    // Allocate space to save a high resolution frame for crop
+    if (!createAndMapTmpFile(CONV_PP_FILE_PATTERN, yuyvBufferSize,
+                             &ppInputAddr, &ppInputFd)) {
+        goto end;
+    }
     if (!createAndMapTmpFile(CROP_FILE_PATTERN,
-                             args.raw_width * args.raw_height * CHANNELS,
+                             rawWidth * rawHeight * CHANNELS,
                              &cropAddr, &cropFd)) {
         goto end;
     }
-
-    // Allocate space for output tensor 1 (Locations)
     if (!createAndMapTmpFile(CONV_OUT1_FILE_PATTERN, TENSOR1SIZE,
                              &larodOutput1Addr, &larodOutput1Fd)) {
         goto end;
     }
-
-    // Allocate space for output tensor 2 (Classes)
     if (!createAndMapTmpFile(CONV_OUT2_FILE_PATTERN, TENSOR2SIZE,
                              &larodOutput2Addr, &larodOutput2Fd)) {
         goto end;
     }
 
-
-    syslog(LOG_INFO, "Create input tensors");
-    inputTensors = larodCreateModelInputs(model, &numInputs, &error);
-    if (!inputTensors) {
-        syslog(LOG_ERR, "Failed retrieving input tensors: %s", error->msg);
+    // Connect tensors to file descriptors
+    syslog(LOG_INFO, "Connect tensors to file descriptors");
+    if (!larodSetTensorFd(ppInputTensors[0], ppInputFd, &error)) {
+        syslog(LOG_ERR, "Failed setting input tensor fd: %s", error->msg);
+        goto end;
+    }
+    if (!larodSetTensorFd(ppOutputTensors[0], larodInputFd, &error)) {
+        syslog(LOG_ERR, "Failed setting input tensor fd: %s", error->msg);
         goto end;
     }
 
@@ -522,14 +664,6 @@ int main(int argc, char** argv) {
         syslog(LOG_ERR, "Failed setting input tensor fd: %s", error->msg);
         goto end;
     }
-
-    syslog(LOG_INFO, "Create output tensors");
-    outputTensors = larodCreateModelOutputs(model, &numOutputs, &error);
-    if (!outputTensors) {
-        syslog(LOG_ERR, "Failed retrieving output tensors: %s", error->msg);
-        goto end;
-    }
-
 
     syslog(LOG_INFO, "Set output tensors");
     if (!larodSetTensorFd(outputTensors[0], larodOutput1Fd, &error)) {
@@ -542,15 +676,25 @@ int main(int argc, char** argv) {
         goto end;
     }
 
-    infReq = larodCreateInferenceRequest(model, inputTensors, numInputs, outputTensors,
-                                         numOutputs, &error);
+    // Create job requests
+    syslog(LOG_INFO, "Create job requests");
+    ppReq = larodCreateJobRequest(ppModel, ppInputTensors, ppNumInputs,
+        ppOutputTensors, ppNumOutputs, cropMap, &error);
+    if (!ppReq) {
+        syslog(LOG_ERR, "Failed creating preprocessing job request: %s", error->msg);
+        goto end;
+    }
+
+    // App supports only one input/output tensor.
+    infReq = larodCreateJobRequest(model, inputTensors, numInputs, outputTensors,
+                                         numOutputs, NULL, &error);
     if (!infReq) {
         syslog(LOG_ERR, "Failed creating inference request: %s", error->msg);
         goto end;
     }
 
-    if (args.labelsFile) {
-        if (!parseLabels(&labels, &labelFileData, args.labelsFile,
+    if (labelsFile) {
+        if (!parseLabels(&labels, &labelFileData, labelsFile,
                          &numLabels)) {
             syslog(LOG_ERR, "Failed creating parsing labels file");
             goto end;
@@ -560,16 +704,18 @@ int main(int argc, char** argv) {
     syslog(LOG_INFO, "Found %d input tensors and %d output tensors",(int) numInputs, (int) numOutputs);
     syslog(LOG_INFO, "Start fetching video frames from VDO");
     if (!startFrameFetch(provider)) {
+        syslog(LOG_ERR, "Stuck in provider");
         goto end;
     }
 
     if (!startFrameFetch(provider_raw)) {
+        syslog(LOG_ERR, "Stuck in provider raw");
         goto end;
     }
 
     // This contains the box coordinates and class scores for each detected object.
     boxes = (box*)malloc(sizeof(box) * numberOfDetections);
-    rgb_image = (uint8_t*)calloc(sizeof(uint8_t), args.width * args.height * CHANNELS);
+    rgb_image = (uint8_t*)calloc(sizeof(uint8_t), inputWidth * inputHeight * CHANNELS);
 
     while (true) {
         struct timeval startTs, endTs;
@@ -578,11 +724,13 @@ int main(int argc, char** argv) {
         // Get latest frame from image pipeline.
         VdoBuffer* buf = getLastFrameBlocking(provider);
         if (!buf) {
+            syslog(LOG_ERR, "buf empty in provider");
             goto end;
         }
 
         VdoBuffer* buf_hq = getLastFrameBlocking(provider_raw);
         if (!buf_hq) {
+            syslog(LOG_ERR, "buf empty in provider raw");
             goto end;
         }
 
@@ -593,18 +741,13 @@ int main(int argc, char** argv) {
         // Covert image data from NV12 format to interleaved uint8_t RGB format.
         gettimeofday(&startTs, NULL);
 
-
-
-        if (!convertCropScaleU8yuvToRGB(nv12Data, streamWidth, streamHeight,
-                                        (uint8_t*) rgb_image, args.width,
-                                        args.height,"RGB-planar")) {
-            syslog(LOG_ERR, "%s: Failed img scale/convert in "
-                     "convertCropScaleU8yuvToRGB() (continue anyway)",
-                     __func__);
+        memcpy(ppInputAddr, nv12Data, yuyvBufferSize);
+        if (!larodRunJob(conn, ppReq, &error)) {
+            syslog(LOG_ERR, "Unable to run job to preprocess model: %s (%d)",
+                   error->msg, error->code);
+            goto end;
         }
-        padImageWidth(rgb_image, larodInputAddr, args.width, args.height, args.padding);
-
-        convertU8yuvToRGBlibYuv(args.raw_width, args.raw_height, nv12Data_hq, (uint8_t*) cropAddr);
+        padImageWidth(rgb_image, larodInputAddr, inputWidth, inputHeight, padding);
 
         gettimeofday(&endTs, NULL);
 
@@ -613,11 +756,10 @@ int main(int argc, char** argv) {
         syslog(LOG_INFO, "Converted image in %u ms", elapsedMs);
 
         // Since larodOutputAddr points to the beginning of the fd we should
-        // rewind the file position before each inference.
+        // rewind the file position before each job.
         if (lseek(larodOutput1Fd, 0, SEEK_SET) == -1) {
             syslog(LOG_ERR, "Unable to rewind output file position: %s",
-                     strerror(errno));
-
+                   strerror(errno));
             goto end;
         }
 
@@ -629,9 +771,9 @@ int main(int argc, char** argv) {
         }
 
         gettimeofday(&startTs, NULL);
-        if (!larodRunInference(conn, infReq, &error)) {
+        if (!larodRunJob(conn, infReq, &error)) {
             syslog(LOG_ERR, "Unable to run inference on model %s: %s (%d)",
-                     args.modelFile, error->msg, error->code);
+                   labelsFile, error->msg, error->code);
             goto end;
         }
         gettimeofday(&endTs, NULL);
@@ -647,7 +789,7 @@ int main(int argc, char** argv) {
         // hyperparameters depend on the model used. For the model used in this example
         // the values come from the config file used to train the model.
         // https://github.com/tensorflow/models/blob/master/research/object_detection/samples/configs/ssd_mobilenet_v2_coco.config#L11
-        int confidenceThreshold = args.threshold/100.0;
+        int confidenceThreshold = threshold/100.0;
         int iouThreshold = 0.5;
         int yScale = 10;
         int xScale = 10;
@@ -656,7 +798,7 @@ int main(int argc, char** argv) {
 
         gettimeofday(&startTs, NULL);
         // postprocessing the output of the network. This will fill the boxes array.
-        postProcessing(locations,classes,numberOfDetections,anchor_file,numberOfClasses,confidenceThreshold,iouThreshold,yScale,xScale,hScale,wScale,boxes);
+        postProcessing(locations,classes,numberOfDetections,anchorFile,numberOfClasses,confidenceThreshold,iouThreshold,yScale,xScale,hScale,wScale,boxes);
         gettimeofday(&endTs, NULL);
 
         elapsedMs = (unsigned int) (((endTs.tv_sec - startTs.tv_sec) * 1000) +
@@ -670,31 +812,29 @@ int main(int argc, char** argv) {
             float bottom = boxes[i].y_max;
             float right = boxes[i].x_max;
 
-            unsigned int crop_x = left * args.raw_width + (args.raw_width- args.raw_height)/2;
-            unsigned int crop_y = top * args.raw_height;
-            unsigned int crop_w = (right - left) * args.raw_width;
-            unsigned int crop_h = (bottom - top) * args.raw_height;
+            unsigned int crop_x = left * rawWidth + (rawWidth- rawHeight)/2;
+            unsigned int crop_y = top * rawHeight;
+            unsigned int crop_w = (right - left) * rawWidth;
+            unsigned int crop_h = (bottom - top) * rawHeight;
 
-            if (boxes[i].score >= args.threshold/100.0 && boxes[i].label != 0) {
+            if (boxes[i].score >= threshold/100.0 && boxes[i].label != 0) {
                 syslog(LOG_INFO, "Object %d: Classes: %s - Scores: %f - Locations: [%f,%f,%f,%f]",
                     i, labels[boxes[i].label-1], boxes[i].score, top, left, bottom, right);
 
-                unsigned char* crop_buffer = crop_interleaved(cropAddr, args.raw_width, args.raw_height, CHANNELS,
+                unsigned char* crop_buffer = crop_interleaved(cropAddr, rawWidth, rawHeight, CHANNELS,
                                                                 crop_x, crop_y, crop_w, crop_h);
 
                 unsigned long jpeg_size = 0;
                 unsigned char* jpeg_buffer = NULL;
                 struct jpeg_compress_struct jpeg_conf;
-                set_jpeg_configuration(crop_w, crop_h, CHANNELS, args.quality, &jpeg_conf);
+                set_jpeg_configuration(crop_w, crop_h, CHANNELS, quality, &jpeg_conf);
                 buffer_to_jpeg(crop_buffer, &jpeg_conf, &jpeg_size, &jpeg_buffer);
                 char file_name[32];
                 snprintf(file_name, sizeof(char) * 32, "/tmp/detection_%i.jpg", i);
                 jpeg_to_file(file_name, jpeg_buffer, jpeg_size);
                 free(crop_buffer);
                 free(jpeg_buffer);
-
             }
-
 
         }
 
@@ -714,12 +854,15 @@ end:
     if (provider) {
         destroyImgProvider(provider);
     }
-        if (provider_raw) {
+    if (provider_raw) {
         destroyImgProvider(provider_raw);
     }
     // Only the model handle is released here. We count on larod service to
     // release the privately loaded model when the session is disconnected in
     // larodDisconnect().
+    larodDestroyMap(&ppMap);
+    larodDestroyMap(&cropMap);
+    larodDestroyModel(&ppModel);
     larodDestroyModel(&model);
     if (conn) {
         larodDisconnect(&conn, NULL);
@@ -728,13 +871,19 @@ end:
         close(larodModelFd);
     }
     if (larodInputAddr != MAP_FAILED) {
-        munmap(larodInputAddr, args.width * args.height * CHANNELS);
+        munmap(larodInputAddr, inputWidth * inputHeight * CHANNELS);
     }
     if (larodInputFd >= 0) {
         close(larodInputFd);
     }
-     if (cropAddr != MAP_FAILED) {
-        munmap(cropAddr, args.raw_width * args.raw_height * CHANNELS);
+    if (ppInputAddr != MAP_FAILED) {
+        munmap(ppInputAddr, inputWidth * inputHeight * CHANNELS);
+    }
+    if (ppInputFd >= 0) {
+        close(ppInputFd);
+    }
+    if (cropAddr != MAP_FAILED) {
+        munmap(cropAddr, rawWidth * rawHeight * CHANNELS);
     }
     if (cropFd >= 0) {
         close(cropFd);
@@ -756,9 +905,10 @@ end:
     }
 
 
-    larodDestroyInferenceRequest(&infReq);
-    larodDestroyTensors(&inputTensors, numInputs);
-    larodDestroyTensors(&outputTensors, numOutputs);
+    larodDestroyJobRequest(&ppReq);
+    larodDestroyJobRequest(&infReq);
+    larodDestroyTensors(conn, &inputTensors, numInputs, &error);
+    larodDestroyTensors(conn, &outputTensors, numOutputs, &error);
     larodClearError(&error);
 
     if (labels) {
@@ -771,8 +921,6 @@ end:
         free(rgb_image);
     }
 
-    // Close application logging to syslog
-    closelog();
-
+    syslog(LOG_INFO, "Exit %s", argv[0]);
     return ret ? EXIT_SUCCESS : EXIT_FAILURE;
 }

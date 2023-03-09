@@ -108,24 +108,24 @@ createAndMapTmpFile(CROP_FILE_PATTERN, args.raw_width * args.raw_height * CHANNE
 The `larodCreateModelInputs` and `larodCreateModelOutputs` methods map the input and output tensors with the model.
 
 ```c
-size_t numInputs = 0;
-size_t numOutputs = 0;
-inputTensors = larodCreateModelInputs(model, &numInputs, &error);
-outputTensors = larodCreateModelOutputs(model, &numOutputs, &error);
+size_t ppInputs = 0;
+size_t ppOutputs = 0;
+ppInputTensors = larodCreateModelInputs(ppModel, &ppInputs, &error);
+ppOutputTensors = larodCreateModelOutputs(ppModel, &ppOutputs, &error);
 ```
 
 The `larodSetTensorFd` method then maps each tensor to the corresponding file descriptor to allow IO.
 
 ```c
-larodSetTensorFd(inputTensors[0], larodInputFd, &error);
-larodSetTensorFd(outputTensors[0], larodOutput1Fd, &error);
-larodSetTensorFd(outputTensors[1], larodOutput2Fd, &error);
+larodSetTensorFd(ppInputTensors[0], larodInputFd, &error);
+larodSetTensorFd(ppOutputTensors[0], larodOutput1Fd, &error);
+larodSetTensorFd(ppOutputTensors[1], larodOutput2Fd, &error);
 ```
 
-Finally, the `larodCreateInferenceRequest` method creates an inference request to use the model.
+Finally, the `larodCreateJobRequest` method creates an inference request to use the model.
 
 ```c
-infReq = larodCreateInferenceRequest(model, inputTensors, numInputs, outputTensors, numOutputs, &error);
+infReq = larodCreateJobRequest(ppModel, ppInputTensors, ppNumInputs, ppOutputTensors, ppNumOutputs, cropMap, &error);
 ```
 
 #### Fetching a frame and performing inference
@@ -138,25 +138,22 @@ uint8_t* nv12Data = (uint8_t*) vdo_buffer_get_data(buf);
 ```
 
 Axis cameras output images on the NV12 YUV format. As this is not normally used as input format to deep learning models,
-conversion to e.g., RGB might be needed. This can be done using ```libyuv```. However, if performance is a primary objective, training the model to use the YUV format directly should be considered, as each frame conversion takes a few milliseconds.  To convert the NV12 stream to RGB, the `convertCropScaleU8yuvToRGB` from `imgconverter` is used, which in turn uses the `libyuv` library.
+conversion to e.g., RGB might be needed. This is done by creating a pre-processing job request `ppReq` using the function `larodCreateJobRequest`.
 
 ```c
-convertCropScaleU8yuvToRGB(nv12Data, streamWidth, streamHeight, (uint8_t*) larodInputAddr, args.width, args.height);
+ppReq = larodCreateJobRequest(ppModel, ppInputTensors, ppNumInputs, ppOutputTensors, ppNumOutputs, cropMap, &error);
 ```
 
-In terms of the frame used to crop the detected objects, there is no need to scale, so `convertU8yuvToRGBlibYuv` method is used.
+The image data is then converted from NV12 format to interleaved uint8_t RGB format by running the `larodRunJob` function on the above defined pre-processing job request `ppReq`.
 
 ```c
-VdoBuffer* buf_hq = getLastFrameBlocking(provider_raw);
-uint8_t* nv12Data_hq = (uint8_t*) vdo_buffer_get_data(buf_hq);
-
-convertU8yuvToRGBlibYuv(args.raw_width, args.raw_height, nv12Data_hq, (uint8_t*) cropAddr);
+larodRunJob(conn, ppReq, &error)
 ```
 
-By using the `larodRunInference` method, the predictions from the MobileNet are saved into the specified addresses.
+By using the `larodRunJob` function on `infReq`, the predictions from the MobileNet are saved into the specified addresses.
 
 ```c
-larodRunInference(conn, infReq, &error);
+larodRunJob(conn, infReq, &error);
 ```
 
 There are four outputs from the Object Detection model, and each object's location are described in the form of \[top, left, bottom, right\].
@@ -228,6 +225,17 @@ the following command:
 ```sh
 tail -f /var/volatile/log/info.log | grep object_detection
 ```
+
+Depending on selected chip, different output is received. The label file is used for identifying objects.
+
+In the system log the chip is sometimes only mentioned as a string, they are mapped as follows:
+
+| Chips | Larod 1 (int) | Larod 3 (string) |
+|-------|--------------|------------------|
+| CPU with TensorFlow Lite | 2 | cpu-tflite |
+| Google TPU | 4 | google-edge-tpu-tflite |
+| Ambarella CVFlow (NN) | 6 | ambarella-cvflow |
+| ARTPEC-8 DLPU | 12 | axis-a8-dlpu-tflite |
 
 There are four outputs from MobileNet SSD v2 (COCO) model. The number of detections, cLasses, scores, and locations are shown as below. The four location numbers stand for [top, left, bottom, right]. By the way, currently the saved images will be overwritten continuously, so those saved images might not all from the detections of the last frame, if the number of detections is less than previous detection numbers.
 

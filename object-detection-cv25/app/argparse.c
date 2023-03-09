@@ -54,7 +54,7 @@ const struct argp argp = {
     "is the path of a txt where labes names are saved, containing NUMLABELS classes "
     "NUMDETECTIONS is the number of detections produced by the network "
     "and ANCHORSFILE is the path of a bin file where the anchors are stored. "
-    "\n\nExample call: "   
+    "\n\nExample call: "
     "\n/usr/local/packages/object_detection/model/converted_model.bin 300 "
     "300 20 80 1920 1080 70 /usr/local/packages/object_detection/label/labels.txt "
     "91 1917 /usr/local/packages/object_detection/model/anchor_boxes.bin -c 6 "
@@ -76,12 +76,7 @@ int parseOpt(int key, char* arg, struct argp_state* state) {
 
     switch (key) {
     case 'c': {
-        unsigned long long chip;
-        int ret = parsePosInt(arg, &chip, INT_MAX);
-        if (ret) {
-            argp_failure(state, EXIT_FAILURE, ret, "invalid chip type");
-        }
-        args->chip = (larodChip) chip;
+        args->chip = arg;
         break;
     }
     case 'h':
@@ -172,7 +167,7 @@ int parseOpt(int key, char* arg, struct argp_state* state) {
         args->raw_width = 0;
         args->raw_height = 0;
         args->threshold = 0;
-        args->chip = 0;
+        args->chip = NULL;
         args->modelFile = NULL;
         args->labelsFile = NULL;
         args->anchorsFile = NULL;
