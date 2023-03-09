@@ -19,7 +19,6 @@
  */
 
 #include "argparse.h"
-
 #include <argp.h>
 #include <stdlib.h>
 
@@ -70,12 +69,7 @@ int parseOpt(int key, char* arg, struct argp_state* state) {
 
     switch (key) {
     case 'c': {
-        unsigned long long chip;
-        int ret = parsePosInt(arg, &chip, INT_MAX);
-        if (ret) {
-            argp_failure(state, EXIT_FAILURE, ret, "invalid chip type");
-        }
-        args->chip = (larodChip) chip;
+        args->chip = arg;
         break;
     }
     case 'h':
@@ -142,7 +136,7 @@ int parseOpt(int key, char* arg, struct argp_state* state) {
         args->raw_width = 0;
         args->raw_height = 0;
         args->threshold = 0;
-        args->chip = 0;
+        args->chip = NULL;
         args->modelFile = NULL;
         args->labelsFile = NULL;
         break;
