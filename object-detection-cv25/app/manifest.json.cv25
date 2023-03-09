@@ -10,7 +10,7 @@
                 "group": "sdk",
                 "username": "sdk"
             },
-            "runOptions": "/usr/local/packages/object_detection/model/converted_model.bin 300 300 20 80 640 360 70 /usr/local/packages/object_detection/label/labels.txt 91 1917 /usr/local/packages/object_detection/model/anchor_boxes.bin -c 6",
+            "runOptions": "/usr/local/packages/object_detection/model/converted_model.bin 300 300 20 80 640 360 70 /usr/local/packages/object_detection/label/labels.txt 91 1917 /usr/local/packages/object_detection/model/anchor_boxes.bin -c ambarella-cvflow",
             "vendorUrl": "https://www.axis.com",
             "runMode": "never",
             "version": "1.0.0"
