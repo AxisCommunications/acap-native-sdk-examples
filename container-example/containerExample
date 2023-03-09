@@ -12,10 +12,10 @@ cd -P -- "$(dirname -- "$0")" || {
 }
 
 # Trap SIGINT and SIGTERM
-trap 'stop_containers' 2 15
+trap stop_containers INT TERM
 
 docker compose --env-file "./env.config" up
 
 while true; do
-  sleep 1
+  sleep 604800
 done
