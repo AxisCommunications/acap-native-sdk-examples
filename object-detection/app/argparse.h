@@ -33,7 +33,7 @@ typedef struct args_t {
     unsigned raw_width;
     unsigned raw_height;
     unsigned threshold;
-    larodChip chip;
+    char* chip;
 } args_t;
 
 bool parseArgs(int argc, char** argv, args_t* args);

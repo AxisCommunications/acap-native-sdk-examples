@@ -10,7 +10,7 @@
                 "group": "sdk",
                 "username": "sdk"
             },
-            "runOptions": "/usr/local/packages/object_detection/model/converted_model.tflite 300 300 80 1920 1080 50 /usr/local/packages/object_detection/label/labels.txt -c 4",
+            "runOptions": "/usr/local/packages/object_detection/model/converted_model.tflite 300 300 80 1920 1080 50 /usr/local/packages/object_detection/label/labels.txt -c google-edge-tpu-tflite",
             "vendorUrl": "https://www.axis.com",
             "runMode": "never",
             "version": "1.0.0"
