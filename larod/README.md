@@ -2,7 +2,7 @@
 
 # A larod based ACAP application running inference on an edge device
 
-This README file explains how to build an ACAP application that uses the [larod API](../FAQs.md#WhatisLarod?). It is achieved by using the containerized API and toolchain images.
+This README file explains how to build an ACAP application that uses the [Machine learning API (Larod)](https://axiscommunications.github.io/acap-documentation/docs/api/native-sdk-api.html#machine-learning-api-larod). It is achieved by using the containerized API and toolchain images.
 
 Together with this README file, you should be able to find a directory called app. That directory contains the "larod_simple_app" application source code which can easily
 be compiled and run with the help of the tools and step by step below.
@@ -50,9 +50,9 @@ Standing in your working directory run the following commands:
 > **Note**
 >
 > Depending on the network you are connected to, you may need to add proxy settings.
-The file that needs those settings is:* ~/.docker/config.json. *For
-reference please see: <https://docs.docker.com/network/proxy/> and a
-[script for Axis device here](../FAQs.md#HowcanIset-upnetworkproxysettingsontheAxisdevice?).*
+> The file that needs these settings is: `~/.docker/config.json`. For reference please see
+> https://docs.docker.com/network/proxy and a
+> [script for Axis devices](https://axiscommunications.github.io/acap-documentation/docs/develop/build-install-run.html#configure-network-proxy-settings) in the ACAP documentation.
 
 ```sh
 docker build --tag <APP_IMAGE> .

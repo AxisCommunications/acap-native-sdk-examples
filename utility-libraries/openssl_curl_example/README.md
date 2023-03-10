@@ -97,12 +97,12 @@ the application on a device.
 
 ### Build the application
 
-> **IMPORTANT**
-> Depending on the network you are connected to, you may need to add proxy
-> settings. The file that needs those settings is ~/.docker/config.json.  For
-> reference go to https://docs.docker.com/network/proxy/ and a [script for
-> Axis device
-> here](../../FAQs.md#how-can-i-set-up-network-proxy-settings-on-the-axis-device).
+> **Note**
+>
+> Depending on the network you are connected to, you may need to add proxy settings.
+> The file that needs these settings is: `~/.docker/config.json`. For reference please see
+> https://docs.docker.com/network/proxy and a
+> [script for Axis devices](https://axiscommunications.github.io/acap-documentation/docs/develop/build-install-run.html#configure-network-proxy-settings) in the ACAP documentation.
 
 Standing in your working directory run:
 
@@ -198,10 +198,10 @@ HTTPS content of https://www.example.com and stores the content in
 `/usr/local/packages/openssl_curl_example/localdata/www.example.com.txt` on the
 device.
 
-> **IMPORTANT**
-> Make sure [SSH is
-> enabled](../../FAQs.md#how-can-i-enable-ssh-on-an-axis-device) on the device
-> to run the following commands.
+> **Note**
+> Make sure
+> [SSH is enabled](https://axiscommunications.github.io/acap-documentation/docs/get-started/set-up-developer-environment/set-up-device.html#access-the-device-through-ssh)
+> on the device to run the following commands.
 
 Compare the web page source code to the content of file `www.example.com.txt`.
 
@@ -223,10 +223,10 @@ http://<AXIS_DEVICE_IP>/axis-cgi/admin/systemlog.cgi?appname=openssl_curl_exampl
 or by clicking the "**App log**" link in the device's web interface, or by
 extracting the logs using the following commands in the terminal.
 
-> **IMPORTANT**
-> Make sure [SSH is
-> enabled](../../FAQs.md#how-can-i-enable-ssh-on-an-axis-device) on the device
-> to run the following commands.
+> **Note**
+> Make sure
+> [SSH is enabled](https://axiscommunications.github.io/acap-documentation/docs/get-started/set-up-developer-environment/set-up-device.html#access-the-device-through-ssh)
+> on the device to run the following commands.
 
 ```sh
 ssh root@<AXIS_DEVICE_IP>
@@ -332,10 +332,10 @@ objdump -p openssl_curl_example | grep -E "NEEDED|RUNPATH|RPATH"
   RUNPATH              $ORIGIN/lib
 ```
 
-> **IMPORTANT**
-> Make sure [SSH is
-> enabled](../../FAQs.md#how-can-i-enable-ssh-on-an-axis-device) on the device
-> to run the following commands.
+> **Note**
+> Make sure
+> [SSH is enabled](https://axiscommunications.github.io/acap-documentation/docs/get-started/set-up-developer-environment/set-up-device.html#access-the-device-through-ssh)
+> on the device to run the following commands.
 
 For even better information on where the application binary will search for
 dependencies, SSH in to the device, and check the installed application binary
