@@ -4,9 +4,9 @@
 
 This README file explains how to build an ACAP application that uses:
 
-- vdo to fetch frames from e.g. a camera
+- the [Video capture API (VDO)](https://axiscommunications.github.io/acap-documentation/docs/api/native-sdk-api.html#video-capture-api-vdo) to fetch frames from e.g. a camera
 - a library called libyuv to do image preprocessing
-- [larod API](../FAQs.md#WhatisLarod?) to load a graph model and run classification inferences on it
+- the [Machine learning API (Larod)](https://axiscommunications.github.io/acap-documentation/docs/api/native-sdk-api.html#machine-learning-api-larod) to load a graph model and run classification inferences on it
 
 It is achieved by using the containerized API and toolchain images.
 
@@ -91,9 +91,9 @@ Below is the step by step instructions on how to execute the program. So basical
 > **Note**
 >
 > Depending on the network you are connected to, you may need to add proxy settings.
-The file that needs those settings is:* ~/.docker/config.json. *For
-reference please see: <https://docs.docker.com/network/proxy/> and a
-[script for Axis device here](../FAQs.md#HowcanIset-upnetworkproxysettingsontheAxisdevice?).*
+> The file that needs these settings is: `~/.docker/config.json`. For reference please see
+> https://docs.docker.com/network/proxy and a
+> [script for Axis devices](https://axiscommunications.github.io/acap-documentation/docs/develop/build-install-run.html#configure-network-proxy-settings) in the ACAP documentation.
 
 Depending on selected chip, different models can be used for running larod.
 Label file is used for identifying objects in the video stream. In this

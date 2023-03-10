@@ -27,12 +27,12 @@ building-opencv
 
 ### Quick start
 
-> **IMPORTANT**
-> Depending on the network you are connected to, you may need to add proxy
-> settings. The file that needs those settings is ~/.docker/config.json.  For
-> reference go to https://docs.docker.com/network/proxy/ and a [script for
-> Axis device
-> here](../../FAQs.md#how-can-i-set-up-network-proxy-settings-on-the-axis-device).
+> **Note**
+>
+> Depending on the network you are connected to, you may need to add proxy settings.
+> The file that needs these settings is: `~/.docker/config.json`. For reference please see
+> https://docs.docker.com/network/proxy and a
+> [script for Axis devices](https://axiscommunications.github.io/acap-documentation/docs/develop/build-install-run.html#configure-network-proxy-settings) in the ACAP documentation.
 
 1. Standing in your working directory run the following commands:
 
