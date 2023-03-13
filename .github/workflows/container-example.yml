@@ -1,5 +1,6 @@
 name: Build container-example application
 on:
+  workflow_dispatch:
   push:
     paths:
       - 'container-example/**'

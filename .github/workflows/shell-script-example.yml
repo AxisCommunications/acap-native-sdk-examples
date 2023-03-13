@@ -1,5 +1,6 @@
 name: Build shell-script-example application
 on:
+  workflow_dispatch:
   push:
     paths:
       - 'shell-script-example/**'
