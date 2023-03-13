@@ -6,7 +6,7 @@ LDLIBS += $(shell PKG_CONFIG_PATH=$(PKG_CONFIG_PATH) pkg-config \
 CFLAGS += -Wall -Wextra
 
 # This example is based on larod version 1
-CFLAGS += -DLAROD_API_VERSION_1
+CFLAGS += -DLAROD_API_VERSION_3
 
 .PHONY: all
 all: larod_simple_app

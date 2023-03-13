@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2018-2021, Axis Communications AB, Lund, Sweden
+ * Copyright (C) 2018, Axis Communications AB, Lund, Sweden
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,186 +47,119 @@
  */
 
 #include <errno.h>
-#include <inttypes.h>
-#include <libgen.h>
-#include <limits.h>
+#include <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
+#include <sys/types.h>
 #include <syslog.h>
+#include <unistd.h>
 
 #include "larod.h"
 
 /**
- * brief Deletes a model from larod.
+ * brief Sets up and configures a connection to larod, and loads a model.
  *
- * So that the model can no longer be used by calls to larod.
+ * Opens a connection to larod, which is tied to larodConn. After opening a
+ * larod connection the chip specified by larodChip is set for the
+ * connection. Then the model file specified by larodModelFd is loaded to the
+ * chip, and a corresponding larodModel object is tied to model.
  *
- * param conn An initialized larod connection handle.
- * param model A pointer to a larod model.
- * return False if any errors occur, otherwise true.
+ * param larodChip Specifier for which larod chip to use.
+ * param larodModelFd Fd for a model file to load.
+ * param larodConn Pointer to a larod connection to be opened.
+ * param model Pointer to a larodModel to be obtained.
+ * return False if error has occurred, otherwise true.
  */
-bool deleteModel(larodConnection* conn, larodModel* model);
+static bool setupLarod(const char* chipString, const int larodModelFd,
+                       larodConnection** larodConn, larodModel** model) {
+    larodError* error = NULL;
+    larodConnection* conn = NULL;
+    larodModel* loadedModel = NULL;
+    bool ret = false;
+
+    // Set up larod connection.
+    if (!larodConnect(&conn, &error)) {
+        syslog(LOG_ERR, "%s: Could not connect to larod: %s", __func__, error->msg);
+        goto end;
+    }
+
+    // List available chip id:s
+    size_t numDevices = 0;
+    syslog(LOG_INFO, "Available chip IDs:");
+    const larodDevice** devices;
+    devices = larodListDevices(conn, &numDevices, &error);
+    for (size_t i = 0; i < numDevices; ++i) {
+            syslog(LOG_INFO, "%s: %s", "Chip", larodGetDeviceName(devices[i], &error));;
+        }
+    const larodDevice* dev = larodGetDevice(conn, chipString, 0, &error);
+    loadedModel = larodLoadModel(conn, larodModelFd, dev, LAROD_ACCESS_PRIVATE,
+                                 "Vdo Example App Model", NULL, &error);
+    if (!loadedModel) {
+        syslog(LOG_ERR, "%s: Unable to load model: %s", __func__, error->msg);
+        goto error;
+    }
+    *larodConn = conn;
+    *model = loadedModel;
+
+    ret = true;
+
+    goto end;
+
+error:
+    if (conn) {
+        larodDisconnect(&conn, NULL);
+    }
+
+end:
+    if (error) {
+        larodClearError(&error);
+    }
+
+    return ret;
+}
 
 /**
- * brief Load a model into larod.
- *
- * So that the model we can run inferences on the model with larod.
- *
- * param conn An initialized larod connection handle.
- * param modelFile A string containing the path to the model file.
- * param modelName A string containing the preferred name of the model.
- * param model A pointer to a pointer to the model returned by larod after it
- * has been loaded.
- * return False if any errors occur, otherwise true.
+ * brief Main function that starts a stream with different options.
  */
-bool loadModel(larodConnection* conn, char* modelFile, const char* modelName,
-               larodModel** model);
-
-/**
- * brief Run inference on a model with larod.
- *
- * param conn An initialized larod connection handle.
- * param model A pointer to the model to run inference on.
- * param inputFile A string containing the path to the input file for the
- * inference.
- * param outputFile A string containing the preferred path of the file to which
- * the inference output will be written. If NULL is provided a file name based
- * on the input file's name suffixed with ".out" will be produced.
- * return False if any errors occur, otherwise true.
- */
-bool runInference(larodConnection* conn, larodModel* model, char* inputFile,
-                  char* outputFile);
-
-larodError* error = NULL;
-
 int main(int argc, char** argv) {
     bool ret = false;
+    larodError* error = NULL;
     larodConnection* conn = NULL;
     larodModel* model = NULL;
+    larodTensor** inputTensors = NULL;
+    size_t numInputs = 0;
+    larodTensor** outputTensors = NULL;
+    size_t numOutputs = 0;
+    larodJobRequest* infReq = NULL;
+    int larodModelFd = -1;
+    FILE* fpInput = NULL;
+    FILE* fpOutput = NULL;
+    char * outputFile = NULL;
 
-    // Check for valid number of arguments
     if (argc != 3) {
         syslog(LOG_ERR, "ERROR: Invalid number of arguments\n"
                         "Usage: larod_simple_app MODEL_FILE INPUT_FILE\n");
         goto end;
     }
 
-    syslog(LOG_INFO,"Connecting to larod...");
-    if (!larodConnect(&conn, &error)) {
-        syslog(LOG_ERR, "ERROR: Could not connect to larod (%d): %s\n",
-                error->code, error->msg);
+    const char* chipString = "cpu-tflite";
+    const char* modelFile = argv[1];
+    const char* inputFile = argv[2];
 
-        larodClearError(&error);
-        goto end;
-    }
-    syslog(LOG_INFO,"Connected");
-
-    if (!larodSetChip(conn, LAROD_CHIP_TFLITE_CPU, &error)) {
-        syslog(LOG_ERR,
-                "ERROR: Could not set larod chip to TFLite CPU (%d): %s\n",
-                error->code, error->msg);
-
-        larodClearError(&error);
+    // Create larod models
+    syslog(LOG_INFO, "Create larod models");
+    larodModelFd = open(modelFile, O_RDONLY);
+    if (larodModelFd < 0) {
+        syslog(LOG_ERR, "Unable to open model file %s: %s", inputFile,
+               strerror(errno));
         goto end;
     }
 
-    if (!loadModel(conn, argv[1], NULL, &model)) {
+
+    syslog(LOG_INFO, "Setting up larod connection with chip %s, model %s", chipString, inputFile);
+    if (!setupLarod(chipString, larodModelFd, &conn, &model)) {
         goto end;
     }
-
-    if (!runInference(conn, model, argv[2], NULL)) {
-        goto end;
-    }
-
-    if (!deleteModel(conn, model)) {
-        goto end;
-    }
-
-    ret = true;
-
-end:
-    larodDestroyModel(&model);
-
-    if (conn && !larodDisconnect(&conn, &error)) {
-        syslog(LOG_ERR, "ERROR: Could not disconnect (%d): %s\n", error->code,
-                error->msg);
-
-        larodClearError(&error);
-    }
-
-    return ret ? EXIT_SUCCESS : EXIT_FAILURE;
-}
-
-bool loadModel(larodConnection* conn, char* modelFile, const char* modelName,
-               larodModel** model) {
-    syslog(LOG_INFO, "Loading model...");
-    larodModel* localModel = NULL;
-    FILE* fpModel = fopen(modelFile, "rb");
-    if (!fpModel) {
-        syslog(LOG_ERR, "ERROR: Could not open model file %s: %s\n", modelFile,
-                strerror(errno));
-        return false;
-    }
-
-    const int fd = fileno(fpModel);
-    if (fd < 0) {
-        syslog(LOG_ERR,
-                "ERROR: Could not get file descriptor for model file: %s\n",
-                strerror(errno));
-        fclose(fpModel);
-        return false;
-    }
-
-    if (!modelName) {
-        modelName = basename(modelFile);
-    }
-
-    localModel =
-        larodLoadModel(conn, fd, LAROD_ACCESS_PUBLIC, modelName, &error);
-    if (!localModel) {
-        syslog(LOG_ERR, "ERROR: Could not load model (%d): %s\n", error->code,
-                error->msg);
-
-        larodClearError(&error);
-        fclose(fpModel);
-        return false;
-    }
-
-    if (fclose(fpModel)) {
-        syslog(LOG_ERR, "ERROR: Could not close file %s\n", modelFile);
-    }
-
-    *model = localModel;
-    syslog(LOG_INFO, "Model %s loaded \n", modelFile);
-
-    return true;
-}
-
-bool deleteModel(larodConnection* conn, larodModel* model) {
-    if (!larodDeleteModel(conn, model, &error)) {
-        syslog(LOG_ERR, "ERROR: Could not delete model (%d): %s\n", error->code,
-                error->msg);
-
-        larodClearError(&error);
-        return false;
-    }
-
-    return true;
-}
-
-bool runInference(larodConnection* conn, larodModel* model, char* inputFile,
-                  char* outputFile) {
-    syslog(LOG_INFO,"Running inference...");
-
-    bool ret = false;
-    larodInferenceRequest* infReq = NULL;
-    FILE* fpInput = NULL;
-    FILE* fpOutput = NULL;
-    larodTensor** inputTensors = NULL;
-    size_t numInputs = 0;
-    larodTensor** outputTensors = NULL;
-    size_t numOutputs = 0;
 
     fpInput = fopen(inputFile, "rb");
     if (!fpInput) {
@@ -235,8 +168,8 @@ bool runInference(larodConnection* conn, larodModel* model, char* inputFile,
         goto end;
     }
 
-    const int inFd = fileno(fpInput);
-    if (inFd < 0) {
+    const int larodInputFd = fileno(fpInput);
+    if (larodInputFd < 0) {
         syslog(LOG_ERR,
                 "ERROR: Could not get file descriptor for input file: %s\n",
                 strerror(errno));
@@ -253,74 +186,71 @@ bool runInference(larodConnection* conn, larodModel* model, char* inputFile,
         goto end;
     }
 
-    const int outFd = fileno(fpOutput);
-    if (outFd < 0) {
+    const int larodOutputFd = fileno(fpOutput);
+    if (larodOutputFd < 0) {
         syslog(LOG_ERR,
                 "ERROR: Could not get file descriptor for output file: %s\n",
                 strerror(errno));
         goto end;
     }
-
     inputTensors = larodCreateModelInputs(model, &numInputs, &error);
     if (!inputTensors) {
-        syslog(LOG_ERR, "ERROR: Failed retrieving input tensors (%d): %s\n",
-                error->code, error->msg);
+        syslog(LOG_ERR, "Failed retrieving input tensors: %s", error->msg);
         goto end;
     }
+    // This app only supports 1 input tensor right now.
     if (numInputs != 1) {
-        syslog(LOG_ERR,
-                "ERROR: This model has %zu input tensors, but example only "
-                "supports 1 input tensor.\n",
-                numInputs);
+        syslog(LOG_ERR, "Model has %zu inputs, app only supports 1 input tensor.",
+               numInputs);
         goto end;
     }
-
-    if (!larodSetTensorFd(inputTensors[0], inFd, &error)) {
-        syslog(LOG_ERR, "ERROR: Could not set input tensor fd (%d): %s\n",
-                error->code, error->msg);
-        goto end;
-    }
-
     outputTensors = larodCreateModelOutputs(model, &numOutputs, &error);
     if (!outputTensors) {
-        syslog(LOG_ERR, "ERROR: Failed retrieving output tensors (%d): %s\n",
-                error->code, error->msg);
+        syslog(LOG_ERR, "Failed retrieving output tensors: %s", error->msg);
         goto end;
     }
+    // This app only supports 1 output tensor right now.
     if (numOutputs != 1) {
-        syslog(LOG_ERR,
-                "ERROR: This model has %zu output tensors, but example only "
-                "supports 1 output tensor.\n",
-                numOutputs);
+        syslog(LOG_ERR, "Model has %zu outputs, app only supports 1 output tensor.",
+               numOutputs);
+        goto end;
+    }
+    // Connect tensors to file descriptors
+    syslog(LOG_INFO, "Connect tensors to file descriptors");
+    if (!larodSetTensorFd(inputTensors[0], larodInputFd, &error)) {
+        syslog(LOG_ERR, "Failed setting input tensor fd: %s", error->msg);
+        goto end;
+    }
+    if (!larodSetTensorFd(outputTensors[0], larodOutputFd, &error)) {
+        syslog(LOG_ERR, "Failed setting output tensor fd: %s", error->msg);
         goto end;
     }
 
-    if (!larodSetTensorFd(outputTensors[0], outFd, &error)) {
-        syslog(LOG_ERR, "ERROR: Could not set output tensor fd (%d): %s\n",
-                error->code, error->msg);
+    // Create job requests
+    syslog(LOG_INFO, "Create job requests");
+    infReq = larodCreateJobRequest(model, inputTensors, 1, outputTensors,
+                                   1, NULL, &error);
+    if (!infReq)
+    {
+        syslog(LOG_ERR, "Failed creating inference request: %s", error->msg);
         goto end;
     }
 
-    infReq = larodCreateInferenceRequest(model, inputTensors, 1, outputTensors,
-                                         1, &error);
-    if (!infReq) {
-        syslog(LOG_ERR, "ERROR: Could not create inference request (%d): %s\n",
-                error->code, error->msg);
-        goto end;
+    if (!larodRunJob(conn, infReq, &error)) {
+          syslog(LOG_ERR, "Unable to run inference on model %s: %s (%d)",
+                   modelFile, error->msg, error->code);
+            goto end;
     }
-
-    if (!larodRunInference(conn, infReq, &error)) {
-        syslog(LOG_ERR, "Could not run inference (%d): %s", error->code,
-                error->msg);
-        goto end;
-    }
-
-    ret = true;
 
     syslog(LOG_INFO,"Output written to %s\n", outputFile);
 
+    ret = true;
 
 end:
+    larodDestroyModel(&model);
+    if (conn) {
+        larodDisconnect(&conn, NULL);
+    }
     if (fpInput && fclose(fpInput)) {
         syslog(LOG_ERR, "ERROR: Could not close file %s\n", inputFile);
     }
@@ -328,11 +258,11 @@ end:
         syslog(LOG_ERR, "ERROR: Could not close file %s\n", outputFile);
     }
 
-    larodDestroyInferenceRequest(&infReq);
-    larodDestroyTensors(&inputTensors, numInputs);
-    larodDestroyTensors(&outputTensors, numOutputs);
-
+    larodDestroyJobRequest(&infReq);
+    larodDestroyTensors(conn, &inputTensors, numInputs, &error);
+    larodDestroyTensors(conn, &outputTensors, numOutputs, &error);
     larodClearError(&error);
 
-    return ret;
+    syslog(LOG_INFO, "Exit %s", argv[0]);
+    return ret ? EXIT_SUCCESS : EXIT_FAILURE;
 }

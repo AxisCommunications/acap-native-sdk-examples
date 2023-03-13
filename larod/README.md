@@ -127,9 +127,11 @@ the newly built **larod_simple_app_1_0_0_armv7hf.eap** > Click **Install** > Run
 
 In order to see the output, please copy the file with the output (veiltail-11457_640_RGB_224x224.bin.out) from the device into your host
 application directory.
-> [!IMPORTANT]
-*> Please make sure SSH is enabled on the device to run the
-following commands.*
+
+> **Note**
+> Make sure
+> [SSH is enabled](https://axiscommunications.github.io/acap-documentation/docs/get-started/set-up-developer-environment/set-up-device.html#access-the-device-through-ssh)
+> on the device to run the following commands.
 
 ```sh
 scp root@<axis_device_ip>:/usr/local/packages/larod_simple_app/input/veiltail-11457_640_RGB_224x224.bin.out .
@@ -149,9 +151,9 @@ The matched class will be printed below:
 
 **Output:** The model has found that with a probability of 100 % the picture represents a goldfish.
 
-> [!NOTE]
-> *This app only supports models with one input and one output
-tensor, whereas larod itself supports any number of either.*
+> **Note**
+> This app only supports models with one input and one output tensor, whereas
+> larod itself supports any number of either.
 
 ## License
 
