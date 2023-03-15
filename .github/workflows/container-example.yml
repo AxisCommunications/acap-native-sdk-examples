@@ -9,6 +9,15 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - arch: armv7hf
+            imagearch: arm32v7
+            axis-os: 11.3.57
+          - arch: aarch64
+            imagearch: arm64v8
+            axis-os: 11.3.57
     env:
       EXREPO: acap-native-examples
       EXNAME: container-example
@@ -23,8 +32,8 @@ jobs:
         run: |
           docker image rm -f $imagetag
           cd $EXNAME
-          docker pull arm32v7/alpine:3.14.0
-          docker save -o alpine.tar arm32v7/alpine:3.14.0
+          docker pull ${{ matrix.imagearch }}/alpine:3.14.0
+          docker save -o alpine.tar ${{ matrix.imagearch }}/alpine:3.14.0
           docker build --no-cache --tag $imagetag .
           docker cp $(docker create $imagetag):/opt/app ./build
           cd ..

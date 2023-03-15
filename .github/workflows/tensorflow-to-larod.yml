@@ -9,6 +9,9 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        axis-os: ["11.3.57"]
     env:
       EXREPO: acap-native-examples
       EXNAME: tensorflow-to-larod
