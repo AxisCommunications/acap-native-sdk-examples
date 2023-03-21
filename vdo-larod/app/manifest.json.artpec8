@@ -10,7 +10,7 @@
                 "group": "sdk",
                 "username": "sdk"
             },
-            "runOptions": "/usr/local/packages/vdo_larod/model/mobilenet_v2_1.0_224_quant.tflite 224 224 1001 -c 12 -l /usr/local/packages/vdo_larod/label/imagenet_labels.txt",
+            "runOptions": "axis-a8-dlpu-tflite /usr/local/packages/vdo_larod/model/mobilenet_v2_1.0_224_quant.tflite /usr/local/packages/vdo_larod/model/imagenet_labels.txt 224 224 5",
             "vendorUrl": "https://www.axis.com",
             "runMode": "never",
             "version": "1.0.0"

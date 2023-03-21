@@ -1,29 +1,35 @@
- *Copyright (C) 2021, Axis Communications AB, Lund, Sweden. All Rights Reserved.*
+*Copyright (C) 2021, Axis Communications AB, Lund, Sweden. All Rights Reserved.*
 
-# A combined vdo stream and larod based ACAP application running inference on an edge device
+# A combined VDO stream and Larod based ACAP application running inference on an edge device
 
 This README file explains how to build an ACAP application that uses:
 
 - the [Video capture API (VDO)](https://axiscommunications.github.io/acap-documentation/docs/api/native-sdk-api.html#video-capture-api-vdo) to fetch frames from e.g. a camera
-- a library called libyuv to do image preprocessing
-- the [Machine learning API (Larod)](https://axiscommunications.github.io/acap-documentation/docs/api/native-sdk-api.html#machine-learning-api-larod) to load a graph model and run classification inferences on it
+- the [Machine learning API (Larod)](https://axiscommunications.github.io/acap-documentation/docs/api/native-sdk-api.html#machine-learning-api-larod) to load a graph model and run preprocessing and classification inferences
 
 It is achieved by using the containerized API and toolchain images.
 
-Together with this README file you should be able to find a directory called app. That directory contains the "vdo_larod" application source code, which can easily
-be compiled and run with the help of the tools and step by step below.
+Together with this README file you should be able to find a directory called app. That directory contains the "vdo_larod" application source code, which can easily be compiled and run with the help of the tools and step by step below.
 
 ## Detailed outline of example application
 
-This application opens a client to vdo and starts fetching frames (in a new thread) in the yuv format. It tries to match twice the WIDTH and HEIGHT that is required by the neural network. The thread fetching frames is written so that it always tries to provide a frame as new as possible even if not all previous frames have been processed by libyuv and larod. The implementation of the vdo specific parts of the app can be found in file "imgprovider.c".
+This application opens a client to VDO and starts fetching frames (in a new thread) in the YUV format. It tries to find the smallest VDO stream resolution that fits the width and height required by the neural network. The thread fetching frames is written so that it always tries to provide a frame as new as possible even if not all previous frames have been processed by larod.
 
-The image preprocessing is then started by libyuv in "imgconverter.c". The code will perform the following three steps:
+Steps in application:
 
-1. Convert the full size NV12 image delivered by vdo to interleaved BGRA color format since the bulk of libyuv functions works on that format.
-2. Crop out a part of the full size image. The crop will be taken from the center of the vdo image and be as big as possible while still maintaining the WIDTH x HEIGHT aspect ratio. This crop will then be scaled to be of the same size as what the neural network requires (WIDTH x HEIGHT).
-3. Lastly the scaled image will be converted from BGRA to interleaved RGB which is a common format for e.g. Mobilenet CNNs.
+1. Fetch image data from VDO.
+2. Preprocess the images (crop to 224x224, scale and color convert) using larod with either the libyuv or VProc backend (depending on platform).
+3. Run MobileNetV2 inferences on a specific chip with the preprocessing output as input on a larod backend specified by a command line argument.
+4. Sort the classification scores output by the MobileNetV2 inferences and print the top scores along with corresponding indices and [ImageNet][1] labels to stdout.
+5. Repeat for 5 iterations.
 
-Finally larod will load a neural network model and start processing. It simply takes the images produced by vdo and libyuv and makes synchronous inferences calls to the neural network that was loaded. These function calls return when inferences are finished upon which the application parses the output tensor provided to print the top result to syslog/application log. The larod related code is found in "vdo_larod.c".
+See the manifest.json.* files to change the configuration on chip, image size, number of iterations, model path and label path.
+
+## Which backends and models are supported?
+
+Unless you modify the app to your own needs you should only use a MobileNetV2 model that takes 224x224 RGB images as input, and that outputs an array of 1001 classification scores of type `uint8` or `float32`.
+
+You can run the example with any inference backend as long as you can provide it with a model as described above.
 
 ## Getting started
 
@@ -32,10 +38,6 @@ These instructions will guide you on how to execute the code. Below is the struc
 ```sh
 vdo-larod
 ├── app
-│   ├── argparse.c
-│   ├── argparse.h
-│   ├── imgconverter.c
-│   ├── imgconverter.h
 │   ├── imgprovider.c
 │   ├── imgprovider.h
 │   ├── LICENSE
@@ -46,12 +48,9 @@ vdo-larod
 │   ├── manifest.json.edgetpu
 │   └── vdo_larod.c
 ├── Dockerfile
-├── README.md
-└── yuv
+└── README.md
 ```
 
-- **app/argparse.c/h** - Implementation of argument parser, written in C.
-- **app/imgconverter.c/h** - Implementation of libyuv parts, written in C.
 - **app/imgprovider.c/h** - Implementation of vdo parts, written in C.
 - **app/LICENSE** - Text file which lists all open source licensed source code distributed with the application.
 - **app/Makefile** - Makefile containing the build and link instructions for building the ACAP application.
@@ -59,28 +58,17 @@ vdo-larod
 - **app/manifest.json.cpu** - Defines the application and its configuration when building for CPU with TensorFlow Lite.
 - **app/manifest.json.cv25** - Defines the application and its configuration when building chip and model for cv25 DLPU.
 - **app/manifest.json.edgetpu** - Defines the application and its configuration when building chip and model for Google TPU.
-- **app/vdo-larod.c** - Application using larod, written in C.
+- **app/vdo_larod.c** - Application using larod, written in C.
 - **Dockerfile** - Docker file with the specified Axis toolchain and API container to build the example specified.
 - **README.md** - Step by step instructions on how to run the example.
-- **yuv** - Folder containing files for building libyuv.
-
-Below is the patch to build libyuv, remaining details are found in Dockerfile:
-
-```sh
-vdo-larod
-├── yuv
-│   └── 0001-Create-a-shared-library.patch
-```
-
-- **yuv/0001-Create-a-shared-library.patch** - Patch, which is needed to support building an .so file, for the shared library libyuv.
 
 ## Limitations
 
-- ARTPEC-7 based device with edge TPU.
+- ARTPEC-7 based device with edge TPU
 - ARTPEC-8
 - CV25
-- This application was not written to optimize performance.
-- MobileNet is good for classification, but it requires that the object you want to classify should cover almost all the frame.
+- This application was not written to optimize performance
+- MobileNet is good for classification, but it requires that the object you want to classify should cover almost all the frame
 
 ## How to run the code
 
@@ -169,14 +157,8 @@ The working directory now contains a build folder with the following files of im
 ```sh
 vdo-larod
 ├── build
-│   ├── argparse.c
-│   ├── argparse.h
-│   ├── imgconverter.c
-│   ├── imgconverter.h
 │   ├── imgprovider.c
 │   ├── imgprovider.h
-│   ├── label
-|   │   └── imagenet_labels.txt
 │   ├── lib
 │   ├── LICENSE
 │   ├── Makefile
@@ -186,9 +168,8 @@ vdo-larod
 │   ├── manifest.json.edgetpu
 │   ├── manifest.json.cv25
 │   ├── model
-|   │   ├── mobilenet_v2_cavalry.bin
-|   │   ├── mobilenet_v2_1.0_224_quant_edgetpu.tflite
-|   │   └── mobilenet_v2_1.0_224_quant.tflite
+|   │   ├── imagenet_labels.txt
+|   │   └── mobilenet_v2_1.0_224_quant.tflite / mobilenet_v2_1.0_224_quant_edgetpu.tflite / mobilenet_v2_cavalry.bin
 │   ├── package.conf
 │   ├── package.conf.orig
 │   ├── param.conf
@@ -198,13 +179,12 @@ vdo-larod
 │   └── vdo_larod.c
 ```
 
-- **build/label** - Folder containing label files used in this application.
-- **build/label/imagenet_labels.txt** - Label file for MobileNet V2 (ImageNet).
-- **build/lib** - Folder containing compiled library files for libyuv.
 - **build/manifest.json** - Defines the application and its configuration.
 - **build/model** - Folder containing models used in this application.
+- **build/model/imagenet_labels.txt** - Label file for MobileNet V2 (ImageNet).
 - **build/model/mobilenet_v2_1.0_224_quant_edgetpu.tflite** - Model file for MobileNet V2 (ImageNet), used for Google TPU.
 - **build/model/mobilenet_v2_1.0_224_quant.tflite** - Model file for MobileNet V2 (ImageNet), used for ARTPEC-8 and CPU with TensorFlow Lite.
+- **build/model/mobilenet_v2_cavalry.bin** - Model file for MobileNet V2 (ImageNet), used for ARTPEC-8 and CV25.
 - **build/package.conf** - Defines the application and its configuration.
 - **build/package.conf.orig** - Defines the application and its configuration, original file.
 - **build/param.conf** - File containing application parameters.
@@ -223,8 +203,8 @@ vdo-larod
 - **build/vdo_larod_edgetpu_1_0_0_LICENSE.txt** - Copy of LICENSE file.
 
   If chip `cv25` has been built.
-- **build/vdo_larod_preprocessing_cv25_1_0_0_aarch64.eap** - Application package .eap file.
-- **build/vdo_larod_preprocessing_cv25_1_0_0_LICENSE.txt** - Copy of LICENSE file.
+- **build/vdo_larod_cv25_1_0_0_aarch64.eap** - Application package .eap file.
+- **build/vdo_larod_cv25_1_0_0_LICENSE.txt** - Copy of LICENSE file.
 
 ### Install your application
 
@@ -239,7 +219,7 @@ http://<axis_device_ip>/#settings/apps
 *Go to your device web page above >
  Click on the tab **App** in the device GUI >
  Add **(+)** sign and browse to the newly built
-**vdo_larod_cv25_1_0_0_aarch64.eap** or
+ **vdo_larod_cv25_1_0_0_aarch64.eap** or
  **vdo_larod_artpec8_1_0_0_aarch64.eap** or
  **vdo_larod_cpu_1_0_0_armv7hf.eap** or
  **vdo_larod_edgetpu_1_0_0_armv7hf.eap** >
@@ -268,37 +248,68 @@ cd /var/log/
 head -50 info.log
 ```
 
-Depending on selected chip, different output is received. The label file is used for identifying objects.
+Depending on the selected chip, different output is received.
 
-In the system log the chip is sometimes only mentioned as a number, they are mapped as follows:
+In previous larod versions, the chip was referred to as a number instead of a string. See the table below to understand the mapping:
 
-| Number | Chip |
-| --- | --- |
-| 2 | CPU with TensorFlow Lite |
-| 4 | Google TPU |
-| 6 | Ambarella CVFlow (NN) |
-| 12 | ARTPEC-8 DLPU |
+| Chips | Larod 1/2 (int) | Larod 3 (string) |
+|-------|--------------|------------------|
+| CPU with TensorFlow Lite | 2 | cpu-tflite |
+| Google TPU | 4 | google-edge-tpu-tflite |
+| Ambarella CVFlow (NN) | 6 | ambarella-cvflow |
+| ARTPEC-8 DLPU | 12 | axis-a8-dlpu-tflite |
 
 #### Output - ARTPEC-8 with TensorFlow Lite
 
 ```sh
 ----- Contents of SYSTEM_LOG for 'vdo_larod' -----
 
-vdo_larod[423215]: Creating VDO image provider and creating stream 320 x 240
-vdo_larod[423215]: Dump of vdo stream settings map =====
-vdo_larod[423215]: chooseStreamResolution: We select stream w/h=320 x 240 based on VDO channel info.
-vdo_larod[423215]: Setting up larod connection with chip 12 and model /usr/local/packages/vdo_larod/model/mobilenet_v2_1.0_224_quant.tflite
-vdo_larod[423215]: Converted image in 2 ms
-vdo_larod[423215]: Creating temporary files and memmaps for inference input and output tensors
-vdo_larod[423215]: Start fetching video frames from VDO
-vdo_larod[423215]: createAndMapTmpFile: Setting up a temp fd with pattern /tmp/larod.in.test-XXXXXX and size 150528
-vdo_larod[423215]: createAndMapTmpFile: Setting up a temp fd with pattern /tmp/larod.out.test-XXXXXX and size 1001
-vdo_larod[423215]: Converted image in 2 ms
-vdo_larod[423215]: Ran inference for 7 ms
-vdo_larod[27814]: Top result:  955  banana with score 94.20%
-vdo_larod[423215]: Converted image in 2 ms
-vdo_larod[423215]: Ran inference for 8 ms
-vdo_larod[27814]: Top result:  955  banana with score 94.60%
+
+vdo_larod[4165]: Starting /usr/local/packages/vdo_larod/vdo_larod
+vdo_larod[4165]: 'buffer.strategy': <uint32 3>
+vdo_larod[4165]: 'channel': <uint32 1>
+vdo_larod[4165]: 'format': <uint32 3>
+vdo_larod[4165]: 'height': <uint32 240>
+vdo_larod[4165]: 'width': <uint32 320>
+vdo_larod[4165]: Creating VDO image provider and creating stream 320 x 240
+vdo_larod[4165]: Dump of vdo stream settings map =====
+vdo_larod[4165]: chooseStreamResolution: We select stream w/h=320 x 240 based on VDO channel info.
+vdo_larod[4165]: Calculate crop image
+vdo_larod[4165]: Create larod models
+vdo_larod[4165]: Create preprocessing maps
+vdo_larod[4165]: Crop VDO image X=40 Y=0 (240 x 240)
+vdo_larod[4165]: Setting up larod connection with chip axis-a8-dlpu-tflite, model /usr/local/packages/vdo_larod/model/mobilenet_v2_1.0_224_quant.tflite and label file /usr/local/packages/vdo_larod/model
+vdo_larod[4165]: Available chip ids:
+vdo_larod[4165]: Chip: cpu-tflite
+vdo_larod[4165]: Chip: axis-ace-proc
+vdo_larod[4165]: Chip: cpu-proc
+vdo_larod[4165]: Chip: axis-a8-dlpu-tflite
+vdo_larod[4165]: Chip: axis-a8-dlpu-native
+vdo_larod[4165]: Chip: axis-a8-dlpu-proc
+vdo_larod[4165]: Chip: axis-a8-gpu-proc
+vdo_larod[4165]: Allocate memory for input/output buffers
+vdo_larod[4165]: Connect tensors to file descriptors
+vdo_larod[4165]: Create input/output tensors
+vdo_larod[4165]: Create job requests
+vdo_larod[4165]: Determine tensor buffer sizes
+vdo_larod[4165]: Start fetching video frames from VDO
+vdo_larod[4165]: Converted image in 6 ms
+vdo_larod[4165]: Ran inference for 8 ms
+vdo_larod[4165]: Top result:  955  banana with score 96.20%
+vdo_larod[4165]: Converted image in 2 ms
+vdo_larod[4165]: Ran inference for 7 ms
+vdo_larod[4165]: Top result:  955  banana with score 97.40%
+vdo_larod[4165]: Converted image in 3 ms
+vdo_larod[4165]: Ran inference for 7 ms
+vdo_larod[4165]: Top result:  955  banana with score 97.80%
+vdo_larod[4165]: Converted image in 2 ms
+vdo_larod[4165]: Ran inference for 7 ms
+vdo_larod[4165]: Top result:  955  banana with score 98.20%
+vdo_larod[4165]: Converted image in 2 ms
+vdo_larod[4165]: Ran inference for 7 ms
+vdo_larod[4165]: Stop streaming video from VDO
+vdo_larod[4165]: Top result:  955  banana with score 98.00%
+vdo_larod[4165]: Exit /usr/local/packages/vdo_larod/vdo_larod
 ```
 
 #### Output - CPU with TensorFlow Lite
@@ -306,20 +317,49 @@ vdo_larod[27814]: Top result:  955  banana with score 94.60%
 ```sh
 ----- Contents of SYSTEM_LOG for 'vdo_larod' -----
 
-vdo_larod[13021]: Creating VDO image provider and creating stream 320 x 240
-vdo_larod[13021]: Dump of vdo stream settings map =====
-vdo_larod[13021]: chooseStreamResolution: We select stream w/h=320 x 240 based on VDO channel info.
-vdo_larod[13021]: Setting up larod connection with chip 2 and model /usr/local/packages/vdo_larod/model/mobilenet_v2_1.0_224_quant.tflite
-vdo_larod[13021]: Creating temporary files and memmaps for inference input and output tensors
-vdo_larod[13021]: Start fetching video frames from VDO
-vdo_larod[13021]: createAndMapTmpFile: Setting up a temp fd with pattern /tmp/larod.in.test-XXXXXX and size 150528
-vdo_larod[13021]: createAndMapTmpFile: Setting up a temp fd with pattern /tmp/larod.out.test-XXXXXX and size 1001
-vdo_larod[13021]: Converted image in 3 ms
-vdo_larod[13021]: Ran inference for 417 ms
-vdo_larod[13021]: Top result:  955  banana with score 84.00%
-vdo_larod[13021]: Converted image in 3 ms
-vdo_larod[13021]: Ran inference for 356 ms
-vdo_larod[13021]: Top result:  955  banana with score 85.60%
+Starting /usr/local/packages/vdo_larod/vdo_larod
+vdo_larod[1670]: 'buffer.strategy': <uint32 3>
+vdo_larod[1670]: 'channel': <uint32 1>
+vdo_larod[1670]: 'format': <uint32 3>
+vdo_larod[1670]: 'height': <uint32 240>
+vdo_larod[1670]: 'width': <uint32 320>
+vdo_larod[1670]: Creating VDO image provider and creating stream 320 x 240
+vdo_larod[1670]: Dump of vdo stream settings map =====
+vdo_larod[1670]: chooseStreamResolution: We select stream w/h=320 x 240 based on VDO channel info.
+vdo_larod[1670]: Calculate crop image
+vdo_larod[1670]: Create larod models
+vdo_larod[1670]: Create preprocessing maps
+vdo_larod[1670]: Crop VDO image X=40 Y=0 (240 x 240)
+vdo_larod[1670]: Setting up larod connection with chip cpu-tflite, model /usr/local/packages/vdo_larod/model/mobilenet_v2_1.0_224_quant.tflite and label file /usr/local/packages/vdo_larod/model/imagenet_labels.txt
+vdo_larod[1670]: Available chip ids:
+vdo_larod[1670]: Chip: cpu-tflite
+vdo_larod[1670]: Chip: google-edge-tpu-tflite
+vdo_larod[1670]: Chip: axis-ace-proc
+vdo_larod[1670]: Chip: cpu-proc
+vdo_larod[1670]: Chip: axis-a7-gpu-proc
+vdo_larod[1670]: Allocate memory for input/output buffers
+vdo_larod[1670]: Connect tensors to file descriptors
+vdo_larod[1670]: Create input/output tensors
+vdo_larod[1670]: Create job requests
+vdo_larod[1670]: Determine tensor buffer sizes
+vdo_larod[1670]: Start fetching video frames from VDO
+vdo_larod[1670]: Converted image in 6 ms
+vdo_larod[1670]: Ran inference for 293 ms
+vdo_larod[1670]: Top result:  955  banana with score 77.20%
+vdo_larod[1670]: Converted image in 5 ms
+vdo_larod[1670]: Ran inference for 224 ms
+vdo_larod[1670]: Top result:  955  banana with score 76.80%
+vdo_larod[1670]: Converted image in 5 ms
+vdo_larod[1670]: Ran inference for 217 ms
+vdo_larod[1670]: Top result:  955  banana with score 76.00%
+vdo_larod[1670]: Converted image in 10 ms
+vdo_larod[1670]: Ran inference for 213 ms
+vdo_larod[1670]: Top result:  955  banana with score 75.60%
+vdo_larod[1670]: Converted image in 5 ms
+vdo_larod[1670]: Ran inference for 221 ms
+vdo_larod[1670]: Stop streaming video from VDO
+vdo_larod[1670]: Top result:  955  banana with score 75.20%
+vdo_larod[1670]: Exit /usr/local/packages/vdo_larod/vdo_larod
 ```
 
 #### Output - Google TPU
@@ -327,46 +367,121 @@ vdo_larod[13021]: Top result:  955  banana with score 85.60%
 ```sh
 ----- Contents of SYSTEM_LOG for 'vdo_larod' -----
 
-vdo_larod[27814]: Creating VDO image provider and creating stream 320 x 240
-vdo_larod[27814]: Dump of vdo stream settings map =====
-vdo_larod[27814]: chooseStreamResolution: We select stream w/h=320 x 240 based on VDO channel info.
-vdo_larod[27814]: Setting up larod connection with chip 4 and model /usr/local/packages/vdo_larod/model/mobilenet_v2_1.0_224_quant_edgetpu.tflite
-vdo_larod[27814]: Creating temporary files and memmaps for inference input and output tensors
-vdo_larod[27814]: Start fetching video frames from VDO
-vdo_larod[27814]: createAndMapTmpFile: Setting up a temp fd with pattern /tmp/larod.in.test-XXXXXX and size 150528
-vdo_larod[27814]: createAndMapTmpFile: Setting up a temp fd with pattern /tmp/larod.out.test-XXXXXX and size 1001
-vdo_larod[27814]: Converted image in 3 ms
-vdo_larod[27814]: Ran inference for 27 ms
-vdo_larod[27814]: Top result:  955  banana with score 93.60%
-vdo_larod[27814]: Converted image in 3 ms
-vdo_larod[27814]: Ran inference for 17 ms
-vdo_larod[27814]: Top result:  955  banana with score 93.60%
+ Starting /usr/local/packages/vdo_larod/vdo_larod
+vdo_larod[31476]: 'buffer.strategy': <uint32 3>
+vdo_larod[31476]: 'channel': <uint32 1>
+vdo_larod[31476]: 'format': <uint32 3>
+vdo_larod[31476]: 'height': <uint32 240>
+vdo_larod[31476]: 'width': <uint32 320>
+vdo_larod[31476]: Creating VDO image provider and creating stream 320 x 240
+vdo_larod[31476]: Dump of vdo stream settings map =====
+vdo_larod[31476]: chooseStreamResolution: We select stream w/h=320 x 240 based on VDO channel info.
+vdo_larod[31476]: Calculate crop image
+vdo_larod[31476]: Create larod models
+vdo_larod[31476]: Create preprocessing maps
+vdo_larod[31476]: Crop VDO image X=40 Y=0 (240 x 240)
+vdo_larod[31476]: Setting up larod connection with chip google-edge-tpu-tflite, model /usr/local/packages/vdo_larod/model/mobilenet_v2_1.0_224_quant_edgetpu.tflite and label file /usr/local/packages/vdo_larod/model/imagenet_labels.txt
+vdo_larod[31476]: Available chip ids:
+vdo_larod[31476]: Chip: axis-a7-gpu-tflite
+vdo_larod[31476]: Chip: cpu-tflite
+vdo_larod[31476]: Chip: google-edge-tpu-tflite
+vdo_larod[31476]: Chip: axis-ace-proc
+vdo_larod[31476]: Chip: cpu-proc
+vdo_larod[31476]: Chip: axis-a7-gpu-proc
+vdo_larod[31476]: Allocate memory for input/output buffers
+vdo_larod[31476]: Connect tensors to file descriptors
+vdo_larod[31476]: Create input/output tensors
+vdo_larod[31476]: Create job requests
+vdo_larod[31476]: Determine tensor buffer sizes
+vdo_larod[31476]: Start fetching video frames from VDO
+vdo_larod[31476]: Converted image in 6 ms
+vdo_larod[31476]: Ran inference for 22 ms
+vdo_larod[31476]: Top result:  955  banana with score 97.20%
+vdo_larod[31476]: Converted image in 5 ms
+vdo_larod[31476]: Ran inference for 5 ms
+vdo_larod[31476]: Top result:  955  banana with score 98.40%
+vdo_larod[31476]: Converted image in 6 ms
+vdo_larod[31476]: Ran inference for 8 ms
+vdo_larod[31476]: Top result:  955  banana with score 99.20%
+vdo_larod[31476]: Converted image in 4 ms
+vdo_larod[31476]: Ran inference for 5 ms
+vdo_larod[31476]: Top result:  955  banana with score 99.20%
+vdo_larod[31476]: Converted image in 6 ms
+vdo_larod[31476]: Ran inference for 4 ms
+vdo_larod[31476]: Stop streaming video from VDO
+vdo_larod[31476]: Top result:  955  banana with score 99.20%
+vdo_larod[31476]: Exit /usr/local/packages/vdo_larod/vdo_larod```
 ```
 
 #### Output - CV25
 
 ```sh
-
 ----- Contents of SYSTEM_LOG for 'vdo_larod' -----
 
 
-2022-08-17T09:36:17.450+02:00 axis-b8a44f31b72f [ INFO    ] vdo_larod[584067]: Starting ...
-
-vdo_larod[584067]: Creating VDO image provider and creating stream 320 x 240
-vdo_larod[584067]: Dump of vdo stream settings map =====
-vdo_larod[584067]: chooseStreamResolution: We select stream w/h=320 x 240 based on VDO channel info.
-vdo_larod[584067]: Setting up larod connection with chip 6 and model /usr/local/packages/vdo_larod/model/mobilenet_v2_cavalry.bin
-vdo_larod[584067]: Creating temporary files and memmaps for inference input and output tensors
-vdo_larod[584067]: Start fetching video frames from VDO
-vdo_larod[584067]: createAndMapTmpFile: Setting up a temp fd with pattern /tmp/larod.in.test-XXXXXX and size 150528
-vdo_larod[584067]: createAndMapTmpFile: Setting up a temp fd with pattern /tmp/larod.out.test-XXXXXX and size 32032
-vdo_larod[584067]: Converted image in 3 ms
-vdo_larod[584067]: Ran inference for 6 ms
-vdo_larod[584067]: Top result:  955  banana with score 73.90%
-vdo_larod[584067]: Converted image in 2 ms
-vdo_larod[584067]: Ran inference for 6 ms
-vdo_larod[584067]: Top result:  955  banana with score 78.71%
+vdo_larod[5100]: setupLarod: Unable to load model: Could not load model: Could not initialize net
+vdo_larod[584171]: Starting /usr/local/packages/vdo_larod/vdo_larod
+vdo_larod[584171]: 'buffer.strategy': <uint32 3>
+vdo_larod[584171]: 'channel': <uint32 1>
+vdo_larod[584171]: 'format': <uint32 3>
+vdo_larod[584171]: 'height': <uint32 240>
+vdo_larod[584171]: 'width': <uint32 320>
+vdo_larod[584171]: Creating VDO image provider and creating stream 320 x 240
+vdo_larod[584171]: Dump of vdo stream settings map =====
+vdo_larod[584171]: chooseStreamResolution: We select stream w/h=320 x 240 based on VDO channel info.
+vdo_larod[584171]: Calculate crop image
+vdo_larod[584171]: Create larod models
+vdo_larod[584171]: Create preprocessing maps
+vdo_larod[584171]: Crop VDO image X=40 Y=0 (240 x 240)
+vdo_larod[584171]: Setting up larod connection with chip ambarella-cvflow, model /usr/local/packages/vdo_larod/model/mobilenet_v2_cavalry.bin and label file /usr/local/packages/vdo_larod/model/imagenet_labels.txt
+vdo_larod[584171]: Available chip ids:
+vdo_larod[584171]: Chip: ambarella-cvflow
+vdo_larod[584171]: Chip: ambarella-cvflow-proc
+vdo_larod[584171]: Chip: cpu-tflite
+vdo_larod[584171]: Chip: cpu-proc
+vdo_larod[584171]: Allocate memory for input/output buffers
+vdo_larod[584171]: Connect tensors to file descriptors
+vdo_larod[584171]: Create input/output tensors
+vdo_larod[584171]: Determine tensor buffer sizes
+vdo_larod[584171]: createAndMapTmpFile: Setting up a temp fd with pattern /tmp/larod.in.test-XXXXXX and size 150528
+vdo_larod[584171]: createAndMapTmpFile: Setting up a temp fd with pattern /tmp/larod.out.test-XXXXXX and size 32032
+vdo_larod[584171]: createAndMapTmpFile: Setting up a temp fd with pattern /tmp/larod.pp.test-XXXXXX and size 115200
+vdo_larod[584171]: Create job requests
+vdo_larod[584171]: Start fetching video frames from VDO
+vdo_larod[584171]: Converted image in 4 ms
+vdo_larod[584171]: Ran inference for 6 ms
+vdo_larod[584171]: Top result:  955  banana with score 56.81%
+vdo_larod[584171]: Converted image in 4 ms
+vdo_larod[584171]: Ran inference for 6 ms
+vdo_larod[584171]: Top result:  955  banana with score 69.17%
+vdo_larod[584171]: Converted image in 4 ms
+vdo_larod[584171]: Ran inference for 6 ms
+vdo_larod[584171]: Top result:  955  banana with score 72.00%
+vdo_larod[584171]: Converted image in 4 ms
+vdo_larod[584171]: Ran inference for 6 ms
+vdo_larod[584171]: Top result:  955  banana with score 75.61%
+vdo_larod[584171]: Converted image in 4 ms
+vdo_larod[584171]: Ran inference for 6 ms
+vdo_larod[584171]: Stop streaming video from VDO
+vdo_larod[584171]: Top result:  955  banana with score 76.88%
+vdo_larod[584171]: Exit /usr/local/packages/vdo_larod/vdo_larod
 ```
+
+#### A note on performance
+
+Buffers are allocated and tracked by VDO and larod. As such they will
+automatically be handled as efficiently as possible. The libyuv backend will
+map each buffer once and never copy. The VProc backend and any inference
+backend that supports dma-bufs will use that to achieve both zero copy and zero
+mapping. Inference backends not supporting dma-bufs will map each buffer once
+and never copy just like libyuv. It should also be mentioned that the input
+tensors of the inference model will be used as output tensors for the
+preprocessing model to avoid copying data.
+
+The application however does no pipelining of preprocessing and inferences, but
+uses the synchronous liblarod API call `larodRunJob()` in the interest of
+simplicity. One could implement pipelining using `larodRunJobAsync()` and thus
+improve performance, but with some added complexity to the program.
 
 #### Conclusion
 
@@ -379,3 +494,5 @@ vdo_larod[584067]: Top result:  955  banana with score 78.71%
 ## License
 
 **[Apache License 2.0](../LICENSE)**
+
+[1]: http://www.image-net.org/

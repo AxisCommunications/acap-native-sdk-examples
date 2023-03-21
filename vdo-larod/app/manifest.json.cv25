@@ -10,7 +10,7 @@
                 "group": "sdk",
                 "username": "sdk"
             },
-            "runOptions": "/usr/local/packages/vdo_larod/model/mobilenet_v2_cavalry.bin 224 224 32032 -c 6 -l /usr/local/packages/vdo_larod/label/imagenet_labels.txt",
+            "runOptions": "ambarella-cvflow /usr/local/packages/vdo_larod/model/mobilenet_v2_cavalry.bin /usr/local/packages/vdo_larod/model/imagenet_labels.txt 224 224 5",
             "vendorUrl": "https://www.axis.com",
             "runMode": "never",
             "version": "1.0.0"
