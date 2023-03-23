@@ -28,8 +28,6 @@ Below is the list of examples available in the repository.
   - This example demonstrates a way of using containers in a native ACAP application.
 - [hello-world](./hello-world/)
   - The example code is written in C and shows how to build a simple hello world application.
-- [larod](./larod/)
-  - The example code is written in C which connects to the [Machine learning API (Larod)](https://axiscommunications.github.io/acap-documentation/docs/api/native-sdk-api.html#machine-learning-api-larod) and loads a model, runs inference on it and then finally deletes the loaded model from Larod.
 - [licensekey](./licensekey/)
   - The example code is written in C which illustrates how to check the licensekey status.
 - [object-detection](./object-detection/)
@@ -41,9 +39,7 @@ Below is the list of examples available in the repository.
 - [shell-script-example](./shell-script-example)
   - A simple hello world application written in shell script.
 - [tensorflow-to-larod](./tensorflow-to-larod/)
-  - This example covers model conversion, model quantization, image formats and custom models in
-greater depth than the [larod](./larod)
-and [vdo-larod](./vdo-larod) examples.
+  - This example covers model conversion, model quantization, image formats and custom models.
 - [tensorflow-to-larod-artpec8](./tensorflow-to-larod-artpec8/)
   - This example is very similar to tensorflow-to-larod, but is designed for AXIS ARTPEC-8 devices.
 - [tensorflow-to-larod-cv25](./tensorflow-to-larod-cv25/)
@@ -53,7 +49,7 @@ and [vdo-larod](./vdo-larod) examples.
 - [utility-libraries](./utility-libraries/)
   - These examples covers how to build, bundle and use external libraries.
 - [vdo-larod](./vdo-larod/)
-  - The example code is written in C and loads an image classification model to the [Machine learning API (Larod)](https://axiscommunications.github.io/acap-documentation/docs/api/native-sdk-api.html#machine-learning-api-larod), then uses the [Video capture API (VDO)](https://axiscommunications.github.io/acap-documentation/docs/api/native-sdk-api.html#video-capture-api-vdo) to fetch video frames in YUV format and finally run inference.
+  - The example code is written in C and loads an image classification model to the [Machine learning API (Larod)](https://axiscommunications.github.io/acap-documentation/docs/api/native-sdk-api.html#machine-learning-api-larod) and then uses the [Video capture API (VDO)](https://axiscommunications.github.io/acap-documentation/docs/api/native-sdk-api.html#video-capture-api-vdo) to fetch video frames in YUV format and finally run inference.
 - [vdo-opencl-filtering](./vdo-opencl-filtering/)
   - This example illustrates how to capture frames from the vdo service, access the received buffer, and finally perform a GPU accelerated Sobel filtering with OpenCL.
 - [vdostream](./vdostream/)
