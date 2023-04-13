@@ -1,5 +1,5 @@
 PROG1	= vdo_larod
-OBJS1	= $(PROG1).c imgprovider.c
+OBJS1	= $(PROG1).c imgprovider.c utility-functions.c
 PROGS	= $(PROG1)
 
 PKGS = gio-2.0 vdostream gio-unix-2.0 liblarod
