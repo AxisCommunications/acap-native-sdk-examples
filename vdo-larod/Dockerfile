@@ -6,33 +6,44 @@ ARG SDK=acap-native-sdk
 
 FROM ${REPO}/${SDK}:${VERSION}-${ARCH}-ubuntu${UBUNTU_VERSION}
 
-# Download model
-WORKDIR /opt/app/model
-RUN curl -o mobilenet_v2_1.0_224_quant.tgz http://download.tensorflow.org/models/tflite_11_05_08/mobilenet_v2_1.0_224_quant.tgz && \
-    tar -xvf mobilenet_v2_1.0_224_quant.tgz && \
-    curl -L -o mobilenet_v2_1.0_224_quant_edgetpu.tflite https://github.com/google-coral/edgetpu/raw/master/test_data/mobilenet_v2_1.0_224_quant_edgetpu.tflite && \
-    curl -L -o imagenet_labels.txt https://github.com/google-coral/edgetpu/raw/master/test_data/imagenet_labels.txt && \
-    curl -L -o mobilenet_v2_cavalry.bin https://acap-ml-model-storage.s3.amazonaws.com/mobilenetv2_cavalry.bin
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    unzip \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /opt/app/
+ARG CHIP
+
+# Download the pretrained model
+ARG MODEL_BUCKET=https://acap-artifacts.s3.eu-north-1.amazonaws.com/models
+RUN if [ "$CHIP" = artpec8 ]; then \
+        curl -o model.zip $MODEL_BUCKET/models.aarch64.artpec8.zip ; \
+    elif [ "$CHIP" = cpu ]; then \
+        curl -o model.zip $MODEL_BUCKET/models.aarch64.artpec8.zip ; \
+    elif [ "$CHIP" = edgetpu ]; then \
+        curl -o model.zip $MODEL_BUCKET/models.armv7hf.edgetpu.zip ; \    
+    elif [ "$CHIP" = cv25 ]; then \
+        curl -o model.zip $MODEL_BUCKET/tensorflow_to_larod_models.cv25.zip ; \        
+    else \
+        printf "Error: '%s' is not a valid value for the CHIP variable\n", "$CHIP"; \
+        exit 1; \
+    fi && \
+    unzip -q model.zip && rm -f model.zip
 
 # Copy the library to application folder
 WORKDIR /opt/app
 COPY ./app .
 
-ARG CHIP=
-# Building the ACAP application
-RUN if [ "$CHIP" = cpu ] || [ "$CHIP" = artpec8 ]; then \
-        cp /opt/app/manifest.json.${CHIP} /opt/app/manifest.json && \
-        . /opt/axis/acapsdk/environment-setup* && acap-build . \
-        -a 'model/mobilenet_v2_1.0_224_quant.tflite' -a 'model/imagenet_labels.txt' ; \
+# Build the ACAP application
+RUN cp /opt/app/manifest.json.${CHIP} /opt/app/manifest.json && \
+    . /opt/axis/acapsdk/environment-setup* && \
+    if [ "$CHIP" = artpec8 ] || [ "$CHIP" = cpu ]; then \
+        acap-build . -a 'models/converted_model.tflite'; \
     elif [ "$CHIP" = edgetpu ]; then \
-        cp /opt/app/manifest.json.${CHIP} /opt/app/manifest.json && \
-        . /opt/axis/acapsdk/environment-setup* && acap-build . \
-        -a 'model/mobilenet_v2_1.0_224_quant_edgetpu.tflite' -a 'model/imagenet_labels.txt' ; \
+        acap-build . -a 'models/converted_model_edgetpu.tflite'; \
     elif [ "$CHIP" = cv25 ]; then \
-        cp /opt/app/manifest.json.${CHIP} /opt/app/manifest.json && \
-        . /opt/axis/acapsdk/environment-setup* && acap-build . \
-        -a 'model/mobilenet_v2_cavalry.bin' -a 'model/imagenet_labels.txt'; \
+        acap-build . -a 'models/car_human_model_cavalry.bin'; \
     else \
         printf "Error: '%s' is not a valid value for the CHIP variable\n", "$CHIP"; \
         exit 1; \
-    fi
+fi
+

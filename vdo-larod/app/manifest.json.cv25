@@ -10,7 +10,7 @@
                 "group": "sdk",
                 "username": "sdk"
             },
-            "runOptions": "ambarella-cvflow /usr/local/packages/vdo_larod/model/mobilenet_v2_cavalry.bin /usr/local/packages/vdo_larod/model/imagenet_labels.txt 224 224 5",
+            "runOptions": "ambarella-cvflow /usr/local/packages/vdo_larod/models/car_human_model_cavalry.bin 480 270 5",
             "vendorUrl": "https://www.axis.com",
             "runMode": "never",
             "version": "1.0.0"
