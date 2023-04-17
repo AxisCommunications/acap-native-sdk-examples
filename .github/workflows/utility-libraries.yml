@@ -24,7 +24,7 @@ jobs:
       - name: Build ${{ env.example }} application
         env:
           example: custom_lib_example
-          imagetag: ${{ env.EXREPO }}_custom-lib-example:1.0
+          imagetag: ${{ env.EXREPO }}_custom-lib-example:${{ matrix.arch }}
         run: |
           docker image rm -f $imagetag
           cd $EXNAME/$example
@@ -36,7 +36,7 @@ jobs:
       - name: Build ${{ env.example }} application
         env:
           example: openssl_curl_example
-          imagetag: openssl-curl-example:1.0
+          imagetag: openssl-curl-example:${{ matrix.arch }}
         run: |
           docker image rm -f $imagetag
           cd $EXNAME/$example

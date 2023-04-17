@@ -24,8 +24,8 @@ jobs:
       - name: Build ${{ env.EXNAME }} application
         env:
           env_name: ${{ env.EXREPO }}-${{ env.EXNAME }}-env
-          imagetag_env: ${{ env.EXREPO }}_${{ env.EXNAME }}_environement:1.0
-          imagetag: ${{ env.EXREPO }}_${{ env.EXNAME }}:1.0
+          imagetag_env: ${{ env.EXREPO }}_${{ env.EXNAME }}_environment:${{ env.arch }}
+          imagetag: ${{ env.EXREPO }}_${{ env.EXNAME }}${{ env.arch }}
         run: |
           docker image rm -f $imagetag
           docker image rm -f $imagetag_env

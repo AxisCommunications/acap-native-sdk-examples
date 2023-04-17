@@ -24,7 +24,7 @@ jobs:
       - name: Build ${{ env.example }} application
         env:
           example: send_event
-          imagetag: ${{ env.EXREPO }}_send-event:1.0
+          imagetag: ${{ env.EXREPO }}_send-event:${{ matrix.arch }}
         run: |
           docker image rm -f $imagetag
           cd $EXNAME/$example
@@ -36,7 +36,7 @@ jobs:
       - name: Build ${{ env.example }} application
         env:
           example: subscribe_to_event
-          imagetag: ${{ env.EXREPO }}_subscribe-to-event:1.0
+          imagetag: ${{ env.EXREPO }}_subscribe-to-event:${{ matrix.arch }}
         run: |
           docker image rm -f $imagetag
           cd $EXNAME/$example
@@ -48,7 +48,7 @@ jobs:
       - name: Build ${{ env.example }} application
         env:
           example: subscribe_to_events
-          imagetag: ${{ env.EXREPO }}_subscribe-to-events:1.0
+          imagetag: ${{ env.EXREPO }}_subscribe-to-events:${{ matrix.arch }}
         run: |
           docker image rm -f $imagetag
           cd $EXNAME/$example
