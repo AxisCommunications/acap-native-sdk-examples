@@ -17,7 +17,7 @@ jobs:
         run: |
 
           # Whitelist this file
-          workflowfile=documentation-checks.yml
+          workflowfile=linter-documentation-links.yml
 
           # Version specific URL strings
           acap3_type_urls="help.axis.com/acap-3-developer-guide \

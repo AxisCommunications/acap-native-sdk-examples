@@ -31,7 +31,7 @@ jobs:
       - name: Build ${{ env.example }} application
         env:
           example: ${{ env.EXNAME }}-${{ matrix.chip }}
-          imagetag: ${{ env.EXREPO }}_${{ env.EXNAME }}-${{ matrix.chip }}:1.0
+          imagetag: ${{ env.EXREPO }}_${{ env.EXNAME }}-${{ matrix.chip }}:${{ matrix.arch }}
         run: |
           docker image rm -f $imagetag
           cd $EXNAME
