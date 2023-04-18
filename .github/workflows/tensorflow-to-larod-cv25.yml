@@ -15,7 +15,6 @@ jobs:
     env:
       EXREPO: acap-native-examples
       EXNAME: tensorflow-to-larod-cv25
-      EXDIR: acap/examples/$EXNAME
       arch: aarch64
       chip: cv25
     steps:

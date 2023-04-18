@@ -16,7 +16,6 @@ jobs:
     env:
       EXREPO: acap-native-examples
       EXNAME: using-opencv
-      EXDIR: acap/examples/$EXNAME
     steps:
       - uses: actions/checkout@v3
       - uses: docker/setup-buildx-action@v2
