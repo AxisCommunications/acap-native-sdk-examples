@@ -15,7 +15,6 @@ jobs:
     env:
       EXREPO: acap-native-examples
       EXNAME: tensorflow-to-larod
-      EXDIR: acap/examples/$EXNAME
       arch: armv7hf
     steps:
       - uses: actions/checkout@v3
