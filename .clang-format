@@ -1,0 +1,24 @@
+---
+# Most of the settings are inherited by LLVM default
+BasedOnStyle:  LLVM
+# Cpp covers both C and C++.
+Language:        Cpp
+AlignConsecutiveMacros: Consecutive
+AlignConsecutiveAssignments: Consecutive
+AlignConsecutiveBitFields: Consecutive
+AlignEscapedNewlines: Left
+AllowShortIfStatementsOnASingleLine: WithoutElse
+AllowShortLoopsOnASingleLine: true
+AlwaysBreakBeforeMultilineStrings: true
+ColumnLimit:     100
+IndentCaseLabels: true
+# Most files have used this indentation width and to not get to large diffs
+# at the first adaption to clang the width is kept at 4 instead of the LLVM and
+# Google default of 2.
+IndentWidth:     4
+PointerAlignment: Left
+KeepEmptyLinesAtTheStartOfBlocks: false
+SpacesBeforeTrailingComments: 2
+Standard:        Auto
+...
+

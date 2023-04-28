@@ -26,9 +26,9 @@ switch_case_indent = true
 keep_padding       = true
 space_redirects    = true
 
-# https://google.github.io/styleguide/cppguide.html
-[*.{py,c,cpp,h}]
-indent_size = 2
+# Align to clang-format at first implementation
+[*.{c,cpp,h}]
+indent_size = 4
 
 # https://google.github.io/styleguide/pyguide.html
 [*.py]

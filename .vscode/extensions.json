@@ -1,13 +1,14 @@
 {
-    "recommendations": [
-      "DavidAnson.vscode-markdownlint",
-      "editorconfig.editorconfig",
-      "exiasr.hadolint",
-      "timonwong.shellcheck",
-      "foxundermoon.shell-format",
-      "redhat.vscode-yaml",
-      "dbaeumer.vscode-eslint",
-      "yzhang.markdown-all-in-one",
-      "streetsidesoftware.code-spell-checker"
-    ]
-  }
+  "recommendations": [
+    "DavidAnson.vscode-markdownlint",
+    "editorconfig.editorconfig",
+    "exiasr.hadolint",
+    "timonwong.shellcheck",
+    "foxundermoon.shell-format",
+    "redhat.vscode-yaml",
+    "ms-vscode.cpptools",
+    "dbaeumer.vscode-eslint",
+    "yzhang.markdown-all-in-one",
+    "streetsidesoftware.code-spell-checker"
+  ]
+}

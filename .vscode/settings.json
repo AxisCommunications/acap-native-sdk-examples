@@ -2,9 +2,19 @@
   "[markdown]": {
     "editor.defaultFormatter": "DavidAnson.vscode-markdownlint",
     "editor.formatOnSave": true,
+    "editor.formatOnPaste": true,
+    "extension.list.indentationSize": "inherit"
+  },
+  "[c]": {
+    "editor.defaultFormatter": "ms-vscode.cpptools",
+    "editor.formatOnSave": true,
     "editor.formatOnPaste": true
   },
-  "markdown.extension.list.indentationSize": "inherit",
+  "[cpp]": {
+    "editor.defaultFormatter": "ms-vscode.cpptools",
+    "editor.formatOnSave": true,
+    "editor.formatOnPaste": true
+  },
   "hadolint.hadolintPath": ".vscode/hadolint",
   "hadolint.cliOptions": [],
   "yaml.schemas": {
