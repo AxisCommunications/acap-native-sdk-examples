@@ -34,7 +34,7 @@ class SimpleCOCODataGenerator(Sequence):
         a given image.
     """
     def __init__(self, samples_dir, annotation_path, width=480, height=270,
-                 batch_size=16, shuffle=True, balance=True):
+                 batch_size=2, shuffle=True, balance=True):
         """ Initializes the data generator.
 
         Args:

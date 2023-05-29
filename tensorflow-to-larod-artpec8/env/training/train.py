@@ -70,7 +70,7 @@ def export_evaluation_model(quantized_model_path, frozen_graph_path, model_confi
         model.summary()
 
 
-def quantize_and_finetune_model(data_generator, weights_path, quantized_model_path, model_configuration):
+def quantize_and_finetune_model(data_generator, weights_path, quantized_model_path, model_configuration, tune_epochs):
     """ Initiates a model, loads trained weights and performs quantization aware training
         by finetuning the trained model with quantization nodes. The quantized model
         model are then saved to quantized_model_path.
@@ -79,7 +79,8 @@ def quantize_and_finetune_model(data_generator, weights_path, quantized_model_pa
         data_generator (str): A data generator for supplying training data.
         weights_path (str): Path pointing to the trained model weights.
         quantized_model_path (str): Path to output the quantized, trained model model to.
-        model_configuration (dict): Key-word arguments to the model creation function
+        model_configuration (dict): Key-word arguments to the model creation function.
+        train_epochs (int): Number of desired epochs to finetune the model.
     """
     # Create a new session and graph for the quantization-aware training
     finetune_graph = tf.Graph()
@@ -104,18 +105,19 @@ def quantize_and_finetune_model(data_generator, weights_path, quantized_model_pa
         model.compile(optimizer='adam', metrics=['binary_accuracy'],
                       loss=['binary_crossentropy', 'binary_crossentropy'])
 
-        model.fit(data_generator, epochs=4, workers=4)
+        model.fit(data_generator, epochs=tune_epochs, workers=4)
         tf.train.Saver().save(finetune_sess, quantized_model_path)
 
 
-def train_model(data_generator, trained_model_path, model_configuration):
+def train_model(data_generator, trained_model_path, model_configuration, train_epochs):
     """ Initiates a model and trains it using a data generator. The model
         weights are then saved to the output path.
 
     Args:
         data_generator (str): A data generator for supplying training data.
         weights_path (str): Path to output the trained model weights to.
-        model_configuration (dict): Key-word arguments to the model creation function
+        model_configuration (dict): Key-word arguments to the model creation function.
+        train_epochs (int): Number of desired epochs to train the model.
     """
     # Create a new session and graph for the training
     train_graph = tf.Graph()
@@ -131,7 +133,7 @@ def train_model(data_generator, trained_model_path, model_configuration):
                       loss=['binary_crossentropy', 'binary_crossentropy'])
 
         model.summary()
-        model.fit(data_generator, epochs=8, workers=4)
+        model.fit(data_generator, epochs=train_epochs, workers=4)
 
         # Save model
         tf.train.Saver().save(train_sess, trained_model_path)
@@ -149,6 +151,10 @@ if __name__ == '__main__':
                         help='The width of the model\'s input image')
     parser.add_argument('--input-height', type=int, default=270,
                         help='The height of the model\'s input image')
+    parser.add_argument('-e', '--training-epochs', type=int, default=8,
+                        help='number of training epochs')
+    parser.add_argument('-t', '--tuning-epochs', type=int, default=4,
+                        help='number of fine-tuning epochs')
     args = parser.parse_args()
 
     print('Using TensorFlow version: {}'.format(tf.__version__))
@@ -158,12 +164,14 @@ if __name__ == '__main__':
     trained_model_path = '/env/models/fp32_model/model'
     quantized_model_path = '/env/models/qat_model/model'
     final_frozen_graph_path = '/env/models/trained_model.pb'
+    train_epochs = args.training_epochs
+    tune_epochs = args.tuning_epochs
 
     model_configuration = {'input_shape': (args.input_height, args.input_width, 3),
                            'n_blocks': 5, 'n_filters': 16}
 
-    train_model(data_generator, trained_model_path, model_configuration)
+    train_model(data_generator, trained_model_path, model_configuration, train_epochs)
     quantize_and_finetune_model(data_generator, trained_model_path,
-                                quantized_model_path, model_configuration)
+                                quantized_model_path, model_configuration, tune_epochs)
     export_evaluation_model(quantized_model_path, final_frozen_graph_path,
                             model_configuration)

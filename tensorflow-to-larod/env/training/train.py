@@ -27,20 +27,21 @@ from model import create_model
 from utils import SimpleCOCODataGenerator as DataGenerator
 
 
-def train(image_dir, annotation_path):
+def train(image_dir, annotation_path, train_epochs):
     """ Initiates a model and and trains it using a data generator. The model
         is then saved to the output path.
 
     Args:
         image_dir (str): Path to the directory holding the dataset images.
         annotation_path (str): Path to the dataset annotation json-file.
+        train_epochs (int): Number of desired epochs to train the model.
     """
     person_car_indicator = create_model()
     person_car_indicator.compile(optimizer='adam', metrics=['binary_accuracy'],
                                  loss=['bce', 'bce'])
     person_car_indicator.summary()
     data_generator = DataGenerator(image_dir, annotation_path, batch_size=16)
-    person_car_indicator.fit(data_generator, epochs=10)
+    person_car_indicator.fit(data_generator, epochs=train_epochs)
 
     tf.saved_model.save(person_car_indicator, 'models/saved_model')
 
@@ -53,6 +54,9 @@ if __name__ == '__main__':
     parser.add_argument('-a', '--annotations', type=str, required=True,
                         help='path to the .json-file containing COCO instance \
                         annotations')
+    parser.add_argument('-e', '--training-epochs', type=int, default=8,
+                        help='number of training epochs')
 
     args = parser.parse_args()
-    train(args.images, args.annotations)
+
+    train(args.images, args.annotations, args.training_epochs)
