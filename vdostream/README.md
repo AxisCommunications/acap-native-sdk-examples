@@ -1,4 +1,4 @@
- *Copyright (C) 2021, Axis Communications AB, Lund, Sweden. All Rights Reserved.*
+*Copyright (C) 2021, Axis Communications AB, Lund, Sweden. All Rights Reserved.*
 
 # A vdo stream based ACAP application on an edge device
 

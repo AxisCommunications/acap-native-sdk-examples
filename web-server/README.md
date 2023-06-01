@@ -1,3 +1,5 @@
+*Copyright (C) 2021, Axis Communications AB, Lund, Sweden. All Rights Reserved.*
+
 # How to run a web server in an ACAP application
 
 This example explains how to build and use [Monkey Web Server](https://github.com/monkey/monkey) in ACAP Native SDK with Reverse Proxy configuration in Apache Server.

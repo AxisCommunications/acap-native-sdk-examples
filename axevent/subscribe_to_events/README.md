@@ -1,4 +1,4 @@
- *Copyright (C) 2021, Axis Communications AB, Lund, Sweden. All Rights Reserved.*
+*Copyright (C) 2021, Axis Communications AB, Lund, Sweden. All Rights Reserved.*
 
 # An ACAP application subscribing to multiple events
 

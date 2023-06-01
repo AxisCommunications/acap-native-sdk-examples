@@ -1,4 +1,4 @@
- *Copyright (C) 2020, Axis Communications AB, Lund, Sweden. All Rights Reserved.*
+*Copyright (C) 2020, Axis Communications AB, Lund, Sweden. All Rights Reserved.*
 
 # An example of how to use containers in a native ACAP application
 
