@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *     https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -87,7 +87,7 @@ static bool setupLarod(const char* chipString, const int larodModelFd,
     // List available chip id:s
     size_t numDevices = 0;
     syslog(LOG_INFO, "Available chip IDs:");
-    const larodDevice** devices; 
+    const larodDevice** devices;
     devices = larodListDevices(conn, &numDevices, &error);
     for (size_t i = 0; i < numDevices; ++i) {
             syslog(LOG_INFO, "%s: %s", "Chip", larodGetDeviceName(devices[i], &error));;
@@ -165,7 +165,7 @@ int main(int argc, char** argv) {
     const int inputWidth = atoi(argv[3]);
     const int inputHeight = atoi(argv[4]);
     const int numRounds = atoi(argv[5]);
-    
+
     // Open the syslog to report messages for "vdo_larod"
     openlog("vdo_larod", LOG_PID|LOG_CONS, LOG_USER);
     syslog(LOG_INFO, "Starting %s", argv[0]);

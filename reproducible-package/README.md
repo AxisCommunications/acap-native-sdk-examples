@@ -1,4 +1,4 @@
- *Copyright (C) 2021, Axis Communications AB, Lund, Sweden. All Rights Reserved.*
+*Copyright (C) 2021, Axis Communications AB, Lund, Sweden. All Rights Reserved.*
 
 # An example of how to create a reproducible ACAP application
 

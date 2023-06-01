@@ -1,4 +1,4 @@
- *Copyright (C) 2021, Axis Communications AB, Lund, Sweden. All Rights Reserved.*
+*Copyright (C) 2021, Axis Communications AB, Lund, Sweden. All Rights Reserved.*
 
 # A guide to building and running a custom library in an ACAP application
 
