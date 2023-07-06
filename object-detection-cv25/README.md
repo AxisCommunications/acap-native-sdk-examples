@@ -4,7 +4,7 @@
 
 ## Overview
 
-This example focuses on the application of object detection on an CV25 Axis camera. A pretrained model [MobileNet SSD v2 (COCO)] is used to detect the location of 90 types of different objects. The model is downloaded through from tensorflow hub, and converted using the ambarella toolchain. The detected objects are saved in /tmp folder for further usage.
+This example focuses on the application of object detection on an CV25 Axis camera. A pretrained model [MobileNet SSD v2 (COCO)] is used to detect the location of 90 types of different objects. The model is downloaded through from Tensorflow Hub, and converted using the Ambarella toolchain. The detected objects are saved in /tmp folder for further usage.
 
 ## Prerequisites
 
@@ -40,44 +40,45 @@ The following instructions can be executed to simply run the example.
 
 ## Designing the application
 
-The whole principle is similar to the [tensorflow-to-larod](../tensorflow-to-larod). In this example, the original video has a resolution of 640x360, while the input size of MobileNet SSD COCO requires a input size of 300x300, so we set up two different streams, one is for MobileNet model, another is used to crop a higher resolution jpg image.
+The whole principle is similar to the [tensorflow-to-larod-cv25](../tensorflow-to-larod-cv25). In this example, the original video stream has a resolution of 640x360, while MobileNet SSD COCO requires an input size of 300x300, so we set up two different streams: one is for MobileNet model, another is used to crop a higher resolution jpg image.
 
-### Setting up the MobileNet Stream
+### Setting up the MobileNet stream
 
 There are two methods used to obtain a proper resolution. The [chooseStreamResolution](app/imgprovider.c#L221) method is used to select the smallest stream and assign them into streamWidth and streamHeight.
 
 ```c
 unsigned int streamWidth = 0;
 unsigned int streamHeight = 0;
-chooseStreamResolution(args.width, args.height, &streamWidth, &streamHeight);
+chooseStreamResolution(inputWidth, inputHeight, &streamWidth, &streamHeight);
 ```
 
-Then the [createImgProvider](app/imgprovider.c#L95) method is used to return an ImgProvider with the selected [output format](https://axiscommunications.github.io/acap-documentation/docs/api/src/api/vdostream/html/vdo-types_8h.html#a5ed136c302573571bf325c39d6d36246).
+Then, the [createImgProvider](app/imgprovider.c#L95) method is used to return an ImgProvider with the selected [output format](https://axiscommunications.github.io/acap-documentation/docs/api/src/api/vdostream/html/vdo-types_8h.html#a5ed136c302573571bf325c39d6d36246).
 
 ```c
 provider = createImgProvider(streamWidth, streamHeight, 2, VDO_FORMAT_YUV);
 ```
 
-#### Setting up the Crop Stream
+#### Setting up the crop stream
 
-The original resolution args.raw_width x args.raw_height is used to crop a higher resolution image.
+The original resolution `args.raw_width` x `args.raw_height` is used to crop a higher resolution image.
 
 ```c
-provider_raw = createImgProvider(args.raw_width, args.raw_height, 2, VDO_FORMAT_YUV);
+provider_raw = createImgProvider(rawWidth, rawHeight, 2, VDO_FORMAT_YUV);
 ```
 
 #### Setting up the larod interface
 
-Then similar with [tensorflow-to-larod](../tensorflow-to-larod), the [larod](https://axiscommunications.github.io/acap-documentation/docs/api/src/api/larod/html/index.html) interface needs to be set up. The [setupLarod](app/object_detection.c#L236) method is used to create a conncection to larod and select the hardware to use the model.
+Then similar with [tensorflow-to-larod-cv25](../tensorflow-to-larod-cv25), the [larod](https://axiscommunications.github.io/acap-documentation/docs/api/src/api/larod/html/index.html) interface needs to be set up. The [setupLarod](app/object_detection.c#L329) method is used to create a conncection to larod and select the hardware to use the model.
 
 ```c
 int larodModelFd = -1;
+const char* chipString;
 larodConnection* conn = NULL;
 larodModel* model = NULL;
-setupLarod(args.chip, larodModelFd, &conn, &model);
+setupLarod(chipString, larodModelFd, &conn, &model);
 ```
 
-The [createAndMapTmpFile](app/object_detection.c#L173) method is used to create temporary files to store the input and output tensors.
+The [createAndMapTmpFile](app/object_detection.c#L266) method is used to create temporary files to store the input and output tensors.
 
 ```c
 char CONV_INP_FILE_PATTERN[] = "/tmp/larod.in.test-XXXXXX";
@@ -90,7 +91,9 @@ int larodInputFd = -1;
 int larodOutput1Fd = -1;
 int larodOutput2Fd = -1;
 
-createAndMapTmpFile(CONV_INP_FILE_PATTERN,  args.width * args.height * CHANNELS, &larodInputAddr, &larodInputFd);
+createAndMapTmpFile(CONV_INP_FILE_PATTERN,(inputWidth + padding) * inputHeight * CHANNELS,
+                    &larodInputAddr, &larodInputFd);
+createAndMapTmpFile(CONV_PP_FILE_PATTERN, yuyvBufferSize, &ppInputAddr, &ppInputFd);
 createAndMapTmpFile(CONV_OUT1_FILE_PATTERN, TENSOR1SIZE, &larodOutput1Addr, &larodOutput1Fd);
 createAndMapTmpFile(CONV_OUT2_FILE_PATTERN, TENSOR2SIZE, &larodOutput2Addr, &larodOutput2Fd);
 ```
@@ -102,7 +105,7 @@ char CROP_FILE_PATTERN[] = "/tmp/crop.test-XXXXXX";
 void* cropAddr = MAP_FAILED;
 int cropFd = -1;
 
-createAndMapTmpFile(CROP_FILE_PATTERN, args.raw_width * args.raw_height * CHANNELS, &cropAddr, &cropFd);
+createAndMapTmpFile(CROP_FILE_PATTERN, rawWidth * rawHeight * CHANNELS, &cropAddr, &cropFd);
 ```
 
 The `larodCreateModelInputs` and `larodCreateModelOutputs` methods map the input and output tensors with the model.
@@ -137,7 +140,7 @@ VdoBuffer* buf = getLastFrameBlocking(provider);
 uint8_t* nv12Data = (uint8_t*) vdo_buffer_get_data(buf);
 ```
 
-Axis cameras output images on the NV12 YUV format. As this is not normally used as input format to deep learning models,
+Axis cameras outputs frames on the NV12 YUV format. As this is not normally used as input format to deep learning models,
 conversion to e.g., RGB might be needed. This is done by creating a pre-processing job request `ppReq` using the function `larodCreateJobRequest`.
 
 ```c
@@ -150,7 +153,15 @@ The image data is then converted from NV12 format to interleaved uint8_t RGB for
 larodRunJob(conn, ppReq, &error)
 ```
 
-By using the `larodRunJob` function on `infReq`, the predictions from the MobileNet are saved into the specified addresses.
+To ensure compatibility with the CV25 device, it is required to apply padding to the obtained frame. The CV25 device has a specific requirement where both input and output sizes must be multiples of 32 bytes.
+
+In our example, the model used expects an input size of 300x300 pixels, but it is necessary to convert the image dimensions to 300x320 pixels to satisfy the chip requirements. This is done by adding 20 bytes of padding to each row of the image.
+
+```c
+padImageWidth(rgb_image, larodInputAddr, inputWidth, inputHeight, padding)
+```
+
+By using the `larodRunJob` function on `infReq`, the predictions from the MobileNet model are saved into the specified addresses.
 
 ```c
 larodRunJob(conn, infReq, &error);
@@ -237,7 +248,7 @@ In the system log the chip is sometimes only mentioned as a string, they are map
 | Ambarella CVFlow (NN) | 6 | ambarella-cvflow |
 | ARTPEC-8 DLPU | 12 | axis-a8-dlpu-tflite |
 
-There are four outputs from MobileNet SSD v2 (COCO) model. The number of detections, cLasses, scores, and locations are shown as below. The four location numbers stand for [top, left, bottom, right]. By the way, currently the saved images will be overwritten continuously, so those saved images might not all from the detections of the last frame, if the number of detections is less than previous detection numbers.
+There are four outputs from MobileNet SSD v2 (COCO) model. The number of detections, cLasses, scores, and locations are shown as below. The four location numbers stand for \[top, left, bottom, right\]. By the way, currently the saved images will be overwritten continuously, so those saved images might not all from the detections of the last frame, if the number of detections is less than previous detection numbers.
 
 ```sh
 [ INFO    ] object_detection[645]: Object 1: Classes: 2 car - Scores: 0.769531 - Locations: [0.750146,0.086451,0.894765,0.299347]
