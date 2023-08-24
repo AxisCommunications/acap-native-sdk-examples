@@ -28,10 +28,10 @@
  *
  */
 
+#include <axoverlay.h>
+#include <cairo/cairo.h>
 #include <errno.h>
 #include <glib.h>
-#include <cairo/cairo.h>
-#include <axoverlay.h>
 #include <syslog.h>
 
 #define PALETTE_VALUE_RANGE 255.0
@@ -58,7 +58,7 @@ static gint bottom_color = 3;
  * return color value.
  */
 static gdouble
-index2cairo(gint color_index)
+index2cairo(const gint color_index)
 {
   return ((color_index << 4) + color_index) / PALETTE_VALUE_RANGE;
 }
@@ -104,7 +104,7 @@ draw_rectangle(cairo_t *context, gint left, gint top,
  * param pos_y Center position coordinate (y).
  */
 static void
-draw_text(cairo_t *context, gint pos_x, gint pos_y)
+draw_text(cairo_t *context, const gint pos_x, const gint pos_y)
 {
   cairo_text_extents_t te;
   cairo_text_extents_t te_length;
@@ -164,7 +164,7 @@ setup_axoverlay_data(struct axoverlay_overlay_data *data)
  * return result as boolean
  */
 static gboolean
-setup_palette_color(gint index, gint r, gint g, gint b, gint a)
+setup_palette_color(const int index, const gint r, const gint g, const gint b, const gint a)
 {
   GError *error = NULL;
   struct axoverlay_palette_color color;
@@ -204,7 +204,7 @@ setup_palette_color(gint index, gint r, gint g, gint b, gint a)
  * param user_data Optional user data associated with this overlay.
  */
 static void
-adjustment_cb(gint id, struct axoverlay_stream_data *stream,
+adjustment_cb(const gint id, const struct axoverlay_stream_data *stream,
               enum axoverlay_position_type *postype,
               gfloat *overlay_x, gfloat *overlay_y,
               gint *overlay_width, gint *overlay_height,
@@ -235,11 +235,11 @@ adjustment_cb(gint id, struct axoverlay_stream_data *stream,
  * param user_data Optional user data associated with this overlay.
  */
 static void
-render_overlay_cb(gpointer rendering_context, gint id,
-                  struct axoverlay_stream_data *stream,
-                  enum axoverlay_position_type postype, gfloat overlay_x,
-                  gfloat overlay_y, gint overlay_width, gint overlay_height,
-                  gpointer user_data)
+render_overlay_cb(gpointer rendering_context, const gint id,
+                  const struct axoverlay_stream_data *stream,
+                  const enum axoverlay_position_type postype, const gfloat overlay_x,
+                  const gfloat overlay_y, const gint overlay_width, const gint overlay_height,
+                  const gpointer user_data)
 {
   gdouble val = FALSE;
 
