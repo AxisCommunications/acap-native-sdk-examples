@@ -426,7 +426,6 @@ int main(int argc, char** argv) {
     void* cropAddr                  = NULL;
     void* ppInputAddr               = MAP_FAILED;
     void* ppOutputAddr              = MAP_FAILED;
-    size_t outputBufferSize         = 0;
     void* ppInputAddrHD             = MAP_FAILED;
     void* ppOutputAddrHD            = MAP_FAILED;
     void* larodInputAddr            = MAP_FAILED;
@@ -451,7 +450,8 @@ int main(int argc, char** argv) {
 
     args_t args;
     if (!parseArgs(argc, argv, &args)) {
-        goto end;
+        syslog(LOG_ERR, "%s: Could not parse arguments", __func__);
+        goto earlyend;
     }
 
     const char* chipString       = args.chip;
@@ -667,7 +667,7 @@ int main(int argc, char** argv) {
     size_t rgbBufferSize = ppOutputPitches->pitches[0];
     size_t expectedSize  = inputWidth * inputHeight * CHANNELS;
     if (expectedSize != rgbBufferSize) {
-        syslog(LOG_ERR, "Expected video output size %ld, actual %ld", expectedSize, rgbBufferSize);
+        syslog(LOG_ERR, "Expected video output size %zu, actual %zu", expectedSize, rgbBufferSize);
         goto end;
     }
     const larodTensorPitches* outputPitches = larodGetTensorPitches(outputTensors[0], &error);
@@ -675,7 +675,6 @@ int main(int argc, char** argv) {
         syslog(LOG_ERR, "Could not get pitches of tensor: %s", error->msg);
         goto end;
     }
-    outputBufferSize = outputPitches->pitches[0];
 
     // Allocate space for input tensor
     syslog(LOG_INFO, "Allocate memory for input/output buffers");
@@ -778,7 +777,7 @@ int main(int argc, char** argv) {
         }
     }
 
-    syslog(LOG_INFO, "Found %lx input tensors and %lx output tensors", numInputs, numOutputs);
+    syslog(LOG_INFO, "Found %zu input tensors and %zu output tensors", numInputs, numOutputs);
     syslog(LOG_INFO, "Start fetching video frames from VDO");
     if (!startFrameFetch(sdImageProvider)) {
         syslog(LOG_ERR, "Stuck in provider");
@@ -1017,6 +1016,7 @@ end:
         free(boxes);
     }
 
+earlyend:
     syslog(LOG_INFO, "Exit %s", argv[0]);
     return ret ? EXIT_SUCCESS : EXIT_FAILURE;
 }

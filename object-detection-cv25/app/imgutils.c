@@ -14,10 +14,14 @@
  * limitations under the License.
  */
 
-#include <jpeglib.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+/** Note that the order of the import matters for some reason and
+ * jpeglib. must come after stdio.h
+ */
+#include <jpeglib.h>
 
 /**
  * @brief Encode an image buffer as jpeg and store it in memory
