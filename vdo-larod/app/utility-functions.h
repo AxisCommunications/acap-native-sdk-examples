@@ -14,13 +14,12 @@
  * limitations under the License.
  */
 
-
 #include <errno.h>
 #include <fcntl.h>
-#include <stdio.h>
-#include <stdlib.h>
 #include <stdbool.h>
 #include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include <sys/mman.h>
 #include <sys/stat.h>
 #include <syslog.h>
@@ -50,9 +49,4 @@ void saveRgbImageAsPpm(const uint8_t* rgbData, int width, int height, const char
  * param Pointer to the generated fd.
  * return False if any errors occur, otherwise true.
  */
-bool createAndMapTmpFile(char* fileName, size_t fileSize,
-                                void** mappedAddr, int* convFd);
-
-
-
-
+bool createAndMapTmpFile(char* fileName, size_t fileSize, void** mappedAddr, int* convFd);

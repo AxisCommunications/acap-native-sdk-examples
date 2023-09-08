@@ -31,8 +31,7 @@
  * It writes "Hello World!" to the syslog through custom lib.
  *
  */
-int main(void)
-{
-  log_hello_world();
-  return 0;
+int main(void) {
+    log_hello_world();
+    return 0;
 }

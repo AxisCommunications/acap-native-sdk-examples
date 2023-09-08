@@ -14,9 +14,8 @@
  * limitations under the License.
  */
 
-
-#include <stdlib.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 // define box struct
@@ -29,13 +28,13 @@ typedef struct {
     int label;
 } box;
 
-
-
 /**
  * @brief convert output from model into detection boxes
  *
- * @param locations output from the model of size num_of_detections*4 containing the location of the boxes in the format [dy, dx, dh, dw]
- * @param classes output from the model of size num_of_detections*num_of_classes containing the confidence for each class
+ * @param locations output from the model of size num_of_detections*4 containing the location of the
+ * boxes in the format [dy, dx, dh, dw]
+ * @param classes output from the model of size num_of_detections*num_of_classes containing the
+ * confidence for each class
  * @param num_of_detections number of detections
  * @param anchors_file path to file containing anchors
  * @param num_of_classes number of classes
@@ -47,8 +46,6 @@ typedef struct {
  * @param w_scale scale factor for the width
  * @param boxes output array of boxes
  */
-int postProcessing(float* locations, float* classes,
-                    int num_of_detections, char* anchor_file,
-                    int num_of_classes, float score_threshold, float nms_threshold,
-                    float y_scale, float x_scale, float h_scale, float w_scale,
-                    box* boxes);
+int postProcessing(float* locations, float* classes, int num_of_detections, char* anchor_file,
+                   int num_of_classes, float score_threshold, float nms_threshold, float y_scale,
+                   float x_scale, float h_scale, float w_scale, box* boxes);

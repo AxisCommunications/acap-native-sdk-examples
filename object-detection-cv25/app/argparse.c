@@ -25,8 +25,7 @@
 
 #define KEY_USAGE (127)
 
-static int parsePosInt(char* arg, unsigned long long* i,
-                       unsigned long long limit);
+static int parsePosInt(char* arg, unsigned long long* i, unsigned long long limit);
 static int parseOpt(int key, char* arg, struct argp_state* state);
 
 const struct argp_option opts[] = {
@@ -41,7 +40,8 @@ const struct argp_option opts[] = {
 const struct argp argp = {
     opts,
     parseOpt,
-    "MODEL WIDTH HEIGHT PADDING QUALITY RAW_WIDTH RAW_HEIGHT THRESHOLD LABELSFILE NUMLABELS NUMDETECTIONS ANCHORSFILE",
+    "MODEL WIDTH HEIGHT PADDING QUALITY RAW_WIDTH RAW_HEIGHT THRESHOLD LABELSFILE NUMLABELS "
+    "NUMDETECTIONS ANCHORSFILE",
     "This is an example app which loads an object detection MODEL to "
     "larod and then uses vdo to fetch frames of size WIDTH x HEIGHT in yuv "
     "format which are converted to interleaved rgb format and then sent to "
@@ -75,112 +75,112 @@ int parseOpt(int key, char* arg, struct argp_state* state) {
     args_t* args = state->input;
 
     switch (key) {
-    case 'c': {
-        args->chip = arg;
-        break;
-    }
-    case 'h':
-        argp_state_help(state, stdout, ARGP_HELP_STD_HELP);
-        break;
-    case KEY_USAGE:
-        argp_state_help(state, stdout, ARGP_HELP_USAGE | ARGP_HELP_EXIT_OK);
-        break;
-    case ARGP_KEY_ARG:
-        if (state->arg_num == 0) {
-            args->modelFile = arg;
-        } else if (state->arg_num == 1) {
-            unsigned long long width;
-            int ret = parsePosInt(arg, &width, UINT_MAX);
-            if (ret) {
-                argp_failure(state, EXIT_FAILURE, ret, "invalid width");
-            }
-            args->width = (unsigned int) width;
-        } else if (state->arg_num == 2) {
-            unsigned long long height;
-            int ret = parsePosInt(arg, &height, UINT_MAX);
-            if (ret) {
-                argp_failure(state, EXIT_FAILURE, ret, "invalid height");
-            }
-            args->height = (unsigned int) height;
-        } else if (state->arg_num == 3) {
-            unsigned long long padding;
-            int ret = parsePosInt(arg, &padding, UINT_MAX);
-            if (ret) {
-                argp_failure(state, EXIT_FAILURE, ret, "invalid padding");
-            }
-            args->padding = (unsigned int) padding;
-        } else if (state->arg_num == 4) {
-            unsigned long long quality;
-            int ret = parsePosInt(arg, &quality, UINT_MAX);
-            if (ret) {
-                argp_failure(state, EXIT_FAILURE, ret, "invalid quality");
-            }
-            args->quality = (unsigned int) quality;
-        } else if (state->arg_num == 5) {
-            unsigned long long raw_width;
-            int ret = parsePosInt(arg, &raw_width, UINT_MAX);
-            if (ret) {
-                argp_failure(state, EXIT_FAILURE, ret, "invalid raw_width");
-            }
-            args->raw_width = (unsigned int) raw_width;
-        } else if (state->arg_num == 6) {
-            unsigned long long raw_height;
-            int ret = parsePosInt(arg, &raw_height, UINT_MAX);
-            if (ret) {
-                argp_failure(state, EXIT_FAILURE, ret, "invalid raw_height");
-            }
-            args->raw_height = (unsigned int) raw_height;
-        } else if (state->arg_num == 7) {
-            unsigned long long threshold;
-            int ret = parsePosInt(arg, &threshold, UINT_MAX);
-            if (ret) {
-                argp_failure(state, EXIT_FAILURE, ret, "invalid threshold");
-            }
-            args->threshold = (unsigned int) threshold;
-        } else if (state->arg_num == 8) {
-            args->labelsFile = arg;
-        } else if (state->arg_num == 9) {
-            unsigned long long numLabels;
-            int ret = parsePosInt(arg, &numLabels, UINT_MAX);
-            if (ret) {
-                argp_failure(state, EXIT_FAILURE, ret, "invalid numLabels");
-            }
-            args->numLabels = (unsigned int) numLabels;
-        } else if (state->arg_num == 10) {
-            unsigned long long numDetections;
-            int ret = parsePosInt(arg, &numDetections, UINT_MAX);
-            if (ret) {
-                argp_failure(state, EXIT_FAILURE, ret, "invalid numDetections");
-            }
-            args->numDetections = (unsigned int) numDetections;
-        } else if (state->arg_num == 11) {
-            args->anchorsFile = arg;
-        } else {
-            argp_error(state, "Too many arguments given");
+        case 'c': {
+            args->chip = arg;
+            break;
         }
-        break;
-    case ARGP_KEY_INIT:
-        args->width = 0;
-        args->height = 0;
-        args->padding = 0;
-        args->quality = 0;
-        args->raw_width = 0;
-        args->raw_height = 0;
-        args->threshold = 0;
-        args->chip = NULL;
-        args->modelFile = NULL;
-        args->labelsFile = NULL;
-        args->anchorsFile = NULL;
-        args->numLabels = 0;
-        args->numDetections = 0;
-        break;
-    case ARGP_KEY_END:
-        if (state->arg_num != 12) {
-            argp_error(state, "Invalid number of arguments given");
-        }
-        break;
-    default:
-        return ARGP_ERR_UNKNOWN;
+        case 'h':
+            argp_state_help(state, stdout, ARGP_HELP_STD_HELP);
+            break;
+        case KEY_USAGE:
+            argp_state_help(state, stdout, ARGP_HELP_USAGE | ARGP_HELP_EXIT_OK);
+            break;
+        case ARGP_KEY_ARG:
+            if (state->arg_num == 0) {
+                args->modelFile = arg;
+            } else if (state->arg_num == 1) {
+                unsigned long long width;
+                int ret = parsePosInt(arg, &width, UINT_MAX);
+                if (ret) {
+                    argp_failure(state, EXIT_FAILURE, ret, "invalid width");
+                }
+                args->width = (unsigned int)width;
+            } else if (state->arg_num == 2) {
+                unsigned long long height;
+                int ret = parsePosInt(arg, &height, UINT_MAX);
+                if (ret) {
+                    argp_failure(state, EXIT_FAILURE, ret, "invalid height");
+                }
+                args->height = (unsigned int)height;
+            } else if (state->arg_num == 3) {
+                unsigned long long padding;
+                int ret = parsePosInt(arg, &padding, UINT_MAX);
+                if (ret) {
+                    argp_failure(state, EXIT_FAILURE, ret, "invalid padding");
+                }
+                args->padding = (unsigned int)padding;
+            } else if (state->arg_num == 4) {
+                unsigned long long quality;
+                int ret = parsePosInt(arg, &quality, UINT_MAX);
+                if (ret) {
+                    argp_failure(state, EXIT_FAILURE, ret, "invalid quality");
+                }
+                args->quality = (unsigned int)quality;
+            } else if (state->arg_num == 5) {
+                unsigned long long raw_width;
+                int ret = parsePosInt(arg, &raw_width, UINT_MAX);
+                if (ret) {
+                    argp_failure(state, EXIT_FAILURE, ret, "invalid raw_width");
+                }
+                args->raw_width = (unsigned int)raw_width;
+            } else if (state->arg_num == 6) {
+                unsigned long long raw_height;
+                int ret = parsePosInt(arg, &raw_height, UINT_MAX);
+                if (ret) {
+                    argp_failure(state, EXIT_FAILURE, ret, "invalid raw_height");
+                }
+                args->raw_height = (unsigned int)raw_height;
+            } else if (state->arg_num == 7) {
+                unsigned long long threshold;
+                int ret = parsePosInt(arg, &threshold, UINT_MAX);
+                if (ret) {
+                    argp_failure(state, EXIT_FAILURE, ret, "invalid threshold");
+                }
+                args->threshold = (unsigned int)threshold;
+            } else if (state->arg_num == 8) {
+                args->labelsFile = arg;
+            } else if (state->arg_num == 9) {
+                unsigned long long numLabels;
+                int ret = parsePosInt(arg, &numLabels, UINT_MAX);
+                if (ret) {
+                    argp_failure(state, EXIT_FAILURE, ret, "invalid numLabels");
+                }
+                args->numLabels = (unsigned int)numLabels;
+            } else if (state->arg_num == 10) {
+                unsigned long long numDetections;
+                int ret = parsePosInt(arg, &numDetections, UINT_MAX);
+                if (ret) {
+                    argp_failure(state, EXIT_FAILURE, ret, "invalid numDetections");
+                }
+                args->numDetections = (unsigned int)numDetections;
+            } else if (state->arg_num == 11) {
+                args->anchorsFile = arg;
+            } else {
+                argp_error(state, "Too many arguments given");
+            }
+            break;
+        case ARGP_KEY_INIT:
+            args->width         = 0;
+            args->height        = 0;
+            args->padding       = 0;
+            args->quality       = 0;
+            args->raw_width     = 0;
+            args->raw_height    = 0;
+            args->threshold     = 0;
+            args->chip          = NULL;
+            args->modelFile     = NULL;
+            args->labelsFile    = NULL;
+            args->anchorsFile   = NULL;
+            args->numLabels     = 0;
+            args->numDetections = 0;
+            break;
+        case ARGP_KEY_END:
+            if (state->arg_num != 12) {
+                argp_error(state, "Invalid number of arguments given");
+            }
+            break;
+        default:
+            return ARGP_ERR_UNKNOWN;
     }
 
     return 0;
@@ -194,8 +194,7 @@ int parseOpt(int key, char* arg, struct argp_state* state) {
  * param limit Max limit for data type integer will be saved to.
  * return Positive errno style return code (zero means success).
  */
-static int parsePosInt(char* arg, unsigned long long* i,
-                       unsigned long long limit) {
+static int parsePosInt(char* arg, unsigned long long* i, unsigned long long limit) {
     char* endPtr;
 
     *i = strtoull(arg, &endPtr, 0);
