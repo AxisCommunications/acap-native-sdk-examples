@@ -14,11 +14,10 @@
  * limitations under the License.
  */
 
-
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
 #include <jpeglib.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 /**
  * @brief Encode an image buffer as jpeg and store it in memory
@@ -30,7 +29,6 @@
  */
 void buffer_to_jpeg(unsigned char* image_buffer, struct jpeg_compress_struct* jpeg_conf,
                     unsigned long* jpeg_size, unsigned char** jpeg_buffer);
-
 
 /**
  * @brief Inserts common values into a jpeg configuration struct
@@ -44,7 +42,6 @@ void buffer_to_jpeg(unsigned char* image_buffer, struct jpeg_compress_struct* jp
 void set_jpeg_configuration(int width, int height, int channels, int quality,
                             struct jpeg_compress_struct* jpeg_conf);
 
-
 /**
  * @brief Writes a memory buffer to a file
  *
@@ -53,7 +50,6 @@ void set_jpeg_configuration(int width, int height, int channels, int quality,
  * @param buffer_size The size of the data to be written
  */
 void jpeg_to_file(char* file_name, unsigned char* buffer, unsigned long buffer_size);
-
 
 /**
  * @brief Crops a rectangular patch from an image buffer.
@@ -68,11 +64,8 @@ void jpeg_to_file(char* file_name, unsigned char* buffer, unsigned long buffer_s
  * @param crop_w The width of the desired crop in pixels
  * @param crop_h The height of the desired crop in pixels
  */
-unsigned char* crop_interleaved(unsigned char* image_buffer, int image_w,
-                                int image_h, int channels,
-                                int crop_x, int crop_y,
-                                int crop_w, int crop_h);
-
+unsigned char* crop_interleaved(unsigned char* image_buffer, int image_w, int image_h, int channels,
+                                int crop_x, int crop_y, int crop_w, int crop_h);
 
 /**
  * @brief An example of how to use the supplied utility functions

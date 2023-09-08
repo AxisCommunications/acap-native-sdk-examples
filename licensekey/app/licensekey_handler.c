@@ -23,47 +23,43 @@
  *
  */
 #include <glib.h>
+#include <licensekey.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <syslog.h>
-#include <stdio.h>
-#include <licensekey.h>
 
-#define APP_ID           0
-#define MAJOR_VERSION    1
-#define MINOR_VERSION    0
+#define APP_ID        0
+#define MAJOR_VERSION 1
+#define MINOR_VERSION 0
 
 // This is a very simplistic example, checking every 5 minutes
-#define CHECK_SECS       300
+#define CHECK_SECS 300
 
-static gchar *glob_app_name = NULL;
+static gchar* glob_app_name = NULL;
 
 // Checks licensekey status every 5th minute
-gboolean
-check_license_status(void *data)
-{
-  if (licensekey_verify(glob_app_name, APP_ID, MAJOR_VERSION, MINOR_VERSION) != 1) {
-    syslog(LOG_INFO, "Licensekey is invalid");
-  } else {
-    syslog(LOG_INFO, "Licensekey is valid");
-  }
-  return TRUE;
+gboolean check_license_status(void* data) {
+    if (licensekey_verify(glob_app_name, APP_ID, MAJOR_VERSION, MINOR_VERSION) != 1) {
+        syslog(LOG_INFO, "Licensekey is invalid");
+    } else {
+        syslog(LOG_INFO, "Licensekey is valid");
+    }
+    return TRUE;
 }
 
 /**
  * Main function
  */
-int
-main(int argc, char *argv[])
-{
-  GMainLoop *loop;
+int main(int argc, char* argv[]) {
+    GMainLoop* loop;
 
-  glob_app_name = g_path_get_basename(argv[0]);
-  openlog(glob_app_name, LOG_PID | LOG_CONS, LOG_USER);
-  loop = g_main_loop_new(NULL, FALSE);
+    glob_app_name = g_path_get_basename(argv[0]);
+    openlog(glob_app_name, LOG_PID | LOG_CONS, LOG_USER);
+    loop = g_main_loop_new(NULL, FALSE);
 
-  check_license_status(NULL);
-  g_timeout_add_seconds(CHECK_SECS, check_license_status, NULL);
+    check_license_status(NULL);
+    g_timeout_add_seconds(CHECK_SECS, check_license_status, NULL);
 
-  g_main_loop_run(loop);
-  return EXIT_SUCCESS;
+    g_main_loop_run(loop);
+    return EXIT_SUCCESS;
 }

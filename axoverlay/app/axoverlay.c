@@ -36,13 +36,13 @@
 
 #define PALETTE_VALUE_RANGE 255.0
 
-static GMainLoop *main_loop = NULL;
+static GMainLoop* main_loop = NULL;
 static gint animation_timer = -1;
 static gint overlay_id      = -1;
 static gint overlay_id_text = -1;
-static gint counter = 10;
-static gint top_color = 1;
-static gint bottom_color = 3;
+static gint counter         = 10;
+static gint top_color       = 1;
+static gint bottom_color    = 3;
 
 /***** Drawing functions *****************************************************/
 
@@ -57,10 +57,8 @@ static gint bottom_color = 3;
  *
  * return color value.
  */
-static gdouble
-index2cairo(const gint color_index)
-{
-  return ((color_index << 4) + color_index) / PALETTE_VALUE_RANGE;
+static gdouble index2cairo(const gint color_index) {
+    return ((color_index << 4) + color_index) / PALETTE_VALUE_RANGE;
 }
 
 /**
@@ -78,19 +76,16 @@ index2cairo(const gint color_index)
  * param color_index Palette color index.
  * param line_width Rectange line width.
  */
-static void
-draw_rectangle(cairo_t *context, gint left, gint top,
-               gint right, gint bottom,
-               gint color_index, gint line_width)
-{
-  gdouble val = 0;
+static void draw_rectangle(cairo_t* context, gint left, gint top, gint right, gint bottom,
+                           gint color_index, gint line_width) {
+    gdouble val = 0;
 
-  val = index2cairo(color_index);
-  cairo_set_source_rgba(context, val, val, val, val);
-  cairo_set_operator(context, CAIRO_OPERATOR_SOURCE);
-  cairo_set_line_width(context, line_width);
-  cairo_rectangle(context, left, top, right - left, bottom - top);
-  cairo_stroke(context);
+    val = index2cairo(color_index);
+    cairo_set_source_rgba(context, val, val, val, val);
+    cairo_set_operator(context, CAIRO_OPERATOR_SOURCE);
+    cairo_set_line_width(context, line_width);
+    cairo_rectangle(context, left, top, right - left, bottom - top);
+    cairo_stroke(context);
 }
 
 /**
@@ -103,31 +98,28 @@ draw_rectangle(cairo_t *context, gint left, gint top,
  * param pos_x Center position coordinate (x).
  * param pos_y Center position coordinate (y).
  */
-static void
-draw_text(cairo_t *context, const gint pos_x, const gint pos_y)
-{
-  cairo_text_extents_t te;
-  cairo_text_extents_t te_length;
-  gchar *str = NULL;
-  gchar *str_length = NULL;
+static void draw_text(cairo_t* context, const gint pos_x, const gint pos_y) {
+    cairo_text_extents_t te;
+    cairo_text_extents_t te_length;
+    gchar* str        = NULL;
+    gchar* str_length = NULL;
 
-  //  Show text in black
-  cairo_set_source_rgb(context, 0, 0, 0);
-  cairo_select_font_face(context, "serif", CAIRO_FONT_SLANT_NORMAL,
-                         CAIRO_FONT_WEIGHT_BOLD);
-  cairo_set_font_size(context, 32.0);
+    //  Show text in black
+    cairo_set_source_rgb(context, 0, 0, 0);
+    cairo_select_font_face(context, "serif", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
+    cairo_set_font_size(context, 32.0);
 
-  // Position the text at a fix centered position
-  str_length = g_strdup_printf("Countdown  ");
-  cairo_text_extents(context, str_length, &te_length);
-  cairo_move_to(context, pos_x - te_length.width / 2, pos_y);
-  g_free(str_length);
+    // Position the text at a fix centered position
+    str_length = g_strdup_printf("Countdown  ");
+    cairo_text_extents(context, str_length, &te_length);
+    cairo_move_to(context, pos_x - te_length.width / 2, pos_y);
+    g_free(str_length);
 
-  // Add the counter number to the shown text
-  str = g_strdup_printf("Countdown %i", counter);
-  cairo_text_extents(context, str, &te);
-  cairo_show_text(context, str);
-  g_free(str);
+    // Add the counter number to the shown text
+    str = g_strdup_printf("Countdown %i", counter);
+    cairo_text_extents(context, str, &te);
+    cairo_show_text(context, str);
+    g_free(str);
 }
 
 /**
@@ -138,15 +130,13 @@ draw_text(cairo_t *context, const gint pos_x, const gint pos_y)
  *
  * param data The overlay data struct to initialize.
  */
-static void
-setup_axoverlay_data(struct axoverlay_overlay_data *data)
-{
-  axoverlay_init_overlay_data(data);
-  data->postype = AXOVERLAY_CUSTOM_NORMALIZED;
-  data->anchor_point = AXOVERLAY_ANCHOR_CENTER;
-  data->x = 0.0;
-  data->y = 0.0;
-  data->scale_to_stream = FALSE;
+static void setup_axoverlay_data(struct axoverlay_overlay_data* data) {
+    axoverlay_init_overlay_data(data);
+    data->postype         = AXOVERLAY_CUSTOM_NORMALIZED;
+    data->anchor_point    = AXOVERLAY_ANCHOR_CENTER;
+    data->x               = 0.0;
+    data->y               = 0.0;
+    data->scale_to_stream = FALSE;
 }
 
 /**
@@ -163,24 +153,23 @@ setup_axoverlay_data(struct axoverlay_overlay_data *data)
  *
  * return result as boolean
  */
-static gboolean
-setup_palette_color(const int index, const gint r, const gint g, const gint b, const gint a)
-{
-  GError *error = NULL;
-  struct axoverlay_palette_color color;
+static gboolean setup_palette_color(const int index, const gint r, const gint g, const gint b,
+                                    const gint a) {
+    GError* error = NULL;
+    struct axoverlay_palette_color color;
 
-  color.red = r;
-  color.green = g;
-  color.blue = b;
-  color.alpha = a;
-  color.pixelate = FALSE;
-  axoverlay_set_palette_color(index, &color, &error);
-  if (error != NULL) {
-    g_error_free(error);
-    return FALSE;
-  }
+    color.red      = r;
+    color.green    = g;
+    color.blue     = b;
+    color.alpha    = a;
+    color.pixelate = FALSE;
+    axoverlay_set_palette_color(index, &color, &error);
+    if (error != NULL) {
+        g_error_free(error);
+        return FALSE;
+    }
 
-  return TRUE;
+    return TRUE;
 }
 
 /***** Callback functions ****************************************************/
@@ -203,18 +192,15 @@ setup_palette_color(const int index, const gint r, const gint g, const gint b, c
  * param overlay_height Overlay height.
  * param user_data Optional user data associated with this overlay.
  */
-static void
-adjustment_cb(const gint id, const struct axoverlay_stream_data *stream,
-              enum axoverlay_position_type *postype,
-              gfloat *overlay_x, gfloat *overlay_y,
-              gint *overlay_width, gint *overlay_height,
-              gpointer user_data)
-{
-  syslog(LOG_INFO, "Adjust callback for overlay: %i x %i", *overlay_width, *overlay_height);
-  syslog(LOG_INFO, "Adjust callback for stream: %i x %i", stream->width, stream->height);
+static void adjustment_cb(const gint id, const struct axoverlay_stream_data* stream,
+                          enum axoverlay_position_type* postype, gfloat* overlay_x,
+                          gfloat* overlay_y, gint* overlay_width, gint* overlay_height,
+                          gpointer user_data) {
+    syslog(LOG_INFO, "Adjust callback for overlay: %i x %i", *overlay_width, *overlay_height);
+    syslog(LOG_INFO, "Adjust callback for stream: %i x %i", stream->width, stream->height);
 
-  *overlay_width = stream->width;
-  *overlay_height = stream->height;
+    *overlay_width  = stream->width;
+    *overlay_height = stream->height;
 }
 
 /**
@@ -234,40 +220,37 @@ adjustment_cb(const gint id, const struct axoverlay_stream_data *stream,
  * param overlay_height Overlay height.
  * param user_data Optional user data associated with this overlay.
  */
-static void
-render_overlay_cb(gpointer rendering_context, const gint id,
-                  const struct axoverlay_stream_data *stream,
-                  const enum axoverlay_position_type postype, const gfloat overlay_x,
-                  const gfloat overlay_y, const gint overlay_width, const gint overlay_height,
-                  const gpointer user_data)
-{
-  gdouble val = FALSE;
+static void render_overlay_cb(gpointer rendering_context, const gint id,
+                              const struct axoverlay_stream_data* stream,
+                              const enum axoverlay_position_type postype, const gfloat overlay_x,
+                              const gfloat overlay_y, const gint overlay_width,
+                              const gint overlay_height, const gpointer user_data) {
+    gdouble val = FALSE;
 
-  syslog(LOG_INFO, "Render callback for camera: %i", stream->camera);
-  syslog(LOG_INFO, "Render callback for overlay: %i x %i", overlay_width, overlay_height);
-  syslog(LOG_INFO, "Render callback for stream: %i x %i", stream->width, stream->height);
+    syslog(LOG_INFO, "Render callback for camera: %i", stream->camera);
+    syslog(LOG_INFO, "Render callback for overlay: %i x %i", overlay_width, overlay_height);
+    syslog(LOG_INFO, "Render callback for stream: %i x %i", stream->width, stream->height);
 
-  if (id == overlay_id) {
-    //  Clear background by drawing a "filled" rectangle
-    val = index2cairo(0);
-    cairo_set_source_rgba(rendering_context, val, val, val, val);
-    cairo_set_operator(rendering_context, CAIRO_OPERATOR_SOURCE);
-    cairo_rectangle(rendering_context, 0, 0, stream->width, stream->height);
-    cairo_fill(rendering_context);
+    if (id == overlay_id) {
+        //  Clear background by drawing a "filled" rectangle
+        val = index2cairo(0);
+        cairo_set_source_rgba(rendering_context, val, val, val, val);
+        cairo_set_operator(rendering_context, CAIRO_OPERATOR_SOURCE);
+        cairo_rectangle(rendering_context, 0, 0, stream->width, stream->height);
+        cairo_fill(rendering_context);
 
-    //  Draw a top rectangle in toggling color
-    draw_rectangle(rendering_context, 0, 0, stream->width,
-                   stream->height / 4, top_color, 9.6);
+        //  Draw a top rectangle in toggling color
+        draw_rectangle(rendering_context, 0, 0, stream->width, stream->height / 4, top_color, 9.6);
 
-    //  Draw a bottom rectangle in toggling color
-    draw_rectangle(rendering_context, 0, stream->height * 3 / 4, stream->width,
-                   stream->height, bottom_color, 2.0);
-  } else if (id == overlay_id_text) {
-    //  Show text in black
-    draw_text(rendering_context, stream->width / 2, stream->height / 2);
-  } else {
-    syslog(LOG_INFO, "Unknown overlay id!");
-  }
+        //  Draw a bottom rectangle in toggling color
+        draw_rectangle(rendering_context, 0, stream->height * 3 / 4, stream->width, stream->height,
+                       bottom_color, 2.0);
+    } else if (id == overlay_id_text) {
+        //  Show text in black
+        draw_text(rendering_context, stream->width / 2, stream->height / 2);
+    } else {
+        syslog(LOG_INFO, "Unknown overlay id!");
+    }
 }
 
 /**
@@ -278,33 +261,31 @@ render_overlay_cb(gpointer rendering_context, const gint id,
  *
  * param user_data Optional callback user data.
  */
-static gboolean
-update_overlay_cb(gpointer user_data)
-{
-  GError *error = NULL;
+static gboolean update_overlay_cb(gpointer user_data) {
+    GError* error = NULL;
 
-  // Countdown
-  counter = counter < 1 ? 10 : counter - 1;
+    // Countdown
+    counter = counter < 1 ? 10 : counter - 1;
 
-  if (counter == 0) {
-    // A small color surprise
-    top_color = top_color > 2 ? 1 : top_color + 1;
-    bottom_color = bottom_color > 2 ? 1 : bottom_color + 1;
-  }
+    if (counter == 0) {
+        // A small color surprise
+        top_color    = top_color > 2 ? 1 : top_color + 1;
+        bottom_color = bottom_color > 2 ? 1 : bottom_color + 1;
+    }
 
-  // Request a redraw of the overlay
-  axoverlay_redraw(&error);
-  if (error != NULL) {
-    /*
-     * If redraw fails then it is likely due to that overlayd has
-     * crashed. Don't exit instead wait for overlayd to restart and
-     * for axoverlay to restore the connection.
-     */
-    syslog(LOG_ERR, "Failed to redraw overlay (%d): %s", error->code, error->message);
-    g_error_free(error);
-  }
+    // Request a redraw of the overlay
+    axoverlay_redraw(&error);
+    if (error != NULL) {
+        /*
+         * If redraw fails then it is likely due to that overlayd has
+         * crashed. Don't exit instead wait for overlayd to restart and
+         * for axoverlay to restore the connection.
+         */
+        syslog(LOG_ERR, "Failed to redraw overlay (%d): %s", error->code, error->message);
+        g_error_free(error);
+    }
 
-  return G_SOURCE_CONTINUE;
+    return G_SOURCE_CONTINUE;
 }
 
 /***** Signal handler functions **********************************************/
@@ -317,18 +298,16 @@ update_overlay_cb(gpointer user_data)
  *
  * param signal_num Signal number.
  */
-static void
-signal_handler(gint signal_num)
-{
-  switch (signal_num) {
-  case SIGTERM:
-  case SIGABRT:
-  case SIGINT:
-    g_main_loop_quit(main_loop);
-    break;
-  default:
-    break;
-  }
+static void signal_handler(gint signal_num) {
+    switch (signal_num) {
+        case SIGTERM:
+        case SIGABRT:
+        case SIGINT:
+            g_main_loop_quit(main_loop);
+            break;
+        default:
+            break;
+    }
 }
 
 /**
@@ -338,26 +317,23 @@ signal_handler(gint signal_num)
  *
  * return result as boolean.
  */
-static gboolean
-signal_handler_init(void)
-{
-  struct sigaction sa = {0};
+static gboolean signal_handler_init(void) {
+    struct sigaction sa = {0};
 
-  if (sigemptyset(&sa.sa_mask) == -1) {
-    syslog(LOG_ERR, "Failed to initialize signal handler: %s", strerror(errno));
-    return FALSE;
-  }
+    if (sigemptyset(&sa.sa_mask) == -1) {
+        syslog(LOG_ERR, "Failed to initialize signal handler: %s", strerror(errno));
+        return FALSE;
+    }
 
-  sa.sa_handler = signal_handler;
+    sa.sa_handler = signal_handler;
 
-  if ((sigaction(SIGTERM, &sa, NULL) < 0) ||
-      (sigaction(SIGABRT, &sa, NULL) < 0) ||
-      (sigaction(SIGINT, &sa, NULL) < 0)) {
-    syslog(LOG_ERR, "Failed to install signal handler: %s", strerror(errno));
-    return FALSE;
-  }
+    if ((sigaction(SIGTERM, &sa, NULL) < 0) || (sigaction(SIGABRT, &sa, NULL) < 0) ||
+        (sigaction(SIGINT, &sa, NULL) < 0)) {
+        syslog(LOG_ERR, "Failed to install signal handler: %s", strerror(errno));
+        return FALSE;
+    }
 
-  return TRUE;
+    return TRUE;
 }
 
 /***** Main function *********************************************************/
@@ -371,126 +347,121 @@ signal_handler_init(void)
  * param argc Number of arguments.
  * param argv Arguments vector.
  */
-int
-main(int argc, char **argv)
-{
-  GError *error = NULL;
-  GError *error_text = NULL;
-  gint camera_height = 0;
-  gint camera_width = 0;
+int main(int argc, char** argv) {
+    GError* error      = NULL;
+    GError* error_text = NULL;
+    gint camera_height = 0;
+    gint camera_width  = 0;
 
-  openlog(NULL, LOG_PID, LOG_USER);
+    openlog(NULL, LOG_PID, LOG_USER);
 
-  if (!signal_handler_init()) {
-    syslog(LOG_ERR, "Could not set up signal handler");
-    return 1;
-  }
+    if (!signal_handler_init()) {
+        syslog(LOG_ERR, "Could not set up signal handler");
+        return 1;
+    }
 
-  //  Create a glib main loop
-  main_loop = g_main_loop_new(NULL, FALSE);
+    //  Create a glib main loop
+    main_loop = g_main_loop_new(NULL, FALSE);
 
-  if(!axoverlay_is_backend_supported(AXOVERLAY_CAIRO_IMAGE_BACKEND)) {
-    syslog(LOG_ERR, "AXOVERLAY_CAIRO_IMAGE_BACKEND is not supported");
-    return 1;
-  }
+    if (!axoverlay_is_backend_supported(AXOVERLAY_CAIRO_IMAGE_BACKEND)) {
+        syslog(LOG_ERR, "AXOVERLAY_CAIRO_IMAGE_BACKEND is not supported");
+        return 1;
+    }
 
-  //  Initialize the library
-  struct axoverlay_settings settings;
-  axoverlay_init_axoverlay_settings(&settings);
-  settings.render_callback = render_overlay_cb;
-  settings.adjustment_callback = adjustment_cb;
-  settings.select_callback = NULL;
-  settings.backend = AXOVERLAY_CAIRO_IMAGE_BACKEND;
-  axoverlay_init(&settings, &error);
-  if (error != NULL) {
-    syslog(LOG_ERR, "Failed to initialize axoverlay: %s", error->message);
-    g_error_free(error);
-    return 1;
-  }
-
-  //  Setup colors
-  if (!setup_palette_color(0, 0, 0, 0, 0) ||
-      !setup_palette_color(1, 255, 0, 0, 255) ||
-      !setup_palette_color(2, 0, 255, 0, 255) ||
-      !setup_palette_color(3, 0, 0, 255, 255)) {
-    syslog(LOG_ERR, "Failed to setup palette colors");
-    return 1;
-  }
-
-  // Get max resolution for width and height
-  camera_width = axoverlay_get_max_resolution_width(1, &error);
-  g_error_free(error);
-  camera_height = axoverlay_get_max_resolution_height(1, &error);
-  g_error_free(error);
-  syslog(LOG_INFO, "Max resolution (width x height): %i x %i", camera_width,
-         camera_height);
-
-  // Create a large overlay using Palette color space
-  struct axoverlay_overlay_data data;
-  setup_axoverlay_data(&data);
-  data.width = camera_width;
-  data.height = camera_height;
-  data.colorspace = AXOVERLAY_COLORSPACE_4BIT_PALETTE;
-  overlay_id = axoverlay_create_overlay(&data, NULL, &error);
-  if (error != NULL) {
-    syslog(LOG_ERR, "Failed to create first overlay: %s", error->message);
-    g_error_free(error);
-    return 1;
-  }
-
-  // Create an text overlay using ARGB32 color space
-  struct axoverlay_overlay_data data_text;
-  setup_axoverlay_data(&data_text);
-  data_text.width = camera_width;
-  data_text.height = camera_height;
-  data_text.colorspace = AXOVERLAY_COLORSPACE_ARGB32;
-  overlay_id_text = axoverlay_create_overlay(&data_text, NULL, &error_text);
-  if (error_text != NULL) {
-    syslog(LOG_ERR, "Failed to create second overlay: %s", error_text->message);
-    g_error_free(error_text);
-    return 1;
-  }
-
-  // Draw overlays
-  axoverlay_redraw(&error);
-  if (error != NULL) {
-    syslog(LOG_ERR, "Failed to draw overlays: %s", error->message);
-    axoverlay_destroy_overlay(overlay_id, &error);
-    axoverlay_destroy_overlay(overlay_id_text, &error_text);
-    axoverlay_cleanup();
-    g_error_free(error);
-    g_error_free(error_text);
-    return 1;
-  }
-
-  // Start animation timer
-  animation_timer = g_timeout_add_seconds(1, update_overlay_cb, NULL);
-
-  // Enter main loop
-  g_main_loop_run(main_loop);
-
-  // Destroy the overlay
-  axoverlay_destroy_overlay(overlay_id, &error);
+    //  Initialize the library
+    struct axoverlay_settings settings;
+    axoverlay_init_axoverlay_settings(&settings);
+    settings.render_callback     = render_overlay_cb;
+    settings.adjustment_callback = adjustment_cb;
+    settings.select_callback     = NULL;
+    settings.backend             = AXOVERLAY_CAIRO_IMAGE_BACKEND;
+    axoverlay_init(&settings, &error);
     if (error != NULL) {
-    syslog(LOG_ERR, "Failed to destroy first overlay: %s", error->message);
+        syslog(LOG_ERR, "Failed to initialize axoverlay: %s", error->message);
+        g_error_free(error);
+        return 1;
+    }
+
+    //  Setup colors
+    if (!setup_palette_color(0, 0, 0, 0, 0) || !setup_palette_color(1, 255, 0, 0, 255) ||
+        !setup_palette_color(2, 0, 255, 0, 255) || !setup_palette_color(3, 0, 0, 255, 255)) {
+        syslog(LOG_ERR, "Failed to setup palette colors");
+        return 1;
+    }
+
+    // Get max resolution for width and height
+    camera_width = axoverlay_get_max_resolution_width(1, &error);
     g_error_free(error);
-    return 1;
-  }
-  axoverlay_destroy_overlay(overlay_id_text, &error_text);
-  if (error_text != NULL) {
-    syslog(LOG_ERR, "Failed to destroy second overlay: %s", error_text->message);
-    g_error_free(error_text);
-    return 1;
-  }
+    camera_height = axoverlay_get_max_resolution_height(1, &error);
+    g_error_free(error);
+    syslog(LOG_INFO, "Max resolution (width x height): %i x %i", camera_width, camera_height);
 
-  // Release library resources
-  axoverlay_cleanup();
+    // Create a large overlay using Palette color space
+    struct axoverlay_overlay_data data;
+    setup_axoverlay_data(&data);
+    data.width      = camera_width;
+    data.height     = camera_height;
+    data.colorspace = AXOVERLAY_COLORSPACE_4BIT_PALETTE;
+    overlay_id      = axoverlay_create_overlay(&data, NULL, &error);
+    if (error != NULL) {
+        syslog(LOG_ERR, "Failed to create first overlay: %s", error->message);
+        g_error_free(error);
+        return 1;
+    }
 
-  // Release the animation timer
-  g_source_remove(animation_timer);
+    // Create an text overlay using ARGB32 color space
+    struct axoverlay_overlay_data data_text;
+    setup_axoverlay_data(&data_text);
+    data_text.width      = camera_width;
+    data_text.height     = camera_height;
+    data_text.colorspace = AXOVERLAY_COLORSPACE_ARGB32;
+    overlay_id_text      = axoverlay_create_overlay(&data_text, NULL, &error_text);
+    if (error_text != NULL) {
+        syslog(LOG_ERR, "Failed to create second overlay: %s", error_text->message);
+        g_error_free(error_text);
+        return 1;
+    }
 
-  // Release main loop
-  g_main_loop_unref(main_loop);
+    // Draw overlays
+    axoverlay_redraw(&error);
+    if (error != NULL) {
+        syslog(LOG_ERR, "Failed to draw overlays: %s", error->message);
+        axoverlay_destroy_overlay(overlay_id, &error);
+        axoverlay_destroy_overlay(overlay_id_text, &error_text);
+        axoverlay_cleanup();
+        g_error_free(error);
+        g_error_free(error_text);
+        return 1;
+    }
 
-  return 0;
+    // Start animation timer
+    animation_timer = g_timeout_add_seconds(1, update_overlay_cb, NULL);
+
+    // Enter main loop
+    g_main_loop_run(main_loop);
+
+    // Destroy the overlay
+    axoverlay_destroy_overlay(overlay_id, &error);
+    if (error != NULL) {
+        syslog(LOG_ERR, "Failed to destroy first overlay: %s", error->message);
+        g_error_free(error);
+        return 1;
+    }
+    axoverlay_destroy_overlay(overlay_id_text, &error_text);
+    if (error_text != NULL) {
+        syslog(LOG_ERR, "Failed to destroy second overlay: %s", error_text->message);
+        g_error_free(error_text);
+        return 1;
+    }
+
+    // Release library resources
+    axoverlay_cleanup();
+
+    // Release the animation timer
+    g_source_remove(animation_timer);
+
+    // Release main loop
+    g_main_loop_unref(main_loop);
+
+    return 0;
 }
