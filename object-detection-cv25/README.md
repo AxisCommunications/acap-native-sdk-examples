@@ -40,7 +40,7 @@ The following instructions can be executed to simply run the example.
 
 ## Designing the application
 
-The whole principle is similar to the [tensorflow-to-larod-cv25](../tensorflow-to-larod-cv25). In this example, the original video stream has a resolution of 640x360, while MobileNet SSD COCO requires an input size of 300x300, so we set up two different streams: one is for MobileNet model, another is used to crop a higher resolution jpg image.
+The whole principle is similar to the [tensorflow-to-larod-cv25](../tensorflow-to-larod-cv25). In this example, the original video stream has a resolution of 1280x720, while MobileNet SSD COCO requires an input size of 300x300, so we set up two different streams: one is for MobileNet model, another is used to crop a higher resolution jpg image.
 Although the model takes an input of 300x300, the CV25 accelerator expects an input of size multiple of 32. This means that the input needs to be converted to a resolution of 300x320 to satisfy the chip requirements. This is done by adding 20 bytes of padding to each row of the image.
 In general, it would be easier to use a model that has already by design an input of size multiple of 32 (typically 320x320 or 640x640).
 
