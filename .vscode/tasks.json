@@ -1,0 +1,12 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "super-linter: Run all linters",
+      "type": "shell",
+      "command": "cd ${workspaceFolder} && docker run --rm -e RUN_LOCAL=true --env-file '.github/super-linter.env' -v \"$PWD\":/tmp/lint -w /tmp/lint ghcr.io/github/super-linter:slim-v5",
+      "group": "lint",
+      "problemMatcher": []
+    }
+  ]
+}
