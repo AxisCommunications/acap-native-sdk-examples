@@ -41,6 +41,8 @@ The following instructions can be executed to simply run the example.
 ## Designing the application
 
 The whole principle is similar to the [tensorflow-to-larod-cv25](../tensorflow-to-larod-cv25). In this example, the original video stream has a resolution of 640x360, while MobileNet SSD COCO requires an input size of 300x300, so we set up two different streams: one is for MobileNet model, another is used to crop a higher resolution jpg image.
+Although the model takes an input of 300x300, the CV25 accelerator expects an input of size multiple of 32. This means that the input needs to be converted to a resolution of 300x320 to satisfy the chip requirements. This is done by adding 20 bytes of padding to each row of the image.
+In general, it would be easier to use a model that has already by design an input of size multiple of 32 (typically 320x320 or 640x640).
 
 ### Setting up the MobileNet stream
 
@@ -153,9 +155,7 @@ The image data is then converted from NV12 format to interleaved uint8_t RGB for
 larodRunJob(conn, ppReq, &error)
 ```
 
-To ensure compatibility with the CV25 device, it is required to apply padding to the obtained frame. The CV25 device has a specific requirement where both input and output sizes must be multiples of 32 bytes.
-
-In our example, the model used expects an input size of 300x300 pixels, but it is necessary to convert the image dimensions to 300x320 pixels to satisfy the chip requirements. This is done by adding 20 bytes of padding to each row of the image.
+As mentioned before, to ensure compatibility with the CV25 device, we apply 20 bytes of padding to make sure that our input has an size multiple of 32 bytes.
 
 ```c
 padImageWidth(rgb_image, larodInputAddr, inputWidth, inputHeight, padding)
