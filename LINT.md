@@ -20,24 +20,38 @@ editors may run it locally to lint the codebase. For complete instructions and
 guidance, see super-linter page for [running
 locally](https://github.com/github/super-linter/blob/main/docs/run-linter-locally.md).
 
-To run a number of linters on the codebase from command-line:
+### VS Code
+
+1. Go to menu `Terminal` > `Run Task`.
+1. Choose task `super-linter: Run all linters`.
+1. A new shell is opened and runs the linters.
+
+### Command-line
+
+To run all linters on the codebase from command-line, the same that would run
+when a Pull Request is opened, use command:
 
 ```sh
 docker run --rm \
   -v $PWD:/tmp/lint \
-  -e LINTER_RULES_PATH=/ \
-  -e DOCKERFILE_HADOLINT_FILE_NAME=.hadolint.yml \
-  -e MARKDOWN_CONFIG_FILE=.markdownlint.yml \
-  -e YAML_CONFIG_FILE=.yamllint.yml \
   -e RUN_LOCAL=true \
-  -e VALIDATE_BASH=true \
-  -e VALIDATE_CLANG_FORMAT=true \
-  -e VALIDATE_DOCKERFILE_HADOLINT=true \
-  -e VALIDATE_JSON=true \
+  --env-file ".github/super-linter.env \
+  ghcr.io/github/super-linter:slim-v5
+```
+
+For more details which linters that run and the settings, see the file
+`.github/super-linter.env`.
+
+To only test one specific linter, e.g. lint Markdown, see the variable name in
+`.github/super-linter.env` that in this case is `VALIDATE_MARKDOWN=true`. Then
+run the single linter with this command:
+
+```sh
+docker run --rm \
+  -v $PWD:/tmp/lint \
+  -e RUN_LOCAL=true \
   -e VALIDATE_MARKDOWN=true \
-  -e VALIDATE_SHELL_SHFMT=true \
-  -e VALIDATE_YAML=true \
-  github/super-linter:slim-v5
+  ghcr.io/github/super-linter:slim-v5
 ```
 
 ## Run super-linter interactively
@@ -128,4 +142,25 @@ clang-format -i $(find . -type f -regex ".*\.[ch]p\{0,2\}")
 
 # Fix Markdown file errors
 markdownlint -f <path/to/file>
+```
+
+## Troubleshooting
+
+### fatal: not a git repository
+
+You may see output like this repeated in many lines.
+
+```sh
+fatal: not a git repository (or any of the parent directories): .git
+```
+
+A [fix](https://github.com/super-linter/super-linter/pull/4348) has been merged
+and released in **super-linter/super-linter** `v5.2.1` but this repo use
+**github/super-linter** which hasn't got this release.
+
+The error message can be ignored. A workaround is to add this option to the
+Docker command:
+
+```sh
+  -w /tmp/lint
 ```
