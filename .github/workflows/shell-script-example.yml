@@ -17,7 +17,7 @@ jobs:
       EXREPO: acap-native-examples
       EXNAME: shell-script-example
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: docker/setup-buildx-action@v2
 
       - name: Build ${{ env.EXNAME }} application
