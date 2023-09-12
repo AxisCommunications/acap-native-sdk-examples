@@ -35,7 +35,7 @@ when a Pull Request is opened, use command:
 docker run --rm \
   -v $PWD:/tmp/lint \
   -e RUN_LOCAL=true \
-  --env-file ".github/super-linter.env \
+  --env-file ".github/super-linter.env" \
   ghcr.io/github/super-linter:slim-v5
 ```
 
@@ -88,7 +88,7 @@ eslint --ext .json .
 # Lint C and C++ files
 # Note, manual formatting is discouraged, use clang-format to format these
 # files. See more info in coming section.
-clang-format --dry-run $(find . -regex ".*\.[h|c|cpp]")
+clang-format --dry-run $(find . -regex '.*\.\(c\|cpp\|h\|cc\|C\|CPP\|c++\|cp\)$')
 
 # Lint shell script files
 shellcheck $(shfmt -f .)
@@ -136,9 +136,9 @@ docker run --rm \
   --entrypoint /bin/bash \
   -it github/super-linter:slim-v5
 
-# Auto-format C and C++ files (second line change all .c,.h and .cpp files
+# Auto-format C and C++ files (second line change all)
 clang-format -i <path/to/file>
-clang-format -i $(find . -type f -regex ".*\.[ch]p\{0,2\}")
+clang-format -i $(find . -regex '.*\.\(c\|cpp\|h\|cc\|C\|CPP\|c++\|cp\)$')
 
 # Fix Markdown file errors
 markdownlint -f <path/to/file>
