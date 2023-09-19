@@ -18,7 +18,7 @@ jobs:
       EXNAME: utility-libraries
     steps:
       - uses: actions/checkout@v4
-      - uses: docker/setup-buildx-action@v2
+      - uses: docker/setup-buildx-action@v3
 
       - name: Build ${{ env.example }} application
         env:
