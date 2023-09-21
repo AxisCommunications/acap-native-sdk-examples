@@ -440,20 +440,15 @@ int main(int argc, char** argv) {
         goto earlyend;
     }
 
-    const char* chipString  = args.chip;
-    const char* modelFile   = args.modelFile;
-    const char* labelsFile  = args.labelsFile;
-    const int inputWidth    = args.width;
-    const int inputHeight   = args.height;
-    const int widthFrameHD  = args.raw_width;
-    const int heightFrameHD = args.raw_height;
-    const int threshold     = args.threshold;
-    const int quality       = args.quality;
-
-    syslog(LOG_INFO, "Starting %s", argv[0]);
-    // Register an interrupt handler which tries to exit cleanly if invoked once
-    // but exits immediately if further invoked.
-    signal(SIGINT, sigintHandler);
+    const char* chipString       = args.chip;
+    const char* modelFile        = args.modelFile;
+    const char* labelsFile       = args.labelsFile;
+    const int inputWidth         = args.width;
+    const int inputHeight        = args.height;
+    const int desiredHDImgWidth  = args.raw_width;
+    const int desiredHDImgHeight = args.raw_height;
+    const int threshold          = args.threshold;
+    const int quality            = args.quality;
 
     syslog(LOG_INFO, "Finding best resolution to use as model input");
     unsigned int streamWidth  = 0;
@@ -470,7 +465,14 @@ int main(int argc, char** argv) {
         syslog(LOG_ERR, "%s: Could not create image provider", __func__);
         goto end;
     }
-
+    syslog(LOG_INFO, "Find the best resolution to save the high resolution image");
+    unsigned int widthFrameHD;
+    unsigned int heightFrameHD;
+    if (!chooseStreamResolution(desiredHDImgWidth, desiredHDImgHeight, &widthFrameHD,
+                                &heightFrameHD)) {
+        syslog(LOG_ERR, "%s: Failed choosing HD resolution", __func__);
+        goto end;
+    }
     syslog(LOG_INFO, "Creating VDO High resolution image provider and stream %d x %d", widthFrameHD,
            heightFrameHD);
     hdImageProvider = createImgProvider(widthFrameHD, heightFrameHD, 2, VDO_FORMAT_YUV);
