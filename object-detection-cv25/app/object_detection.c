@@ -459,8 +459,8 @@ int main(int argc, char** argv) {
     const char* labelsFile       = args.labelsFile;
     const int inputWidth         = args.width;
     const int inputHeight        = args.height;
-    const int widthFrameHD       = args.raw_width;
-    const int heightFrameHD      = args.raw_height;
+    const int desiredHDImgWidth  = args.raw_width;
+    const int desiredHDImgHeight = args.raw_height;
     const int threshold          = args.threshold;
     const int quality            = args.quality;
     const int numberOfDetections = args.numDetections;  // number of detections
@@ -478,22 +478,32 @@ int main(int argc, char** argv) {
     // but exits immediately if further invoked.
     signal(SIGINT, sigintHandler);
 
-    syslog(LOG_INFO, "Finding best resolution to use as model input");
-    unsigned int streamWidth  = 0;
-    unsigned int streamHeight = 0;
-    if (!chooseStreamResolution(inputWidth, inputHeight, &streamWidth, &streamHeight)) {
-        syslog(LOG_ERR, "%s: Failed choosing stream resolution", __func__);
-        goto end;
-    }
-
+    // Hard coding stream resolution because CV25 devices don't support well
+    // the function to pick the best resolution
+    unsigned int streamWidth  = 640;
+    unsigned int streamHeight = 360;
     syslog(LOG_INFO, "Creating VDO image provider and creating stream %d x %d", streamWidth,
            streamHeight);
+    if (streamWidth < inputWidth || streamHeight < inputHeight) {
+        syslog(
+            LOG_ERR,
+            "Warning: Stream resolution (%d x %d) should be larger than input resolution (%d x %d)",
+            streamWidth, streamHeight, inputWidth, inputHeight);
+        goto end;
+    }
     sdImageProvider = createImgProvider(streamWidth, streamHeight, 2, VDO_FORMAT_YUV);
     if (!sdImageProvider) {
         syslog(LOG_ERR, "%s: Could not create image provider", __func__);
         goto end;
     }
-
+    syslog(LOG_INFO, "Find the best resolution to save the high resolution image");
+    unsigned int widthFrameHD;
+    unsigned int heightFrameHD;
+    if (!chooseStreamResolution(desiredHDImgWidth, desiredHDImgHeight, &widthFrameHD,
+                                &heightFrameHD)) {
+        syslog(LOG_ERR, "%s: Failed choosing HD resolution", __func__);
+        goto end;
+    }
     syslog(LOG_INFO, "Creating VDO High resolution image provider and stream %d x %d", widthFrameHD,
            heightFrameHD);
     hdImageProvider = createImgProvider(widthFrameHD, heightFrameHD, 2, VDO_FORMAT_YUV);
