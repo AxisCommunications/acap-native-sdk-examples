@@ -14,16 +14,16 @@ jobs:
         include:
           - arch: armv7hf
             chip: cpu
-            axis-os: 11.5.64
+            axis-os: 11.6.89
           - arch: armv7hf
             chip: edgetpu
-            axis-os: 11.5.64
+            axis-os: 11.6.89
           - arch: aarch64
             chip: artpec8
-            axis-os: 11.5.64
+            axis-os: 11.6.89
           - arch: aarch64
             chip: cv25
-            axis-os: 11.5.64
+            axis-os: 11.6.89
     env:
       EXREPO: acap-native-examples
       EXNAME: vdo-larod
