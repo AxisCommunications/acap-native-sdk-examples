@@ -73,7 +73,7 @@ int fcgi_run() {
         FCGX_FPrintF(request.out, "<h1>Hello ");
 
         // Parse the uri and the query string
-        char* uriString = FCGX_GetParam("REQUEST_URI", request.envp);
+        const char* uriString = FCGX_GetParam("REQUEST_URI", request.envp);
 
         UriUriA uri;
         UriQueryListA* queryList;
@@ -86,6 +86,8 @@ int fcgi_run() {
         if (uriParseSingleUriA(&uri, uriString, &errorPos) != URI_SUCCESS) {
             /* Failure (no need to call uriFreeUriMembersA) */
             FCGX_FPrintF(request.out, "Failed to parse URI");
+            FCGX_Finish_r(&request);
+            continue;
         }
 
         syslog(LOG_INFO, "URI: %s", uriString);
@@ -95,6 +97,9 @@ int fcgi_run() {
             URI_SUCCESS) {
             /* Failure */
             FCGX_FPrintF(request.out, "Failed to parse query");
+            FCGX_Finish_r(&request);
+            uriFreeUriMembersA(&uri);
+            continue;
         }
 
         // Find and print the name parameter in the query string
