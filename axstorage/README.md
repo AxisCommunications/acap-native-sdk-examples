@@ -1,0 +1,131 @@
+# How to manage storage disks in an ACAP application
+
+This guide explains how to build an ACAP application that uses the axstorage API. This example illustrates how to handle storage disks. It is possible to list, setup and release storage devices, subscribe to different events and write data. This examples shows how to do all of the above and, if available, writes to two files in the SD card every 10 seconds.
+
+## Getting started
+
+These instructions will guide you on how to execute the code. Below is the structure and scripts used in the example:
+
+```sh
+axstorage
+├── app
+│   ├── axstorage.c
+│   ├── LICENSE
+│   ├── Makefile
+│   └── manifest.json
+├── Dockerfile
+└── README.md
+```
+
+- **app/axstorage.c** - Application to show API in C.
+- **app/LICENSE** - Text file which lists all open source licensed source code distributed with the application.
+- **app/Makefile** - Makefile containing the build and link instructions for building the ACAP application.
+- **app/manifest.json** - Defines the application and its configuration.
+- **Dockerfile** - Docker file with the specified Axis toolchain and API container to build the example specified.
+- **README.md** - Step by step instructions on how to run the example.
+
+### How to run the code
+
+Below is the step by step instructions on how to execute the program. So basically starting with the generation of the .eap file to running it on a device.
+
+#### Build the application
+
+Standing in your working directory run the following commands:
+
+> [!NOTE]
+>
+> Depending on the network you are connected to, you may need to add proxy settings.
+> The file that needs these settings is: `~/.docker/config.json`. For reference please see
+> https://docs.docker.com/network/proxy and a
+> [script for Axis devices](https://axiscommunications.github.io/acap-documentation/docs/develop/build-install-run.html#configure-network-proxy-settings) in the ACAP documentation.
+
+```sh
+docker build --tag <APP_IMAGE> .
+```
+
+`<APP_IMAGE>` is the name to tag the image with, e.g., `axstorage:1.0`
+
+Default architecture is **armv7hf**. To build for **aarch64** it's possible to
+update the *ARCH* variable in the Dockerfile or to set it in the docker build
+command via build argument:
+
+```sh
+docker build --build-arg ARCH=aarch64 --tag <APP_IMAGE> .
+```
+
+Copy the result from the container image to a local directory called `build`:
+
+```sh
+docker cp $(docker create <APP_IMAGE>):/opt/app ./build
+```
+
+The working directory now contains a build folder with the following files:
+
+```sh
+axstorage
+build
+├── Makefile
+├── manifest.json
+├── package.conf
+├── package.conf.orig
+├── param.conf
+├── axstorage*
+├── axstorage_1_0_0_armv7hf.eap
+├── axstorage_1_0_0_LICENSE.txt
+├── axstorage.c
+└── LICENSE
+```
+
+- **manifest.json** - Defines the application and its configuration.
+- **package.conf** - Defines the application and its configuration.
+- **package.conf.orig** - Defines the application and its configuration, original file.
+- **param.conf** - File containing additional application parameters.
+- **axstorage*** - Application executable binary file.
+- **axstorage_1_0_0_armv7hf.eap** - Application package .eap file.
+- **axstorage_1_0_0_LICENSE.txt** - Copy of LICENSE file.
+
+#### Install your application
+
+Installing your application on an Axis device is as simple as:
+
+1. In your browser, navigate to `http://<DEVICE_IP>/#settings/apps` where `<DEVICE_IP>` is the IP address of your device
+2. Click on the tab **App** in the device GUI
+3. Click the **(+)** button and browse to the newly built **axstorage_1_0_0_armv7hf.eap**
+4. Click **Install**
+5. Run the application by enabling the **Start** switch
+
+#### The expected output
+
+Application log can be found directly at `http://<DEVICE_IP>/axis-cgi/admin/systemlog.cgi?appname=axstorage` or by clicking on the "**App log**" link in the device GUI.
+
+```sh
+----- Contents of SYSTEM_LOG for 'axstorage' -----
+16:40:53.234 [ INFO ] axstorage[1234]: Start AXStorage application
+16:40:53.234 [ INFO ] axstorage[1234]: Subscribe for the events of NetworkShare
+16:40:53.234 [ INFO ] axstorage[1234]: Subscribe for the events of SD_DISK
+16:40:53.234 [ INFO ] axstorage[1234]: Status of events for NetworkShare: writable NO, available NO, exiting NO, full NO
+16:40:53.234 [ INFO ] axstorage[1234]: Status of events for SD_DISK: writable YES, available YES, exiting NO, full NO
+16:40:53.234 [ INFO ] axstorage[1234]: Setup SD_DISK
+16:40:53.234 [ INFO ] axstorage[1234]: Disk: SD_DISK has been setup in /var/spool/storage/areas/SD_DISK/axstorage
+16:40:53.234 [ INFO ] axstorage[1234]: Setup of SD_DISK was successful
+16:41:03.342 [ INFO ] axstorage[1234]: Writing to /var/spool/storage/areas/SD_DISK/axstorage/file1.log
+16:40:03.342 [ INFO ] axstorage[1234]: Writing to /var/spool/storage/areas/SD_DISK/axstorage/file2.log
+16:40:13.536 [ INFO ] axstorage[1234]: Writing to /var/spool/storage/areas/SD_DISK/axstorage/file1.log
+16:40:13.536 [ INFO ] axstorage[1234]: Writing to /var/spool/storage/areas/SD_DISK/axstorage/file2.log
+...
+```
+
+If your camera doesn't have a SD card available, the application won't be able to write any files.
+
+When the application is stopped, you will see how the application unsubscribes from the disks and releases the objects:
+
+```sh
+16:47:53.807 [ INFO ] axstorage[1234]: Unsubscribed events of NetworkShare
+16:47:53.807 [ INFO ] axstorage[1234]: Unsubscribed events of SD_DISK
+16:47:53.807 [ INFO ] axstorage[1234]: Release of SD_DISK was successful
+16:47:53.807 [ INFO ] axstorage[1234]: Finish AXStorage application
+```
+
+## License
+
+**[Apache License 2.0](../LICENSE)**
