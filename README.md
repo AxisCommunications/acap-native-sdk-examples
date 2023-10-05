@@ -24,6 +24,8 @@ Below is the list of examples available in the repository.
   - The example code is written in C which illustrates both how to subscribe to different events and how to send an event.
 - [axoverlay](./axoverlay/)
   - The example code is written in C which illustrates how to draw plain boxes and text as overlays in a stream.
+- [axstorage](./axstorage/)
+  - The example code is written in C which shows how to use available storage devices.
 - [container-example](./container-example/)
   - This example demonstrates a way of using containers in a native ACAP application.
 - [hello-world](./hello-world/)
