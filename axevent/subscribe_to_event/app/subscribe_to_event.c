@@ -53,7 +53,7 @@ static void subscription_callback(guint subscription, AXEvent* event, guint* tok
     key_value_set = ax_event_get_key_value_set(event);
 
     // Get the Value of the Processor Usage
-    ax_event_key_value_set_get_double(key_value_set, "Value", NULL, &value, NULL);
+    ax_event_key_value_set_get_double(key_value_set, "value", NULL, &value, NULL);
 
     // Print a helpful message
     syslog(LOG_INFO, "Received event with value: %lf", value);
@@ -77,16 +77,16 @@ static void subscription_callback(guint subscription, AXEvent* event, guint* tok
  * param token Token as user data to the callback function.
  * return subscription id as integer.
  */
-static guint onviftrigger_subscription(AXEventHandler* event_handler, guint* token) {
+static guint onviftrigger_subscription(AXEventHandler* event_handler, gdouble* token) {
     AXEventKeyValueSet* key_value_set = NULL;
     guint subscription                = 0;
 
     key_value_set = ax_event_key_value_set_new();
 
     // Set keys and namespaces for the event to be subscribed
-    ax_event_key_value_set_add_key_value(key_value_set, "topic0", "tns1", "Monitoring",
-                                         AX_VALUE_TYPE_STRING, NULL);
-    ax_event_key_value_set_add_key_value(key_value_set, "topic1", "tns1", "ProcessorUsage",
+    ax_event_key_value_set_add_key_value(key_value_set, "topic0", "tnsaxis",
+                                         "CameraApplicationPlatform", AX_VALUE_TYPE_STRING, NULL);
+    ax_event_key_value_set_add_key_value(key_value_set, "topic1", "tnsaxis", "Event_example",
                                          AX_VALUE_TYPE_STRING, NULL);
 
     /*
@@ -96,7 +96,7 @@ static guint onviftrigger_subscription(AXEventHandler* event_handler, guint* tok
     ax_event_handler_subscribe(event_handler, key_value_set, &subscription,
                                (AXSubscriptionCallback)subscription_callback, token, NULL);
 
-    syslog(LOG_INFO, "And here's the token: %d", *token);
+    syslog(LOG_INFO, "And here's the token: %f", *token);
 
     // The key/value set is no longer needed
     ax_event_key_value_set_free(key_value_set);
@@ -111,7 +111,7 @@ int main(void) {
     GMainLoop* main_loop          = NULL;
     AXEventHandler* event_handler = NULL;
     guint subscription            = 0;
-    guint token                   = 1234;
+    gdouble token                 = 1234;
 
     // Set up the user logging to syslog
     openlog(NULL, LOG_PID, LOG_USER);
