@@ -48,13 +48,14 @@ static AppData* app_data = NULL;
 static gboolean send_event(AppData* app_data) {
     AXEventKeyValueSet* key_value_set = NULL;
     AXEvent* event                    = NULL;
-
-    key_value_set = ax_event_key_value_set_new();
+    g_autoptr(GError) err             = NULL;
+    key_value_set                     = ax_event_key_value_set_new();
 
     // Add the variable elements of the event to the set
     syslog(LOG_INFO, "Add value: %lf", app_data->value);
-    ax_event_key_value_set_add_key_value(key_value_set, "Value", NULL, &app_data->value,
-                                         AX_VALUE_TYPE_DOUBLE, NULL);
+
+    ax_event_key_value_set_add_key_values(key_value_set, &err, "value", NULL, &app_data->value,
+                                          AX_VALUE_TYPE_DOUBLE, NULL);
 
     // Create the event
     // Use ax_event_new2 since ax_event_new is deprecated from 3.2
@@ -120,26 +121,23 @@ static void declaration_complete(guint declaration, gdouble* value) {
 static guint setup_declaration(AXEventHandler* event_handler) {
     AXEventKeyValueSet* key_value_set = NULL;
     guint declaration                 = 0;
-    guint token                       = 0;
     gdouble start_value               = 0;
     GError* error                     = NULL;
 
     // Create keys, namespaces and nice names for the event
     key_value_set = ax_event_key_value_set_new();
-    ax_event_key_value_set_add_key_value(key_value_set, "topic0", "tns1", "Monitoring",
+
+    ax_event_key_value_set_add_key_values(
+        key_value_set, &error, "topic0", "tnsaxis", "CameraApplicationPlatform",
+        AX_VALUE_TYPE_STRING, "topic1", "tnsaxis", "Event_example", AX_VALUE_TYPE_STRING, NULL);
+
+    ax_event_key_value_set_add_key_value(key_value_set, "topic2", "tnsaxis", "event",
                                          AX_VALUE_TYPE_STRING, NULL);
-    ax_event_key_value_set_add_key_value(key_value_set, "topic1", "tns1", "ProcessorUsage",
-                                         AX_VALUE_TYPE_STRING, NULL);
-    ax_event_key_value_set_add_key_value(key_value_set, "Token", NULL, &token, AX_VALUE_TYPE_INT,
-                                         NULL);
-    ax_event_key_value_set_add_key_value(key_value_set, "Value", NULL, &start_value,
+    ax_event_key_value_set_add_nice_names(key_value_set, "topic2", "tnsaxis", "event",
+                                          "Event_example:Event", NULL);
+    ax_event_key_value_set_add_key_value(key_value_set, "value", NULL, &start_value,
                                          AX_VALUE_TYPE_DOUBLE, NULL);
-    ax_event_key_value_set_mark_as_source(key_value_set, "Token", NULL, NULL);
-    ax_event_key_value_set_mark_as_user_defined(key_value_set, "Token", NULL,
-                                                "wstype:tt:ReferenceToken", NULL);
-    ax_event_key_value_set_mark_as_data(key_value_set, "Value", NULL, NULL);
-    ax_event_key_value_set_mark_as_user_defined(key_value_set, "Value", NULL, "wstype:xs:float",
-                                                NULL);
+    ax_event_key_value_set_mark_as_data(key_value_set, "value", NULL, NULL);
 
     // Declare event
     if (!ax_event_handler_declare(event_handler, key_value_set,
