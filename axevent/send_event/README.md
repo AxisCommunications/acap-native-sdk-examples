@@ -273,6 +273,28 @@ Output in XML, which has been formatted manually to show topic "tns1:Monitoring/
 </tt:MetadataStream>
 ```
 
+### Generate Axis events
+
+As opposed to ONVIF events, Axis events are visible in the device web page for events, reachable at:
+
+```sh
+https://<device_ip>/camera/index.html#/system/events/rules.
+```
+
+In order to produce an Axis event, you have to use the `tnsaxis` namespace, and rename the `topic0` value to `CameraApplicationPlatform`.
+This example use ONVIF events, to modify it to use Axis events, change the event declaration in function `setup_declaration` of [send_event.c](./app/send_event.c) to:
+
+```c
+ax_event_key_value_set_add_key_value(key_value_set, "topic0", "tnsaxis",
+                                     "CameraApplicationPlatform", AX_VALUE_TYPE_STRING, NULL);
+ax_event_key_value_set_add_key_value(key_value_set, "topic1", "tnsaxis", "ProcessorUsage",
+                                     AX_VALUE_TYPE_STRING, NULL);
+ax_event_key_value_set_add_key_value(key_value_set, "Token", "tnsaxis", &token,
+                                     AX_VALUE_TYPE_INT, NULL);
+ax_event_key_value_set_add_key_value(key_value_set, "Value", "tnsaxis", &start_value,
+                                     AX_VALUE_TYPE_DOUBLE, NULL);
+```
+
 ## License
 
 **[Apache License 2.0](../../LICENSE)**
