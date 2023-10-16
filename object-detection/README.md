@@ -4,11 +4,11 @@
 
 ## Overview
 
-This example focuses on the application of object detection on an Axis camera equipped with an Edge TPU, but can also be easily configured to run on CPU or ARTPEC8 cameras (DLPU). A pretrained model [MobileNet SSD v2 (COCO)] is used to detect the location of 90 types of different objects. The model is downloaded through the dockerfile from the google-coral repository. The detected objects are saved in /tmp folder for further usage.
+This example focuses on the application of object detection on an Axis camera equipped with an Edge TPU, but can also be easily configured to run on CPU or ARTPEC-8 cameras (DLPU). A pretrained model [MobileNet SSD v2 (COCO)] is used to detect the location of 90 types of different objects. The model is downloaded through the Dockerfile from the google-coral repository. The detected objects are saved in /tmp folder for further usage.
 
 ## Prerequisites
 
-- Axis camera equipped with an [Edge TPU](https://coral.ai/docs/edgetpu/faq/)
+- Axis camera equipped with CPU, an [Edge TPU](https://coral.ai/docs/edgetpu/faq/) or DLPU (for ARTPEC-8)
 - [Docker](https://docs.docker.com/get-docker/)
 
 ## Quickstart
@@ -44,9 +44,9 @@ The following instructions can be executed to simply run the example.
 
 ## Designing the application
 
-The whole principle is similar to the [tensorflow-to-larod](../tensorflow-to-larod). In this example, the original video has a resolution of 1920x1080, while the input size of MobileNet SSD COCO requires a input size of 300x300, so we set up two different streams, one is for MobileNet model, another is used to crop a higher resolution jpg image.
+The whole principle is similar to the [vdo-larod](../vdo-larod). In this example, the original stream has a resolution of 1920x1080, while MobileNet SSD COCO requires an input size of 300x300, so we set up two different streams: one is for MobileNet model, another is used to crop a higher resolution jpg image.
 
-### Setting up the MobileNet Stream
+### Setting up the MobileNet stream
 
 There are two methods used to obtain a proper resolution. The [chooseStreamResolution](app/imgprovider.c#L221) method is used to select the smallest stream and assign them into streamWidth and streamHeight.
 
@@ -56,32 +56,32 @@ unsigned int streamHeight = 0;
 chooseStreamResolution(args.width, args.height, &streamWidth, &streamHeight);
 ```
 
-Then the [createImgProvider](app/imgprovider.c#L95) method is used to return an ImgProvider with the selected [output format](https://axiscommunications.github.io/acap-documentation/docs/api/src/api/vdostream/html/vdo-types_8h.html#a5ed136c302573571bf325c39d6d36246).
+Then, the [createImgProvider](app/imgprovider.c#L95) method is used to return an ImgProvider with the selected [output format](https://axiscommunications.github.io/acap-documentation/docs/api/src/api/vdostream/html/vdo-types_8h.html#a5ed136c302573571bf325c39d6d36246).
 
 ```c
 provider = createImgProvider(streamWidth, streamHeight, 2, VDO_FORMAT_YUV);
 ```
 
-#### Setting up the Crop Stream
+#### Setting up the crop stream
 
-The original resolution args.raw_width x args.raw_height is used to crop a higher resolution image.
+The original resolution `args.raw_width` x `args.raw_height` is used to crop a higher resolution image.
 
 ```c
-provider_raw = createImgProvider(args.raw_width, args.raw_height, 2, VDO_FORMAT_YUV);
+provider_raw = createImgProvider(rawWidth, rawHeight, 2, VDO_FORMAT_YUV);
 ```
 
 #### Setting up the larod interface
 
-Then similar with [tensorflow-to-larod](../tensorflow-to-larod), the [larod](https://axiscommunications.github.io/acap-documentation/docs/api/src/api/larod/html/index.html) interface needs to be set up. The [setupLarod](app/object_detection.c#L236) method is used to create a conncection to larod and select the hardware to use the model.
+Then similar with [tensorflow-to-larod](../tensorflow-to-larod), the [larod](https://axiscommunications.github.io/acap-documentation/docs/api/src/api/larod/html/index.html) interface needs to be set up. The [setupLarod](app/object_detection.c#L314) method is used to create a conncection to larod and select the hardware to use the model.
 
 ```c
 int larodModelFd = -1;
 larodConnection* conn = NULL;
 larodModel* model = NULL;
-setupLarod(args.chip, larodModelFd, &conn, &model);
+setupLarod(chipString, larodModelFd, &conn, &model);
 ```
 
-The [createAndMapTmpFile](app/object_detection.c#L173) method is used to create temporary files to store the input and output tensors.
+The [createAndMapTmpFile](app/object_detection.c#L251) method is used to create temporary files to store the input and output tensors.
 
 ```c
 char CONV_INP_FILE_PATTERN[] = "/tmp/larod.in.test-XXXXXX";
@@ -100,7 +100,7 @@ int larodOutput2Fd = -1;
 int larodOutput3Fd = -1;
 int larodOutput4Fd = -1;
 
-createAndMapTmpFile(CONV_INP_FILE_PATTERN,  args.width * args.height * CHANNELS, &larodInputAddr, &larodInputFd);
+createAndMapTmpFile(CONV_INP_FILE_PATTERN,  rawWidth * rawHeight * CHANNELS, &larodInputAddr, &larodInputFd);
 createAndMapTmpFile(CONV_OUT1_FILE_PATTERN, TENSOR1SIZE, &larodOutput1Addr, &larodOutput1Fd);
 createAndMapTmpFile(CONV_OUT2_FILE_PATTERN, TENSOR2SIZE, &larodOutput2Addr, &larodOutput2Fd);
 createAndMapTmpFile(CONV_OUT3_FILE_PATTERN, TENSOR3SIZE, &larodOutput3Addr, &larodOutput3Fd);
@@ -114,7 +114,7 @@ char CROP_FILE_PATTERN[] = "/tmp/crop.test-XXXXXX";
 void* cropAddr = MAP_FAILED;
 int cropFd = -1;
 
-createAndMapTmpFile(CROP_FILE_PATTERN, args.raw_width * args.raw_height * CHANNELS, &cropAddr, &cropFd);
+createAndMapTmpFile(CROP_FILE_PATTERN, rawWidth * rawHeight * CHANNELS, &cropAddr, &cropFd);
 ```
 
 The `larodCreateModelInputs` and `larodCreateModelOutputs` methods map the preprocessing input and output tensors with the model.
@@ -151,7 +151,7 @@ VdoBuffer* buf = getLastFrameBlocking(provider);
 uint8_t* nv12Data = (uint8_t*) vdo_buffer_get_data(buf);
 ```
 
-Axis cameras output images on the NV12 YUV format. As this is not normally used as input format to deep learning models,
+Axis cameras outputs frames on the NV12 YUV format. As this is not normally used as input format to deep learning models,
 conversion to e.g., RGB might be needed. This is done by creating a pre-processing job request `ppReq` using the function `larodCreateJobRequest`.
 
 ```c
@@ -185,7 +185,7 @@ If the score is higher than a threshold `args.threshold/100.0`, the results are 
 syslog(LOG_INFO, "Object %d: Classes: %s - Scores: %f - Locations: [%f,%f,%f,%f]",
 i, class_name[(int) classes[i]], scores[i], top, left, bottom, right);
 
-unsigned char* crop_buffer = crop_interleaved(cropAddr, args.raw_width, args.raw_height, CHANNELS,
+unsigned char* crop_buffer = crop_interleaved(cropAddr, rawWidth, rawHeight, CHANNELS,
                                           crop_x, crop_y, crop_w, crop_h);
 
 buffer_to_jpeg(crop_buffer, &jpeg_conf, &jpeg_size, &jpeg_buffer);
@@ -262,7 +262,7 @@ In the system log the chip is sometimes only mentioned as a string, they are map
 | Ambarella CVFlow (NN) | 6 | ambarella-cvflow |
 | ARTPEC-8 DLPU | 12 | axis-a8-dlpu-tflite |
 
-There are four outputs from MobileNet SSD v2 (COCO) model. The number of detections, cLasses, scores, and locations are shown as below. The four location numbers stand for [top, left, bottom, right]. By the way, currently the saved images will be overwritten continuously, so those saved images might not all from the detections of the last frame, if the number of detections is less than previous detection numbers.
+There are four outputs from MobileNet SSD v2 (COCO) model. The number of detections, cLasses, scores, and locations are shown as below. The four location numbers stand for \[top, left, bottom, right\]. By the way, currently the saved images will be overwritten continuously, so those saved images might not all from the detections of the last frame, if the number of detections is less than previous detection numbers.
 
 ```sh
 [ INFO    ] object_detection[645]: Object 1: Classes: 2 car - Scores: 0.769531 - Locations: [0.750146,0.086451,0.894765,0.299347]
