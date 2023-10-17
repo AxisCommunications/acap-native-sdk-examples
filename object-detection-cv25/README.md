@@ -47,7 +47,7 @@ In general, it would be easier to use a model that has already by design an inpu
 ### Setting up the MobileNet stream
 
 > [!NOTE]
-> This example is designed to post-process the output of this specific model. If you want to use your own model, you'll have to adapt the [post-processing](https://github.com/AxisCommunications/acap-native-sdk-examples-staging/blob/main/object-detection-cv25/app/object_detection.c#L891)
+> This example is designed to post-process the output of this specific model. If you want to use your own model, you'll have to adapt the [post-processing](https://github.com/AxisCommunications/acap-native-sdk-examples/blob/main/object-detection-cv25/app/object_detection.c#L891)
 
 There are two methods used to obtain a proper resolution. The [chooseStreamResolution](app/imgprovider.c#L221) method is used to select the smallest stream and assign them into streamWidth and streamHeight.
 
