@@ -40,11 +40,14 @@ The following instructions can be executed to simply run the example.
 
 ## Designing the application
 
-The whole principle is similar to the [tensorflow-to-larod-cv25](../tensorflow-to-larod-cv25). In this example, the original video stream has a resolution of 640x360, while MobileNet SSD COCO requires an input size of 300x300, so we set up two different streams: one is for MobileNet model, another is used to crop a higher resolution jpg image.
+The whole principle is similar to the [vdo-larod-cv25](../vdo-larod-cv25). In this example, the original video stream has a resolution of 640x360, while MobileNet SSD COCO requires an input size of 300x300, so we set up two different streams: one is for MobileNet model, another is used to crop a higher resolution jpg image.
 Although the model takes an input of 300x300, the CV25 accelerator expects an input of size multiple of 32. This means that the input needs to be converted to a resolution of 300x320 to satisfy the chip requirements. This is done by adding 20 bytes of padding to each row of the image.
 In general, it would be easier to use a model that has already by design an input of size multiple of 32 (typically 320x320 or 640x640).
 
 ### Setting up the MobileNet stream
+
+> [!NOTE]
+> This example is designed to post-process the output of this specific model. If you want to use your own model, you'll have to adapt the [post-processing](https://github.com/AxisCommunications/acap-native-sdk-examples-staging/blob/main/object-detection-cv25/app/object_detection.c#L891)
 
 There are two methods used to obtain a proper resolution. The [chooseStreamResolution](app/imgprovider.c#L221) method is used to select the smallest stream and assign them into streamWidth and streamHeight.
 
@@ -173,6 +176,21 @@ There are four outputs from the Object Detection model, and each object's locati
 float* locations = (float*) larodOutput1Addr;
 float* classes = (float*) larodOutput2Addr;
 ```
+
+Unlike ARTPEC, the CV25 accelerator lacks the capability to perform bounding-box post-processing independently. Therefore, after the inference, we call the custom `postProcessing`function to execute the post-processing steps.
+
+```c
+ postProcessing(locations, classes, numberOfDetections, anchorFile, numberOfClasses,
+                       confidenceThreshold, iouThreshold, yScale, xScale, hScale, wScale, boxes);
+```
+
+- The post-processing consists of the conversion of `locations` using anchor boxes into bounding boxes with the format `[y_min, x_min, y_max, x_max]`
+- The anchor boxes constitute a list of N boxes used as references for the detections.
+- The `location` array is represented as a vector with dimensions N*4.
+  - Here, N denotes the total number of detections, and the 4 values are `[dy, dx, dh, dw]`.
+    - In this context, `dy` and `dx` signify the vertical and horizontal shifts relative to the corresponding anchor box, while `dh` and `dw` represent the scaling of height and width in relation to the anchor box.
+
+After creating the bounding box using the locations and the anchor boxes, non-maxima suppression is applied so that overlapping boxes with lower scores are removed.
 
 If the score is higher than a threshold `args.threshold/100.0`, the results are outputted by the `syslog` function, and the object is cropped and saved into jpg form by `crop_interleaved`, `set_jpeg_configuration`, `buffer_to_jpeg`, `jpeg_to_file` methods.
 
