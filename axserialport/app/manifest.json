@@ -1,0 +1,18 @@
+{
+    "schemaVersion": "1.3.1",
+    "acapPackageConf": {
+        "setup": {
+            "friendlyName": "axserialport",
+            "appName": "axserialport",
+            "vendor": "Axis Communications",
+            "embeddedSdkVersion": "3.0",
+            "user": {
+                "group": "sdk",
+                "username": "sdk"
+            },
+            "vendorUrl": "https://www.axis.com",
+            "runMode": "never",
+            "version": "1.0.0"
+        }
+    }
+}
