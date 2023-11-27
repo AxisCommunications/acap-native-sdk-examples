@@ -63,7 +63,7 @@ Below is the list of examples available in the repository.
 - [web-server-using-fastcgi](./web-server-using-fastcgi/)
   - This example code is written in C and explains how to build an ACAP application that can handle HTTP requests sent to the Axis device, using the device's own web server.
 
-### DockerHub Image
+### Docker Hub image
 
 The ACAP Native SDK image can be used as a basis for custom built images to run your application or as a developer environment inside the container.
 
@@ -77,14 +77,6 @@ The specific SDK version that each example is based on is specified in the Docke
 The full compatibility schema for ACAP SDK version and firmware version is available at [Compatibility for Native SDK](https://axiscommunications.github.io/acap-documentation/docs/api/native-sdk-api.html#compatibility).
 
 If the issue persists with a compatible firmware, please create an issue containing the information specified in the template below.
-
-## Issue template
-
-*Axis product/device (e.g. Q1615 Mk III):*
-
-*Device firmware version:*
-
-*Issue description:*
 
 # License
 
