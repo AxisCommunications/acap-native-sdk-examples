@@ -3,13 +3,17 @@
 BasedOnStyle:  LLVM
 # Cpp covers both C and C++.
 Language:        Cpp
-AlignConsecutiveMacros: Consecutive
 AlignConsecutiveAssignments: Consecutive
 AlignConsecutiveBitFields: Consecutive
+AlignConsecutiveMacros: Consecutive
 AlignEscapedNewlines: Left
+AllowAllArgumentsOnNextLine: false
+AllowAllParametersOfDeclarationOnNextLine: false
 AllowShortIfStatementsOnASingleLine: WithoutElse
 AllowShortLoopsOnASingleLine: true
 AlwaysBreakBeforeMultilineStrings: true
+BinPackArguments: false
+BinPackParameters: false
 ColumnLimit:     100
 IndentCaseLabels: true
 # Most files have used this indentation width and to not get to large diffs

@@ -157,7 +157,9 @@ static gboolean send_timer_data(gpointer data) {
         /* Flush the write buffer */
         ret = g_io_channel_flush(iochannel, &error);
         /* Log the return status from g_io_channel_write_chars() */
-        g_message("%s() wrote %d bytes, status:'%s'", __FUNCTION__, bytes_written,
+        g_message("%s() wrote %d bytes, status:'%s'",
+                  __FUNCTION__,
+                  bytes_written,
                   iostatus2str(ret));
     }
 

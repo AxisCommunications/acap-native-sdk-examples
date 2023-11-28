@@ -162,7 +162,9 @@ static void free_disk_item_t() {
                before releasing the storage device. */
             ax_storage_release_async(item->storage, release_disk_cb, item->storage_id, &error);
             if (error != NULL) {
-                syslog(LOG_WARNING, "Failed to release %s. Error: %s", item->storage_id,
+                syslog(LOG_WARNING,
+                       "Failed to release %s. Error: %s",
+                       item->storage_id,
                        error->message);
                 g_clear_error(&error);
             } else {
@@ -173,7 +175,9 @@ static void free_disk_item_t() {
 
         ax_storage_unsubscribe(item->subscription_id, &error);
         if (error != NULL) {
-            syslog(LOG_WARNING, "Failed to unsubscribe event of %s. Error: %s", item->storage_id,
+            syslog(LOG_WARNING,
+                   "Failed to unsubscribe event of %s. Error: %s",
+                   item->storage_id,
                    error->message);
             g_clear_error(&error);
         } else {
@@ -266,7 +270,9 @@ static void subscribe_cb(gchar* storage_id, gpointer user_data, GError* error) {
     /* Get the status of the events. */
     exiting = ax_storage_get_status(storage_id, AX_STORAGE_EXITING_EVENT, &ax_error);
     if (ax_error != NULL) {
-        syslog(LOG_WARNING, "Failed to get EXITING event for %s. Error: %s", storage_id,
+        syslog(LOG_WARNING,
+               "Failed to get EXITING event for %s. Error: %s",
+               storage_id,
                ax_error->message);
         g_error_free(ax_error);
         return;
@@ -274,7 +280,9 @@ static void subscribe_cb(gchar* storage_id, gpointer user_data, GError* error) {
 
     available = ax_storage_get_status(storage_id, AX_STORAGE_AVAILABLE_EVENT, &ax_error);
     if (ax_error != NULL) {
-        syslog(LOG_WARNING, "Failed to get AVAILABLE event for %s. Error: %s", storage_id,
+        syslog(LOG_WARNING,
+               "Failed to get AVAILABLE event for %s. Error: %s",
+               storage_id,
                ax_error->message);
         g_error_free(ax_error);
         return;
@@ -282,7 +290,9 @@ static void subscribe_cb(gchar* storage_id, gpointer user_data, GError* error) {
 
     writable = ax_storage_get_status(storage_id, AX_STORAGE_WRITABLE_EVENT, &ax_error);
     if (ax_error != NULL) {
-        syslog(LOG_WARNING, "Failed to get WRITABLE event for %s. Error: %s", storage_id,
+        syslog(LOG_WARNING,
+               "Failed to get WRITABLE event for %s. Error: %s",
+               storage_id,
                ax_error->message);
         g_error_free(ax_error);
         return;
@@ -290,7 +300,9 @@ static void subscribe_cb(gchar* storage_id, gpointer user_data, GError* error) {
 
     full = ax_storage_get_status(storage_id, AX_STORAGE_FULL_EVENT, &ax_error);
     if (ax_error != NULL) {
-        syslog(LOG_WARNING, "Failed to get FULL event for %s. Error: %s", storage_id,
+        syslog(LOG_WARNING,
+               "Failed to get FULL event for %s. Error: %s",
+               storage_id,
                ax_error->message);
         g_error_free(ax_error);
         return;
@@ -301,8 +313,12 @@ static void subscribe_cb(gchar* storage_id, gpointer user_data, GError* error) {
     disk->exiting   = exiting;
     disk->full      = full;
 
-    syslog(LOG_INFO, "Status of events for %s: %swritable, %savailable, %sexiting, %sfull",
-           storage_id, writable ? "" : "not ", available ? "" : "not ", exiting ? "" : "not ",
+    syslog(LOG_INFO,
+           "Status of events for %s: %swritable, %savailable, %sexiting, %sfull",
+           storage_id,
+           writable ? "" : "not ",
+           available ? "" : "not ",
+           exiting ? "" : "not ",
            full ? "" : "not ");
 
     /* If exiting, and the disk was set up before, release it. */
@@ -349,7 +365,9 @@ static disk_item_t* new_disk_item_t(gchar* storage_id) {
     /* Subscribe to disks events. */
     subscription_id = ax_storage_subscribe(storage_id, subscribe_cb, NULL, &error);
     if (subscription_id == 0 || error != NULL) {
-        syslog(LOG_ERR, "Failed to subscribe to events of %s. Error: %s", storage_id,
+        syslog(LOG_ERR,
+               "Failed to subscribe to events of %s. Error: %s",
+               storage_id,
                error->message);
         g_clear_error(&error);
         return NULL;

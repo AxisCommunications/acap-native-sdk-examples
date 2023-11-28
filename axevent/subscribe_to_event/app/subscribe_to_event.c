@@ -84,17 +84,29 @@ static guint onviftrigger_subscription(AXEventHandler* event_handler, guint* tok
     key_value_set = ax_event_key_value_set_new();
 
     // Set keys and namespaces for the event to be subscribed
-    ax_event_key_value_set_add_key_value(key_value_set, "topic0", "tns1", "Monitoring",
-                                         AX_VALUE_TYPE_STRING, NULL);
-    ax_event_key_value_set_add_key_value(key_value_set, "topic1", "tns1", "ProcessorUsage",
-                                         AX_VALUE_TYPE_STRING, NULL);
+    ax_event_key_value_set_add_key_value(key_value_set,
+                                         "topic0",
+                                         "tns1",
+                                         "Monitoring",
+                                         AX_VALUE_TYPE_STRING,
+                                         NULL);
+    ax_event_key_value_set_add_key_value(key_value_set,
+                                         "topic1",
+                                         "tns1",
+                                         "ProcessorUsage",
+                                         AX_VALUE_TYPE_STRING,
+                                         NULL);
 
     /*
      * Time to setup the subscription. Use the "token" input argument as
      * input data to the callback function "subscription callback"
      */
-    ax_event_handler_subscribe(event_handler, key_value_set, &subscription,
-                               (AXSubscriptionCallback)subscription_callback, token, NULL);
+    ax_event_handler_subscribe(event_handler,
+                               key_value_set,
+                               &subscription,
+                               (AXSubscriptionCallback)subscription_callback,
+                               token,
+                               NULL);
 
     syslog(LOG_INFO, "And here's the token: %d", *token);
 

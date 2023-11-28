@@ -91,8 +91,11 @@ size_t global_work_size[2];
 GHashTable* table = NULL;
 
 static void print_cl_platform_info(cl_platform_id id) {
-    cl_platform_info param_names[] = {CL_PLATFORM_PROFILE, CL_PLATFORM_VERSION, CL_PLATFORM_NAME,
-                                      CL_PLATFORM_VENDOR, CL_PLATFORM_EXTENSIONS};
+    cl_platform_info param_names[] = {CL_PLATFORM_PROFILE,
+                                      CL_PLATFORM_VERSION,
+                                      CL_PLATFORM_NAME,
+                                      CL_PLATFORM_VENDOR,
+                                      CL_PLATFORM_EXTENSIONS};
 
     syslog(LOG_INFO, "Platform info:");
     for (int i = 0; i < 5; i++) {
@@ -126,8 +129,11 @@ static cl_program create_cl_program(cl_context cont, const char* file_name, cl_i
 
     fclose(fp);
 
-    cl_program prog = clCreateProgramWithSource(cont, 1, (const char**)&source_str,
-                                                (const size_t*)&source_size, ret);
+    cl_program prog = clCreateProgramWithSource(cont,
+                                                1,
+                                                (const char**)&source_str,
+                                                (const size_t*)&source_size,
+                                                ret);
     free(source_str);
     return prog;
 }
@@ -163,8 +169,8 @@ static int free_opencl() {
     return 0;
 }
 
-static int setup_opencl(const char* kernel_name, enum render_area area, unsigned width,
-                        unsigned height) {
+static int
+setup_opencl(const char* kernel_name, enum render_area area, unsigned width, unsigned height) {
     cl_int ret = clGetPlatformIDs(1, &platform_id, &ret_num_platforms);
     if (ret != CL_SUCCESS) {
         syslog(LOG_ERR, "Could not get device id's");
@@ -247,8 +253,12 @@ static int setup_opencl(const char* kernel_name, enum render_area area, unsigned
  * For our sobel operations we ignore cbcr values and simply output 128 for all
  * pixels directly in the kernel.
  */
-static int do_opencl_filtering(cl_mem* in_image_y, void* out_data, unsigned width, unsigned height,
-                               size_t image_y_size, size_t image_cbcr_size) {
+static int do_opencl_filtering(cl_mem* in_image_y,
+                               void* out_data,
+                               unsigned width,
+                               unsigned height,
+                               size_t image_y_size,
+                               size_t image_cbcr_size) {
     int ret;
 
     /*
@@ -268,10 +278,16 @@ static int do_opencl_filtering(cl_mem* in_image_y, void* out_data, unsigned widt
      * memory, such that no unnecessary data has to be copied to GPU memory.
      * This data may still however be cached in the GPU.
      */
-    out_image_y    = clCreateBuffer(context, CL_MEM_WRITE_ONLY | CL_MEM_USE_HOST_PTR, image_y_size,
-                                 out_data, &ret);
-    out_image_cbcr = clCreateBuffer(context, CL_MEM_WRITE_ONLY | CL_MEM_USE_HOST_PTR,
-                                    image_cbcr_size, (out_data + image_y_size), &ret);
+    out_image_y    = clCreateBuffer(context,
+                                 CL_MEM_WRITE_ONLY | CL_MEM_USE_HOST_PTR,
+                                 image_y_size,
+                                 out_data,
+                                 &ret);
+    out_image_cbcr = clCreateBuffer(context,
+                                    CL_MEM_WRITE_ONLY | CL_MEM_USE_HOST_PTR,
+                                    image_cbcr_size,
+                                    (out_data + image_y_size),
+                                    &ret);
     if (ret != CL_SUCCESS) {
         syslog(LOG_ERR, "Unable to create cl memory objects");
         return -1;
@@ -282,8 +298,15 @@ static int do_opencl_filtering(cl_mem* in_image_y, void* out_data, unsigned widt
     ret |= clSetKernelArg(kernel, 2, sizeof(cl_mem), (void*)&out_image_cbcr);
     ret |= clSetKernelArg(kernel, 3, sizeof(width), &width);
     ret |= clSetKernelArg(kernel, 4, sizeof(height), &height);
-    ret |= clEnqueueNDRangeKernel(command_queue, kernel, 2, offset, global_work_size,
-                                  local_work_size, 0, NULL, NULL);
+    ret |= clEnqueueNDRangeKernel(command_queue,
+                                  kernel,
+                                  2,
+                                  offset,
+                                  global_work_size,
+                                  local_work_size,
+                                  0,
+                                  NULL,
+                                  NULL);
 
     ret |= clFinish(command_queue);
     if (ret != CL_SUCCESS) {
@@ -307,8 +330,12 @@ static void hash_table_destroy(void) {
  * Map a VDO buffer address to an OpenCL memory object. If the address has
  * already been mapped, look up the OpenCL memory object in the hash table
  */
-static int map_input_buffer(void* buffer, cl_mem* in_images, cl_mem* in_image_y, size_t image_size,
-                            enum render_area area, unsigned buffer_count) {
+static int map_input_buffer(void* buffer,
+                            cl_mem* in_images,
+                            cl_mem* in_image_y,
+                            size_t image_size,
+                            enum render_area area,
+                            unsigned buffer_count) {
     int ret;
     static unsigned count = 0;
 
@@ -389,7 +416,9 @@ int main(int argc, char* argv[]) {
     vdo_stream_info = vdo_stream_get_info(stream, &error);
     if (!vdo_stream_info) goto exit;
 
-    syslog(LOG_INFO, "Starting stream: %s in %s, %ux%u, %u fps.", output_file_format,
+    syslog(LOG_INFO,
+           "Starting stream: %s in %s, %ux%u, %u fps.",
+           output_file_format,
            vdo_map_get_string(vdo_stream_info, "subformat", NULL, "N/A"),
            vdo_map_get_uint32(vdo_stream_info, "width", 0),
            vdo_map_get_uint32(vdo_stream_info, "height", 0),
@@ -402,7 +431,8 @@ int main(int argc, char* argv[]) {
 
     /* Open output file */
     char file_path[128];
-    snprintf(file_path, sizeof(file_path),
+    snprintf(file_path,
+             sizeof(file_path),
              "/usr/local/packages/"
              "vdo_cl_filter_demo/cl_vdo_demo.%s",
              output_file_format);
@@ -422,8 +452,12 @@ int main(int argc, char* argv[]) {
      * Allocate memory for output buffer. In this case it's more practical with
      * a separate output buffer since we're performing a filtering operation.
      */
-    out_data = mmap(NULL, (image_y_size + image_cbcr_size), PROT_READ | PROT_WRITE,
-                    MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+    out_data = mmap(NULL,
+                    (image_y_size + image_cbcr_size),
+                    PROT_READ | PROT_WRITE,
+                    MAP_PRIVATE | MAP_ANONYMOUS,
+                    -1,
+                    0);
     if (out_data == MAP_FAILED) {
         syslog(LOG_ERR, "mmap failed: %d", errno);
         goto exit;
@@ -476,11 +510,19 @@ int main(int argc, char* argv[]) {
          * cl buffer.
          */
         cl_mem in_image_y;
-        if (map_input_buffer(in_data, in_images, &in_image_y, image_y_size, cur_render_area,
+        if (map_input_buffer(in_data,
+                             in_images,
+                             &in_image_y,
+                             image_y_size,
+                             cur_render_area,
                              buffer_count))
             goto exit;
 
-        if (do_opencl_filtering(&in_image_y, out_data, image_width, image_height, image_y_size,
+        if (do_opencl_filtering(&in_image_y,
+                                out_data,
+                                image_width,
+                                image_height,
+                                image_y_size,
                                 image_cbcr_size))
             goto exit;
 

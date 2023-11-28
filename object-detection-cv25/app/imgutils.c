@@ -31,8 +31,10 @@
  * @param jpeg_size The output size of the jpeg
  * @param jpeg_buffer The output buffer of the jpeg
  */
-void buffer_to_jpeg(unsigned char* image_buffer, struct jpeg_compress_struct* jpeg_conf,
-                    unsigned long* jpeg_size, unsigned char** jpeg_buffer) {
+void buffer_to_jpeg(unsigned char* image_buffer,
+                    struct jpeg_compress_struct* jpeg_conf,
+                    unsigned long* jpeg_size,
+                    unsigned char** jpeg_buffer) {
     struct jpeg_error_mgr jerr;
     JSAMPROW row_pointer[1];
 
@@ -60,7 +62,10 @@ void buffer_to_jpeg(unsigned char* image_buffer, struct jpeg_compress_struct* jp
  * @param quality The desired jpeg quality (0-100)
  * @param jpeg_conf The jpeg configuration struct to modify
  */
-void set_jpeg_configuration(int width, int height, int channels, int quality,
+void set_jpeg_configuration(int width,
+                            int height,
+                            int channels,
+                            int quality,
                             struct jpeg_compress_struct* jpeg_conf) {
     // Only supports RGB and grayscale
     jpeg_create_compress(jpeg_conf);
@@ -111,8 +116,14 @@ void jpeg_to_file(char* file_name, unsigned char* buffer, unsigned long buffer_s
  * @param crop_w The width of the desired crop in pixels
  * @param crop_h The height of the desired crop in pixels
  */
-unsigned char* crop_interleaved(unsigned char* image_buffer, int image_w, int image_h, int channels,
-                                int crop_x, int crop_y, int crop_w, int crop_h) {
+unsigned char* crop_interleaved(unsigned char* image_buffer,
+                                int image_w,
+                                int image_h,
+                                int channels,
+                                int crop_x,
+                                int crop_y,
+                                int crop_w,
+                                int crop_h) {
     // This function crops out a section of an image that is located at
     // (x, y, x + w, x + h).
     // The input buffer channel layout is assumed to be interleaved

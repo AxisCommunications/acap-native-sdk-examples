@@ -28,7 +28,10 @@ static int parsePosInt(char* arg, unsigned long long* i, unsigned long long limi
 static int parseOpt(int key, char* arg, struct argp_state* state);
 
 const struct argp_option opts[] = {
-    {"chip", 'c', "CHIP", 0,
+    {"chip",
+     'c',
+     "CHIP",
+     0,
      "Chooses chip CHIP to run on, where CHIP is the enum type larodChip "
      "from the library. If not specified, the default chip for a new "
      "connection will be used.",

@@ -40,8 +40,12 @@ typedef struct {
  * [xmin,ymin,xmax,ymax]
  *
  */
-int loadDetectionStruct(const float* locations, float* classes, int num_of_detections,
-                        int num_of_classes, const char* anchor_file, detection* dets) {
+int loadDetectionStruct(const float* locations,
+                        float* classes,
+                        int num_of_detections,
+                        int num_of_classes,
+                        const char* anchor_file,
+                        detection* dets) {
     // Open anchor file
     FILE* fp;
     fp = fopen(anchor_file, "rb");
@@ -95,8 +99,13 @@ float min(float a, float b) {
 }
 
 // Apply anchors to detections to obtain boxes
-void applyAnchors(detection* dets, int num_of_detections, box* boxes, float y_scale, float x_scale,
-                  float h_scale, float w_scale) {
+void applyAnchors(detection* dets,
+                  int num_of_detections,
+                  box* boxes,
+                  float y_scale,
+                  float x_scale,
+                  float h_scale,
+                  float w_scale) {
     float prior_center_y, prior_center_x, prior_height, prior_width;
     float center_y, center_x, height, width;
     for (int i = 0; i < num_of_detections; i++) {
@@ -211,12 +220,25 @@ void copyBoxes(box* boxes, box* boxes2, int num_of_boxes) {
     }
 }
 
-int postProcessing(float* locations, float* classes, int num_of_detections, char* anchor_file,
-                   int num_of_classes, float score_threshold, float nms_threshold, float y_scale,
-                   float x_scale, float h_scale, float w_scale, box* boxes) {
+int postProcessing(float* locations,
+                   float* classes,
+                   int num_of_detections,
+                   char* anchor_file,
+                   int num_of_classes,
+                   float score_threshold,
+                   float nms_threshold,
+                   float y_scale,
+                   float x_scale,
+                   float h_scale,
+                   float w_scale,
+                   box* boxes) {
     // Load detections and anchors in struct array
     detection* dets = (detection*)malloc(num_of_detections * sizeof(detection));
-    if (loadDetectionStruct(locations, classes, num_of_detections, num_of_classes, anchor_file,
+    if (loadDetectionStruct(locations,
+                            classes,
+                            num_of_detections,
+                            num_of_classes,
+                            anchor_file,
                             dets) != 0) {
         printf("Error loading detection struct");
         free(dets);

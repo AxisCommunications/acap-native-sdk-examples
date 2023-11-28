@@ -76,8 +76,13 @@ static gdouble index2cairo(const gint color_index) {
  * param color_index Palette color index.
  * param line_width Rectange line width.
  */
-static void draw_rectangle(cairo_t* context, gint left, gint top, gint right, gint bottom,
-                           gint color_index, gint line_width) {
+static void draw_rectangle(cairo_t* context,
+                           gint left,
+                           gint top,
+                           gint right,
+                           gint bottom,
+                           gint color_index,
+                           gint line_width) {
     gdouble val = 0;
 
     val = index2cairo(color_index);
@@ -153,8 +158,8 @@ static void setup_axoverlay_data(struct axoverlay_overlay_data* data) {
  *
  * return result as boolean
  */
-static gboolean setup_palette_color(const int index, const gint r, const gint g, const gint b,
-                                    const gint a) {
+static gboolean
+setup_palette_color(const int index, const gint r, const gint g, const gint b, const gint a) {
     GError* error = NULL;
     struct axoverlay_palette_color color;
 
@@ -192,9 +197,13 @@ static gboolean setup_palette_color(const int index, const gint r, const gint g,
  * param overlay_height Overlay height.
  * param user_data Optional user data associated with this overlay.
  */
-static void adjustment_cb(const gint id, const struct axoverlay_stream_data* stream,
-                          enum axoverlay_position_type* postype, gfloat* overlay_x,
-                          gfloat* overlay_y, gint* overlay_width, gint* overlay_height,
+static void adjustment_cb(const gint id,
+                          const struct axoverlay_stream_data* stream,
+                          enum axoverlay_position_type* postype,
+                          gfloat* overlay_x,
+                          gfloat* overlay_y,
+                          gint* overlay_width,
+                          gint* overlay_height,
                           gpointer user_data) {
     syslog(LOG_INFO, "Adjust callback for overlay: %i x %i", *overlay_width, *overlay_height);
     syslog(LOG_INFO, "Adjust callback for stream: %i x %i", stream->width, stream->height);
@@ -220,11 +229,15 @@ static void adjustment_cb(const gint id, const struct axoverlay_stream_data* str
  * param overlay_height Overlay height.
  * param user_data Optional user data associated with this overlay.
  */
-static void render_overlay_cb(gpointer rendering_context, const gint id,
+static void render_overlay_cb(gpointer rendering_context,
+                              const gint id,
                               const struct axoverlay_stream_data* stream,
-                              const enum axoverlay_position_type postype, const gfloat overlay_x,
-                              const gfloat overlay_y, const gint overlay_width,
-                              const gint overlay_height, const gpointer user_data) {
+                              const enum axoverlay_position_type postype,
+                              const gfloat overlay_x,
+                              const gfloat overlay_y,
+                              const gint overlay_width,
+                              const gint overlay_height,
+                              const gpointer user_data) {
     gdouble val = FALSE;
 
     syslog(LOG_INFO, "Render callback for camera: %i", stream->camera);
@@ -243,8 +256,13 @@ static void render_overlay_cb(gpointer rendering_context, const gint id,
         draw_rectangle(rendering_context, 0, 0, stream->width, stream->height / 4, top_color, 9.6);
 
         //  Draw a bottom rectangle in toggling color
-        draw_rectangle(rendering_context, 0, stream->height * 3 / 4, stream->width, stream->height,
-                       bottom_color, 2.0);
+        draw_rectangle(rendering_context,
+                       0,
+                       stream->height * 3 / 4,
+                       stream->width,
+                       stream->height,
+                       bottom_color,
+                       2.0);
     } else if (id == overlay_id_text) {
         //  Show text in black
         draw_text(rendering_context, stream->width / 2, stream->height / 2);
