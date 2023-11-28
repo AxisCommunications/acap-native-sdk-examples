@@ -84,12 +84,14 @@ static void common_callback(guint subscription, AXEvent* event, guint* token) {
             syslog(LOG_INFO,
                    "%d:audiotrigger-event: Audio channel %d above "
                    "trigger level",
-                   *token, channel);
+                   *token,
+                   channel);
         } else {
             syslog(LOG_INFO,
                    "%d:audiotrigger-event: Audio channel %d below "
                    "trigger level",
-                   *token, channel);
+                   *token,
+                   channel);
         }
 
     } else if (*token == DAYNIGHT_TOKEN) {
@@ -112,7 +114,9 @@ static void common_callback(guint subscription, AXEvent* event, guint* token) {
         if (state) {
             syslog(LOG_INFO, "%d:manualtrigger-event: Trigger on port %d is active", *token, port);
         } else {
-            syslog(LOG_INFO, "%d:manualtrigger-event: Trigger on port %d is inactive", *token,
+            syslog(LOG_INFO,
+                   "%d:manualtrigger-event: Trigger on port %d is inactive",
+                   *token,
                    port);
         }
 
@@ -155,7 +159,10 @@ static void ptzmove_callback(guint subscription, AXEvent* event, ptzmove* data) 
     key_value_set = ax_event_get_key_value_set(event);
 
     // Get the state of the manual trigger port
-    ax_event_key_value_set_get_integer(key_value_set, "PTZConfigurationToken", NULL, &channel,
+    ax_event_key_value_set_get_integer(key_value_set,
+                                       "PTZConfigurationToken",
+                                       NULL,
+                                       &channel,
                                        NULL);
     ax_event_key_value_set_get_boolean(key_value_set, "is_moving", NULL, &is_moving, NULL);
 
@@ -163,8 +170,12 @@ static void ptzmove_callback(guint subscription, AXEvent* event, ptzmove* data) 
     if (is_moving) {
         data->ptzchannel[channel].num_moves += 1;
         val = (data->ptzchannel[channel].num_moves == 1);
-        syslog(LOG_INFO, "%d:ptzmove-event: PTZ channel %d started moving (%d %s)", data->id,
-               channel, data->ptzchannel[channel].num_moves, val ? "time" : "times");
+        syslog(LOG_INFO,
+               "%d:ptzmove-event: PTZ channel %d started moving (%d %s)",
+               data->id,
+               channel,
+               data->ptzchannel[channel].num_moves,
+               val ? "time" : "times");
     } else {
         if (data->ptzchannel[channel].num_moves > 0) {
             syslog(LOG_INFO, "%d:ptzmove-event: PTZ channel %d stopped moving", data->id, channel);
@@ -202,10 +213,25 @@ static guint audiotrigger_subscription(AXEventHandler* event_handler, guint toke
      *        channel=NULL    <-- Subscribe to all channels
      *      triggered=NULL    <-- Subscribe to all states
      */
-    ax_event_key_value_set_add_key_values(
-        key_value_set, NULL, "topic0", "tns1", "AudioSource", AX_VALUE_TYPE_STRING, "topic1",
-        "tnsaxis", "TriggerLevel", AX_VALUE_TYPE_STRING, "channel", NULL, NULL, AX_VALUE_TYPE_INT,
-        "triggered", NULL, NULL, AX_VALUE_TYPE_BOOL, NULL);
+    ax_event_key_value_set_add_key_values(key_value_set,
+                                          NULL,
+                                          "topic0",
+                                          "tns1",
+                                          "AudioSource",
+                                          AX_VALUE_TYPE_STRING,
+                                          "topic1",
+                                          "tnsaxis",
+                                          "TriggerLevel",
+                                          AX_VALUE_TYPE_STRING,
+                                          "channel",
+                                          NULL,
+                                          NULL,
+                                          AX_VALUE_TYPE_INT,
+                                          "triggered",
+                                          NULL,
+                                          NULL,
+                                          AX_VALUE_TYPE_BOOL,
+                                          NULL);
 
     // Setup subscription and connect to callback function
     ax_event_handler_subscribe(event_handler,                            // event handler
@@ -245,10 +271,25 @@ static guint daynight_subscription(AXEventHandler* event_handler, guint token) {
      * VideoSource...=NULL    <-- Subscribe to all values
      *            day=NULL    <-- Subscribe to all states
      */
-    ax_event_key_value_set_add_key_values(
-        key_value_set, NULL, "topic0", "tns1", "VideoSource", AX_VALUE_TYPE_STRING, "topic1",
-        "tnsaxis", "DayNightVision", AX_VALUE_TYPE_STRING, "VideoSourceConfigurationToken", NULL,
-        NULL, AX_VALUE_TYPE_INT, "day", NULL, NULL, AX_VALUE_TYPE_BOOL, NULL);
+    ax_event_key_value_set_add_key_values(key_value_set,
+                                          NULL,
+                                          "topic0",
+                                          "tns1",
+                                          "VideoSource",
+                                          AX_VALUE_TYPE_STRING,
+                                          "topic1",
+                                          "tnsaxis",
+                                          "DayNightVision",
+                                          AX_VALUE_TYPE_STRING,
+                                          "VideoSourceConfigurationToken",
+                                          NULL,
+                                          NULL,
+                                          AX_VALUE_TYPE_INT,
+                                          "day",
+                                          NULL,
+                                          NULL,
+                                          AX_VALUE_TYPE_BOOL,
+                                          NULL);
 
     // Setup subscription and connect to callback function
     ax_event_handler_subscribe(event_handler,                            // event handler
@@ -290,10 +331,29 @@ static guint manualtrigger_subscription(AXEventHandler* event_handler, guint tok
      *           port=&port    <-- Subscribe to port number 1
      *          state=NULL     <-- Subscribe to all states
      */
-    ax_event_key_value_set_add_key_values(
-        key_value_set, NULL, "topic0", "tns1", "Device", AX_VALUE_TYPE_STRING, "topic1", "tnsaxis",
-        "IO", AX_VALUE_TYPE_STRING, "topic2", "tnsaxis", "VirtualPort", AX_VALUE_TYPE_STRING,
-        "port", NULL, &port, AX_VALUE_TYPE_INT, "state", NULL, NULL, AX_VALUE_TYPE_BOOL, NULL);
+    ax_event_key_value_set_add_key_values(key_value_set,
+                                          NULL,
+                                          "topic0",
+                                          "tns1",
+                                          "Device",
+                                          AX_VALUE_TYPE_STRING,
+                                          "topic1",
+                                          "tnsaxis",
+                                          "IO",
+                                          AX_VALUE_TYPE_STRING,
+                                          "topic2",
+                                          "tnsaxis",
+                                          "VirtualPort",
+                                          AX_VALUE_TYPE_STRING,
+                                          "port",
+                                          NULL,
+                                          &port,
+                                          AX_VALUE_TYPE_INT,
+                                          "state",
+                                          NULL,
+                                          NULL,
+                                          AX_VALUE_TYPE_BOOL,
+                                          NULL);
 
     // Setup subscription and connect to callback function
     ax_event_handler_subscribe(event_handler,                            // event handler
@@ -333,10 +393,25 @@ static guint ptzmove_subscription(AXEventHandler* event_handler, ptzmove* data) 
      *        channel=NULL    <-- Subscribe to all PTZ channels
      *      is_moving=NULL    <-- Subscribe to all values
      */
-    ax_event_key_value_set_add_key_values(
-        key_value_set, NULL, "topic0", "tns1", "PTZController", AX_VALUE_TYPE_STRING, "topic1",
-        "tnsaxis", "Move", AX_VALUE_TYPE_STRING, "PTZConfigurationToken", NULL, NULL,
-        AX_VALUE_TYPE_INT, "is_moving", NULL, NULL, AX_VALUE_TYPE_BOOL, NULL);
+    ax_event_key_value_set_add_key_values(key_value_set,
+                                          NULL,
+                                          "topic0",
+                                          "tns1",
+                                          "PTZController",
+                                          AX_VALUE_TYPE_STRING,
+                                          "topic1",
+                                          "tnsaxis",
+                                          "Move",
+                                          AX_VALUE_TYPE_STRING,
+                                          "PTZConfigurationToken",
+                                          NULL,
+                                          NULL,
+                                          AX_VALUE_TYPE_INT,
+                                          "is_moving",
+                                          NULL,
+                                          NULL,
+                                          AX_VALUE_TYPE_BOOL,
+                                          NULL);
 
     // Setup subscription and connect to callback function
     ax_event_handler_subscribe(event_handler,                             // event handler
@@ -377,10 +452,25 @@ static guint tampering_subscription(AXEventHandler* event_handler, guint token) 
      *        channel=&channel    <-- Subscribe to channel number 1
      *      tampering=NULL        <-- Subscribe to all values
      */
-    ax_event_key_value_set_add_key_values(
-        key_value_set, NULL, "topic0", "tns1", "VideoSource", AX_VALUE_TYPE_STRING, "topic1",
-        "tnsaxis", "Tampering", AX_VALUE_TYPE_STRING, "channel", NULL, &channel, AX_VALUE_TYPE_INT,
-        "tampering", NULL, NULL, AX_VALUE_TYPE_INT, NULL);
+    ax_event_key_value_set_add_key_values(key_value_set,
+                                          NULL,
+                                          "topic0",
+                                          "tns1",
+                                          "VideoSource",
+                                          AX_VALUE_TYPE_STRING,
+                                          "topic1",
+                                          "tnsaxis",
+                                          "Tampering",
+                                          AX_VALUE_TYPE_STRING,
+                                          "channel",
+                                          NULL,
+                                          &channel,
+                                          AX_VALUE_TYPE_INT,
+                                          "tampering",
+                                          NULL,
+                                          NULL,
+                                          AX_VALUE_TYPE_INT,
+                                          NULL);
 
     // Setup subscription and connect to callback function
     ax_event_handler_subscribe(event_handler,                            // event handler

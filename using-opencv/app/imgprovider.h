@@ -73,8 +73,10 @@ typedef struct ImgProvider {
  * param chosenHeight Selected image height.
  * return False if any errors occur, otherwise true.
  */
-bool chooseStreamResolution(unsigned int reqWidth, unsigned int reqHeight,
-                            unsigned int* chosenWidth, unsigned int* chosenHeight);
+bool chooseStreamResolution(unsigned int reqWidth,
+                            unsigned int reqHeight,
+                            unsigned int* chosenWidth,
+                            unsigned int* chosenHeight);
 
 /**
  * brief Initializes and starts an ImgProvider.
@@ -89,8 +91,8 @@ bool chooseStreamResolution(unsigned int reqWidth, unsigned int reqHeight,
  * param vdoFormat Image format to be output by stream.
  * return Pointer to new ImgProvider, or NULL if failed.
  */
-ImgProvider_t* createImgProvider(unsigned int w, unsigned int h, unsigned int numFrames,
-                                 VdoFormat vdoFormat);
+ImgProvider_t*
+createImgProvider(unsigned int w, unsigned int h, unsigned int numFrames, VdoFormat vdoFormat);
 
 /**
  * brief Release VDO buffers and deallocate provider.

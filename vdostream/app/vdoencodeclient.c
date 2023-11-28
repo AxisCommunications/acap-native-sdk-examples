@@ -95,8 +95,11 @@ static void print_frame(VdoFrame* frame) {
             frame_type = "NA";
     }
 
-    syslog(LOG_INFO, "frame = %4u, type = %s, size = %zu\n", vdo_frame_get_sequence_nbr(frame),
-           frame_type, vdo_frame_get_size(frame));
+    syslog(LOG_INFO,
+           "frame = %4u, type = %s, size = %zu\n",
+           vdo_frame_get_sequence_nbr(frame),
+           frame_type,
+           vdo_frame_get_size(frame));
 }
 
 // Set vdo format from input parameter
@@ -114,8 +117,11 @@ static gboolean set_format(VdoMap* settings, gchar* format, GError** error) {
         vdo_map_set_uint32(settings, "format", VDO_FORMAT_YUV);
         vdo_map_set_string(settings, "subformat", "Y800");
     } else {
-        g_set_error(error, VDO_CLIENT_ERROR, VDO_ERROR_NOT_FOUND,
-                    "Format \"%s\" is not supported\n", format);
+        g_set_error(error,
+                    VDO_CLIENT_ERROR,
+                    VDO_ERROR_NOT_FOUND,
+                    "Format \"%s\" is not supported\n",
+                    format);
         return FALSE;
     }
 
@@ -139,7 +145,12 @@ int main(int argc, char* argv[]) {
     openlog(NULL, LOG_PID, LOG_USER);
 
     GOptionEntry options[] = {
-        {"format", 't', 0, G_OPTION_ARG_STRING, &format, "format (h264, h265, jpeg, nv12, y800)",
+        {"format",
+         't',
+         0,
+         G_OPTION_ARG_STRING,
+         &format,
+         "format (h264, h265, jpeg, nv12, y800)",
          NULL},
         {"frames", 'n', 0, G_OPTION_ARG_INT, &frames, "number of frames", NULL},
         {"output", 'o', 0, G_OPTION_ARG_FILENAME, &output_file, "output filename", NULL},
@@ -188,8 +199,11 @@ int main(int argc, char* argv[]) {
     VdoMap* info = vdo_stream_get_info(stream, &error);
     if (!info) goto exit;
 
-    syslog(LOG_INFO, "Starting stream: %s, %ux%u, %u fps\n", format,
-           vdo_map_get_uint32(info, "width", 0), vdo_map_get_uint32(info, "height", 0),
+    syslog(LOG_INFO,
+           "Starting stream: %s, %ux%u, %u fps\n",
+           format,
+           vdo_map_get_uint32(info, "width", 0),
+           vdo_map_get_uint32(info, "height", 0),
            vdo_map_get_uint32(info, "framerate", 0));
 
     g_clear_object(&info);

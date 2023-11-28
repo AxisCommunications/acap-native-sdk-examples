@@ -46,6 +46,15 @@ typedef struct {
  * @param w_scale scale factor for the width
  * @param boxes output array of boxes
  */
-int postProcessing(float* locations, float* classes, int num_of_detections, char* anchor_file,
-                   int num_of_classes, float score_threshold, float nms_threshold, float y_scale,
-                   float x_scale, float h_scale, float w_scale, box* boxes);
+int postProcessing(float* locations,
+                   float* classes,
+                   int num_of_detections,
+                   char* anchor_file,
+                   int num_of_classes,
+                   float score_threshold,
+                   float nms_threshold,
+                   float y_scale,
+                   float x_scale,
+                   float h_scale,
+                   float w_scale,
+                   box* boxes);

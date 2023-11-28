@@ -41,7 +41,9 @@ int main(int argc, char* argv[]) {
         exit(1);
     }
 
-    syslog(LOG_INFO, "Creating VDO image provider and creating stream %d x %d", streamWidth,
+    syslog(LOG_INFO,
+           "Creating VDO image provider and creating stream %d x %d",
+           streamWidth,
            streamHeight);
     provider = createImgProvider(streamWidth, streamHeight, 2, VDO_FORMAT_YUV);
     if (!provider) {

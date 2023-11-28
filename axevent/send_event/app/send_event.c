@@ -53,8 +53,12 @@ static gboolean send_event(AppData* app_data) {
 
     // Add the variable elements of the event to the set
     syslog(LOG_INFO, "Add value: %lf", app_data->value);
-    ax_event_key_value_set_add_key_value(key_value_set, "Value", NULL, &app_data->value,
-                                         AX_VALUE_TYPE_DOUBLE, NULL);
+    ax_event_key_value_set_add_key_value(key_value_set,
+                                         "Value",
+                                         NULL,
+                                         &app_data->value,
+                                         AX_VALUE_TYPE_DOUBLE,
+                                         NULL);
 
     // Create the event
     // Use ax_event_new2 since ax_event_new is deprecated from 3.2
@@ -126,26 +130,51 @@ static guint setup_declaration(AXEventHandler* event_handler) {
 
     // Create keys, namespaces and nice names for the event
     key_value_set = ax_event_key_value_set_new();
-    ax_event_key_value_set_add_key_value(key_value_set, "topic0", "tns1", "Monitoring",
-                                         AX_VALUE_TYPE_STRING, NULL);
-    ax_event_key_value_set_add_key_value(key_value_set, "topic1", "tns1", "ProcessorUsage",
-                                         AX_VALUE_TYPE_STRING, NULL);
-    ax_event_key_value_set_add_key_value(key_value_set, "Token", NULL, &token, AX_VALUE_TYPE_INT,
+    ax_event_key_value_set_add_key_value(key_value_set,
+                                         "topic0",
+                                         "tns1",
+                                         "Monitoring",
+                                         AX_VALUE_TYPE_STRING,
                                          NULL);
-    ax_event_key_value_set_add_key_value(key_value_set, "Value", NULL, &start_value,
-                                         AX_VALUE_TYPE_DOUBLE, NULL);
+    ax_event_key_value_set_add_key_value(key_value_set,
+                                         "topic1",
+                                         "tns1",
+                                         "ProcessorUsage",
+                                         AX_VALUE_TYPE_STRING,
+                                         NULL);
+    ax_event_key_value_set_add_key_value(key_value_set,
+                                         "Token",
+                                         NULL,
+                                         &token,
+                                         AX_VALUE_TYPE_INT,
+                                         NULL);
+    ax_event_key_value_set_add_key_value(key_value_set,
+                                         "Value",
+                                         NULL,
+                                         &start_value,
+                                         AX_VALUE_TYPE_DOUBLE,
+                                         NULL);
     ax_event_key_value_set_mark_as_source(key_value_set, "Token", NULL, NULL);
-    ax_event_key_value_set_mark_as_user_defined(key_value_set, "Token", NULL,
-                                                "wstype:tt:ReferenceToken", NULL);
+    ax_event_key_value_set_mark_as_user_defined(key_value_set,
+                                                "Token",
+                                                NULL,
+                                                "wstype:tt:ReferenceToken",
+                                                NULL);
     ax_event_key_value_set_mark_as_data(key_value_set, "Value", NULL, NULL);
-    ax_event_key_value_set_mark_as_user_defined(key_value_set, "Value", NULL, "wstype:xs:float",
+    ax_event_key_value_set_mark_as_user_defined(key_value_set,
+                                                "Value",
+                                                NULL,
+                                                "wstype:xs:float",
                                                 NULL);
 
     // Declare event
-    if (!ax_event_handler_declare(event_handler, key_value_set,
+    if (!ax_event_handler_declare(event_handler,
+                                  key_value_set,
                                   FALSE,  // Indicate a property state event
-                                  &declaration, (AXDeclarationCompleteCallback)declaration_complete,
-                                  &start_value, &error)) {
+                                  &declaration,
+                                  (AXDeclarationCompleteCallback)declaration_complete,
+                                  &start_value,
+                                  &error)) {
         syslog(LOG_WARNING, "Could not declare: %s", error->message);
         g_error_free(error);
     }

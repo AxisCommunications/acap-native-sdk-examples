@@ -72,7 +72,9 @@ static void sigintHandler(int sig) {
  * param model Pointer to a larodModel to be obtained.
  * return False if error has occurred, otherwise true.
  */
-static bool setupLarod(const char* chipString, const int larodModelFd, larodConnection** larodConn,
+static bool setupLarod(const char* chipString,
+                       const int larodModelFd,
+                       larodConnection** larodConn,
                        larodModel** model) {
     larodError* error       = NULL;
     larodConnection* conn   = NULL;
@@ -95,8 +97,13 @@ static bool setupLarod(const char* chipString, const int larodModelFd, larodConn
         ;
     }
     const larodDevice* dev = larodGetDevice(conn, chipString, 0, &error);
-    loadedModel            = larodLoadModel(conn, larodModelFd, dev, LAROD_ACCESS_PRIVATE,
-                                 "Vdo Example App Model", NULL, &error);
+    loadedModel            = larodLoadModel(conn,
+                                 larodModelFd,
+                                 dev,
+                                 LAROD_ACCESS_PRIVATE,
+                                 "Vdo Example App Model",
+                                 NULL,
+                                 &error);
     if (!loadedModel) {
         syslog(LOG_ERR, "%s: Unable to load model: %s", __func__, error->msg);
         goto error;
@@ -190,7 +197,9 @@ int main(int argc, char** argv) {
         goto end;
     }
 
-    syslog(LOG_INFO, "Creating VDO image provider and creating stream %d x %d", streamWidth,
+    syslog(LOG_INFO,
+           "Creating VDO image provider and creating stream %d x %d",
+           streamWidth,
            streamHeight);
     provider = createImgProvider(streamWidth, streamHeight, 2, VDO_FORMAT_YUV);
     if (!provider) {
@@ -264,7 +273,9 @@ int main(int argc, char** argv) {
         goto end;
     }
 
-    syslog(LOG_INFO, "Setting up larod connection with chip %s and model file %s", chipString,
+    syslog(LOG_INFO,
+           "Setting up larod connection with chip %s and model file %s",
+           chipString,
            modelFile);
     if (!setupLarod(chipString, larodModelFd, &conn, &model)) {
         goto end;
@@ -276,7 +287,9 @@ int main(int argc, char** argv) {
     dev_pp  = larodGetDevice(conn, larodLibyuvPP, 0, &error);
     ppModel = larodLoadModel(conn, -1, dev_pp, LAROD_ACCESS_PRIVATE, "", ppMap, &error);
     if (!ppModel) {
-        syslog(LOG_ERR, "Unable to load preprocessing model with chip %s: %s", larodLibyuvPP,
+        syslog(LOG_ERR,
+               "Unable to load preprocessing model with chip %s: %s",
+               larodLibyuvPP,
                error->msg);
         goto end;
     } else {
@@ -347,8 +360,10 @@ int main(int argc, char** argv) {
     if (!createAndMapTmpFile(CONV_PP_FILE_PATTERN, yuyvBufferSize, &ppInputAddr, &ppInputFd)) {
         goto end;
     }
-    if (!createAndMapTmpFile(CONV_INP_FILE_PATTERN, inputWidth * inputHeight * CHANNELS,
-                             &larodInputAddr, &larodInputFd)) {
+    if (!createAndMapTmpFile(CONV_INP_FILE_PATTERN,
+                             inputWidth * inputHeight * CHANNELS,
+                             &larodInputAddr,
+                             &larodInputFd)) {
         goto end;
     }
     if (!createAndMapTmpFile(CONV_OUT1_FILE_PATTERN, 4, &larodOutput1Addr, &larodOutput1Fd)) {
@@ -384,8 +399,13 @@ int main(int argc, char** argv) {
 
     // Create job requests
     syslog(LOG_INFO, "Create job requests");
-    ppReq = larodCreateJobRequest(ppModel, ppInputTensors, ppNumInputs, ppOutputTensors,
-                                  ppNumOutputs, cropMap, &error);
+    ppReq = larodCreateJobRequest(ppModel,
+                                  ppInputTensors,
+                                  ppNumInputs,
+                                  ppOutputTensors,
+                                  ppNumOutputs,
+                                  cropMap,
+                                  &error);
     if (!ppReq) {
         syslog(LOG_ERR, "Failed creating preprocessing job request: %s", error->msg);
         goto end;
@@ -420,7 +440,9 @@ int main(int argc, char** argv) {
         gettimeofday(&startTs, NULL);
         memcpy(ppInputAddr, nv12Data, yuyvBufferSize);
         if (!larodRunJob(conn, ppReq, &error)) {
-            syslog(LOG_ERR, "Unable to run job to preprocess model: %s (%d)", error->msg,
+            syslog(LOG_ERR,
+                   "Unable to run job to preprocess model: %s (%d)",
+                   error->msg,
                    error->code);
             goto end;
         }
@@ -448,7 +470,10 @@ int main(int argc, char** argv) {
 
         gettimeofday(&startTs, NULL);
         if (!larodRunJob(conn, infReq, &error)) {
-            syslog(LOG_ERR, "Unable to run inference on model %s: %s (%d)", modelFile, error->msg,
+            syslog(LOG_ERR,
+                   "Unable to run inference on model %s: %s (%d)",
+                   modelFile,
+                   error->msg,
                    error->code);
             goto end;
         }
@@ -462,15 +487,19 @@ int main(int argc, char** argv) {
             uint8_t* person_pred = (uint8_t*)larodOutput1Addr;
             uint8_t* car_pred    = (uint8_t*)larodOutput2Addr;
 
-            syslog(LOG_INFO, "Person detected: %.2f%% - Car detected: %.2f%%",
-                   (float)person_pred[0] / 2.55f, (float)car_pred[0] / 2.55f);
+            syslog(LOG_INFO,
+                   "Person detected: %.2f%% - Car detected: %.2f%%",
+                   (float)person_pred[0] / 2.55f,
+                   (float)car_pred[0] / 2.55f);
         } else {
             uint8_t* car_pred        = (uint8_t*)larodOutput1Addr;
             uint8_t* person_pred     = (uint8_t*)larodOutput2Addr;
             float float_score_car    = *((float*)car_pred);
             float float_score_person = *((float*)person_pred);
-            syslog(LOG_INFO, "Person detected: %.2f%% - Car detected: %.2f%%",
-                   float_score_person * 100, float_score_car * 100);
+            syslog(LOG_INFO,
+                   "Person detected: %.2f%% - Car detected: %.2f%%",
+                   float_score_person * 100,
+                   float_score_car * 100);
         }
 
         // Release frame reference to provider.

@@ -39,7 +39,10 @@ void saveRgbImageAsPpm(const uint8_t* rgbData, int width, int height, const char
 }
 
 bool createAndMapTmpFile(char* fileName, size_t fileSize, void** mappedAddr, int* convFd) {
-    syslog(LOG_INFO, "%s: Setting up a temp fd with pattern %s and size %zu", __func__, fileName,
+    syslog(LOG_INFO,
+           "%s: Setting up a temp fd with pattern %s and size %zu",
+           __func__,
+           fileName,
            fileSize);
 
     int fd = mkstemp(fileName);
@@ -50,14 +53,20 @@ bool createAndMapTmpFile(char* fileName, size_t fileSize, void** mappedAddr, int
 
     // Allocate enough space in for the fd.
     if (ftruncate(fd, (off_t)fileSize) < 0) {
-        syslog(LOG_ERR, "%s: Unable to truncate temp file %s: %s", __func__, fileName,
+        syslog(LOG_ERR,
+               "%s: Unable to truncate temp file %s: %s",
+               __func__,
+               fileName,
                strerror(errno));
         goto error;
     }
 
     // Remove since we don't actually care about writing to the file system.
     if (unlink(fileName)) {
-        syslog(LOG_ERR, "%s: Unable to unlink from temp file %s: %s", __func__, fileName,
+        syslog(LOG_ERR,
+               "%s: Unable to unlink from temp file %s: %s",
+               __func__,
+               fileName,
                strerror(errno));
         goto error;
     }

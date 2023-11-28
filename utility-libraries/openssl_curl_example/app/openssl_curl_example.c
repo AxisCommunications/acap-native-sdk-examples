@@ -121,15 +121,19 @@ int main(void) {
     CURLcode rv;
     struct File fetch_file = {
         // Path to the file which will store the fetched web content
-        "/usr/local/packages/openssl_curl_example/localdata/www.example.com.txt", NULL};
+        "/usr/local/packages/openssl_curl_example/localdata/www.example.com.txt",
+        NULL};
 
     // Start logging
     openlog(NULL, LOG_PID, LOG_USER);
 
     // Log the curl and openssl library versions used in the code
     curl_version_info_data* ver = curl_version_info(CURLVERSION_NOW);
-    syslog(LOG_INFO, "ACAP application curl version: %u.%u.%u\n", (ver->version_num >> 16) & 0xff,
-           (ver->version_num >> 8) & 0xff, ver->version_num & 0xff);
+    syslog(LOG_INFO,
+           "ACAP application curl version: %u.%u.%u\n",
+           (ver->version_num >> 16) & 0xff,
+           (ver->version_num >> 8) & 0xff,
+           ver->version_num & 0xff);
     syslog(LOG_INFO, "ACAP application openssl version: %s", OpenSSL_version(OPENSSL_VERSION));
 
     // This function sets up the program environment that libcurl needs
