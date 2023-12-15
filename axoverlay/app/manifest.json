@@ -1,15 +1,22 @@
 {
     "schemaVersion": "1.4.0",
+    "resources": {
+	"dbus": {
+            "requiredMethods": [
+                "com.axis.Graphics2.Overlay.GetCommandChannel",
+                "com.axis.Graphics2.Overlay.GetSourceResolution",
+                "com.axis.Graphics2.Overlay.OpenCameraDevice",
+                "com.axis.Overlay2.Factory.CreateOverlay",
+                "com.axis.Overlay2.Factory.RemoveOverlay"
+	    ]
+	}
+    },
     "acapPackageConf": {
         "setup": {
             "friendlyName": "axoverlay",
             "appName": "axoverlay",
             "vendor": "Axis Communications",
             "embeddedSdkVersion": "3.0",
-            "user": {
-                "group": "sdk",
-                "username": "sdk"
-            },
             "vendorUrl": "https://www.axis.com",
             "runMode": "never",
             "version": "1.0.0"
