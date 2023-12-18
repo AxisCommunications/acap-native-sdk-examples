@@ -15,5 +15,4 @@ $(PROGS): $(OBJS)
 	$(CC) $(LDFLAGS) $^ $(LIBS) $(LDLIBS) -o $@
 
 clean:
-	rm -f $(PROGS) *.o *.a core
-
+	rm -f $(PROGS) *.o *.eap* *_LICENSE.txt package.conf* param.conf tmp*
