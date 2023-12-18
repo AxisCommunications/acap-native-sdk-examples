@@ -5,10 +5,6 @@
             "appName": "openssl_curl_example",
             "vendor": "Axis Communications",
             "embeddedSdkVersion": "3.0",
-            "user": {
-                "group": "sdk",
-                "username": "sdk"
-            },
             "runMode": "never",
             "version": "1.0.0"
         }

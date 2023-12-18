@@ -6,10 +6,6 @@
             "appName": "vdo_larod",
             "vendor": "Axis Communications",
             "embeddedSdkVersion": "3.0",
-            "user": {
-                "group": "sdk",
-                "username": "sdk"
-            },
             "runOptions": "ambarella-cvflow /usr/local/packages/vdo_larod/models/car_human_model_cavalry.bin 480 270 5",
             "vendorUrl": "https://www.axis.com",
             "runMode": "never",
