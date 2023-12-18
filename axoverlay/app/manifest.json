@@ -1,15 +1,15 @@
 {
     "schemaVersion": "1.4.0",
     "resources": {
-	"dbus": {
+        "dbus": {
             "requiredMethods": [
                 "com.axis.Graphics2.Overlay.GetCommandChannel",
                 "com.axis.Graphics2.Overlay.GetSourceResolution",
                 "com.axis.Graphics2.Overlay.OpenCameraDevice",
                 "com.axis.Overlay2.Factory.CreateOverlay",
                 "com.axis.Overlay2.Factory.RemoveOverlay"
-	    ]
-	}
+            ]
+        }
     },
     "acapPackageConf": {
         "setup": {
