@@ -1,15 +1,20 @@
 {
     "schemaVersion": "1.4.0",
+    "resources": {
+        "linux": {
+            "user": {
+                "groups": [
+                    "storage"
+                ]
+            }
+        }
+    },
     "acapPackageConf": {
         "setup": {
             "friendlyName": "axstorage",
             "appName": "axstorage",
             "vendor": "Axis Communications",
             "embeddedSdkVersion": "3.0",
-            "user": {
-                "group": "sdk",
-                "username": "sdk"
-            },
             "vendorUrl": "https://www.axis.com",
             "runMode": "never",
             "version": "1.0.0"
