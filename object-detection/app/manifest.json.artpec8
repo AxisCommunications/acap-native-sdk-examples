@@ -6,10 +6,6 @@
             "appName": "object_detection",
             "vendor": "Axis Communications",
             "embeddedSdkVersion": "3.0",
-            "user": {
-                "group": "sdk",
-                "username": "sdk"
-            },
             "runOptions": "/usr/local/packages/object_detection/model/converted_model.tflite 300 300 80 1920 1080 50 /usr/local/packages/object_detection/label/labels.txt -c axis-a8-dlpu-tflite",
             "vendorUrl": "https://www.axis.com",
             "runMode": "never",
