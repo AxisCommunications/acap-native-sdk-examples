@@ -102,7 +102,7 @@ static gboolean incoming_data(GIOChannel* channel, GIOCondition cond, gpointer d
     GIOChannel* iochannel      = conf_data->channel;
     GError* error              = NULL;
     GIOStatus ret;
-    guint bytes_read;
+    gsize bytes_read;
     gchar timestamp[2];
     gchar str[128];
 
@@ -142,7 +142,7 @@ static gboolean send_timer_data(gpointer data) {
     GIOStatus ret;
     gdouble elapsed;
     gchar min, sec;
-    guint bytes_written;
+    gsize bytes_written;
     gchar timestamp[2];
 
     /* time in seconds since timer started */
@@ -157,9 +157,9 @@ static gboolean send_timer_data(gpointer data) {
         /* Flush the write buffer */
         ret = g_io_channel_flush(iochannel, &error);
         /* Log the return status from g_io_channel_write_chars() */
-        g_message("%s() wrote %d bytes, status:'%s'",
+        g_message("%s() wrote %ld bytes, status:'%s'",
                   __FUNCTION__,
-                  bytes_written,
+                  (long int)bytes_written,
                   iostatus2str(ret));
     }
 
