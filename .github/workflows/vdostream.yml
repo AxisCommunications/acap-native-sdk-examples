@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        axis-os: ["11.7.57"]
+        axis-os: ["11.8"]
         arch: ["armv7hf", "aarch64"]
     env:
       EXREPO: acap-native-examples

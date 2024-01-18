@@ -1,5 +1,5 @@
 {
-    "schemaVersion": "1.4.0",
+    "schemaVersion": "1.5",
     "acapPackageConf": {
         "setup": {
             "friendlyName": "object_detection_artpec8",
