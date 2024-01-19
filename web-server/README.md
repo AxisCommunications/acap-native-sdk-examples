@@ -9,28 +9,28 @@ This example addresses a similar problem as the [web-server-using-fastcgi](../we
 
 [Reverse Proxy configuration](https://httpd.apache.org/docs/2.4/howto/reverse_proxy.html) provides a flexible way for an ACAP application to expose an external API through the Apache Server in AXIS OS and internally route the requests to a small Web Server running in the ACAP application.
 
-Reverse Proxy is a technique that can be used for exposing many types of network APIs and can e.g. cover same cgi usecases as axHttp API.
+**Reverse proxy** is a technique that can be used for exposing many types of network APIs and can e.g. cover the same CGI use cases as the old [AxHTTP](https://axiscommunications.github.io/acap-documentation/docs/acap-sdk-version-3/api/#http-api) API and is a different implementation to the [FastCGI](https://axiscommunications.github.io/acap-documentation/docs/api/native-sdk-api.html#fastcgi) API.
 
-The Apache server is configured using post-install and pre-uninstall scripts features in a native ACAP. The post-install script adds a configuration file to apache configuration with reverse configuration for monkey server and applies it to Apache Server, and in the pre-uninstall the configuration is removed.
+The Apache server is configured using the manifest.json file in an ACAP application. In manifest.json under `configuration`, it is possible to specify a `settingPage` and a `reverseProxy` where the latter will connect the Monkey server to the Apache server.
 
-The Web Server running in the ACAP application can also be exposed directly to the network by allowing external access to the port in the network configuration for the device. There are some disavantages with exposing Web Server directly to the network such as non standard ports and no reuse of authentication, TLS and other features that comes with Apache Server.
+The Web Server running in the ACAP application can also be exposed directly to the network by allowing external access to the port in the network configuration for the device. There are some disadvantages with exposing Web Server directly to the network such as non standard ports and no reuse of authentication, TLS and other features that comes with Apache Server.
 
 ## Monkey Web Server
 
 Monkey is a fast and lightweight Web Server for Linux. It has been designed to be very scalable with low memory and CPU consumption, the perfect solution for Embedded Linux and high end production environments. Besides the common features as HTTP server, it expose a flexible C API which aims to behave as a fully HTTP development framework, so it can be extended as desired through the plugins interface. The Monkey Web Server [documentation](http://monkey-project.com/documentation/1.5) describes the configuration in detail.
 
+> [!NOTE]  
+> Currently, there's an issue with the Monkey web server when using the reverse proxy, impacting asset discovery. As a workaround, we're showcasing the `list` example.
+
 ## Getting started
 
-These instructions will guide you on how to execute the code. Below is the structure and scripts used in the example:
+These instructions will guide you on how to execute the code. Below is the structure used in the example:
 
 ```sh
 web-server
 ├── app
 │   ├── LICENSE - Text file which lists all open source licensed source code distributed with the application
-│   ├── manifest.json - Defines the application and its configuration
-│   ├── postinstall.sh - Shell script for adding configration to apache
-│   ├── preuninstall.sh - Shell script for removing  configration to apache
-│   └── reverseproxy.conf - Configuration for reverse proxy
+│   └── manifest.json - Defines the application and its configuration
 ├── Dockerfile - Docker file with the specified Axis container image to build the example specified
 ├── monkey.patch - Patch for using monkey examples in a native ACAP
 └── README.md - Step by step instructions on how to run the example
@@ -71,7 +71,7 @@ docker run --rm web-server:$ARCH eap-install.sh $DEVICE_IP $PASS install
 
 Goto your device web page > Click on the tab **Apps** in the device GUI and locate the application. Run the application by enabling the **Start** switch.
 
-The Web Server can be accessed from a Web Browser eighter directly using a port number (i.e. http://<device-ip>:2001) or through the Apache Server in the device using an extension to the device web URL (i.e http://<device-ip>/monkey/index.html) or by using the Open button in the application page in the **Apps** tab.
+The Web Server can be accessed from a Web Browser through the Apache Server in the device using an extension to the device web URL (i.e http://<device-ip>/local/list/server/)
 
 # Start your application from command line
 
@@ -82,13 +82,6 @@ docker run --rm web-server:$ARCH eap-install.sh $DEVICE_IP $PASS start
 docker run --rm web-server:$ARCH eap-install.sh $DEVICE_IP $PASS stop
 docker run --rm web-server:$ARCH eap-install.sh $DEVICE_IP $PASS remove
 ```
-
-## C API Examples
-
-When you build the code, Some C API examples shall be copied into the app directory inside the build container. To build any of the examples, use the build and install procedure as described above after making following changes to the build files:
-
-1. app/manifest.json: Replace AppName "monkey" with the name of the example: hello, list or quiz
-2. Dockerfile: Replace monkey in /usr/local/packages/monkey with the name of the example: hello, list or quiz
 
 ## License
 

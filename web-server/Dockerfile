@@ -2,7 +2,7 @@ ARG ARCH=armv7hf
 ARG REPO=axisecp
 ARG SDK=acap-native-sdk
 ARG UBUNTU_VERSION=22.04
-ARG VERSION=1.11
+ARG VERSION=1.12
 
 FROM ${REPO}/${SDK}:${VERSION}-${ARCH}-ubuntu${UBUNTU_VERSION}
 
@@ -20,11 +20,11 @@ RUN git apply --ignore-space-change --ignore-whitespace ../monkey.patch &&\
     --prefix=/usr/local \
     --bindir=/usr/local/bin \
     --libdir=/usr/local/lib \
-    --sysconfdir=/usr/local/packages/monkey/html \
-    --datadir=/usr/local/packages/monkey/html \
+    --sysconfdir=/usr/local/packages/list/html \
+    --datadir=/usr/local/packages/list/html \
     --mandir=/usr/local/man \
     --logdir=/tmp \
-    --plugdir=/usr/local/packages/monkey/lib \
+    --plugdir=/usr/local/packages/list/lib \
     --pidfile=/tmp/monkey.pid \
     --incdir=/usr/local/include/monkey \
     --systemddir=/usr/lib/systemd/system &&\
@@ -40,9 +40,9 @@ RUN . /opt/axis/acapsdk/environment-setup* &&\
     mkdir -p "$SDKTARGETSYSROOT"/usr/local &&\
     cp -r /usr/local "$SDKTARGETSYSROOT"/usr &&\
     mkdir -p lib &&\
-    cp /usr/local/lib/libmonkey.so.1.5 /usr/local/packages/monkey/lib/*.so -t lib/ &&\
-    cp -r /usr/local/packages/monkey/html . &&\
-    acap-build . -a reverseproxy.conf
+    cp /usr/local/lib/libmonkey.so.1.5 /usr/local/packages/list/lib/*.so -t lib/ &&\
+    cp -r /usr/local/packages/list/html . &&\
+    acap-build .
 
 ENV PATH="${PATH}:/opt/axis/acapsdk/sysroots/x86_64-pokysdk-linux/usr/bin"
 ENTRYPOINT [ "/bin/bash" ]
