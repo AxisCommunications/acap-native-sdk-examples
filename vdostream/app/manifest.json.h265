@@ -1,0 +1,14 @@
+{
+    "schemaVersion": "1.4.0",
+    "acapPackageConf": {
+        "setup": {
+            "friendlyName": "vdoencodeclient_h265",
+            "appName": "vdoencodeclient",
+            "vendor": "Axis Communications",
+            "embeddedSdkVersion": "3.0",
+            "runOptions": "--format h265 --frames 25",
+            "runMode": "never",
+            "version": "1.0.0"
+        }
+    }
+}

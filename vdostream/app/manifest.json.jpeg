@@ -2,10 +2,11 @@
     "schemaVersion": "1.4.0",
     "acapPackageConf": {
         "setup": {
-            "friendlyName": "vdoencodeclient",
+            "friendlyName": "vdoencodeclient_jpeg",
             "appName": "vdoencodeclient",
             "vendor": "Axis Communications",
             "embeddedSdkVersion": "3.0",
+            "runOptions": "--format jpeg --frames 25",
             "runMode": "never",
             "version": "1.0.0"
         }

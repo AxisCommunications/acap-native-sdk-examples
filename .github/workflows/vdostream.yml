@@ -11,8 +11,9 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        axis-os: ["11.7.57"]
+        axis-os: ["11.8.61"]
         arch: ["armv7hf", "aarch64"]
+        vdo-format: ["h264", "h265", "y800", "jpeg", "nv12"]
     env:
       EXREPO: acap-native-examples
       EXNAME: vdostream
@@ -22,11 +23,11 @@ jobs:
 
       - name: Build ${{ env.EXNAME }} application
         env:
-          imagetag: ${{ env.EXREPO }}_${{ env.EXNAME }}:${{ matrix.arch }}
+          imagetag: ${{ env.EXREPO }}_${{ env.EXNAME }}_${{matrix.vdo-format}}:${{ matrix.arch }}
         run: |
           docker image rm -f $imagetag
           cd $EXNAME
-          docker build --no-cache --tag $imagetag --build-arg ARCH=${{ matrix.arch }} .
-          docker cp $(docker create $imagetag):/opt/app ./build
+          docker build --no-cache --build-arg ARCH=${{ matrix.arch }} --build-arg VDO_FORMAT=${{ matrix.vdo-format }} --tag $imagetag .
+          docker cp $(docker create $imagetag):/opt/app ./build_${{ matrix.vdo-format }}
           cd ..
           docker image rm -f $imagetag

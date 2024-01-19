@@ -18,7 +18,11 @@ vdostream
 ├── app
 │   ├── LICENSE
 │   ├── Makefile
-│   ├── manifest.json
+│   ├── manifest.json.h264
+│   ├── manifest.json.h265
+│   ├── manifest.json.jpeg
+│   ├── manifest.json.nv12
+│   ├── manifest.json.y800
 │   └── vdoencodeclient.c
 ├── Dockerfile
 └── README.md
@@ -52,8 +56,10 @@ Standing in your working directory run the following commands:
 > [script for Axis devices](https://axiscommunications.github.io/acap-documentation/docs/develop/build-install-run.html#configure-network-proxy-settings) in the ACAP documentation.
 
 ```sh
-docker build --tag <APP_IMAGE> .
+docker build --tag <APP_IMAGE> --build-arg VDO_FORMAT=<VDO_FORMAT> .
 ```
+
+<VDO_FORMAT> is the video compression format. Supported values are *h264*, *h265*, *jpeg*, *nv12* and *y800*
 
 <APP_IMAGE> is the name to tag the image with, e.g., vdoencodeclient:1.0
 
@@ -62,7 +68,7 @@ update the *ARCH* variable in the Dockerfile or to set it in the docker build
 command via build argument:
 
 ```sh
-docker build --build-arg ARCH=aarch64 --tag <APP_IMAGE> .
+docker build --build-arg ARCH=aarch64 --build-arg VDO_FORMAT=<VDO_FORMAT> --tag <APP_IMAGE> .
 ```
 
 Copy the result from the container image to a local directory build:
@@ -78,12 +84,21 @@ vdostream
 ├── app
 │   ├── LICENSE
 │   ├── Makefile
-│   ├── manifest.json
+│   ├── manifest.json.h264
+│   ├── manifest.json.h265
+│   ├── manifest.json.jpeg
+│   ├── manifest.json.nv12
+│   ├── manifest.json.y800
 │   └── vdoencodeclient.c
 ├── build
 │   ├── LICENSE
 │   ├── Makefile
 │   ├── manifest.json
+│   ├── manifest.json.h264
+│   ├── manifest.json.h265
+│   ├── manifest.json.jpeg
+│   ├── manifest.json.nv12
+│   ├── manifest.json.y800
 │   ├── package.conf
 │   ├── package.conf.orig
 │   ├── param.conf
@@ -116,8 +131,6 @@ http://<axis_device_ip>/#settings/apps
 *Goto your device web page above > Click on the tab **App** in the device GUI > Add **(+)** sign and browse to
 the newly built **vdoencodeclient_1_0_0_armv7hf.eap** > Click **Install** > Run the application by enabling the **Start** switch*
 
-Application will run with default video compression format h264.
-
 #### The expected output
 
 Application log can be found directly at:
@@ -138,29 +151,169 @@ cd /var/log/
 head -50 info.log
 ```
 
+#### Output - format h264
+
 ```sh
 ----- Contents of SYSTEM_LOG for 'vdoencodeclient' -----
 
-11:00:03.509 [ INFO ] vdoencodeclient[17690]: frame = 35729, type = P, size = 81
-11:00:03.532 [ INFO ] vdoencodeclient[17690]: frame = 35730, type = I, size = 78433
-11:00:03.572 [ INFO ] vdoencodeclient[17690]: frame = 35731, type = P, size = 567
-11:00:03.605 [ INFO ] vdoencodeclient[17690]: frame = 35732, type = P, size = 82
-11:00:03.638 [ INFO ] vdoencodeclient[17690]: frame = 35733, type = P, size = 74
-11:00:03.672 [ INFO ] vdoencodeclient[17690]: frame = 35734, type = P, size = 450
-11:00:03.706 [ INFO ] vdoencodeclient[17690]: frame = 35735, type = P, size = 111
-11:00:03.738 [ INFO ] vdoencodeclient[17690]: frame = 35736, type = P, size = 76
-11:00:03.772 [ INFO ] vdoencodeclient[17690]: frame = 35737, type = P, size = 74
-11:00:03.805 [ INFO ] vdoencodeclient[17690]: frame = 35738, type = P, size = 78
-11:00:03.838 [ INFO ] vdoencodeclient[17690]: frame = 35739, type = P, size = 78
-11:00:03.872 [ INFO ] vdoencodeclient[17690]: frame = 35740, type = P, size = 86
-11:00:03.905 [ INFO ] vdoencodeclient[17690]: frame = 35741, type = P, size = 79
-11:00:03.938 [ INFO ] vdoencodeclient[17690]: frame = 35742, type = P, size = 78
-11:00:03.972 [ INFO ] vdoencodeclient[17690]: frame = 35743, type = P, size = 77
-11:00:04.005 [ INFO ] vdoencodeclient[17690]: frame = 35744, type = P, size = 71
-11:00:04.038 [ INFO ] vdoencodeclient[17690]: frame = 35745, type = P, size = 82
-11:00:04.072 [ INFO ] vdoencodeclient[17690]: frame = 35746, type = P, size = 75
-11:00:04.105 [ INFO ] vdoencodeclient[17690]: frame = 35747, type = P, size = 77
-11:00:04.138 [ INFO ] vdoencodeclient[17690]: frame = 35748, type = P, size = 80
+vdoencodeclient[49013]: Starting stream: h264, 640x360, 30 fps
+vdoencodeclient[49013]: frame =    0, type = I, size = 2700
+vdoencodeclient[49013]: frame =    1, type = P, size = 19
+vdoencodeclient[49013]: frame =    2, type = P, size = 19
+vdoencodeclient[49013]: frame =    3, type = P, size = 19
+vdoencodeclient[49013]: frame =    4, type = P, size = 19
+vdoencodeclient[49013]: frame =    5, type = P, size = 19
+vdoencodeclient[49013]: frame =    6, type = P, size = 19
+vdoencodeclient[49013]: frame =    7, type = P, size = 19
+vdoencodeclient[49013]: frame =    8, type = P, size = 19
+vdoencodeclient[49013]: frame =    9, type = P, size = 19
+vdoencodeclient[49013]: frame =   10, type = P, size = 19
+vdoencodeclient[49013]: frame =   11, type = P, size = 19
+vdoencodeclient[49013]: frame =   12, type = P, size = 19
+vdoencodeclient[49013]: frame =   13, type = P, size = 19
+vdoencodeclient[49013]: frame =   14, type = P, size = 19
+vdoencodeclient[49013]: frame =   15, type = P, size = 19
+vdoencodeclient[49013]: frame =   16, type = P, size = 19
+vdoencodeclient[49013]: frame =   17, type = P, size = 19
+vdoencodeclient[49013]: frame =   18, type = P, size = 19
+vdoencodeclient[49013]: frame =   19, type = P, size = 19
+vdoencodeclient[49013]: frame =   20, type = P, size = 19
+vdoencodeclient[49013]: frame =   21, type = P, size = 19
+vdoencodeclient[49013]: frame =   22, type = P, size = 19
+vdoencodeclient[49013]: frame =   23, type = P, size = 19
+vdoencodeclient[49013]: frame =   24, type = P, size = 19
+```
+
+#### Output - format h265
+
+```sh
+----- Contents of SYSTEM_LOG for 'vdoencodeclient' -----
+
+vdoencodeclient[29828]: Starting stream: h265, 640x360, 30 fps
+vdoencodeclient[29828]: frame =    0, type = I, size = 1404
+vdoencodeclient[29828]: frame =    1, type = P, size = 30
+vdoencodeclient[29828]: frame =    2, type = P, size = 31
+vdoencodeclient[29828]: frame =    3, type = P, size = 30
+vdoencodeclient[29828]: frame =    4, type = P, size = 33
+vdoencodeclient[29828]: frame =    5, type = P, size = 43
+vdoencodeclient[29828]: frame =    6, type = P, size = 42
+vdoencodeclient[29828]: frame =    7, type = P, size = 37
+vdoencodeclient[29828]: frame =    8, type = P, size = 40
+vdoencodeclient[29828]: frame =    9, type = P, size = 33
+vdoencodeclient[29828]: frame =   10, type = P, size = 33
+vdoencodeclient[29828]: frame =   11, type = P, size = 33
+vdoencodeclient[29828]: frame =   12, type = P, size = 39
+vdoencodeclient[29828]: frame =   13, type = P, size = 65
+vdoencodeclient[29828]: frame =   14, type = P, size = 104
+vdoencodeclient[29828]: frame =   15, type = P, size = 36
+vdoencodeclient[29828]: frame =   16, type = P, size = 168
+vdoencodeclient[29828]: frame =   17, type = P, size = 39
+vdoencodeclient[29828]: frame =   18, type = P, size = 30
+vdoencodeclient[29828]: frame =   19, type = P, size = 30
+vdoencodeclient[29828]: frame =   20, type = P, size = 30
+vdoencodeclient[29828]: frame =   21, type = P, size = 30
+vdoencodeclient[29828]: frame =   22, type = P, size = 30
+vdoencodeclient[29828]: frame =   23, type = P, size = 30
+vdoencodeclient[29828]: frame =   24, type = P, size = 30
+ ```
+
+#### Output - format jpeg
+
+```sh
+----- Contents of SYSTEM_LOG for 'vdoencodeclient' -----
+
+vdoencodeclient[33823]: Starting stream: jpeg, 640x360, 30 fps
+vdoencodeclient[33823]: frame =    0, type = jpeg, size = 7802
+vdoencodeclient[33823]: frame =    1, type = jpeg, size = 7797
+vdoencodeclient[33823]: frame =    2, type = jpeg, size = 7807
+vdoencodeclient[33823]: frame =    3, type = jpeg, size = 7797
+vdoencodeclient[33823]: frame =    4, type = jpeg, size = 7811
+vdoencodeclient[33823]: frame =    5, type = jpeg, size = 7811
+vdoencodeclient[33823]: frame =    6, type = jpeg, size = 7815
+vdoencodeclient[33823]: frame =    7, type = jpeg, size = 7811
+vdoencodeclient[33823]: frame =    8, type = jpeg, size = 7809
+vdoencodeclient[33823]: frame =    9, type = jpeg, size = 7813
+vdoencodeclient[33823]: frame =   10, type = jpeg, size = 7812
+vdoencodeclient[33823]: frame =   11, type = jpeg, size = 7807
+vdoencodeclient[33823]: frame =   12, type = jpeg, size = 7811
+vdoencodeclient[33823]: frame =   13, type = jpeg, size = 7803
+vdoencodeclient[33823]: frame =   14, type = jpeg, size = 7807
+vdoencodeclient[33823]: frame =   15, type = jpeg, size = 7808
+vdoencodeclient[33823]: frame =   16, type = jpeg, size = 7807
+vdoencodeclient[33823]: frame =   17, type = jpeg, size = 7809
+vdoencodeclient[33823]: frame =   18, type = jpeg, size = 7803
+vdoencodeclient[33823]: frame =   19, type = jpeg, size = 7800
+vdoencodeclient[33823]: frame =   20, type = jpeg, size = 7805
+vdoencodeclient[33823]: frame =   21, type = jpeg, size = 7803
+vdoencodeclient[33823]: frame =   22, type = jpeg, size = 7809
+vdoencodeclient[33823]: frame =   23, type = jpeg, size = 7815
+vdoencodeclient[33823]: frame =   24, type = jpeg, size = 7813
+```
+
+#### Output - format nv12
+
+```sh
+----- Contents of SYSTEM_LOG for 'vdoencodeclient' -----
+
+vdoencodeclient[31151]: Starting stream: nv12, 640x360, 30 fps
+vdoencodeclient[31151]: frame =    0, type = yuv, size = 345600
+vdoencodeclient[31151]: frame =    1, type = yuv, size = 345600
+vdoencodeclient[31151]: frame =    2, type = yuv, size = 345600
+vdoencodeclient[31151]: frame =    3, type = yuv, size = 345600
+vdoencodeclient[31151]: frame =    4, type = yuv, size = 345600
+vdoencodeclient[31151]: frame =    5, type = yuv, size = 345600
+vdoencodeclient[31151]: frame =    6, type = yuv, size = 345600
+vdoencodeclient[31151]: frame =    7, type = yuv, size = 345600
+vdoencodeclient[31151]: frame =    8, type = yuv, size = 345600
+vdoencodeclient[31151]: frame =    9, type = yuv, size = 345600
+vdoencodeclient[31151]: frame =   10, type = yuv, size = 345600
+vdoencodeclient[31151]: frame =   11, type = yuv, size = 345600
+vdoencodeclient[31151]: frame =   12, type = yuv, size = 345600
+vdoencodeclient[31151]: frame =   13, type = yuv, size = 345600
+vdoencodeclient[31151]: frame =   14, type = yuv, size = 345600
+vdoencodeclient[31151]: frame =   15, type = yuv, size = 345600
+vdoencodeclient[31151]: frame =   16, type = yuv, size = 345600
+vdoencodeclient[31151]: frame =   17, type = yuv, size = 345600
+vdoencodeclient[31151]: frame =   18, type = yuv, size = 345600
+vdoencodeclient[31151]: frame =   19, type = yuv, size = 345600
+vdoencodeclient[31151]: frame =   20, type = yuv, size = 345600
+vdoencodeclient[31151]: frame =   21, type = yuv, size = 345600
+vdoencodeclient[31151]: frame =   22, type = yuv, size = 345600
+vdoencodeclient[31151]: frame =   23, type = yuv, size = 345600
+vdoencodeclient[31151]: frame =   24, type = yuv, size = 345600
+```
+
+#### Output - format y800
+
+```sh
+----- Contents of SYSTEM_LOG for 'vdoencodeclient' -----
+
+vdoencodeclient[32479]: Starting stream: y800, 640x360, 30 fps
+vdoencodeclient[32479]: frame =    0, type = yuv, size = 230400
+vdoencodeclient[32479]: frame =    1, type = yuv, size = 230400
+vdoencodeclient[32479]: frame =    2, type = yuv, size = 230400
+vdoencodeclient[32479]: frame =    3, type = yuv, size = 230400
+vdoencodeclient[32479]: frame =    4, type = yuv, size = 230400
+vdoencodeclient[32479]: frame =    5, type = yuv, size = 230400
+vdoencodeclient[32479]: frame =    6, type = yuv, size = 230400
+vdoencodeclient[32479]: frame =    7, type = yuv, size = 230400
+vdoencodeclient[32479]: frame =    8, type = yuv, size = 230400
+vdoencodeclient[32479]: frame =    9, type = yuv, size = 230400
+vdoencodeclient[32479]: frame =   10, type = yuv, size = 230400
+vdoencodeclient[32479]: frame =   11, type = yuv, size = 230400
+vdoencodeclient[32479]: frame =   12, type = yuv, size = 230400
+vdoencodeclient[32479]: frame =   13, type = yuv, size = 230400
+vdoencodeclient[32479]: frame =   14, type = yuv, size = 230400
+vdoencodeclient[32479]: frame =   15, type = yuv, size = 230400
+vdoencodeclient[32479]: frame =   16, type = yuv, size = 230400
+vdoencodeclient[32479]: frame =   17, type = yuv, size = 230400
+vdoencodeclient[32479]: frame =   18, type = yuv, size = 230400
+vdoencodeclient[32479]: frame =   19, type = yuv, size = 230400
+vdoencodeclient[32479]: frame =   20, type = yuv, size = 230400
+vdoencodeclient[32479]: frame =   21, type = yuv, size = 230400
+vdoencodeclient[32479]: frame =   22, type = yuv, size = 230400
+vdoencodeclient[32479]: frame =   23, type = yuv, size = 230400
+vdoencodeclient[32479]: frame =   24, type = yuv, size = 230400
 ```
 
 ## License
