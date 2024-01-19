@@ -1,13 +1,10 @@
 {
-    "schemaVersion": "1.4.0",
+    "schemaVersion": "1.5.0",
     "resources": {
         "dbus": {
             "requiredMethods": [
-                "com.axis.Graphics2.Overlay.GetCommandChannel",
-                "com.axis.Graphics2.Overlay.GetSourceResolution",
-                "com.axis.Graphics2.Overlay.OpenCameraDevice",
-                "com.axis.Overlay2.Factory.CreateOverlay",
-                "com.axis.Overlay2.Factory.RemoveOverlay"
+                "com.axis.Graphics2.*",
+                "com.axis.Overlay2.*"
             ]
         }
     },
