@@ -71,7 +71,8 @@ static void handle_sigint(int signum) { shutdown = TRUE; }
 
 // Determine and log the received frame type
 static void print_frame(VdoFrame* frame) {
-    if (!vdo_frame_get_is_last_buffer(frame)) return;
+    if (!vdo_frame_get_is_last_buffer(frame))
+        return;
 
     gchar* frame_type;
     switch (vdo_frame_get_frame_type(frame)) {
@@ -165,11 +166,13 @@ int main(int argc, char* argv[]) {
         }};
 
     GOptionContext* context = g_option_context_new(param_desc);
-    if (!context) return -1;
+    if (!context)
+        return -1;
 
     g_option_context_set_summary(context, summary);
     g_option_context_add_main_entries(context, options, NULL);
-    if (!g_option_context_parse(context, &argc, &argv, &error)) goto exit;
+    if (!g_option_context_parse(context, &argc, &argv, &error))
+        goto exit;
 
     dest_f = fopen(output_file, "wb");
     if (!dest_f) {
@@ -183,7 +186,8 @@ int main(int argc, char* argv[]) {
     }
 
     VdoMap* settings = vdo_map_new();
-    if (!set_format(settings, format, &error)) goto exit;
+    if (!set_format(settings, format, &error))
+        goto exit;
 
     // Set default arguments
     vdo_map_set_uint32(settings, "width", 640);
@@ -192,12 +196,15 @@ int main(int argc, char* argv[]) {
     // Create a new stream
     stream = vdo_stream_new(settings, NULL, &error);
     g_clear_object(&settings);
-    if (!stream) goto exit;
+    if (!stream)
+        goto exit;
 
-    if (!vdo_stream_attach(stream, NULL, &error)) goto exit;
+    if (!vdo_stream_attach(stream, NULL, &error))
+        goto exit;
 
     VdoMap* info = vdo_stream_get_info(stream, &error);
-    if (!info) goto exit;
+    if (!info)
+        goto exit;
 
     syslog(LOG_INFO,
            "Starting stream: %s, %ux%u, %u fps\n",
@@ -209,7 +216,8 @@ int main(int argc, char* argv[]) {
     g_clear_object(&info);
 
     // Start the stream
-    if (!vdo_stream_start(stream, &error)) goto exit;
+    if (!vdo_stream_start(stream, &error))
+        goto exit;
 
     // Loop until interrupt by Ctrl-C or reaching G_MAXUINT
     for (guint n = 0; n < frames; ++n) {
@@ -218,7 +226,8 @@ int main(int argc, char* argv[]) {
         VdoFrame* frame   = vdo_buffer_get_frame(buffer);
 
         // Error occurred
-        if (!frame) goto exit;
+        if (!frame)
+            goto exit;
 
         // SIGINT occurred
         if (shutdown) {
@@ -242,12 +251,14 @@ int main(int argc, char* argv[]) {
         }
 
         // Release the buffer and allow the server to reuse it
-        if (!vdo_stream_buffer_unref(stream, &buffer, &error)) goto exit;
+        if (!vdo_stream_buffer_unref(stream, &buffer, &error))
+            goto exit;
     }
 
 exit:
     // Ignore SIGINT and server maintenance
-    if (shutdown || vdo_error_is_expected(&error)) g_clear_error(&error);
+    if (shutdown || vdo_error_is_expected(&error))
+        g_clear_error(&error);
 
     gint ret = EXIT_SUCCESS;
     if (error) {
@@ -255,7 +266,8 @@ exit:
         ret = EXIT_FAILURE;
     }
 
-    if (dest_f) fclose(dest_f);
+    if (dest_f)
+        fclose(dest_f);
 
     g_clear_error(&error);
     g_clear_object(&stream);

@@ -408,13 +408,16 @@ int main(int argc, char* argv[]) {
     /* Create a new stream */
     stream = vdo_stream_new(settings, NULL, &error);
     g_clear_object(&settings);
-    if (!stream) goto exit;
+    if (!stream)
+        goto exit;
 
-    if (!vdo_stream_attach(stream, NULL, &error)) goto exit;
+    if (!vdo_stream_attach(stream, NULL, &error))
+        goto exit;
 
     /* Collect stream information */
     vdo_stream_info = vdo_stream_get_info(stream, &error);
-    if (!vdo_stream_info) goto exit;
+    if (!vdo_stream_info)
+        goto exit;
 
     syslog(LOG_INFO,
            "Starting stream: %s in %s, %ux%u, %u fps.",
@@ -427,7 +430,8 @@ int main(int argc, char* argv[]) {
     g_clear_object(&vdo_stream_info);
 
     /* Start the stream */
-    if (!vdo_stream_start(stream, &error)) goto exit;
+    if (!vdo_stream_start(stream, &error))
+        goto exit;
 
     /* Open output file */
     char file_path[128];
@@ -485,7 +489,8 @@ int main(int argc, char* argv[]) {
         VdoFrame* frame   = vdo_buffer_get_frame(buffer);
 
         /* Error occurred */
-        if (!frame) goto exit;
+        if (!frame)
+            goto exit;
 
         /* Get VDO frame buffer data */
         gpointer in_data = vdo_buffer_get_data(buffer);
@@ -501,7 +506,8 @@ int main(int argc, char* argv[]) {
          * For HALF_AREA however, we need to write the background image data
          * as the cl program will not render a full image.
          */
-        if (cur_render_area != FULL_AREA) memcpy(out_data, in_data, image_y_size + image_cbcr_size);
+        if (cur_render_area != FULL_AREA)
+            memcpy(out_data, in_data, image_y_size + image_cbcr_size);
 
         /*
          * Map a received VDO frame buffer with a cl memory object. A cl buffer
@@ -533,12 +539,14 @@ int main(int argc, char* argv[]) {
         }
 
         /* Release the buffer and allow the server to reuse it */
-        if (!vdo_stream_buffer_unref(stream, &buffer, &error)) goto exit;
+        if (!vdo_stream_buffer_unref(stream, &buffer, &error))
+            goto exit;
     }
 
 exit:
     /* Ignore expected error */
-    if (vdo_error_is_expected(&error)) g_clear_error(&error);
+    if (vdo_error_is_expected(&error))
+        g_clear_error(&error);
 
     if (munmap(out_data, image_y_size + image_cbcr_size)) {
         syslog(LOG_ERR, "Unable to unmap image output buffer");
@@ -546,7 +554,8 @@ exit:
 
     hash_table_destroy();
 
-    if (in_images) free(in_images);
+    if (in_images)
+        free(in_images);
 
     gint ret = EXIT_SUCCESS;
     if (error) {
@@ -554,7 +563,8 @@ exit:
         ret = EXIT_FAILURE;
     }
 
-    if (output_file) fclose(output_file);
+    if (output_file)
+        fclose(output_file);
 
     if (free_opencl() != 0) {
         syslog(LOG_ERR, "Unable to clean up opencl");

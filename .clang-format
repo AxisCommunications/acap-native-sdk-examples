@@ -9,7 +9,7 @@ AlignConsecutiveMacros: Consecutive
 AlignEscapedNewlines: Left
 AllowAllArgumentsOnNextLine: false
 AllowAllParametersOfDeclarationOnNextLine: false
-AllowShortIfStatementsOnASingleLine: WithoutElse
+AllowShortIfStatementsOnASingleLine: Never
 AllowShortLoopsOnASingleLine: true
 AlwaysBreakBeforeMultilineStrings: true
 BinPackArguments: false

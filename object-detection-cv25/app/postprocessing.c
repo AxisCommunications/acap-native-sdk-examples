@@ -90,11 +90,13 @@ int loadDetectionStruct(const float* locations,
     return 0;
 }
 float max(float a, float b) {
-    if (a > b) return a;
+    if (a > b)
+        return a;
     return b;
 }
 float min(float a, float b) {
-    if (a < b) return a;
+    if (a < b)
+        return a;
     return b;
 }
 
@@ -174,8 +176,10 @@ void sortBoxesEfficient(box* boxes, int num_of_detections) {
             j--;
         }
     }
-    if (j > 0) sortBoxesEfficient(boxes, j + 1);
-    if (i < num_of_detections - 1) sortBoxesEfficient(boxes + i, num_of_detections - i);
+    if (j > 0)
+        sortBoxesEfficient(boxes, j + 1);
+    if (i < num_of_detections - 1)
+        sortBoxesEfficient(boxes + i, num_of_detections - i);
 }
 
 // Calculate IOU
@@ -209,7 +213,8 @@ void suppressOverlappingBoxes(box* boxes, int num_of_detections, float iou_thres
 int countNonNullBoxes(box* boxes, int num_of_detections) {
     int count = 0;
     for (int i = 0; i < num_of_detections; i++) {
-        if (boxes[i].score > 0) count++;
+        if (boxes[i].score > 0)
+            count++;
     }
     return count;
 }

@@ -159,7 +159,8 @@ void test_buffer_to_jpeg_file() {
     for (int i = 0; i < width * height; i++) {
         for (int channel = 0; channel < channels; channel++) {
             int green_mask = 1;
-            if (channel == 2) green_mask = 0;
+            if (channel == 2)
+                green_mask = 0;
             image_buffer[i * channels + channel] = (double)i / (width * height) * 255 * green_mask;
         }
     }

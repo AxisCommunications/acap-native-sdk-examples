@@ -235,7 +235,8 @@ int main(void) {
             syslog(LOG_INFO, "*** 2. Transfer Failed: Unexpected result, error code: %d ***", rv);
 
         // Close file after transfer and cleanup curl easy handle
-        if (fetch_file.stream) fclose(fetch_file.stream);
+        if (fetch_file.stream)
+            fclose(fetch_file.stream);
         curl_easy_cleanup(curl);
     }
     // Cleanup of curl global environment
