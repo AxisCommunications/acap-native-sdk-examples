@@ -171,19 +171,14 @@ static bool parseLabels(char*** labelsPtr,
     labelIdx++;
     for (size_t i = 0; i < labelsFileSize; i++) {
         if (labelsData[i] == '\n') {
-            // Register the string start in the list of labels.
-            labelArray[labelIdx] = labelsData + i + 1;
-            labelIdx++;
+            if (i < (labelsFileSize - 1)) {
+                // Register the string start in the list of labels.
+                labelArray[labelIdx] = labelsData + i + 1;
+                labelIdx++;
+            }
             // Replace the newline char with string-ending NULL char.
             labelsData[i] = '\0';
         }
-    }
-
-    // If the very last byte in the labels file was a new-line we just
-    // replace that with a NULL-char. Refer previous for loop skipping looking
-    // for new-line at the end of file.
-    if (labelsData[labelsFileSize - 1] == '\n') {
-        labelsData[labelsFileSize - 1] = '\0';
     }
 
     // Make sure we always have a terminating NULL char after the label file
