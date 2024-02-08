@@ -67,9 +67,9 @@ vdo-larod
 
 ## Limitations
 
-- ARTPEC-7 based device with edge TPU
-- ARTPEC-8
-- CV25
+- The example shows how to run on a device's DLPU or CPU, but for good
+  performance it's recommended to use products with DLPU. See links to search
+  for products with DLPU support in [Axis device compatibility](https://www.axis.com/support/tools/product-selector/shared/%5B%7B%22index%22%3A%5B4%2C1%5D%2C%22value%22%3A%22DLPU%22%7D%5D).
 - This application was not written to optimize performance
 - The pretrained models only outputs the confidence of two classes i.e., person and car. For options on pretrained models that classify a higher number of classes, visit the  [Axis Model Zoo](https://github.com/AxisCommunications/axis-model-zoo).
 

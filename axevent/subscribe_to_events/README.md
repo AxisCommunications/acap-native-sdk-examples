@@ -33,8 +33,10 @@ subscribe_to_events
 
 ### Limitations
 
-- The example is done for the armv7hf architecture, but it is possible to update to aarch64 architecture.
-- Which events that are available varies between Axis products, but events that will never be sent are possible to subscribe to and does not give any error.
+- Which events that are available varies between Axis products, e.g.
+  video-related events will not be available on a loudspeaker. It's however
+  possible to subscribe to such events that will never be sent, this doesn't
+  give any error.
 
 ### How to run the code
 
