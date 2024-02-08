@@ -43,7 +43,8 @@ reproducible-package
 
 ### Limitations
 
-- The support to create reproducible packages was introduced in acap-sdk 3.4.
+- The support to create reproducible packages was introduced in `acap-sdk` 3.4
+  and is supported in all versions of `acap-native-sdk`.
 
 ### Build the application
 

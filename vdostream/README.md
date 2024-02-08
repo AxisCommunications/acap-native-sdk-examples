@@ -37,8 +37,8 @@ vdostream
 
 ### Limitations
 
-- The example is done for the armv7hf architecture, but it is possible to update to aarch64 architecture.
-- Supported video compression formats for an Axis video device are found in the data-sheet of the device.
+- Supported video compression formats for an Axis video device are found in the
+  data-sheet of the device.
 
 ### How to run the code
 

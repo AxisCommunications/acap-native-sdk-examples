@@ -32,10 +32,6 @@ licensekey
 - **Dockerfile** - Docker file with the specified Axis toolchain and API container to build the example specified.
 - **README.md** - Step by step instructions on how to run the example.
 
-### Limitations
-
-- The example is done for the armv7hf architecture, but it is possible to update to aarch64 architecture.
-
 ### How to run the code
 
 Below is the step by step instructions on how to execute the program. So basically starting with the generation of the .eap file to running it on a device:
