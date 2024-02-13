@@ -1,0 +1,13 @@
+{
+    "schemaVersion": "1.5.0",
+    "acapPackageConf": {
+        "setup": {
+            "appName": "consume_analytics_metadata",
+            "vendor": "Axis Communications",
+            "embeddedSdkVersion": "3.0",
+            "vendorUrl": "https://www.axis.com",
+            "runMode": "never",
+            "version": "1.0.0"
+        }
+    }
+}

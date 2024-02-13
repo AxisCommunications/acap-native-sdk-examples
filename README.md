@@ -36,6 +36,8 @@ Below is the list of examples available in the repository.
   - A simple hello world C application.
 - [licensekey](./licensekey/)
   - An example in C that illustrates how to check the licensekey status.
+- [metadata-broker](./metadata-broker/)
+  - Examples that consume metadata.
 - [object-detection](./object-detection/)
   - An example of object detection, cropping and saving detected objects into jpeg files.
 - [object-detection-cv25](./object-detection-cv25/)
