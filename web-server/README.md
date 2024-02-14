@@ -17,9 +17,9 @@ The Web Server running in the ACAP application can also be exposed directly to t
 
 ## Monkey Web Server
 
-Monkey is a fast and lightweight Web Server for Linux. It has been designed to be very scalable with low memory and CPU consumption, the perfect solution for Embedded Linux and high end production environments. Besides the common features as HTTP server, it expose a flexible C API which aims to behave as a fully HTTP development framework, so it can be extended as desired through the plugins interface. The Monkey Web Server [documentation](http://monkey-project.com/documentation/1.5) describes the configuration in detail.
+Monkey is a fast and lightweight Web Server for Linux. It has been designed to be very scalable with low memory and CPU consumption, the perfect solution for Embedded Linux and high end production environments. Besides the common features as HTTP server, it expose a flexible C API which aims to behave as a fully HTTP development framework, so it can be extended as desired through the plugins interface. The Monkey Web Server [documentation](https://github.com/monkey/monkey-docs/) describes the configuration in detail.
 
-> [!NOTE]  
+> [!NOTE]
 > Currently, there's an issue with the Monkey web server when using the reverse proxy, impacting asset discovery. As a workaround, we're showcasing the `list` example.
 
 ## Getting started
