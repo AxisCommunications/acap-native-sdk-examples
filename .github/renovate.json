@@ -1,4 +1,5 @@
 {
+  "timezone": "Europe/Stockholm",
   "schedule": ["after 10pm and before 5am every weekday", "every weekend"],
   "extends": ["config:base", ":prHourlyLimitNone"],
   "labels": ["dependencies"],
