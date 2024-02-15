@@ -21,47 +21,47 @@ This repository contains a set of application examples which aims to enrich the 
 Below is the list of examples available in the repository.
 
 - [axevent](./axevent/)
-  - The example code is written in C which illustrates both how to subscribe to different events and how to send an event.
+  - Examples in C that illustrate how to subscribe to and send events.
 - [axoverlay](./axoverlay/)
-  - The example code is written in C which illustrates how to draw plain boxes and text as overlays in a stream.
+  - An example in C that illustrates how to draw plain boxes and text as overlays in a stream.
 - [axserialport](./axserialport/)
-  - This example is written in C and shows the use of the serial port API.
+  - An example in C that shows the use of the serial port API.
 - [axstorage](./axstorage/)
-  - The example code is written in C which shows how to use available storage devices.
+  - An example in C that shows how to use available storage devices.
 - [container-example](./container-example/)
-  - This example demonstrates a way of using containers in a native ACAP application.
+  - An example that demonstrates the use of containers in a native ACAP application.
 - [hello-world](./hello-world/)
-  - The example code is written in C and shows how to build a simple hello world application.
+  - A simple hello world C application.
 - [licensekey](./licensekey/)
-  - The example code is written in C which illustrates how to check the licensekey status.
+  - An example in C that illustrates how to check the licensekey status.
 - [object-detection](./object-detection/)
-  - The example code focus on object detection, cropping and saving detected objects into jpeg files.
+  - An example of object detection, cropping and saving detected objects into jpeg files.
 - [object-detection-cv25](./object-detection-cv25/)
-  - This example is very similar to object-detection, but is designed for AXIS CV25 devices.
+  - An example of object detection, cropping and saving detected objects into jpeg files on AXIS CV25 devices.
 - [reproducible-package](./reproducible-package/)
   - An example of how to create a reproducible application package.
 - [shell-script-example](./shell-script-example)
-  - A simple hello world application written in shell script.
+  - A simple hello world shell script application.
 - [tensorflow-to-larod](./tensorflow-to-larod/)
-  - This example covers model conversion, model quantization, image formats and custom models.
+  - An example that shows model conversion, model quantization, image formats and custom models.
 - [tensorflow-to-larod-artpec8](./tensorflow-to-larod-artpec8/)
-  - This example is very similar to tensorflow-to-larod, but is designed for AXIS ARTPEC-8 devices.
+  - An example that shows model conversion, model quantization, image formats and custom models on AXIS ARTPEC-8 devices.
 - [tensorflow-to-larod-cv25](./tensorflow-to-larod-cv25/)
-  - This example is very similar to tensorflow-to-larod, but is designed for AXIS CV25 devices.
+  - An example that shows model conversion, model quantization, image formats and custom models on AXIS CV25 devices.
 - [using-opencv](./using-opencv/)
-  - This example covers how to build, bundle and use OpenCV in an application.
+  - An example that shows how to build, bundle and use OpenCV in an application.
 - [utility-libraries](./utility-libraries/)
-  - These examples covers how to build, bundle and use external libraries.
+  - Examples that show how to build, bundle and use external libraries.
 - [vdo-larod](./vdo-larod/)
-  - The example code is written in C and loads a pretrained person-car classification model to the [Machine learning API (Larod)](https://axiscommunications.github.io/acap-documentation/docs/api/native-sdk-api.html#machine-learning-api-larod) and then uses the [Video capture API (VDO)](https://axiscommunications.github.io/acap-documentation/docs/api/native-sdk-api.html#video-capture-api-vdo) to fetch video frames in YUV format and finally run inference.
+  - An example in C that loads a pretrained person-car classification model to the [Machine learning API (Larod)](https://axiscommunications.github.io/acap-documentation/docs/api/native-sdk-api.html#machine-learning-api-larod) and then uses the [Video capture API (VDO)](https://axiscommunications.github.io/acap-documentation/docs/api/native-sdk-api.html#video-capture-api-vdo) to fetch video frames in YUV format and finally run inference.
 - [vdo-opencl-filtering](./vdo-opencl-filtering/)
-  - This example illustrates how to capture frames from the vdo service, access the received buffer, and finally perform a GPU accelerated Sobel filtering with OpenCL.
+  - An example that illustrates how to capture frames from the vdo service, access the received buffer, and finally perform a GPU accelerated Sobel filtering with OpenCL.
 - [vdostream](./vdostream/)
-  - The example code is written in C which starts a vdo stream and then illustrates how to continuously capture frames from the vdo service, access the received buffer contents as well as the frame metadata.
+  - An example in C that starts a vdo stream and then illustrates how to continuously capture frames from the vdo service, access the received buffer contents as well as the frame metadata.
 - [web-server](./web-server/)
-  - The example code is written in C which runs a Monkey web server on the camera and exposes an external API with Reverse Proxy configuration in Apache Server.
+  - An example in C that runs a Monkey web server on the camera and exposes an external API with Reverse Proxy configuration in Apache Server.
 - [web-server-using-fastcgi](./web-server-using-fastcgi/)
-  - This example code is written in C and explains how to build an ACAP application that can handle HTTP requests sent to the Axis device, using the device's own web server.
+  - An example in C and explains how to build an ACAP application that can handle HTTP requests sent to the Axis device, using the device's own web server.
 
 ### Docker Hub image
 
