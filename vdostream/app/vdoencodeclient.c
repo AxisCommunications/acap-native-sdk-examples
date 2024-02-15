@@ -67,7 +67,9 @@ static const gchar* param_desc = "";
 static const gchar* summary    = "Encoded video client";
 
 // Facilitate graceful shutdown with CTRL-C
-static void handle_sigint(int signum) { shutdown = TRUE; }
+static void handle_sigint(int signum) {
+    shutdown = TRUE;
+}
 
 // Determine and log the received frame type
 static void print_frame(VdoFrame* frame) {
