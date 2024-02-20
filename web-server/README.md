@@ -71,7 +71,7 @@ docker run --rm web-server:$ARCH eap-install.sh $DEVICE_IP $PASS install
 
 Goto your device web page > Click on the tab **Apps** in the device GUI and locate the application. Run the application by enabling the **Start** switch.
 
-The Web Server can be accessed from a Web Browser through the Apache Server in the device using an extension to the device web URL (i.e http://<device-ip>/local/list/server/)
+The Web Server can be accessed from a Web Browser through the Apache Server in the device using an extension to the device web URL (i.e http://<device-ip>/local/list/my_web_server)
 
 # Start your application from command line
 
