@@ -1,0 +1,28 @@
+{
+    "schemaVersion": "1.5.0",
+    "acapPackageConf": {
+        "setup": {
+            "friendlyName": "axparameter",
+            "appName": "axparameter",
+            "vendor": "Axis Communications",
+            "embeddedSdkVersion": "3.0",
+            "vendorUrl": "https://www.axis.com",
+            "runMode": "never",
+            "version": "1.0.0"
+        },
+        "configuration": {
+            "paramConfig": [
+                {
+                    "name": "IsCustomized",
+                    "default": "no",
+                    "type": "bool:no,yes"
+                },
+                {
+                    "name": "BackupValue",
+                    "default": "restored from backup",
+                    "type": "hidden:string"
+                }
+            ]
+        }
+    }
+}
