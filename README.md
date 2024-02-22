@@ -51,7 +51,9 @@ Below is the list of examples available in the repository.
 - [using-opencv](./using-opencv/)
   - An example that shows how to build, bundle and use OpenCV in an application.
 - [utility-libraries](./utility-libraries/)
-  - Examples that show how to build, bundle and use external libraries.
+  - These examples covers how to build, bundle and use external libraries.
+- [vapix](./vapix/)
+  - An example in C that retrieves VAPIX credentials over D-Bus and makes VAPIX calls over a loopback interface.
 - [vdo-larod](./vdo-larod/)
   - An example in C that loads a pretrained person-car classification model to the [Machine learning API (Larod)](https://axiscommunications.github.io/acap-documentation/docs/api/native-sdk-api.html#machine-learning-api-larod) and then uses the [Video capture API (VDO)](https://axiscommunications.github.io/acap-documentation/docs/api/native-sdk-api.html#video-capture-api-vdo) to fetch video frames in YUV format and finally run inference.
 - [vdo-opencl-filtering](./vdo-opencl-filtering/)
