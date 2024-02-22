@@ -1,0 +1,32 @@
+name: Build vapix application
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'vapix/**'
+      - '!vapix/README.md'
+      - '.github/workflows/vapix.yml'
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        axis-os: ["11.9.53"]
+        arch: ["armv7hf", "aarch64"]
+    env:
+      EXREPO: acap-native-examples
+      EXNAME: vapix
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+
+      - name: Build ${{ env.EXNAME }} application
+        env:
+          imagetag: ${{ env.EXREPO }}_${{ env.EXNAME }}:${{ matrix.arch }}
+        run: |
+          docker image rm -f $imagetag
+          cd $EXNAME
+          docker build --no-cache --tag $imagetag --build-arg ARCH=${{ matrix.arch }} .
+          docker cp $(docker create $imagetag):/opt/app ./build
+          cd ..
+          docker image rm -f $imagetag
