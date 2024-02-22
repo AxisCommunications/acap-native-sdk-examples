@@ -24,6 +24,8 @@ Below is the list of examples available in the repository.
   - Examples in C that illustrate how to subscribe to and send events.
 - [axoverlay](./axoverlay/)
   - An example in C that illustrates how to draw plain boxes and text as overlays in a stream.
+- [axparameter](./axparameter/)
+  - An example in C that demonstrates how to manage application-defined parameters, allowing you to add, remove, set, get, and register callback functions for parameter value updates.
 - [axserialport](./axserialport/)
   - An example in C that shows the use of the serial port API.
 - [axstorage](./axstorage/)
