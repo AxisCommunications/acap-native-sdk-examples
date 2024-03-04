@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        axis-os: ["11.8.61"]
+        axis-os: ["11.9.53"]
         arch: ["armv7hf", "aarch64"]
         vdo-format: ["h264", "h265", "y800", "jpeg", "nv12"]
     env:

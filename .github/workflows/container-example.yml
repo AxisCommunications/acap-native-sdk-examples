@@ -14,10 +14,10 @@ jobs:
         include:
           - arch: armv7hf
             imagearch: arm32v7
-            axis-os: 11.8.61
+            axis-os: 11.9.53
           - arch: aarch64
             imagearch: arm64v8
-            axis-os: 11.8.61
+            axis-os: 11.9.53
     env:
       EXREPO: acap-native-examples
       EXNAME: container-example
