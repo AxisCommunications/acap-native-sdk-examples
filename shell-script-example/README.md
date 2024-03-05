@@ -13,7 +13,7 @@ These instructions will guide you on how to execute the code. Below is the struc
 ```sh
 shell-script-example
 ├── app
-│   ├── shell-script_example.c
+│   ├── shell-script_example
 │   ├── LICENSE
 │   ├── Makefile
 │   └── manifest.json
