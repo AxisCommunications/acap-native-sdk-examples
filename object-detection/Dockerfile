@@ -36,8 +36,8 @@ WORKDIR /opt/app/lib
 RUN cp ${BUILD_DIR_JPEG}/build/*.so* .
 WORKDIR /opt/app/include
 RUN cp ${BUILD_DIR_JPEG}/build/*.h . && \
-    cp ${BUILD_DIR_JPEG}/*.h . 
-    
+    cp ${BUILD_DIR_JPEG}/*.h .
+
 WORKDIR /opt/app
 COPY ./app /opt/app/
 

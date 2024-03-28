@@ -20,9 +20,9 @@ RUN if [ "$CHIP" = artpec8 ]; then \
     elif [ "$CHIP" = cpu ]; then \
         curl -o model.zip $MODEL_BUCKET/models.aarch64.artpec8.zip ; \
     elif [ "$CHIP" = edgetpu ]; then \
-        curl -o model.zip $MODEL_BUCKET/models.armv7hf.edgetpu.zip ; \    
+        curl -o model.zip $MODEL_BUCKET/models.armv7hf.edgetpu.zip ; \
     elif [ "$CHIP" = cv25 ]; then \
-        curl -o model.zip $MODEL_BUCKET/tensorflow_to_larod_models.cv25.zip ; \        
+        curl -o model.zip $MODEL_BUCKET/tensorflow_to_larod_models.cv25.zip ; \
     else \
         printf "Error: '%s' is not a valid value for the CHIP variable\n", "$CHIP"; \
         exit 1; \
