@@ -2,6 +2,16 @@
 
 # Build custom OpenSSL and curl libraries and use them in an ACAP application
 
+> [!IMPORTANT]
+>
+> OpenSSL 1.1.1 reached [End of
+> Life](https://www.openssl.org/blog/blog/2023/09/11/eol-111/index.html)
+> September 11, 2023.
+>
+> It's strongly recommended to update to the latest OpenSSL 3 version, this
+> example is kept as a reference on how to build open source libraries with the
+> ACAP Native SDK.
+
 This example shows you how to build custom versions of
 [OpenSSL](https://www.openssl.org/) and [curl](https://curl.se/) from
 source by using the SDK, and how to bundle them for use in an ACAP application.
