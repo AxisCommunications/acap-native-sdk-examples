@@ -34,6 +34,10 @@
  * param argv Arguments vector.
  */
 int main(int argc, char** argv) {
+    /* Silence compiler warnings for unused parameters/arguments */
+    (void)argc;
+    (void)argv;
+
     /* Open the syslog to report messages for "hello_world" */
     openlog("hello_world", LOG_PID | LOG_CONS, LOG_USER);
 

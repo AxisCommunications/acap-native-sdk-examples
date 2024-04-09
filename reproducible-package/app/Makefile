@@ -3,7 +3,7 @@ OBJS1	= $(PROG1).c
 
 PROGS	= $(PROG1)
 
-CFLAGS-y  = -W -Wformat=2 -Wpointer-arith -Wbad-function-cast -Wstrict-prototypes -Wmissing-prototypes -Winline -Wdisabled-optimization -Wfloat-equal -Wall -Werror
+CFLAGS  = -W -Wformat=2 -Wpointer-arith -Wbad-function-cast -Wstrict-prototypes -Wmissing-prototypes -Winline -Wdisabled-optimization -Wfloat-equal -Wall -Werror
 
 # Set to create a reproducible package
 DATE_FMT = +%Y-%m-%d

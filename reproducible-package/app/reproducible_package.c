@@ -34,6 +34,10 @@
  * param argv Arguments vector.
  */
 int main(int argc, char** argv) {
+    /* Silence compiler warnings for unused parameters/arguments */
+    (void)argc;
+    (void)argv;
+
     /* Open the syslog to report messages for "reproducible_package" */
     openlog("reproducible_package", LOG_PID | LOG_CONS, LOG_USER);
 
