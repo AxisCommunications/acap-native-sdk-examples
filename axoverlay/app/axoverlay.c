@@ -409,9 +409,19 @@ int main(int argc, char** argv) {
 
     // Get max resolution for width and height
     camera_width = axoverlay_get_max_resolution_width(1, &error);
-    g_error_free(error);
+    if (error != NULL) {
+        syslog(LOG_ERR, "Failed to get max resolution width: %s", error->message);
+        g_error_free(error);
+        error = NULL;
+    }
+
     camera_height = axoverlay_get_max_resolution_height(1, &error);
-    g_error_free(error);
+    if (error != NULL) {
+        syslog(LOG_ERR, "Failed to get max resolution height: %s", error->message);
+        g_error_free(error);
+        error = NULL;
+    }
+
     syslog(LOG_INFO, "Max resolution (width x height): %i x %i", camera_width, camera_height);
 
     // Create a large overlay using Palette color space
