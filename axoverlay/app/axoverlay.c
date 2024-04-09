@@ -197,14 +197,21 @@ setup_palette_color(const int index, const gint r, const gint g, const gint b, c
  * param overlay_height Overlay height.
  * param user_data Optional user data associated with this overlay.
  */
-static void adjustment_cb(const gint id,
-                          const struct axoverlay_stream_data* stream,
+static void adjustment_cb(gint id,
+                          struct axoverlay_stream_data* stream,
                           enum axoverlay_position_type* postype,
                           gfloat* overlay_x,
                           gfloat* overlay_y,
                           gint* overlay_width,
                           gint* overlay_height,
                           gpointer user_data) {
+    /* Silence compiler warnings for unused parameters/arguments */
+    (void)id;
+    (void)postype;
+    (void)overlay_x;
+    (void)overlay_y;
+    (void)user_data;
+
     syslog(LOG_INFO, "Adjust callback for overlay: %i x %i", *overlay_width, *overlay_height);
     syslog(LOG_INFO, "Adjust callback for stream: %i x %i", stream->width, stream->height);
 
@@ -230,14 +237,20 @@ static void adjustment_cb(const gint id,
  * param user_data Optional user data associated with this overlay.
  */
 static void render_overlay_cb(gpointer rendering_context,
-                              const gint id,
-                              const struct axoverlay_stream_data* stream,
-                              const enum axoverlay_position_type postype,
-                              const gfloat overlay_x,
-                              const gfloat overlay_y,
-                              const gint overlay_width,
-                              const gint overlay_height,
-                              const gpointer user_data) {
+                              gint id,
+                              struct axoverlay_stream_data* stream,
+                              enum axoverlay_position_type postype,
+                              gfloat overlay_x,
+                              gfloat overlay_y,
+                              gint overlay_width,
+                              gint overlay_height,
+                              gpointer user_data) {
+    /* Silence compiler warnings for unused parameters/arguments */
+    (void)postype;
+    (void)user_data;
+    (void)overlay_x;
+    (void)overlay_y;
+
     gdouble val = FALSE;
 
     syslog(LOG_INFO, "Render callback for camera: %i", stream->camera);
@@ -280,6 +293,9 @@ static void render_overlay_cb(gpointer rendering_context,
  * param user_data Optional callback user data.
  */
 static gboolean update_overlay_cb(gpointer user_data) {
+    /* Silence compiler warnings for unused parameters/arguments */
+    (void)user_data;
+
     GError* error = NULL;
 
     // Countdown
@@ -366,6 +382,10 @@ static gboolean signal_handler_init(void) {
  * param argv Arguments vector.
  */
 int main(int argc, char** argv) {
+    /* Silence compiler warnings for unused parameters/arguments */
+    (void)argc;
+    (void)argv;
+
     GError* error      = NULL;
     GError* error_text = NULL;
     gint camera_height = 0;
