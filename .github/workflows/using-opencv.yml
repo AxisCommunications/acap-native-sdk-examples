@@ -7,7 +7,8 @@ on:
       - '!using-opencv/README.md'
       - '.github/workflows/using-opencv.yml'
 jobs:
-  build:
+  test-app:
+    name: Test app
     runs-on: ubuntu-latest
     strategy:
       matrix:

@@ -7,7 +7,8 @@ on:
       - '!tensorflow-to-larod-artpec8/README.md'
       - '.github/workflows/tensorflow-to-larod-artpec8.yml'
 jobs:
-  build:
+  test-app:
+    name: Test app
     runs-on: ubuntu-latest
     strategy:
       matrix:

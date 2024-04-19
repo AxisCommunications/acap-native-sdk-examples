@@ -7,7 +7,8 @@ on:
       - '!object-detection-cv25/README.md'
       - '.github/workflows/object-detection-cv25.yml'
 jobs:
-  build:
+  test-app:
+    name: Test app
     runs-on: ubuntu-latest
     strategy:
       matrix:
