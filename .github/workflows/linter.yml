@@ -10,7 +10,7 @@ on:
       - '**'
 
 jobs:
-  build:
+  test:
     name: Lint Code Base
     runs-on: ubuntu-latest
     steps:

@@ -7,7 +7,7 @@ on:
   pull_request:
     branches: [main]
 jobs:
-  build:
+  test:
     name: Documentation checks
     runs-on: ubuntu-latest
     steps:

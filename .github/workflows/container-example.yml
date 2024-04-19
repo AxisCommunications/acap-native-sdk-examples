@@ -7,7 +7,8 @@ on:
       - '!container-example/README.md'
       - '.github/workflows/container-example.yml'
 jobs:
-  build:
+  test-app:
+    name: Test app
     runs-on: ubuntu-latest
     strategy:
       matrix:

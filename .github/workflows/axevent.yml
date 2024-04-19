@@ -7,7 +7,8 @@ on:
       - '!axevent/**/README.md'
       - '.github/workflows/axevent.yml'
 jobs:
-  build:
+  test-app:
+    name: Test app
     runs-on: ubuntu-latest
     strategy:
       matrix:

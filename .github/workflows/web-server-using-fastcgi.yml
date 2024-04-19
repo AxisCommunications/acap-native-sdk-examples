@@ -7,7 +7,8 @@ on:
       - '!web-server-using-fastcgi/README.md'
       - '.github/workflows/web-server-using-fastcgi.yml'
 jobs:
-  build:
+  test-app:
+    name: Test app
     runs-on: ubuntu-latest
     strategy:
       matrix:

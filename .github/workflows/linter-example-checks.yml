@@ -7,7 +7,7 @@ on:
   pull_request:
     branches: [main]
 jobs:
-  build:
+  test:
     name: Example repository checks
     runs-on: ubuntu-latest
     steps:

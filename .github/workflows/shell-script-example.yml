@@ -7,7 +7,8 @@ on:
       - '!shell-script-example/README.md'
       - '.github/workflows/shell-script-example.yml'
 jobs:
-  build:
+  test-app:
+    name: Test app
     runs-on: ubuntu-latest
     strategy:
       matrix:

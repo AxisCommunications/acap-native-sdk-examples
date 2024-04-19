@@ -7,7 +7,8 @@ on:
       - '!vdo-opencl-filtering/README.md'
       - '.github/workflows/vdo-opencl-filtering.yml'
 jobs:
-  build:
+  test-app:
+    name: Test app
     runs-on: ubuntu-latest
     strategy:
       matrix:

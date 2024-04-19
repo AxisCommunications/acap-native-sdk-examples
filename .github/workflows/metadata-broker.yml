@@ -7,7 +7,8 @@ on:
       - '!metadata-broker/README.md'
       - '.github/workflows/metadata-broker.yml'
 jobs:
-  build:
+  test-app:
+    name: Test app
     runs-on: ubuntu-latest
     strategy:
       matrix:
