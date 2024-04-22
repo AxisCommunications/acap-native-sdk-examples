@@ -32,6 +32,8 @@ Below is the list of examples available in the repository.
   - An example in C that shows how to use available storage devices.
 - [container-example](./container-example/)
   - An example that demonstrates the use of containers in a native ACAP application.
+- [curl-openssl](./curl-openssl/)
+  - An example that use curl and OpenSSL libraries to retrieve a file securely from an external server.
 - [hello-world](./hello-world/)
   - A simple hello world C application.
 - [licensekey](./licensekey/)

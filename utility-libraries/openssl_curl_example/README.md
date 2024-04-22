@@ -11,6 +11,9 @@
 > It's strongly recommended to update to the latest OpenSSL 3 version, this
 > example is kept as a reference on how to build open source libraries with the
 > ACAP Native SDK.
+>
+> Refer to example [curl-openssl](../../curl-openssl/) to understand how existing application packaging custom
+> Open SSL can be migrated to use and link OpenSSL 3.X available in ACAP Native SDK 1.14 / AXIS OS 11.10 onwards.
 
 This example shows you how to build custom versions of
 [OpenSSL](https://www.openssl.org/) and [curl](https://curl.se/) from
