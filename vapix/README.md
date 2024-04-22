@@ -77,7 +77,7 @@ device.
 
 Standing in your working directory run the following commands:
 
-> [!Note]
+> [!NOTE]
 >
 > Depending on the network you are connected to, you may need to add proxy settings.
 > The file that needs these settings is: `~/.docker/config.json`. For reference please see
@@ -132,12 +132,18 @@ The log shows a few parsed values from the VAPIX API response.
 ```text
 ----- Contents of SYSTEM_LOG for 'vapix_example' -----
 
-[ INFO ] vapix_example[9731]: Curl version 8.4.0-DEV
+[ INFO ] vapix_example[9731]: Curl version 8.6.0
 [ INFO ] vapix_example[9731]: Jansson version 2.14
 [ INFO ] vapix_example[9731]: ProdShortName: AXIS Q3536-LVE
 [ INFO ] vapix_example[9731]: Soc: Axis Artpec-8
 [ INFO ] vapix_example[9731]: SocSerialNumber: ABCD1234-0101ABAB
 ```
+
+> [!NOTE]
+>
+> The curl and Jansson versions mentioned in the example log are only for representation
+> purpose. They may vary according to the library version available and linked from
+> AXIS OS on which the application runs.
 
 ## License
 
