@@ -1,0 +1,32 @@
+name: Build curl-openssl application
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'curl-openssl/**'
+      - '!curl-openssl/README.md'
+      - '.github/workflows/curl-openssl.yml'
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        axis-os: ["11.10.59"]
+        arch: ["armv7hf", "aarch64"]
+    env:
+      EXREPO: acap-native-examples
+      EXNAME: curl-openssl
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+
+      - name: Build ${{ env.EXNAME }} application
+        env:
+          imagetag: ${{ env.EXREPO }}_${{ env.EXNAME }}:${{ matrix.arch }}
+        run: |
+          docker image rm -f $imagetag
+          cd $EXNAME
+          docker build --no-cache --build-arg ARCH=${{ matrix.arch}} --build-arg APP_DEBUG=yes --tag $imagetag .
+          docker cp $(docker create $imagetag):/opt/app ./build
+          cd ..
+          docker image rm -f $imagetag
