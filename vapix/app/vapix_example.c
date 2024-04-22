@@ -1,4 +1,4 @@
-#include <curl.h>
+#include <curl/curl.h>
 #include <gio/gio.h>
 #include <jansson.h>
 #include <syslog.h>
