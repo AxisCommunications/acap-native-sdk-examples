@@ -317,7 +317,11 @@ static int do_opencl_filtering(cl_mem* in_image_y,
 }
 
 static void free_table_entry(gpointer key, gpointer value, gpointer user_data) {
-    clReleaseMemObject((cl_mem)value);
+    cl_mem mem_obj = *(cl_mem*)value;
+    cl_int ret     = clReleaseMemObject(mem_obj);
+    if (ret != CL_SUCCESS) {
+        syslog(LOG_ERR, "Failed to release memory object: %d", ret);
+    }
 }
 
 /* Release cl memory objects on hash table cleanup */
@@ -443,6 +447,7 @@ int main(int argc, char* argv[]) {
 
     output_file = fopen(file_path, "wb");
     if (!output_file) {
+        syslog(LOG_ERR, "Failed to open file: %s\n", file_path);
         g_set_error(&error, VDO_CLIENT_ERROR, VDO_ERROR_IO, "open failed: %m");
         goto exit;
     }
