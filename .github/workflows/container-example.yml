@@ -3,9 +3,9 @@ on:
   workflow_dispatch:
   push:
     paths:
-      - 'container-example/**'
-      - '!container-example/README.md'
-      - '.github/workflows/container-example.yml'
+      - "container-example/**"
+      - "!container-example/README.md"
+      - ".github/workflows/container-example.yml"
 jobs:
   test-app:
     name: Test app
@@ -14,11 +14,11 @@ jobs:
       matrix:
         include:
           - arch: armv7hf
-            imagearch: arm32v7
-            axis-os: 11.9.53
+            platformarch: "linux/arm/v7"
+            axis-os: 11.10.59
           - arch: aarch64
-            imagearch: arm64v8
-            axis-os: 11.9.53
+            platformarch: "linux/arm64/v8"
+            axis-os: 11.10.59
     env:
       EXREPO: acap-native-examples
       EXNAME: container-example
@@ -29,12 +29,12 @@ jobs:
       - name: Build ${{ env.EXNAME }} application
         env:
           imagetag: ${{ env.EXREPO }}_${{ env.EXNAME }}:${{ matrix.arch }}
+          alpinetag: 3.19.1
         run: |
           docker image rm -f $imagetag
           cd $EXNAME
-          docker pull ${{ matrix.imagearch }}/alpine:3.14.0
-          docker save -o alpine.tar ${{ matrix.imagearch }}/alpine:3.14.0
-          docker build --no-cache --tag $imagetag .
-          docker cp $(docker create $imagetag):/opt/app ./build
+          docker pull --platform=${{ matrix.platformarch}} alpine:$alpinetag
+          docker save -o alpine.tar alpine:$alpinetag
+          docker build --no-cache --tag $imagetag --output build .
           cd ..
           docker image rm -f $imagetag

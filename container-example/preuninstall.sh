@@ -1,2 +1,2 @@
 #!/bin/sh
-docker image rm arm32v7/alpine:3.14.0
+docker image rm alpine:3.19.1

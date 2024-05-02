@@ -1,7 +1,6 @@
-version: "3.3"
 services:
   alpine:
-    image: "${ALPINE_IMAGE}"
+    image: alpine:3.19.1
     command: sh -c "while true ; do printf 'HTTP/1.1 200 OK\\n\\nHello from an ACAP\!' | nc -l -p 80 ; done"
     ports:
       - 8080:80

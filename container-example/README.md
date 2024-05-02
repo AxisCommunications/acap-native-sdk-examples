@@ -8,89 +8,109 @@
 
 The purpose of this example is to demonstrate a way of using containers in a native ACAP application.
 
-The advantage of using a native ACAP application for this, as opposed to a Computer Vision ACAP application, is that the application can be administered via the VAPIX API and the web GUI in AxOS. It also has the advantage that the container images can be included in the .eap application file so that the entire application is contained in this single, installable file, without any dependency on external image repositories.
+The advantage of using a native ACAP application for this, as opposed to a Computer Vision ACAP application,
+is that the application can be administered via the VAPIX API and the web GUI in Axis OS. It also has
+the advantage that the container images can be included in the .eap application file so that the entire
+application is contained in this single, installable file, without any dependency on external image repositories.
 
-However, the actual container images that are used in this type of application may well have been built using the Computer Vision SDK, but this is not a requirement.
+However, the actual container images that are used in this type of application may well have been built
+using the ACAP Computer Vision SDK, but this is not a requirement.
 
 ### How it works
 
-This example works by taking advantage of the option to include post-install and pre-uninstall scripts in a native ACAP. In the post-install script we load the container image(s) to the local image store on the device, and in the pre-uninstall script we remove them from the store. The actual application executable is a shell script that runs "docker compose up" when starting and "docker compose down" before exiting. This requires that a Docker compose file has been written, describing how to run the container(s).
+This example works by taking advantage of the option to include post-install and pre-uninstall scripts
+in a native ACAP application. In the post-install script we load the container image(s) to the local
+image store on the device, and in the pre-uninstall script we remove them from the store. The actual
+application executable is a shell script that runs `docker compose up` when starting and
+`docker compose down` before exiting. This requires that a Docker compose file has been written, describing
+how to run the container(s).
 
-In order for this to work, we need to have docker compose functionality included in the device, which means another ACAP must first be installed: the [Docker Compose ACAP](https://github.com/AxisCommunications/docker-compose-acap)
+In order for this to work, we need to have docker compose functionality included in the device, which
+means another ACAP application must first be installed: the [Docker Compose ACAP][docker-compose-acap].
 
-In this way we are able to construct a native ACAP that consists of one or several containers running on an Axis device.
+In this way we are able to construct a native ACAP application that consists of one or several containers
+running on an Axis device.
 
 ### The application
 
-This minimal example consist of an Alpine Linux container that executes a script where the nc (netcat) program displays a text on a simple web page on port 80. Port 80 in the container is then mapped to port 8080 on the device.
+This minimal example consist of an Alpine Linux container that executes a script where the [nc][nc-man]
+(netcat) program displays a text on a simple web page on port 80. Port 80 in the container is then mapped
+to port 8080 on the device.
 
 ## Prerequisites
 
-- An Axis camera with edge container functionality
-- AxOS 10.9 or later
-- The [Docker Compose ACAP](https://github.com/AxisCommunications/docker-compose-acap) must be installed on the device
+- An Axis device with edge container functionality.
+- Axis OS 11.10 or later.
+- The [Docker Compose ACAP][docker-compose-acap] version 3.0 or later, installed and running on the device.
 
-Pull and save the Alpine linux container image. Standing in your working directory run the following commands depending on your architecture:
+## Build and extract the application for armv7hf
 
-## Build the application on armv7hf
-
-```sh
-
-docker pull arm32v7/alpine:3.14.0
-docker save -o alpine.tar arm32v7/alpine:3.14.0
-docker build --tag <APP_NAME> .
-
-```
-
-## Build the application on aarch64
+Navigate to the root directory of this repository and then start with setting environment variables:
 
 ```sh
-
-docker pull arm64v8/alpine:3.14.0
-docker save -o alpine.tar arm64v8/alpine:3.14.0
-docker build --tag <APP_NAME> --build-arg ARCH=aarch64 .
-
+export ARCH="armv7hf"
+export PLATFORM="linux/arm/v7"
 ```
 
-### Extract the .eap file from the container
+Next, pull the [Alpine linux container image][alpine] for armv7hf and save it to a .tar file:
 
 ```sh
-
-docker cp $(docker create <APP_NAME>):/opt/app/ ./build
-
+docker pull --platform=$PLATFORM alpine:3.19.1
+docker save -o alpine.tar alpine:3.19.1
 ```
 
-The .eap file is contained in the build folder.
+Finally build the application and extract the .eap file:
+
+```sh
+docker buildx build --build-arg ARCH=$ARCH --output build-$ARCH .
+```
+
+The .eap file can now be found in the `build-armv7hf` folder.
+
+## Build and extract the application for aarch64
+
+Navigate to the root directory of this repository and then start with setting environment variables:
+
+```sh
+export ARCH="aarch64"
+export PLATFORM="linux/arm64/v8"
+```
+
+Next, pull the [Alpine linux container image][alpine] for aarch64 and save it to a .tar file:
+
+```sh
+docker pull --platform=$PLATFORM alpine:3.19.1
+docker save -o alpine.tar alpine:3.19.1
+```
+
+Finally build the application and extract the .eap file:
+
+```sh
+docker buildx build --build-arg ARCH=$ARCH --output build-$ARCH .
+```
+
+The .eap file can now be found in the `build-aarch64` folder.
 
 ## Install the application
 
-Browse to the following page (replace <axis_device_ip> with the IP number of your Axis video device)
+On your Axis device, navigate to `http://<axis_device_ip>/camera/index.html#/apps`, where <axis-device-ip>
+is the IP of your device. Make sure that the [Docker Compose ACAP][docker-compose-acap] application
+is installed and running. In the settings of that application `IPCSocket` must be set to `yes`.
+`TCPSocket` can be set to `no` since this example does not connect to the Docker Daemon from outside
+of the device. However, if you do want to run with TCP Socket, TLS should be use (`UseTLS` set to `yes`).
+In that case, follow the instructions in the [Docker Compose ACAP][docker-compose-acap] for how to
+generate and upload TLS certificates to the device. For the other settings refer to the documentation
+in that repo.
 
-```sh
-http://<axis_device_ip>/#settings/apps
-```
+Click on the `+Add app` button on the page and in the popup window that appears, select the .eap-file
+that was built earlier.
 
-*Goto your device web page above > Click on the tab **App** in the device GUI > Add **(+)** sign and browse to
-the newly built **Container_Example_1_0_0_armv7hf.eap** > Click **Install** > Run the application by enabling the **Start** switch*
+Alternatively, you can use `upload.cgi` in the [VAPIX Application API][VAPIX-application] to directly
+upload the .eap-file from command line.
 
-### Size limit
+## Run the application
 
-If you're trying to build an ACAP application with a large Docker image, for example the [minimal-ml-example](https://github.com/AxisCommunications/acap-computer-vision-sdk-examples/tree/master/minimal-ml-inference) from [acap-computer-vision-sdk-examples](https://github.com/AxisCommunications/acap-computer-vision-sdk-examples), you might hit a size limit. In this case, we suggest you install the application via [command line](#install-application---command-line).
-
-## Install application - command line
-
-Install the application to the device from command line by using a tool such as [curl](https://curl.se):
-
-```sh
-curl -u <USER:PASS> -F"file=@<APP_FILE_PATH>" <DEVICE_IP>/axis-cgi/applications/upload.cgi
-```
-
-- Further flags for proxy and security might be required, depending on your network.
-- You may also use an API tool like [Postman](https://www.postman.com/) or other command line tools.
-
-## Test the application
-
-Use a web browser to browse to
+Start the application and then use a web browser to browse to
 
 ```html
 http://<axis_device_ip>:8080
@@ -101,3 +121,11 @@ The page should display the text "Hello from an ACAP!"
 ## License
 
 **[Apache License 2.0](../LICENSE)**
+
+<!-- Links to external references -->
+<!-- markdownlint-disable MD034 -->
+[alpine]: https://hub.docker.com/_/alpine
+[docker-compose-acap]: https://github.com/AxisCommunications/docker-compose-acap
+[nc-man]: https://www.commandlinux.com/man-page/man1/nc.1.html
+[VAPIX-application]: https://www.axis.com/vapix-library/subjects/T10102231/section/t10062344/display
+<!-- markdownlint-enable MD034 -->
