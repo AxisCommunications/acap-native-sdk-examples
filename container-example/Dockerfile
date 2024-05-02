@@ -1,12 +1,22 @@
+# syntax=docker/dockerfile:1
+
 ARG ARCH=armv7hf
-ARG VERSION=1.13
+ARG VERSION=1.14_rc3
 ARG UBUNTU_VERSION=22.04
 ARG REPO=axisecp
 
-FROM ${REPO}/acap-native-sdk:${VERSION}-${ARCH}-ubuntu${UBUNTU_VERSION}
+FROM ${REPO}/acap-native-sdk:${VERSION}-${ARCH}-ubuntu${UBUNTU_VERSION} AS build
 ARG ARCH
 COPY ./* /opt/app/
-COPY ./config/env.${ARCH} /opt/app/env.config
+
 WORKDIR /opt/app
-RUN . /opt/axis/acapsdk/environment-setup* && \
- acap-build -a alpine.tar -a docker-compose.yml -a env.config .
+RUN <<EOF
+    . /opt/axis/acapsdk/environment-setup*
+    acap-build . \
+        -a alpine.tar \
+        -a docker-compose.yml
+EOF
+
+FROM scratch AS binaries
+
+COPY --from=build /opt/app/*.eap /
