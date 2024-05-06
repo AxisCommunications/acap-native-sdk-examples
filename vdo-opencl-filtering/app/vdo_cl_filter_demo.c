@@ -83,6 +83,7 @@ cl_kernel kernel;
 cl_command_queue command_queue;
 
 /* OpenCL memory objects */
+cl_mem out_image;
 cl_mem out_image_y;
 cl_mem out_image_cbcr;
 
@@ -254,7 +255,7 @@ setup_opencl(const char* kernel_name, enum render_area area, unsigned width, uns
  * pixels directly in the kernel.
  */
 static int do_opencl_filtering(cl_mem* in_image_y,
-                               void* out_data,
+                               cl_mem* out_image,
                                unsigned width,
                                unsigned height,
                                size_t image_y_size,
@@ -270,6 +271,16 @@ static int do_opencl_filtering(cl_mem* in_image_y,
     size_t local_work_size[2] = {8, 4};
     size_t offset[2]          = {1, 0};
 
+    cl_buffer_region y_region = {
+        .origin = 0,
+        .size   = image_y_size,
+    };
+
+    cl_buffer_region c_region = {
+        .origin = image_y_size,
+        .size   = image_cbcr_size,
+    };
+
     /*
      * Since we use NV12 data we could also create a single memory object
      * direcly with luma and chroma included. For simplicity we split them up.
@@ -278,16 +289,17 @@ static int do_opencl_filtering(cl_mem* in_image_y,
      * memory, such that no unnecessary data has to be copied to GPU memory.
      * This data may still however be cached in the GPU.
      */
-    out_image_y    = clCreateBuffer(context,
-                                 CL_MEM_WRITE_ONLY | CL_MEM_USE_HOST_PTR,
-                                 image_y_size,
-                                 out_data,
-                                 &ret);
-    out_image_cbcr = clCreateBuffer(context,
-                                    CL_MEM_WRITE_ONLY | CL_MEM_USE_HOST_PTR,
-                                    image_cbcr_size,
-                                    (out_data + image_y_size),
+    out_image_y = clCreateSubBuffer(*out_image,
+                                    CL_MEM_WRITE_ONLY,
+                                    CL_BUFFER_CREATE_TYPE_REGION,
+                                    &y_region,
                                     &ret);
+
+    out_image_cbcr = clCreateSubBuffer(*out_image,
+                                       CL_MEM_WRITE_ONLY,
+                                       CL_BUFFER_CREATE_TYPE_REGION,
+                                       &c_region,
+                                       &ret);
     if (ret != CL_SUCCESS) {
         syslog(LOG_ERR, "Unable to create cl memory objects");
         return -1;
@@ -379,6 +391,7 @@ int main(int argc, char* argv[]) {
     VdoMap* vdo_stream_info = NULL;
     void* out_data          = NULL;
     cl_mem* in_images       = NULL;
+    cl_int cl_ret           = CL_SUCCESS;
 
     const gchar* output_file_format = "yuv"; /* Also the VDO stream format */
 
@@ -457,21 +470,6 @@ int main(int argc, char* argv[]) {
     /* Size of chroma data in the image buffer */
     size_t image_cbcr_size = image_y_size / 2;
 
-    /*
-     * Allocate memory for output buffer. In this case it's more practical with
-     * a separate output buffer since we're performing a filtering operation.
-     */
-    out_data = mmap(NULL,
-                    (image_y_size + image_cbcr_size),
-                    PROT_READ | PROT_WRITE,
-                    MAP_PRIVATE | MAP_ANONYMOUS,
-                    -1,
-                    0);
-    if (out_data == MAP_FAILED) {
-        syslog(LOG_ERR, "mmap failed: %d", errno);
-        goto exit;
-    }
-
     /* Set up OpenCL */
     if (setup_opencl(kernel_name, cur_render_area, image_width, image_height)) {
         syslog(LOG_ERR, "Unable to setup OpenCL");
@@ -486,6 +484,37 @@ int main(int argc, char* argv[]) {
      * will be stored in the hash table.
      */
     in_images = (cl_mem*)malloc(sizeof(cl_mem) * buffer_count);
+
+    /*
+     * Allocate memory for output buffer. In this case it's more practical with
+     * a separate output buffer since we're performing a filtering operation.
+     *
+     * If possible, allocate the buffer using OpenCL, and then map up that memory
+     * to the CPU.
+     */
+    out_image = clCreateBuffer(context,
+                               CL_MEM_ALLOC_HOST_PTR,
+                               image_y_size + image_cbcr_size,
+                               NULL,
+                               &cl_ret);
+    if (cl_ret != CL_SUCCESS) {
+        syslog(LOG_ERR, "Unable to create new cl out memory object: %d", cl_ret);
+        return -1;
+    }
+    out_data = clEnqueueMapBuffer(command_queue,
+                                  out_image,
+                                  CL_TRUE,
+                                  CL_MAP_READ,
+                                  0,
+                                  image_y_size + image_cbcr_size,
+                                  0,
+                                  NULL,
+                                  NULL,
+                                  &cl_ret);
+    if (cl_ret != CL_SUCCESS) {
+        syslog(LOG_ERR, "Unable to map cl out memory object: %d", cl_ret);
+        return -1;
+    }
 
     /* Loop for the pre-determined number of frames */
     for (guint n = 0; n < frames; n++) {
@@ -530,7 +559,7 @@ int main(int argc, char* argv[]) {
             goto exit;
 
         if (do_opencl_filtering(&in_image_y,
-                                out_data,
+                                &out_image,
                                 image_width,
                                 image_height,
                                 image_y_size,
@@ -553,8 +582,10 @@ exit:
     if (vdo_error_is_expected(&error))
         g_clear_error(&error);
 
-    if (munmap(out_data, image_y_size + image_cbcr_size)) {
-        syslog(LOG_ERR, "Unable to unmap image output buffer");
+    cl_ret = clEnqueueUnmapMemObject(command_queue, out_image, out_data, 0, NULL, NULL);
+    if (cl_ret != CL_SUCCESS) {
+        syslog(LOG_ERR, "Unable to unmap cl memory object: %d", cl_ret);
+        return -1;
     }
 
     hash_table_destroy();
