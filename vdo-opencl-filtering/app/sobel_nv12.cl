@@ -15,8 +15,8 @@
  */
 
 __kernel void sobel_3x1(__global const unsigned char *In_y,
-                        __global const unsigned char *Out_y,
-                        __global const unsigned char *Out_cbcr,
+                        __global unsigned char *Out_y,
+                        __global unsigned char *Out_cbcr,
                         int width,
                         int height)
 {
@@ -40,13 +40,13 @@ __kernel void sobel_3x1(__global const unsigned char *In_y,
     uchar8 mag = (uchar8)0;
 
     /* Previous row */
-    uchar16 temp = vload16(0, (uchar*)In_y + pix_id - width - 1);
+    uchar16 temp = vload16(0, &In_y[pix_id - width - 1]);
     short8 middle = convert_short8(temp.s12345678);
 
     gy += middle * (short8)(-2);
 
     /* Current row */
-    temp = vload16(0, (uchar*) In_y + pix_id -1);
+    temp = vload16(0, &In_y[pix_id -1]);
     short8 left = convert_short8(temp.s01234567);
     short8 right = convert_short8(temp.s23456789);
 
@@ -54,22 +54,22 @@ __kernel void sobel_3x1(__global const unsigned char *In_y,
     gx += right * (short8)(2);
 
     /* Next row */
-    temp = vload16(0, (uchar*) In_y + pix_id + width - 1);
+    temp = vload16(0, &In_y[pix_id + width - 1]);
     middle = convert_short8(temp.s12345678);
 
     gy += middle * (short8)(2);
 
     mag = convert_uchar8(clamp(abs(gx) + abs(gy),1, 255));
-    vstore8(mag, 0, Out_y + pix_id);
+    vstore8(mag, 0, &Out_y[pix_id]);
 
     /* Write cbcr data (128 for greyscale) */
     uchar8 cbcr = (uchar8) 128;
-    vstore8(cbcr, 0, Out_cbcr + cbcr_id);
+    vstore8(cbcr, 0, &Out_cbcr[cbcr_id]);
 }
 
 __kernel void sobel_3x3(__global const unsigned char *In_y,
-                        __global const unsigned char *Out_y,
-                        __global const unsigned char *Out_cbcr,
+                        __global unsigned char *Out_y,
+                        __global unsigned char *Out_cbcr,
                         int width,
                         int height)
 {
@@ -86,7 +86,7 @@ __kernel void sobel_3x3(__global const unsigned char *In_y,
     uchar8 mag = (uchar8)0;
 
     /* Previous row */
-    uchar16 temp = vload16(0, (uchar*)In_y + pix_id - width - 1);
+    uchar16 temp = vload16(0, &In_y[pix_id - width - 1]);
     short8 left = convert_short8(temp.s01234567);
     short8 middle = convert_short8(temp.s12345678);
     short8 right = convert_short8(temp.s23456789);
@@ -99,7 +99,7 @@ __kernel void sobel_3x3(__global const unsigned char *In_y,
     gy += right * (short8)(-1);
 
     /* Current row */
-    temp = vload16(0, (uchar*) In_y + pix_id -1);
+    temp = vload16(0, &In_y[pix_id -1]);
     left = convert_short8(temp.s01234567);
     right = convert_short8(temp.s23456789);
 
@@ -107,7 +107,7 @@ __kernel void sobel_3x3(__global const unsigned char *In_y,
     gx += right * (short8)(2);
 
     /* Next row */
-    temp = vload16(0, (uchar*) In_y + pix_id + width - 1);
+    temp = vload16(0, &In_y[pix_id + width - 1]);
     left = convert_short8(temp.s01234567);
     middle = convert_short8(temp.s12345678);
     right = convert_short8(temp.s23456789);
@@ -120,9 +120,9 @@ __kernel void sobel_3x3(__global const unsigned char *In_y,
     gy += right * (short8)(1);
 
     mag = convert_uchar8(clamp(abs(gx) + abs(gy),1, 255));
-    vstore8(mag, 0, Out_y + pix_id);
+    vstore8(mag, 0, &Out_y[pix_id]);
 
     /* Write cbcr data (128 for greyscale) */
     uchar8 cbcr = (uchar8) 128;
-    vstore8(cbcr, 0, Out_cbcr + cbcr_id);
+    vstore8(cbcr, 0, &Out_cbcr[cbcr_id]);
 }
