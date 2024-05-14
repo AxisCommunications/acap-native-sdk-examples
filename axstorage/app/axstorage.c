@@ -396,7 +396,7 @@ gint main() {
     gint ret      = EXIT_SUCCESS;
 
     init_signals();
-    openlog(APP_NAME, LOG_PID, LOG_LOCAL4);
+    openlog(APP_NAME, LOG_PID, LOG_USER);
     syslog(LOG_INFO, "Start AXStorage application");
 
     disks = ax_storage_list(&error);
