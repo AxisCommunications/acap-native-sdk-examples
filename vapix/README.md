@@ -3,7 +3,7 @@
 # ACAP application calling VAPIX APIs
 
 This example shows how an ACAP application can call
-[VAPIX](https://www.axis.com/vapix-librar://www.axis.com/vapix-library) APIs,
+[VAPIX](https://www.axis.com/vapix-library) APIs,
 Axis open APIs.
 
 The collection of VAPIX APIs enables a wide selection of functionality to an
