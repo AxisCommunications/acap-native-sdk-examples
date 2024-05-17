@@ -35,6 +35,6 @@ jobs:
           cd $EXNAME
           docker pull --platform=${{ matrix.platformarch}} alpine:$alpinetag
           docker save -o alpine.tar alpine:$alpinetag
-          docker build --no-cache --tag $imagetag --output build .
+          docker build --no-cache --tag $imagetag --build-arg ARCH=${{ matrix.arch }} --output build .
           cd ..
           docker image rm -f $imagetag
