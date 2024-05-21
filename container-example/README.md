@@ -9,7 +9,7 @@
 The purpose of this example is to demonstrate a way of using containers in a native ACAP application.
 
 The advantage of using a native ACAP application for this, as opposed to a Computer Vision ACAP application,
-is that the application can be administered via the VAPIX API and the web GUI in Axis OS. It also has
+is that the application can be administered via the VAPIX API and the web GUI in AXIS OS. It also has
 the advantage that the container images can be included in the .eap application file so that the entire
 application is contained in this single, installable file, without any dependency on external image repositories.
 
@@ -39,84 +39,118 @@ to port 8080 on the device.
 
 ## Prerequisites
 
-- An Axis device with edge container functionality.
-- Axis OS 11.10 or later.
-- The [Docker Compose ACAP][docker-compose-acap] version 3.0 or later, installed and running on the device.
+- An Axis device with [container support](https://www.axis.com/support/tools/product-selector/shared/%5B%7B%22index%22%3A%5B4%2C2%5D%2C%22value%22%3A%22Yes%22%7D%5D), see more info in [Axis devices and compatibility](https://axiscommunications.github.io/acap-documentation/docs/axis-devices-and-compatibility/#acap-computer-vision-sdk-hardware-compatibility).
+- AXIS OS 11.10 or later.
+- The [Docker Compose ACAP][docker-compose-acap] version 3.0 or later,
+  installed and running on the device.
+  - In the settings of the application:
+    - `IPCSocket` must be set to `yes`.
+    - `TCPSocket` can be set to `no` since this example does not connect to the
+      Docker Daemon from outside of the device.
+      - However, if you do want to run with TCP Socket, TLS should be used
+        (`UseTLS` set to `yes`).  In that case, follow the instructions in the
+        [Docker Compose ACAP][docker-compose-acap] for how to generate and
+        upload TLS certificates to the device.
+    - For the other settings refer to the documentation in that repo.
 
-## Build and extract the application for armv7hf
+## Getting started
 
-Navigate to the root directory of this repository and then start with setting environment variables:
+These instructions will guide you on how to execute the code. Below is the
+structure and scripts used in the example:
 
 ```sh
-export ARCH="armv7hf"
-export PLATFORM="linux/arm/v7"
+container-example
+├── containerExample
+├── docker-compose.yml
+├── Dockerfile
+├── LICENSE
+├── Makefile
+├── manifest.json
+├── postinstall.sh
+├── preuninstall.sh
+└── README.md
 ```
 
-Next, pull the [Alpine linux container image][alpine] for armv7hf and save it to a .tar file:
+- **containerExample** - Application source code in shell script.
+- **docker-compose.yml** - Docker compose file to start a container on the device.
+- **Dockerfile** - Docker file with the specified Axis toolchain and API container to build the example specified.
+- **LICENSE** - Text file which lists all open source licensed source code distributed with the application.
+- **Makefile** - Makefile containing the build and link instructions for building the ACAP application.
+- **manifest.json** - Defines the application and its configuration. This includes additional parameters.
+- **postinstall.sh** - Post-install script, running at end of an application installation.
+- **preuninstall.sh** - Pre-uninstall script, running before an application uninstallion.
+- **README.md** - Step by step instructions on how to run the example.
+
+### How to run the code
+
+Below is the step by step instructions on how to execute the program. So
+basically starting with the generation of the .eap file to running it on a
+device.
+
+#### Build the application
+
+Standing in your working directory run the following commands:
+
+> [!NOTE]
+>
+> Depending on the network you are connected to, you may need to add proxy settings.
+> The file that needs these settings is: `~/.docker/config.json`. For reference please see
+> https://docs.docker.com/network/proxy and a
+> [script for Axis devices](https://axiscommunications.github.io/acap-documentation/docs/develop/build-install-run.html#configure-network-proxy-settings) in the ACAP documentation.
+
+##### Build the application for armv7hf
+
+Pull the [Alpine linux container image][alpine] for armv7hf and save it to a
+.tar file, then build the application:
 
 ```sh
-docker pull --platform=$PLATFORM alpine:3.19.1
+docker pull --platform="linux/arm/v7" alpine:3.19.1
 docker save -o alpine.tar alpine:3.19.1
+docker build --build-arg ARCH=armv7hf --tag container-example:armv7hf .
+docker cp $(docker create container-example:armv7hf):/opt/app ./build-armv7hf
 ```
 
-Finally build the application and extract the .eap file:
+##### Build the application for aarch64
+
+Pull the [Alpine linux container image][alpine] for aarch64 and save it to a
+.tar file, then build the application:
 
 ```sh
-docker buildx build --build-arg ARCH=$ARCH --output build-$ARCH .
-```
-
-The .eap file can now be found in the `build-armv7hf` folder.
-
-## Build and extract the application for aarch64
-
-Navigate to the root directory of this repository and then start with setting environment variables:
-
-```sh
-export ARCH="aarch64"
-export PLATFORM="linux/arm64/v8"
-```
-
-Next, pull the [Alpine linux container image][alpine] for aarch64 and save it to a .tar file:
-
-```sh
-docker pull --platform=$PLATFORM alpine:3.19.1
+docker pull --platform="linux/arm64/v8" alpine:3.19.1
 docker save -o alpine.tar alpine:3.19.1
+docker build --build-arg ARCH=aarch64 --tag container-example:aarch64 .
+docker cp $(docker create container-example:aarch64):/opt/app ./build-aarch64
 ```
 
-Finally build the application and extract the .eap file:
+##### Extract the application
+
+The `build-armv7hf` and `build-aarch64` directories contain the build
+artifacts, where the ACAP application is found with suffix `.eap`, depending on
+which SDK architecture that was chosen, one of these files should be found:
+
+- `Container_Example_1_0_0_aarch64.eap`
+- `Container_Example_1_0_0_armv7hf.eap`
+
+#### Install your application
+
+Browse to the application page of the Axis device:
 
 ```sh
-docker buildx build --build-arg ARCH=$ARCH --output build-$ARCH .
+http://<AXIS_DEVICE_IP>/#settings/apps
 ```
 
-The .eap file can now be found in the `build-aarch64` folder.
+- Click on the tab `App` in the device GUI
+- Click `(+)` sign to upload the application file
+- Browse to the newly built ACAP application, depending on architecture:
+  - `Container_Example_1_0_0_aarch64.eap`
+  - `Container_Example_1_0_0_armv7hf.eap`
+- Click `Install`
+- Run the application by enabling the `Start` switch
 
-## Install the application
+#### The expected output
 
-On your Axis device, navigate to `http://<axis_device_ip>/camera/index.html#/apps`, where <axis-device-ip>
-is the IP of your device. Make sure that the [Docker Compose ACAP][docker-compose-acap] application
-is installed and running. In the settings of that application `IPCSocket` must be set to `yes`.
-`TCPSocket` can be set to `no` since this example does not connect to the Docker Daemon from outside
-of the device. However, if you do want to run with TCP Socket, TLS should be use (`UseTLS` set to `yes`).
-In that case, follow the instructions in the [Docker Compose ACAP][docker-compose-acap] for how to
-generate and upload TLS certificates to the device. For the other settings refer to the documentation
-in that repo.
-
-Click on the `+Add app` button on the page and in the popup window that appears, select the .eap-file
-that was built earlier.
-
-Alternatively, you can use `upload.cgi` in the [VAPIX Application API][VAPIX-application] to directly
-upload the .eap-file from command line.
-
-## Run the application
-
-Start the application and then use a web browser to browse to
-
-```html
-http://<axis_device_ip>:8080
-```
-
-The page should display the text "Hello from an ACAP!"
+Browse to `http://<AXIS_DEVICE_IP>:8080`, the page should display the text
+**Hello from an ACAP!**.
 
 ## License
 
@@ -127,5 +161,4 @@ The page should display the text "Hello from an ACAP!"
 [alpine]: https://hub.docker.com/_/alpine
 [docker-compose-acap]: https://github.com/AxisCommunications/docker-compose-acap
 [nc-man]: https://www.commandlinux.com/man-page/man1/nc.1.html
-[VAPIX-application]: https://www.axis.com/vapix-library/subjects/T10102231/section/t10062344/display
 <!-- markdownlint-enable MD034 -->

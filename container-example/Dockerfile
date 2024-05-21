@@ -5,7 +5,7 @@ ARG VERSION=1.14
 ARG UBUNTU_VERSION=22.04
 ARG REPO=axisecp
 
-FROM ${REPO}/acap-native-sdk:${VERSION}-${ARCH}-ubuntu${UBUNTU_VERSION} AS build
+FROM ${REPO}/acap-native-sdk:${VERSION}-${ARCH}-ubuntu${UBUNTU_VERSION}
 ARG ARCH
 COPY ./* /opt/app/
 
@@ -16,7 +16,3 @@ RUN <<EOF
         -a alpine.tar \
         -a docker-compose.yml
 EOF
-
-FROM scratch AS binaries
-
-COPY --from=build /opt/app/*.eap /
