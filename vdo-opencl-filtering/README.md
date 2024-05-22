@@ -116,7 +116,7 @@ the newly built **vdo_cl_filter_demo_1_0_0_\<ARCH\>.eap** > Click **Install** > 
 
 #### Program output
 
-The application will create an output file /usr/local/packages/vdo_cl_filter_demo/cl_vdo_demo.yuv by default.
+The application will create an output file /usr/local/packages/vdo_cl_filter_demo/localdata/cl_vdo_demo.yuv by default.
 
 ## License
 
