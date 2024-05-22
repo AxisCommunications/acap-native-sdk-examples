@@ -28,7 +28,7 @@
  * Sobel filtering is performed according to the sobel_nv12 OpenCL program.
  * You may choose to filter a half or a full image, with two different filter
  * kernels. The result is written to an output file with default name
- * /usr/local/packages/vdo_cl_filter_demo/cl_vdo_demo.yuv.
+ * /usr/local/packages/vdo_cl_filter_demo/localdata/cl_vdo_demo.yuv.
  *
  * Suppose you have completed the steps of installation. You may then go to
  * /usr/local/packages/vdo_cl_filter_demo on your device and run the example as:
@@ -455,7 +455,7 @@ int main(int argc, char* argv[]) {
     snprintf(file_path,
              sizeof(file_path),
              "/usr/local/packages/"
-             "vdo_cl_filter_demo/cl_vdo_demo.%s",
+             "vdo_cl_filter_demo/localdata/cl_vdo_demo.%s",
              output_file_format);
 
     output_file = fopen(file_path, "wb");
