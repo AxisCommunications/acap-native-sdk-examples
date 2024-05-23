@@ -201,19 +201,9 @@ http://<AXIS_DEVICE_IP>/#settings/apps
 
 #### The expected output
 
-The application log can be found by either
+The application log can be found at
 
 - Browse to `http://<AXIS_DEVICE_IP>/axis-cgi/admin/systemlog.cgi?appname=consume_analytics_metadata`.
-- Browse to the application page and click the `App log`.
-- Extract the logs using following commands in the terminal.
-  > [!IMPORTANT]
-  > Please make sure SSH is enabled on the device to run the following commands.
-
-  ```sh
-  ssh root@<AXIS_DEVICE_IP>
-  cd /var/log/
-  head -50 info.log
-  ```
 
 > [!IMPORTANT]
 > The logged output can have data which is empty or has a detection.

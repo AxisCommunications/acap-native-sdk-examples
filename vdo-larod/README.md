@@ -238,18 +238,6 @@ Application log can be found directly at:
 http://<axis_device_ip>/axis-cgi/admin/systemlog.cgi?appname=vdo_larod
 ```
 
-or by clicking on the "**App log**" link in the device GUI or by extracting the logs using following commands
-in the terminal.
-> [!IMPORTANT]
-*> Please make sure SSH is enabled on the device to run the
-following commands.*
-
-```sh
-ssh root@<axis_device_ip>
-cd /var/log/
-head -50 info.log
-```
-
 Depending on the selected chip, different output is received.
 
 In previous larod versions, the chip was referred to as a number instead of a string. See the table below to understand the mapping:
