@@ -139,18 +139,6 @@ Application log can be found directly at:
 http://<axis_device_ip>/axis-cgi/admin/systemlog.cgi?appname=vdoencodeclient
 ```
 
-or by clicking on the "**App log**" link in the device GUI or by extracting the logs using following commands
-in the terminal.
-> [!IMPORTANT]
-*> Please make sure SSH is enabled on the device to run the
-following commands.*
-
-```sh
-ssh root@<axis_device_ip>
-cd /var/log/
-head -50 info.log
-```
-
 #### Output - format h264
 
 ```sh

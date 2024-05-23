@@ -129,7 +129,8 @@ The application has subscribed to the following events:
 - *PTZ* - Sends an event when any of PTZ (Pan/Tilt/Zoom) channels 1-8 are moving (Requires video and PTZ)
 - *Audio* - Sends an event when audio level pass below or above trigger level (Requires audio)
 
-Start of by opening the device web page, follow the instruction for each event on how to trigger it.
+Start off by opening the device web page, follow the instruction for each event
+on how to trigger it.
 
 ```sh
 http://<axis_device_ip>/#settings/apps
@@ -137,19 +138,14 @@ http://<axis_device_ip>/#settings/apps
 
 #### The expected output
 
-In this example, when an event take place an INFO status message is printed to the syslog. Here are two ways you can use to follow them.
+In this example, when an event take place an INFO status message is printed to
+the syslog.
 
-Open a second web browser window and open the application log, update the web page every time you expect a new event to have occured.
+Open a second web browser window and open the application log, update the web
+page every time you expect a new event to have occurred.
 
 ```sh
 http://<axis_device_ip>/axis-cgi/admin/systemlog.cgi?appname=subscribe_to_events
-```
-
->[!IMPORTANT]
-*> Please make sure SSH is enabled on the device to run the following commands.*
-
-```sh
-tail -f /var/log/info.log | grep subscribe_to_events
 ```
 
 #### Manual trigger event

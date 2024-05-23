@@ -123,31 +123,12 @@ Application is now available as an application on the device and has been starte
 
 #### The expected output
 
-Application logs can be found directly at:
+Application logs of the examples can be found directly at:
 
 ```sh
 http://<axis_device_ip>/axis-cgi/admin/systemlog.cgi?appname=send_event
-```
-
-or
-
-```sh
 http://<axis_device_ip>/axis-cgi/admin/systemlog.cgi?appname=subscribe_to_event
 ```
-
-or by clicking on the "**App log**" link in the device GUI or by extracting the logs using following commands
-in the terminal.
-> [!IMPORTANT]
-*> Please make sure SSH is enabled on the device to run the
-following commands.*
-
-```sh
-ssh root@<axis_device_ip>
-cd /var/log/
-head -200 info.log
-```
-
-##### Output
 
 ```sh
 16:23:51.242 [ INFO ] subscribe_to_event[0]: starting subscribe_to_event

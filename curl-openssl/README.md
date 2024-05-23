@@ -128,19 +128,10 @@ cat /usr/local/packages/curl_openssl/localdata/www.example.com.txt
 
 #### Application log
 
-The application log can be found by either
-
-- Browse to `http://<AXIS_DEVICE_IP>/axis-cgi/admin/systemlog.cgi?appname=curl_openssl`.
-- Browse to the application page and click the `App log`.
-
-> [!NOTE]
-> Make sure
-> [SSH is enabled](https://axiscommunications.github.io/acap-documentation/docs/get-started/set-up-developer-environment/set-up-device.html#access-the-device-through-ssh)
-> on the device to run the following commands.
+Application log can be found directly at:
 
 ```sh
-ssh root@<AXIS_DEVICE_IP>
-head -50 /var/log/info.log
+http://<AXIS_DEVICE_IP>/axis-cgi/admin/systemlog.cgi?appname=curl_openssl
 ```
 
 > [!NOTE]

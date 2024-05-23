@@ -116,15 +116,6 @@ Application log can be found directly at:
 http://<axis_device_ip>/axis-cgi/admin/systemlog.cgi?appname=hello_world
 ```
 
-or by clicking on the "**App log**" link in the device GUI or by extracting the logs using following commands in the terminal.
-
->[!IMPORTANT]
-*> Please make sure SSH is enabled on the device to run the following commands.*
-
-```sh
-tail -f /var/log/info.log | grep hello_world
-```
-
 ```sh
 ----- Contents of SYSTEM_LOG for 'hello_world' -----
 
