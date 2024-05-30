@@ -53,7 +53,7 @@ Standing in your working directory run the following commands:
 ```sh
 # Set your device IP address and architecture
 export ARCH=<armv7hf or aarch64>
-export DEVICE_IP=<device IP address>
+export AXIS_DEVICE_IP=<Axis device IP address>
 export PASS=<device password>
 
 docker build . --build-arg ARCH --tag web-server:$ARCH
@@ -64,23 +64,23 @@ docker build . --build-arg ARCH --tag web-server:$ARCH
 Installing your application on an Axis video device is as simple as:
 
 ```sh
-docker run --rm web-server:$ARCH eap-install.sh $DEVICE_IP $PASS install
+docker run --rm web-server:$ARCH eap-install.sh $AXIS_DEVICE_IP $PASS install
 ```
 
 # Start your application using a web browser
 
 Goto your device web page > Click on the tab **Apps** in the device GUI and locate the application. Run the application by enabling the **Start** switch.
 
-The Web Server can be accessed from a Web Browser through the Apache Server in the device using an extension to the device web URL (i.e http://<device-ip>/local/list/my_web_server)
+The Web Server can be accessed from a Web Browser through the Apache Server in the device using an extension to the device web URL (i.e http://<AXIS_DEVICE_IP>/local/list/my_web_server)
 
 # Start your application from command line
 
 As an alternative the application can be started, stopped and removed from command line using following commands:
 
 ```sh
-docker run --rm web-server:$ARCH eap-install.sh $DEVICE_IP $PASS start
-docker run --rm web-server:$ARCH eap-install.sh $DEVICE_IP $PASS stop
-docker run --rm web-server:$ARCH eap-install.sh $DEVICE_IP $PASS remove
+docker run --rm web-server:$ARCH eap-install.sh $AXIS_DEVICE_IP $PASS start
+docker run --rm web-server:$ARCH eap-install.sh $AXIS_DEVICE_IP $PASS stop
+docker run --rm web-server:$ARCH eap-install.sh $AXIS_DEVICE_IP $PASS remove
 ```
 
 ## License

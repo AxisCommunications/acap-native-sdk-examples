@@ -91,7 +91,7 @@ build
 
 Installing your application on an Axis device is as simple as:
 
-1. In your browser, navigate to `http://<DEVICE_IP>/#settings/apps` where `<DEVICE_IP>` is the IP address of your device
+1. In your browser, navigate to `http://<AXIS_DEVICE_IP>/index.html#apps` where `<AXIS_DEVICE_IP>` is the IP address of your device
 2. Click on the tab **App** in the device GUI
 3. Click the **(+)** button and browse to the newly built **axserialport_1_0_0_armv7hf.eap**
 4. Click **Install**
@@ -99,7 +99,7 @@ Installing your application on an Axis device is as simple as:
 
 #### The expected output
 
-Application log can be found directly at `http://<DEVICE_IP>/axis-cgi/admin/systemlog.cgi?appname=axserialport` or by clicking on the "**App log**" link in the device GUI.
+Application log can be found directly at `http://<AXIS_DEVICE_IP>/axis-cgi/admin/systemlog.cgi?appname=axserialport` or by clicking on the "**App log**" link in the device GUI.
 
 ```sh
 ----- Contents of SYSTEM_LOG for 'axserialport' -----

@@ -110,10 +110,10 @@ subscribe_to_events
 
 Installing your application on an Axis device is as simple as:
 
-Browse to the following page (replace <axis_device_ip> with the IP number of your Axis device)
+Browse to the following page (replace <AXIS_DEVICE_IP> with the IP number of your Axis device)
 
 ```sh
-http://<axis_device_ip>/#settings/apps
+http://<AXIS_DEVICE_IP>/index.html#apps
 ```
 
 *Goto your device web page above > Click on the tab **App** in the device GUI > Click Add **(+)** sign and browse to
@@ -133,7 +133,7 @@ Start off by opening the device web page, follow the instruction for each event
 on how to trigger it.
 
 ```sh
-http://<axis_device_ip>/#settings/apps
+http://<AXIS_DEVICE_IP>/index.html#apps
 ```
 
 #### The expected output
@@ -145,7 +145,7 @@ Open a second web browser window and open the application log, update the web
 page every time you expect a new event to have occurred.
 
 ```sh
-http://<axis_device_ip>/axis-cgi/admin/systemlog.cgi?appname=subscribe_to_events
+http://<AXIS_DEVICE_IP>/axis-cgi/admin/systemlog.cgi?appname=subscribe_to_events
 ```
 
 #### Manual trigger event

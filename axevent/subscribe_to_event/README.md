@@ -102,10 +102,10 @@ subscribe_to_event
 
 Installing your application on an Axis video device is as simple as:
 
-Browse to the following page (replace <axis_device_ip> with the IP number of your Axis video device)
+Browse to the following page (replace <AXIS_DEVICE_IP> with the IP number of your Axis video device)
 
 ```sh
-http://<axis_device_ip>/#settings/apps
+http://<AXIS_DEVICE_IP>/index.html#apps
 ```
 
 *Goto your device web page above > Click on the tab **App** in the device GUI > Click Add **(+)** sign and browse to
@@ -126,8 +126,8 @@ Application is now available as an application on the device and has been starte
 Application logs of the examples can be found directly at:
 
 ```sh
-http://<axis_device_ip>/axis-cgi/admin/systemlog.cgi?appname=send_event
-http://<axis_device_ip>/axis-cgi/admin/systemlog.cgi?appname=subscribe_to_event
+http://<AXIS_DEVICE_IP>/axis-cgi/admin/systemlog.cgi?appname=send_event
+http://<AXIS_DEVICE_IP>/axis-cgi/admin/systemlog.cgi?appname=subscribe_to_event
 ```
 
 ```sh

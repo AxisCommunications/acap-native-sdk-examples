@@ -112,10 +112,10 @@ send_event
 
 Installing your application on an Axis video device is as simple as:
 
-Browse to the following page (replace <axis_device_ip> with the IP number of your Axis video device)
+Browse to the following page (replace <AXIS_DEVICE_IP> with the IP number of your Axis video device)
 
 ```sh
-http://<axis_device_ip>/#settings/apps
+http://<AXIS_DEVICE_IP>/index.html#apps
 ```
 
 *Goto your device web page above > Click on the tab **App** in the device GUI > Click Add **(+)** sign and browse to
@@ -128,7 +128,7 @@ Application is now available as an application on the device and has been starte
 Application log can be found directly at:
 
 ```sh
-http://<axis_device_ip>/axis-cgi/admin/systemlog.cgi?appname=send_event
+http://<AXIS_DEVICE_IP>/axis-cgi/admin/systemlog.cgi?appname=send_event
 ```
 
 ```sh
@@ -147,7 +147,7 @@ A stateful event will be sent every 10th second, changing its value.
 
 See general information about wrapper "get_eventlist.py" in [README](../README.md).
 
-Replace <onvifuser>, <onvifpassword> and <axis_device_ip> with the ONVIF user, ONVIF password and IP number of your Axis video device.
+Replace <onvifuser>, <onvifpassword> and <AXIS_DEVICE_IP> with the ONVIF user, ONVIF password and IP number of your Axis video device.
 
 #### Find declared events using wrapper
 
@@ -160,7 +160,7 @@ The wrapper helps you save the declared eventlist to an XML-file.
 In this case ONVIF API is used and an ONVIF username and password needs to be added to the device. E.g
 
 ```sh
-../get_eventlist.py getlist -u <onvifuser> -p <onvifpassword> -i <axis_device_ip>
+../get_eventlist.py getlist -u <onvifuser> -p <onvifpassword> -i <AXIS_DEVICE_IP>
 ```
 
 This output could be compared to the ONVIF event specification chapter "8.8.1 Processor Usage" in
@@ -194,7 +194,7 @@ The wrapper helps you save the sent eventlist to an XML-file.
 In this case ONVIF APIs are used, which means that an ONVIF username and password needs to be added to the device. E.g
 
 ```sh
-../get_eventlist.py getsent -u <onvifuser> -p <onvifpassword> -i <axis_device_ip>
+../get_eventlist.py getsent -u <onvifuser> -p <onvifpassword> -i <AXIS_DEVICE_IP>
 ```
 
 XML file "sentonviflist.xml.new" contains:
@@ -224,10 +224,10 @@ XML file "sentonviflist.xml.new" contains:
 See general information about GStreamer tools in [README](../README.md).
 
 If using GStreamer tools for monitoring events
-(replace <user>, <password> and <axis_device_ip> with the username, password and IP number of your Axis video device).
+(replace <user>, <password> and <AXIS_DEVICE_IP> with the username, password and IP number of your Axis video device).
 
 ```sh
-gst-launch-1.0 rtspsrc location="rtsp://<user>:<password>@<axis_device_ip>/axis-media/media.amp?video=0&audio=0&event=on" ! fdsink
+gst-launch-1.0 rtspsrc location="rtsp://<user>:<password>@<AXIS_DEVICE_IP>/axis-media/media.amp?video=0&audio=0&event=on" ! fdsink
 ```
 
 Output in XML, which has been formatted manually to show topic "tns1:Monitoring/ProcessorUsage":
@@ -262,7 +262,7 @@ Output in XML, which has been formatted manually to show topic "tns1:Monitoring/
 As opposed to ONVIF events, Axis events are visible in the device web page for events, reachable at:
 
 ```sh
-https://<device_ip>/camera/index.html#/system/events/rules.
+https://<AXIS_DEVICE_IP>/index.html#/system/events/rules.
 ```
 
 In order to produce an Axis event, you have to use the `tnsaxis` namespace, and rename the `topic0` value to `CameraApplicationPlatform`.

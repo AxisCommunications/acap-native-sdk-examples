@@ -123,7 +123,7 @@ build
 
 Installing your application on an Axis device is as simple as:
 
-1. In your browser, navigate to `http://<DEVICE_IP>/#settings/apps` where `<DEVICE_IP>` is the IP address of your device
+1. In your browser, navigate to `http://<AXIS_DEVICE_IP>/index.html#apps` where `<AXIS_DEVICE_IP>` is the IP address of your device
 2. Click on the tab **App** in the device GUI
 3. Click the **(+)** button and browse to the newly built **fastcgi_example_1_0_0_armv7hf.eap**
 4. Click **Install**
@@ -131,7 +131,7 @@ Installing your application on an Axis device is as simple as:
 
 #### The expected output
 
-The output of your application can be seen visiting the url `http://<DEVICE_IP>/local/fastcgi_example/example.cgi?name=Axis`. You should see an output like this:
+The output of your application can be seen visiting the url `http://<AXIS_DEVICE_IP>/local/fastcgi_example/example.cgi?name=Axis`. You should see an output like this:
 
 ```text
 Hello Axis from FastCGI
