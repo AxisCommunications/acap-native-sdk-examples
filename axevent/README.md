@@ -51,13 +51,13 @@ Below is the list of examples available in the repository.
 ### Find events using wrapper
 
 > [!IMPORTANT]
-> *The wrapper needs an ONVIF user with password in case wrapper is being used. Browse to the following page (replace <axis_device_ip> with the IP number of your Axis video device)*
+> The wrapper needs an ONVIF user with password.
 >
-> ```sh
-> http://<axis_device_ip>/#settings/system/security/onvif
-> ```
-
-*Goto your device web page above > Click on Add **(+)** sign below the **ONVIF users** in the device GUI >  Add >**Username**, **New password** and **Repeat password** > Click **Save** button*
+> To create an ONVIF account:
+>
+> - Go to `http://<AXIS_DEVICE_IP>/index.html#system/onvif`
+> - Click the `+` icon with text **Add account**
+> - Follow the instructions in the dialog.
 
 #### Find declared events using wrapper
 
@@ -82,10 +82,10 @@ The wrapper also helps you save the sent eventlist to an XML-file called "senton
 <https://gstreamer.freedesktop.org/documentation/installing/on-linux.html?gi-language=c>*
 
 It is also possible to use GStreamer tools for monitoring events, as a complement to the wrapper
-(replace \<user\>, \<password\> and \<axis_device_ip\> with the username, password and IP number of your Axis video device).
+(replace \<user\>, \<password\> and \<AXIS_DEVICE_IP\> with the username, password and IP number of your Axis video device).
 
 ```sh
-gst-launch-1.0 rtspsrc location="rtsp://<user>:<password>@<axis_device_ip>/axis-media/media.amp?video=0&audio=0&event=on" ! fdsink
+gst-launch-1.0 rtspsrc location="rtsp://<user>:<password>@<AXIS_DEVICE_IP>/axis-media/media.amp?video=0&audio=0&event=on" ! fdsink
 ```
 
 ## License

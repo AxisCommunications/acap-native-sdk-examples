@@ -136,7 +136,7 @@ which SDK architecture that was chosen, one of these files should be found:
 Browse to the application page of the Axis device:
 
 ```sh
-http://<AXIS_DEVICE_IP>/#settings/apps
+http://<AXIS_DEVICE_IP>/index.html#apps
 ```
 
 - Click on the tab `App` in the device GUI

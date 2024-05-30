@@ -212,10 +212,10 @@ vdo-larod
 
 Installing your application on an Axis video device is as simple as:
 
-Browse to the following page (replace <axis_device_ip> with the IP number of your Axis video device)
+Browse to the following page (replace <AXIS_DEVICE_IP> with the IP number of your Axis video device)
 
 ```sh
-http://<axis_device_ip>/#settings/apps
+http://<AXIS_DEVICE_IP>/index.html#apps
 ```
 
 *Go to your device web page above >
@@ -235,7 +235,7 @@ The application is now installed on the device and named "vdo_larod_<CHIP>".
 Application log can be found directly at:
 
 ```sh
-http://<axis_device_ip>/axis-cgi/admin/systemlog.cgi?appname=vdo_larod
+http://<AXIS_DEVICE_IP>/axis-cgi/admin/systemlog.cgi?appname=vdo_larod
 ```
 
 Depending on the selected chip, different output is received.

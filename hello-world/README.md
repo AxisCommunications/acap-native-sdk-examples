@@ -99,10 +99,10 @@ hello-world
 
 Installing your application on an Axis video device is as simple as:
 
-Browse to the following page (replace <axis_device_ip> with the IP number of your Axis video device)
+Browse to the following page (replace <AXIS_DEVICE_IP> with the IP number of your Axis video device)
 
 ```sh
-http://<axis_device_ip>/#settings/apps
+http://<AXIS_DEVICE_IP>/index.html#apps
 ```
 
 *Goto your device web page above > Click on the tab **App** in the device GUI > Add **(+)** sign and browse to
@@ -113,7 +113,7 @@ the newly built **hello_world_1_0_0_armv7hf.eap** > Click **Install** > Run the 
 Application log can be found directly at:
 
 ```sh
-http://<axis_device_ip>/axis-cgi/admin/systemlog.cgi?appname=hello_world
+http://<AXIS_DEVICE_IP>/axis-cgi/admin/systemlog.cgi?appname=hello_world
 ```
 
 ```sh

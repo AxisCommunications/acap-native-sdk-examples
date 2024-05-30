@@ -100,10 +100,10 @@ The working dir now contains a build folder with the following files:
 
 Installing your application on an Axis device is as simple as:
 
-Browse to the following page (replace <axis_device_ip> with the IP number of your Axis device)
+Browse to the following page (replace <AXIS_DEVICE_IP> with the IP number of your Axis device)
 
 ```sh
-http://<axis_device_ip>/#settings/apps
+http://<AXIS_DEVICE_IP>/index.html#apps
 ```
 
 *Go to your device web page above > Click on the tab **App** in the device GUI > Click Add **(+)** sign and browse to
@@ -120,7 +120,7 @@ The application will use a user-defined custom library and print "Hello World!" 
 The application log can be found at:
 
 ```sh
-http://<axis_device_ip>/axis-cgi/admin/systemlog.cgi?appname=mainfunc
+http://<AXIS_DEVICE_IP>/axis-cgi/admin/systemlog.cgi?appname=mainfunc
 ```
 
 ```sh
