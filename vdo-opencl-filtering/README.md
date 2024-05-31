@@ -116,7 +116,20 @@ the newly built **vdo_cl_filter_demo_1_0_0_\<ARCH\>.eap** > Click **Install** > 
 
 #### Program output
 
-The application will create an output file /usr/local/packages/vdo_cl_filter_demo/localdata/cl_vdo_demo.yuv by default.
+> [!IMPORTANT]
+> To run the commands below, see section [Access the
+> device](../DEV.md#access-the-device) for setup.
+
+The application will create an output file on the device under
+`/usr/local/packages/vdo_cl_filter_demo/localdata/cl_vdo_demo.yuv` by default.
+To see the content of the file
+
+```sh
+ssh my-ssh-user@<AXIS_DEVICE_IP>
+cat /usr/local/packages/vdo_cl_filter_demo/localdata/cl_vdo_demo.yuv
+
+(Content of file)
+```
 
 ## License
 

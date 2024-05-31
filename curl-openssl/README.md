@@ -112,15 +112,14 @@ HTTPS content of https://www.example.com and stores the content in
 `/usr/local/packages/curl_openssl/localdata/www.example.com.txt` on the
 device.
 
-> [!NOTE]
-> Make sure
-> [SSH is enabled](https://axiscommunications.github.io/acap-documentation/docs/get-started/set-up-developer-environment/set-up-device.html#access-the-device-through-ssh)
-> on the device to run the following commands.
+> [!IMPORTANT]
+> To run the commands below, see section [Access the
+> device](../DEV.md#access-the-device) for setup.
 
 Compare the web page source code to the content of file `www.example.com.txt`.
 
 ```sh
-ssh root@<AXIS_DEVICE_IP>
+ssh my-ssh-user@<AXIS_DEVICE_IP>
 cat /usr/local/packages/curl_openssl/localdata/www.example.com.txt
 
 (HTML content of www.example.com)
