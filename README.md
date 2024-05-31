@@ -77,6 +77,12 @@ The ACAP Native SDK image can be used as a basis for custom built images to run 
 
 - [ACAP Native SDK](https://hub.docker.com/r/axisecp/acap-native-sdk) This image is based on Ubuntu and contains the environment needed for building an AXIS Camera Application Platform (ACAP) Native application. This includes all tools for building and packaging an ACAP Native application as well as API components (header and library files) needed for accessing different parts of the camera firmware.
 
+## ACAP application development
+
+Common topics of interest for developers can be found under [ACAP application
+development](./DEV.md), e.g. when testing out the examples in this repository
+or migrating from an old version of ACAP SDK.
+
 # Issues
 
 If you encounter issues with the examples, make sure your product is running the latest firmware version or one that is compatible with the ACAP SDK used.

@@ -211,15 +211,14 @@ HTTPS content of https://www.example.com and stores the content in
 `/usr/local/packages/openssl_curl_example/localdata/www.example.com.txt` on the
 device.
 
-> **Note**
-> Make sure
-> [SSH is enabled](https://axiscommunications.github.io/acap-documentation/docs/get-started/set-up-developer-environment/set-up-device.html#access-the-device-through-ssh)
-> on the device to run the following commands.
+> [!IMPORTANT]
+> To run the commands below, see section [Access the
+> device](../../DEV.md#access-the-device) for setup.
 
 Compare the web page source code to the content of file `www.example.com.txt`.
 
 ```sh
-ssh root@<AXIS_DEVICE_IP>
+ssh my-ssh-user@<AXIS_DEVICE_IP>
 cat /usr/local/packages/openssl_curl_example/localdata/www.example.com.txt
 
 (HTML content of www.example.com)
@@ -332,17 +331,16 @@ objdump -p openssl_curl_example | grep -E "NEEDED|RUNPATH|RPATH"
   RUNPATH              $ORIGIN/lib
 ```
 
-> **Note**
-> Make sure
-> [SSH is enabled](https://axiscommunications.github.io/acap-documentation/docs/get-started/set-up-developer-environment/set-up-device.html#access-the-device-through-ssh)
-> on the device to run the following commands.
+> [!IMPORTANT]
+> To run the commands below, see section [Access the
+> device](../../DEV.md#access-the-device) for setup.
 
 For even better information on where the application binary will search for
 dependencies, SSH in to the device, and check the installed application binary
 with `ldd`:
 
 ```sh
-ssh root@<AXIS_DEVICE_IP>
+ssh my-ssh-user@<AXIS_DEVICE_IP>
 ldd /usr/local/packages/openssl_curl_example/openssl_curl_example
 
 ldd:  libssl.so.1.1 => /usr/local/packages/openssl_curl_example/lib/libssl.so.1.1 (0x76eab000)
