@@ -121,11 +121,10 @@ static void declaration_complete(guint declaration, gdouble* value) {
  * param event_handler Event handler.
  * return declaration id as integer.
  */
-static guint setup_declaration(AXEventHandler* event_handler) {
+static guint setup_declaration(AXEventHandler* event_handler, gdouble* start_value) {
     AXEventKeyValueSet* key_value_set = NULL;
     guint declaration                 = 0;
     guint token                       = 0;
-    gdouble start_value               = 0;
     GError* error                     = NULL;
 
     // Create keys, namespaces and nice names for the event
@@ -173,7 +172,7 @@ static guint setup_declaration(AXEventHandler* event_handler) {
                                   FALSE,  // Indicate a property state event
                                   &declaration,
                                   (AXDeclarationCompleteCallback)declaration_complete,
-                                  &start_value,
+                                  start_value,
                                   &error)) {
         syslog(LOG_WARNING, "Could not declare: %s", error->message);
         g_error_free(error);
@@ -189,6 +188,7 @@ static guint setup_declaration(AXEventHandler* event_handler) {
  */
 gint main(void) {
     GMainLoop* main_loop = NULL;
+    gdouble start_value  = 0.0;
 
     // Set up the user logging to syslog
     openlog(NULL, LOG_PID, LOG_USER);
@@ -197,7 +197,7 @@ gint main(void) {
     // Event handler
     app_data                = calloc(1, sizeof(AppData));
     app_data->event_handler = ax_event_handler_new();
-    app_data->event_id      = setup_declaration(app_data->event_handler);
+    app_data->event_id      = setup_declaration(app_data->event_handler, &start_value);
 
     // Main loop
     main_loop = g_main_loop_new(NULL, FALSE);
