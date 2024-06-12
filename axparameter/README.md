@@ -8,7 +8,7 @@ Emphasis has been put on the use of callback functions and some of the limitatio
 
 ## Project structure
 
-THe files for building the application are organized in the following structure.
+The files for building the application are organized in the following structure.
 
 ```sh
 axparameter
@@ -123,7 +123,7 @@ The application log can be found by either
 - Browsing to `http://<AXIS_DEVICE_IP>/axis-cgi/admin/systemlog.cgi?appname=axparameter`.
 - Browsing to the *Apps* page and select `App log`.
 
-Initially, the log will show the the device serial number, read from the system parameters.
+Initially, the log will show the device serial number, read from the system parameters.
 
 ```text
 [ INFO    ] axparameter[1234567]: SerialNumber: 'BA9876543210'
@@ -136,7 +136,7 @@ The log immediately shows:
 [ INFO    ] axparameter[1234567]: IsCustomized was changed to 'yes' just now
 ```
 
-follow one second later by:
+Followed one second later by:
 
 ```text
 [ INFO    ] axparameter[1234567]: IsCustomized was changed to 'yes' one second ago
@@ -160,7 +160,7 @@ The log immediately shows:
 [ INFO    ] axparameter[1234567]: CustomValue was changed to 'my customization' just now
 ```
 
-follow one second later by:
+Followed one second later by:
 
 ```text
 [ INFO    ] axparameter[1234567]: CustomValue was changed to 'my customization' one second ago
@@ -178,7 +178,7 @@ The log immediately shows:
 [ INFO    ] axparameter[1234567]: IsCustomized was changed to 'no' just now
 ```
 
-follow one second later by:
+Followed one second later by:
 
 ```text
 [ INFO    ] axparameter[1234567]: IsCustomized was changed to 'no' one second ago
@@ -200,7 +200,7 @@ The log immediately shows:
 [ INFO    ] axparameter[1234567]: IsCustomized was changed to 'yes' just now
 ```
 
-follow one second later by:
+Followed one second later by:
 
 ```text
 [ INFO    ] axparameter[1234567]: IsCustomized was changed to 'yes' one second ago
