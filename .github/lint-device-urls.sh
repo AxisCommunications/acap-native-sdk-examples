@@ -76,7 +76,7 @@ check_device_ip_paths() {
     $base_url<end-of-line> \
     $base_url<space> \
     $base_url: \
-    $base_url/index.html# \
+    $base_url/index.html#[a-z] \
     $base_url/axis-cgi \
     $base_url/local \
     @$base_url \
@@ -86,7 +86,7 @@ check_device_ip_paths() {
 
   # shellcheck disable=SC2086
   __url_grep_list=$(grep -nir "$base_url" $exclude_dir_list |
-    grep -vE "$base_url(\`|$| |:|/axis-cgi|/index.html#|/local)" |
+    grep -vE "$base_url(\`|$| |:|/axis-cgi|/index.html#[a-z]|/local)" |
     grep -vE "@$base_url" || :)
 
   if [ "$__url_grep_list" ]; then

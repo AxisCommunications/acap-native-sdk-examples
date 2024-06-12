@@ -262,7 +262,7 @@ Output in XML, which has been formatted manually to show topic "tns1:Monitoring/
 As opposed to ONVIF events, Axis events are visible in the device web page for events, reachable at:
 
 ```sh
-https://<AXIS_DEVICE_IP>/index.html#/system/events/rules.
+https://<AXIS_DEVICE_IP>/index.html#system/events/rules.
 ```
 
 In order to produce an Axis event, you have to use the `tnsaxis` namespace, and rename the `topic0` value to `CameraApplicationPlatform`.
