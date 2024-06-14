@@ -30,6 +30,8 @@ Below is the list of examples available in the repository.
   - An example in C that shows the use of the serial port API.
 - [axstorage](./axstorage/)
   - An example in C that shows how to use available storage devices.
+- [bounding-box](./bounding-box/)
+  - An example in C that demonstrates how to portably draw burnt-in bounding boxes on selected video sources or channels.
 - [container-example](./container-example/)
   - An example that demonstrates the use of containers in a native ACAP application.
 - [curl-openssl](./curl-openssl/)

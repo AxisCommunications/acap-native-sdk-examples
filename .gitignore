@@ -9,3 +9,5 @@ super-linter.log*
 // Ignore general files
 .DS_Store
 .bash*
+package.conf*
+param.conf

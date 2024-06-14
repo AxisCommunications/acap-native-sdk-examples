@@ -1,0 +1,26 @@
+{
+    "schemaVersion": "1.7.0",
+    "resources": {
+        "dbus": {
+            "requiredMethods": [
+                "com.axis.Graphics2.*",
+                "com.axis.Overlay2.*"
+            ]
+        },
+        "linux": {
+            "user": {
+                "groups": ["video"]
+            }
+        }
+    },
+    "acapPackageConf": {
+        "setup": {
+            "friendlyName": "Axis Bounding Box Example",
+            "appName": "bounding_box_example",
+            "vendor": "Axis Communications",
+            "embeddedSdkVersion": "3.0",
+            "runMode": "never",
+            "version": "1.0.0"
+        }
+    }
+}
