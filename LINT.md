@@ -98,6 +98,9 @@ clang-format --dry-run $(find . -regex '.*\.\(c\|cpp\|h\|cc\|C\|CPP\|c++\|cp\)$'
 # Lint shell script files
 shellcheck $(shfmt -f .)
 shfmt -d .
+
+# Lint Natural language / textlint
+textlint -c .textlintrc .
 ```
 
 To lint only a specific file, replace `.` or `$(COMMAND)` with the file path.
@@ -147,4 +150,7 @@ clang-format -i $(find . -regex '.*\.\(c\|cpp\|h\|cc\|C\|CPP\|c++\|cp\)$')
 
 # Fix Markdown file errors
 markdownlint -f <path/to/file>
+
+# Fix Natural language / textlint remarks
+textlint -c .textlintrc --fix .
 ```
