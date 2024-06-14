@@ -51,7 +51,7 @@ to port 8080 on the device.
         (`UseTLS` set to `yes`).  In that case, follow the instructions in the
         [Docker Compose ACAP][docker-compose-acap] for how to generate and
         upload TLS certificates to the device.
-    - For the other settings refer to the documentation in that repo.
+    - For the other settings refer to the documentation in that repository.
 
 ## Getting started
 

@@ -19,7 +19,7 @@ Steps in application:
 
 1. Fetch image data from VDO.
 2. Preprocess the images (crop to 480x270, scale and color convert) using larod with libyuv backend (depending on platform).
-3. Run inferences using the trained model on a specific chip with the preprocessing output as input on a larod backend specified by a command line argument.
+3. Run inferences using the trained model on a specific chip with the preprocessing output as input on a larod backend specified by a command-line argument.
 4. The model's confidence scores for the presence of person and car in the image are printed as the output.
 5. Repeat for 5 iterations.
 
@@ -93,8 +93,8 @@ attributes in manifest.json and the *CHIP* parameter in the Dockerfile.
 
 The attributes in manifest.json that configures model are:
 
-- runOptions, which contains the application command line options.
-- friendlyName, a user friendly package name which is also part of the .eap file name.
+- runOptions, which contains the application command-line options.
+- friendlyName, a user friendly package name which is also part of the .eap filename.
 
 The **CHIP** argument in the Dockerfile also needs to be changed depending on
 model. This argument controls which files are to be included in the package,

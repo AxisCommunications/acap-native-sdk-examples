@@ -131,7 +131,7 @@ Installing your application on an Axis device is as simple as:
 
 #### The expected output
 
-The output of your application can be seen visiting the url `http://<AXIS_DEVICE_IP>/local/fastcgi_example/example.cgi?name=Axis`. You should see an output like this:
+The output of your application can be seen visiting the URL `http://<AXIS_DEVICE_IP>/local/fastcgi_example/example.cgi?name=Axis`. You should see an output like this:
 
 ```text
 Hello Axis from FastCGI

@@ -38,7 +38,7 @@ web-server
 
 ## Limitations
 
-- Apache Reverse Proxy can not translate content with absolute addresses (i.e. /image.png) in the HTML page. Use only relative content (i.e. image.png or ../image.png)). More information how to handle relative urls correctly with a reverse proxy [here](https://serverfault.com/questions/561892/how-to-handle-relative-urls-correctly-with-a-reverse-proxy).
+- Apache Reverse Proxy can not translate content with absolute addresses (i.e. /image.png) in the HTML page. Use only relative content (i.e. image.png or ../image.png)). More information how to handle relative URLs correctly with a reverse proxy [here](https://serverfault.com/questions/561892/how-to-handle-relative-urls-correctly-with-a-reverse-proxy).
 
 ## Proxy settings
 
@@ -73,9 +73,9 @@ Goto your device web page > Click on the tab **Apps** in the device GUI and loca
 
 The Web Server can be accessed from a Web Browser through the Apache Server in the device using an extension to the device web URL (i.e http://<AXIS_DEVICE_IP>/local/list/my_web_server)
 
-# Start your application from command line
+# Start your application from command-line
 
-As an alternative the application can be started, stopped and removed from command line using following commands:
+As an alternative the application can be started, stopped and removed from command-line using following commands:
 
 ```sh
 docker run --rm web-server:$ARCH eap-install.sh $AXIS_DEVICE_IP $PASS start

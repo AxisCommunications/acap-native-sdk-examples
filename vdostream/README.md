@@ -59,7 +59,9 @@ Standing in your working directory run the following commands:
 docker build --tag <APP_IMAGE> --build-arg VDO_FORMAT=<VDO_FORMAT> .
 ```
 
+<!-- textlint-disable terminology -->
 <VDO_FORMAT> is the video compression format. Supported values are *h264*, *h265*, *jpeg*, *nv12* and *y800*
+<!-- textlint-enable -->
 
 <APP_IMAGE> is the name to tag the image with, e.g., vdoencodeclient:1.0
 
@@ -205,7 +207,9 @@ vdoencodeclient[29828]: frame =   23, type = P, size = 30
 vdoencodeclient[29828]: frame =   24, type = P, size = 30
  ```
 
+<!-- textlint-disable terminology -->
 #### Output - format jpeg
+<!-- textlint-enable -->
 
 ```sh
 ----- Contents of SYSTEM_LOG for 'vdoencodeclient' -----

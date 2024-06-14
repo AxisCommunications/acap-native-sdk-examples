@@ -12,7 +12,7 @@ Please check the following guidelines for ACAP 4:
 - [Introduction](https://axiscommunications.github.io/acap-documentation/docs/introduction.html)
 - [Getting Started](https://axiscommunications.github.io/acap-documentation/docs/get-started.html)
 
-## Getting started with the repo
+## Getting started with the repository
 
 This repository contains a set of application examples which aims to enrich the developers analytics experience. All examples are using Docker framework and has a README file in its directory which shows overview, example directory structure and step-by-step instructions on how to run applications on the camera.
 
@@ -43,9 +43,9 @@ Below is the list of examples available in the repository.
 - [metadata-broker](./metadata-broker/)
   - Examples that consume metadata.
 - [object-detection](./object-detection/)
-  - An example of object detection, cropping and saving detected objects into jpeg files.
+  - An example of object detection, cropping and saving detected objects into JPEG files.
 - [object-detection-cv25](./object-detection-cv25/)
-  - An example of object detection, cropping and saving detected objects into jpeg files on AXIS CV25 devices.
+  - An example of object detection, cropping and saving detected objects into JPEG files on AXIS CV25 devices.
 - [reproducible-package](./reproducible-package/)
   - An example of how to create a reproducible application package.
 - [shell-script-example](./shell-script-example)
