@@ -1,0 +1,5 @@
+.depend
+.dir-locals.el
+*.o
+bounding_box_example
+AXIS_Bounding_Box_Example*
