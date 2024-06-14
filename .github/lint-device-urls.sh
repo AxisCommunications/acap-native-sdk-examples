@@ -70,6 +70,8 @@ check_device_ip_paths() {
   local base_url="<AXIS_DEVICE_IP>"
   local exclude_dir_list="\
     --exclude-dir=.github \
+    --exclude-dir=.git \
+    --exclude-dir=build* \
   "
   local allowed_patterns="\
     \`$base_url\` \
