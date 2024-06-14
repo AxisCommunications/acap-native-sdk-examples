@@ -15,7 +15,16 @@
         ["walkthrough", "walk-through"],
         ["ax(is)?[ ]?os", "AXIS OS"],
         ["artpec", "ARTPEC"],
-        ["vapix", "VAPIX"]
+        ["vapix", "VAPIX"],
+        "ACAP application",
+        "ACAP app",
+        "ACAP documentation",
+        "ACAP Native SDK",
+        "ACAP SDK",
+        ["ACAPs", "ACAP applications"], // Note that it doesn't cover single
+                                        // use of ACAP instead of ACAP app or
+                                        // ACAP application
+        ["acap", "ACAP"]
       ]
     }
   }
