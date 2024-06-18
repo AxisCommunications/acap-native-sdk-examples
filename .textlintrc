@@ -13,7 +13,7 @@
         ["bug[-]fix(es)?", "bug fix$1"],
         ["bugfix(es)?", "bug fix$1"],
         ["walkthrough", "walk-through"],
-        ["ax(|is)(| )os", "AXIS OS"]
+        ["ax(is)?[ ]?os", "AXIS OS"]
       ]
     }
   }
