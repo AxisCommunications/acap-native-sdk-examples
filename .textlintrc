@@ -14,7 +14,7 @@
         ["bugfix(es)?", "bug fix$1"],
         ["walkthrough", "walk-through"],
         ["ax(is)?[ ]?os", "AXIS OS"],
-        ["artpec", "ARTPEC"],
+        ["artpec[-_ ]?(\\d+)?", "ARTPEC-$1"],
         ["vapix", "VAPIX"],
         "ACAP application",
         "ACAP app",
