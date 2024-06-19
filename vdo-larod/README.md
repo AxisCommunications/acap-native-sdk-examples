@@ -57,7 +57,9 @@ vdo-larod
 - **app/utility-functions.c/h** - Contains all the necessary helper functions written in C that are used while building the ACAP application.
 - **app/LICENSE** - Text file which lists all open source licensed source code distributed with the application.
 - **app/Makefile** - Makefile containing the build and link instructions for building the ACAP application.
+  <!-- textlint-disable -->
 - **app/manifest.json.artpec8** - Defines the application and its configuration when building for DLPU with TensorFlow Lite.
+  <!-- textlint-enable -->
 - **app/manifest.json.cpu** - Defines the application and its configuration when building for CPU with TensorFlow Lite.
 - **app/manifest.json.cv25** - Defines the application and its configuration when building chip and model for cv25 DLPU.
 - **app/manifest.json.edgetpu** - Defines the application and its configuration when building chip and model for Google TPU.
@@ -110,9 +112,9 @@ docker build --tag <APP_IMAGE> --build-arg CHIP=<CHIP> .
 docker cp $(docker create <APP_IMAGE>):/opt/app ./build
 ```
 
-- \<APP_IMAGE\> is the name to tag the image with, e.g., vdo_larod:1.0
-- \<CHIP\> is the chip type. Supported values are *artpec8*, *cpu*, *cv25* and *edgetpu*.
-- \<ARCH\> is the architecture. Supported values are armv7hf (default) and aarch64
+- \<APP_IMAGE\> is the name to tag the image with, e.g., `vdo_larod:1.0`.
+- \<CHIP\> is the chip type. Supported values are `artpec8`, `cpu`, `cv25` and `edgetpu`.
+- \<ARCH\> is the architecture. Supported values are `armv7hf` (default) and `aarch64`.
 
 See the following sections for build commands for each chip.
 

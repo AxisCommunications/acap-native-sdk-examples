@@ -23,8 +23,8 @@ The following instructions can be executed to simply run the example.
     ```
 
     where the values are found:
-    - \<CHIP\> is the chip type. Supported values are *artpec8*, *cpu* and *edgetpu*.
-    - \<ARCH\> is the architecture. Supported values are armv7hf (default) and aarch64
+    - \<CHIP\> is the chip type. Supported values are `artpec8`, `cpu` and `edgetpu`.
+    - \<ARCH\> is the architecture. Supported values are `armv7hf` (default) and `aarch64`.
 
 2. Find the ACAP application `.eap` file
 
@@ -210,7 +210,7 @@ downloaded and added to the ACAP application via the -a flag in the
 `acap-build` command.
 
 The application is built to specification by the `Makefile` and `manifest.json`
-in the [app](app) directory. Standing in the application direcory, run:
+in the [app](app) directory. Standing in the application directory, run:
 
 ```sh
 docker build --build-arg ARCH=<ARCH> --build-arg CHIP=<CHIP> --tag obj_detect:1.0 .
@@ -219,8 +219,8 @@ docker cp $(docker create obj_detect:1.0):/opt/app ./build
 
 where the parameters are:
 
-- \<CHIP\> is the chip type. Supported values are *artpec8*, *cpu* and *edgetpu*.
-- \<ARCH\> is the architecture. Supported values are armv7hf (default) and aarch64
+- \<CHIP\> is the chip type. Supported values are `artpec8`, `cpu` and `edgetpu`.
+- \<ARCH\> is the architecture. Supported values are `armv7hf` (default) and `aarch64`.
 
 > N.b. The selected architecture and chip must match the targeted device.
 
