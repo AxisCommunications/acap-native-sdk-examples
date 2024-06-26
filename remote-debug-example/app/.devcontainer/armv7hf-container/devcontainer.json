@@ -1,0 +1,11 @@
+{
+    "name": "ARMV7HF dev container",
+    "image": "dev_container:armv7hf",
+    "workspaceMount": "source=${localWorkspaceFolder},target=/opt/app,type=bind",
+    "workspaceFolder": "/opt/app",
+    "customizations": {
+        "vscode": {
+          "extensions": ["ms-vscode.cpptools", "webfreak.debug"]
+        }
+    }
+}

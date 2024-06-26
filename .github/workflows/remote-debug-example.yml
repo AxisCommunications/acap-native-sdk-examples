@@ -1,0 +1,42 @@
+name: Build remote-debug-example application
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'remote-debug-example/**'
+      - '!remote-debug-example/README.md'
+      - '.github/workflows/remote-debug-example.yml'
+jobs:
+  test-app:
+    name: Test app
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        axis-os: ["11.11.66"]
+        arch: ["armv7hf", "aarch64"]
+    env:
+      EXREPO: acap-native-examples
+      EXNAME: remote-debug-example
+      GDBSERVER: gdbserver
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+
+      - name: Build ${{ env.EXNAME }} application and dev container
+        env:
+          imagetag: ${{ env.EXREPO }}_${{ env.EXNAME }}_dev-container:${{ matrix.arch }}
+          gdbserver_dir: ${{ env.GDBSERVER }}-${{ matrix.arch }}
+        run: |
+          docker image rm -f $imagetag
+          cd $EXNAME
+          docker build --no-cache --tag $imagetag --build-arg ARCH=${{ matrix.arch }} .
+          # Copy out application
+          docker cp $(docker create $imagetag):/opt/app ./build
+          # Copy out gdbserver, control it exist and is non-zero
+          docker cp $(docker create $imagetag):/opt/build/gdb/bin ./$gdbserver_dir
+          [ -s ./$gdbserver_dir/${{ env.GDBSERVER }} ] || {
+            echo "${{ env.GDBSERVER }} in $gdbserver_dir is not available"
+            exit 1
+          }
+          cd ..
+          docker image rm -f $imagetag

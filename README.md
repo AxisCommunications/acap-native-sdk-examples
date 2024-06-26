@@ -46,6 +46,8 @@ Below is the list of examples available in the repository.
   - An example of object detection, cropping and saving detected objects into JPEG files.
 - [object-detection-cv25](./object-detection-cv25/)
   - An example of object detection, cropping and saving detected objects into JPEG files on AXIS CV25 devices.
+- [remote-debug-example](./remote-debug-example/)
+  - An example of how to remote debug an ACAP application.
 - [reproducible-package](./reproducible-package/)
   - An example of how to create a reproducible application package.
 - [shell-script-example](./shell-script-example)
