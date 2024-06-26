@@ -1,0 +1,11 @@
+# Ignore build output files and folders for remote-debug-example
+app/remote_debug
+app/*.o
+app/core
+app/*.eap*
+app/*_LICENSE.txt
+app/debug/
+app/tmp*
+app/package.conf*
+app/param.conf
+app/*var_log_messages*

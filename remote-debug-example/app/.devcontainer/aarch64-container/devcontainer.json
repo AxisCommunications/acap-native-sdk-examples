@@ -1,0 +1,11 @@
+{
+    "name": "AARCH64 dev container",
+    "image": "dev_container:aarch64",
+    "workspaceMount": "source=${localWorkspaceFolder},target=/opt/app,type=bind",
+    "workspaceFolder": "/opt/app",
+    "customizations": {
+        "vscode": {
+          "extensions": ["ms-vscode.cpptools", "webfreak.debug"]
+        }
+    }
+}
