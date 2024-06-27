@@ -16,7 +16,7 @@
 
 /**
  * This example creates a Metadata Broker subscriber for the
- * analytics_scene_description topic. Streamed metadata is received in the
+ * analytics_scene_description topic. Streamed messages are received in the
  * Analytics Data Format (ADF) and is logged to syslog.
  */
 
@@ -45,14 +45,14 @@ static void on_connection_error(mdb_error_t* error, void* user_data) {
     abort();
 }
 
-static void on_metadata(const mdb_metadata_t* metadata, void* user_data) {
-    const struct timespec* timestamp      = mdb_metadata_get_timestamp(metadata);
-    const mdb_metadata_payload_t* payload = mdb_metadata_get_payload(metadata);
+static void on_message(const mdb_message_t* message, void* user_data) {
+    const struct timespec* timestamp     = mdb_message_get_timestamp(message);
+    const mdb_message_payload_t* payload = mdb_message_get_payload(message);
 
     channel_identifier_t* channel_identifier = (channel_identifier_t*)user_data;
 
     syslog(LOG_INFO,
-           "metadata received from topic: %s on source: %s: Monotonic time - "
+           "message received from topic: %s on source: %s: Monotonic time - "
            "%lld.%.9ld. Data - %.*s",
            channel_identifier->topic,
            channel_identifier->source,
@@ -101,7 +101,7 @@ int main(int argc, char** argv) {
 
     subscriber_config = mdb_subscriber_config_create(channel_identifier.topic,
                                                      channel_identifier.source,
-                                                     on_metadata,
+                                                     on_message,
                                                      &channel_identifier,
                                                      &error);
     if (error != NULL) {
