@@ -15,7 +15,7 @@ jobs:
         include:
           - arch: armv7hf
             chip: edgetpu
-            axis-os: 11.10.61
+            axis-os: 11.11.70
     env:
       EXREPO: acap-native-examples
       EXNAME: tensorflow-to-larod
