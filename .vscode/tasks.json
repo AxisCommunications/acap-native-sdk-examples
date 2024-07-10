@@ -4,7 +4,7 @@
     {
       "label": "super-linter: Run all linters",
       "type": "shell",
-      "command": "cd ${workspaceFolder} && docker run --rm -e RUN_LOCAL=true --env-file '.github/super-linter.env' -v \"$PWD\":/tmp/lint -w /tmp/lint ghcr.io/github/super-linter:slim-v5",
+      "command": "cd ${workspaceFolder} && docker run --rm -e RUN_LOCAL=true --env-file '.github/super-linter.env' -v \"$PWD\":/tmp/lint -w /tmp/lint ghcr.io/github/super-linter:slim-v6",
       "group": "lint",
       "problemMatcher": []
     }

@@ -88,8 +88,8 @@ int main(int argc, char** argv) {
     // For com.axis.analytics_scene_description.v0.beta source corresponds to the
     // video channel number.
     channel_identifier_t channel_identifier    = {.topic =
-                                                   "com.axis.analytics_scene_description.v0.beta",
-                                               .source = "1"};
+                                                      "com.axis.analytics_scene_description.v0.beta",
+                                                  .source = "1"};
     mdb_error_t* error                         = NULL;
     mdb_subscriber_config_t* subscriber_config = NULL;
     mdb_subscriber_t* subscriber               = NULL;

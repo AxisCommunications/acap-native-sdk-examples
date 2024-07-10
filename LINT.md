@@ -6,7 +6,7 @@ get a pull request approved.
 ## Linters in GitHub Action
 
 When you create a pull request, a set of linters will run syntax and format
-checks on different file types in GitHub actions by making use of a tool called
+checks on different file types in GitHub Actions by making use of a tool called
 [super-linter](https://github.com/super-linter/super-linter). If any of the
 linters gives an error, this will be shown in the action connected to the pull
 request.
@@ -21,7 +21,7 @@ editors may run it locally to lint the codebase. For complete instructions and
 guidance, see super-linter page for [running
 locally](https://github.com/super-linter/super-linter/blob/main/docs/run-linter-locally.md).
 
-### VS Code
+### Visual Studio Code
 
 1. Go to menu `Terminal` > `Run Task`.
 1. Choose task `super-linter: Run all linters`.
@@ -37,7 +37,7 @@ docker run --rm \
   -v $PWD:/tmp/lint \
   -e RUN_LOCAL=true \
   --env-file ".github/super-linter.env" \
-  ghcr.io/super-linter/super-linter:slim-v5
+  ghcr.io/super-linter/super-linter:slim-v6
 ```
 
 For more details which linters that run and the settings, see the file
@@ -56,7 +56,7 @@ docker run --rm \
   -e RUN_LOCAL=true \
   -e VALIDATE_MARKDOWN=true \
   -e MARKDOWN_CONFIG_FILE=.markdownlint.yml \
-  ghcr.io/super-linter/super-linter:slim-v5
+  ghcr.io/super-linter/super-linter:slim-v6
 ```
 
 ## Run super-linter interactively
@@ -71,7 +71,7 @@ docker run --rm \
   -v $PWD:/tmp/lint \
   -w /tmp/lint \
   --entrypoint /bin/bash \
-  -it ghcr.io/super-linter/super-linter:slim-v5
+  -it ghcr.io/super-linter/super-linter:slim-v6
 ```
 
 Then from the container terminal, the following commands can lint the codebase
@@ -115,21 +115,30 @@ The most common way is to use formatting tools for your editor. An option
 is to use the linter tools themselves in super-linter container to perform this
 formatting.
 
-### VS Code extensions
+### Visual Studio Code extensions
 
 This repository has recommended extensions where some offer automatic
 formatting, see the extension documentation for more info.
 
 #### clang-format (C/C++)
 
-The linter checks that files are formatted according to the configuration file
-`.clang-format` of version 12. As long as the extension adheres to this style,
-Pull Requests should not generate lint errors.
+Super-linter checks that files are formatted according to the configuration
+file `.clang-format` with a certain clang-format version. As long as the Visual
+Studio Code extension adheres to this style, Pull Requests should not generate
+linting errors.
+The field *Likely compatible clang-format versions* marks versions that seem
+compatible, but can't be guaranteed.
+
+| super-linter | clang-format | Likely compatible clang-format versions |
+| ------------ | ------------ | --------------------------------------- |
+| slim-v6      | 17           | 15-17                                   |
 
 If the setup is correct, the extension will automatically format the code
 according to the configuration file on save and when typing.
 
-See installation instructions below.
+If your OS or distribution doesn't have a compatible clang-format version to
+install, use the approach in [Use the super-linter
+container](use-the-super-linter-container) to autoformat files.
 
 ### Use the super-linter container
 
@@ -142,7 +151,7 @@ docker run --rm \
   -v $PWD:/tmp/lint \
   -w /tmp/lint \
   --entrypoint /bin/bash \
-  -it ghcr.io/super-linter/super-linter:slim-v5
+  -it ghcr.io/super-linter/super-linter:slim-v6
 
 # Auto-format C and C++ files (second line change all)
 clang-format -i <path/to/file>
