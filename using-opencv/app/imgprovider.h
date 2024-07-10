@@ -20,9 +20,8 @@
 
 #pragma once
 
-#include <pthread.h>
-//#include <stdatomic.h>
 #include <atomic>
+#include <pthread.h>
 #define _Atomic(X) std::atomic<X>
 
 #include <stdbool.h>

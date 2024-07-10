@@ -73,7 +73,7 @@ docker cp $(docker create rep:1):/opt/app ./build1
 Now let's create a reproducible package. Set the build argument TIMESTAMP which
 in turn set [SOURCE_DATE_EPOCH](https://reproducible-builds.org/docs/source-date-epoch/)
 to a fix time. The chosen timestamp here is the latest commit in the current
-git repository. Copy the output to *build2*.
+Git repository. Copy the output to *build2*.
 
 ```sh
 docker build --no-cache --build-arg TIMESTAMP="$(git log -1 --pretty=%ct)" --tag rep:2 .
@@ -128,7 +128,7 @@ environment variable before running build command.
 SOURCE_DATE_EPOCH=$(git log -1 --pretty=%ct) acap-build .
 ```
 
-**N.b.** To be able to use the git log as in this example you will have to run
+**N.b.** To be able to use the Git log as in this example you will have to run
 the docker container from the top directory where the `.git` directory is placed.
 
 ## License

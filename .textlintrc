@@ -7,12 +7,16 @@
       "defaultTerms": true,
       "exclude": [
         "bug[- ]fix(es)?",
-        "walk-through"
+        "walk-through",
+        "readme(s)?"
       ],
       "terms": [
         ["bug[-]fix(es)?", "bug fix$1"],
         ["bugfix(es)?", "bug fix$1"],
         ["walkthrough", "walk-through"],
+        "README",
+        ["readme(s)?", "README$1"],
+        "AXIS OS",
         ["ax(is)?[ ]?os", "AXIS OS"],
         ["artpec[-_ ]?(\\d+)?", "ARTPEC-$1"],
         ["vapix", "VAPIX"],
