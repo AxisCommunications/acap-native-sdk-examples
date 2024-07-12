@@ -26,7 +26,7 @@ RUN DEBIAN_FRONTEND=noninteractive \
 # Build uriparser library
 #-------------------------------------------------------------------------------
 
-ARG URIPARSER_VERSION=0.9.7
+ARG URIPARSER_VERSION=0.9.8
 ARG URIPARSER_DIR=${BUILD_DIR}/uriparser
 ARG URIPARSER_SRC_DIR=${BUILD_DIR}/uriparser-${URIPARSER_VERSION}
 ARG URIPARSER_BUILD_DIR=${URIPARSER_DIR}/build
