@@ -1,4 +1,4 @@
 #!/bin/bash
 
 docker run --rm -i -v "$(pwd)"/.hadolint.yaml:/.config/hadolint.yaml \
-        hadolint/hadolint hadolint --no-fail - <"$@"
+        hadolint/hadolint hadolint --no-fail - < "$@"
