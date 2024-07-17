@@ -6,42 +6,52 @@ ARG SDK=acap-native-sdk
 
 FROM ${REPO}/${SDK}:${VERSION}-${ARCH}-ubuntu${UBUNTU_VERSION}
 
+# Set general arguments
+ARG ARCH
+ARG SDK_LIB_PATH_BASE=/opt/axis/acapsdk/sysroots/${ARCH}/usr
+ARG BUILD_DIR=/opt/build
 
-WORKDIR /opt/build/libjpeg
-ARG ARCH=armv7hf
+#-------------------------------------------------------------------------------
+# Prepare build environment
+#-------------------------------------------------------------------------------
 
-# Build libjpeg-turbo
-WORKDIR /opt/build
-RUN apt-get update && apt-get install --no-install-recommends -y cmake && \
+# Install build dependencies for library cross compilation
+RUN DEBIAN_FRONTEND=noninteractive \
+    apt-get update && apt-get install -y -f --no-install-recommends \
+    cmake && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
-RUN git clone --branch 2.0.6 https://github.com/libjpeg-turbo/libjpeg-turbo.git
 
-WORKDIR /opt/build/libjpeg-turbo/build
-RUN if [ "$ARCH" = armv7hf ]; then \
-        gCFLAGS=' -O2 -mthumb -mfpu=neon -mfloat-abi=hard -mcpu=cortex-a9 -fomit-frame-pointer' \
-        CC=arm-linux-gnueabihf-gcc cmake -G"Unix Makefiles" .. && \
-        make -j; \
-    elif [ "$ARCH" = aarch64 ]; then \
-        CC=/usr/bin/aarch64-linux-gnu-gcc cmake -G"Unix Makefiles" .. && \
-        make ; \
-    else \
-        printf "Error: '%s' is not a valid value for the ARCH variable\n", "$ARCH"; \
-        exit 1; \
-    fi
+#-------------------------------------------------------------------------------
+# Build libjpeg-turbo
+#-------------------------------------------------------------------------------
 
-# Copy the built libraries to application folder
-ARG BUILD_DIR_JPEG=/opt/build/libjpeg-turbo
-WORKDIR /opt/app/lib
-RUN cp ${BUILD_DIR_JPEG}/build/*.so* .
-WORKDIR /opt/app/include
-RUN cp ${BUILD_DIR_JPEG}/build/*.h . && \
-    cp ${BUILD_DIR_JPEG}/*.h .
+ARG JPEGTURBO_VERSION=2.0.6
+ARG JPEGTURBO_GIT_REPO=https://github.com/libjpeg-turbo/libjpeg-turbo
+ARG JPEGTURBO_VERSION_DIR=libjpeg-turbo-${JPEGTURBO_VERSION}
+ARG JPEGTURBO_DIR=${BUILD_DIR}/libjpeg-turbo
+ARG JPEGTURBO_SRC_DIR=${JPEGTURBO_DIR}/${JPEGTURBO_VERSION_DIR}
+ARG JPEGTURBO_BUILD_DIR=${JPEGTURBO_DIR}/build
 
-WORKDIR /opt/app
-COPY ./app /opt/app/
+WORKDIR ${JPEGTURBO_DIR}
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+RUN curl -fsSL ${JPEGTURBO_GIT_REPO}/releases/download/${JPEGTURBO_VERSION}/${JPEGTURBO_VERSION_DIR}.tar.gz | tar -xz
 
-# Get pretrained models
+WORKDIR ${JPEGTURBO_SRC_DIR}
+RUN . /opt/axis/acapsdk/environment-setup* && \
+    pwd && ls -la && \
+    cmake -G"Unix Makefiles" \
+      -DCMAKE_INSTALL_PREFIX:PATH=${JPEGTURBO_BUILD_DIR} \
+      . && \
+      make -j && \
+      make install
+
+#-------------------------------------------------------------------------------
+# Get models and labels
+#-------------------------------------------------------------------------------
+
+# Download pretrained models
+WORKDIR /opt/app/model
 ARG CHIP=
 RUN if [ "$CHIP" = cpu ] || [ "$CHIP" = artpec8 ]; then \
         curl -L -o converted_model.tflite \
@@ -54,15 +64,16 @@ RUN if [ "$CHIP" = cpu ] || [ "$CHIP" = artpec8 ]; then \
         exit 1; \
     fi
 
-# Download the labels
-RUN mkdir -p label && \
-    curl -L -o label/labels.txt https://github.com/google-coral/test_data/raw/master/coco_labels.txt
+WORKDIR /opt/app/label
+RUN curl -L -o labels.txt https://github.com/google-coral/test_data/raw/master/coco_labels.txt
 
-# Setup the model directory
-RUN mkdir -p model && \
-    cp converted_model.tflite model/converted_model.tflite
+#-------------------------------------------------------------------------------
+# Build ACAP application
+#-------------------------------------------------------------------------------
 
-# Building the ACAP application
+WORKDIR /opt/app
+COPY ./app .
 RUN cp /opt/app/manifest.json.${CHIP} /opt/app/manifest.json && \
     . /opt/axis/acapsdk/environment-setup* && acap-build . \
-    -a 'label/labels.txt' -a 'model/converted_model.tflite'
+    -a 'label/labels.txt' \
+    -a 'model/converted_model.tflite'

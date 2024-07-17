@@ -6,37 +6,67 @@ ARG SDK=acap-native-sdk
 
 FROM ${REPO}/${SDK}:${VERSION}-${ARCH}-ubuntu${UBUNTU_VERSION}
 
-# Build libjpeg-turbo
-WORKDIR /opt/build
-RUN apt-get update && apt-get install --no-install-recommends -y cmake && \
+# Set general arguments
+ARG ARCH
+ARG SDK_LIB_PATH_BASE=/opt/axis/acapsdk/sysroots/${ARCH}/usr
+ARG BUILD_DIR=/opt/build
+
+#-------------------------------------------------------------------------------
+# Prepare build environment
+#-------------------------------------------------------------------------------
+
+# Install build dependencies for library cross compilation
+RUN DEBIAN_FRONTEND=noninteractive \
+    apt-get update && apt-get install -y -f --no-install-recommends \
+    cmake && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
-RUN git clone --branch 2.0.6 https://github.com/libjpeg-turbo/libjpeg-turbo.git
 
-WORKDIR /opt/build/libjpeg-turbo/build
-RUN CC=/usr/bin/aarch64-linux-gnu-gcc cmake -G"Unix Makefiles" .. && make
+#-------------------------------------------------------------------------------
+# Build libjpeg-turbo
+#-------------------------------------------------------------------------------
 
-# Copy the built libraries to application folder
-ARG BUILD_DIR_JPEG=/opt/build/libjpeg-turbo
-WORKDIR /opt/app/lib
-RUN cp ${BUILD_DIR_JPEG}/build/*.so* .
-WORKDIR /opt/app/include
-RUN cp ${BUILD_DIR_JPEG}/build/*.h . && \
-    cp ${BUILD_DIR_JPEG}/*.h . 
+ARG JPEGTURBO_VERSION=2.0.6
+ARG JPEGTURBO_GIT_REPO=https://github.com/libjpeg-turbo/libjpeg-turbo
+ARG JPEGTURBO_VERSION_DIR=libjpeg-turbo-${JPEGTURBO_VERSION}
+ARG JPEGTURBO_DIR=${BUILD_DIR}/libjpeg-turbo
+ARG JPEGTURBO_SRC_DIR=${JPEGTURBO_DIR}/${JPEGTURBO_VERSION_DIR}
+ARG JPEGTURBO_BUILD_DIR=${JPEGTURBO_DIR}/build
+
+WORKDIR ${JPEGTURBO_DIR}
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+RUN curl -fsSL ${JPEGTURBO_GIT_REPO}/releases/download/${JPEGTURBO_VERSION}/${JPEGTURBO_VERSION_DIR}.tar.gz | tar -xz
+
+WORKDIR ${JPEGTURBO_SRC_DIR}
+RUN . /opt/axis/acapsdk/environment-setup* && \
+    pwd && ls -la && \
+    cmake -G"Unix Makefiles" \
+      -DCMAKE_INSTALL_PREFIX:PATH=${JPEGTURBO_BUILD_DIR} \
+      . && \
+      make -j && \
+      make install
+
+#-------------------------------------------------------------------------------
+# Get models and labels
+#-------------------------------------------------------------------------------
+
+# Download pretrained models
+WORKDIR /opt/app/model
+ARG CHIP=cv25
+RUN curl -o converted_model.bin https://acap-ml-model-storage.s3.amazonaws.com/SSD_Mobilenet_Ambarella/ambarella_ssd.bin && \
+    curl -o anchor_boxes.bin  https://acap-ml-model-storage.s3.amazonaws.com/SSD_Mobilenet_Ambarella/anchor_boxes.bin
+
+WORKDIR /opt/app/label
+RUN curl -L -o labels.txt https://github.com/google-coral/test_data/raw/master/coco_labels.txt
+
+#-------------------------------------------------------------------------------
+# Build ACAP application
+#-------------------------------------------------------------------------------
 
 WORKDIR /opt/app
-COPY ./app /opt/app/
-
-# Download the labels
-RUN mkdir -p label && \
-    curl -L -o label/labels.txt https://github.com/google-coral/test_data/raw/master/coco_labels.txt
-
-# Setup the model directory and get pretrained models
-RUN mkdir -p model && \
-    curl -o model/converted_model.bin https://acap-ml-model-storage.s3.amazonaws.com/SSD_Mobilenet_Ambarella/ambarella_ssd.bin && \
-    curl -o model/anchor_boxes.bin  https://acap-ml-model-storage.s3.amazonaws.com/SSD_Mobilenet_Ambarella/anchor_boxes.bin
-
-# Building the ACAP application
-RUN cp /opt/app/manifest.json.cv25 /opt/app/manifest.json && \
+COPY ./app .
+RUN cp /opt/app/manifest.json.${CHIP} /opt/app/manifest.json && \
     . /opt/axis/acapsdk/environment-setup* && acap-build . \
-    -a 'label/labels.txt' -a 'model/converted_model.bin' -a 'model/anchor_boxes.bin'
+    -a 'label/labels.txt' \
+    -a 'model/converted_model.bin' \
+    -a 'model/anchor_boxes.bin'
