@@ -20,7 +20,7 @@ indent_size = 4
 indent_size = 2
 indent_style = tab
 
-[{*.sh,containerExample,shell_script_example}]
+[[shell]]
 indent_size = 2
 switch_case_indent = true
 keep_padding       = true
