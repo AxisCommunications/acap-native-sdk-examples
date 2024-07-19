@@ -26,7 +26,7 @@ RUN DEBIAN_FRONTEND=noninteractive \
 # Build libjpeg-turbo
 #-------------------------------------------------------------------------------
 
-ARG JPEGTURBO_VERSION=2.0.6
+ARG JPEGTURBO_VERSION=3.0.3
 ARG JPEGTURBO_GIT_REPO=https://github.com/libjpeg-turbo/libjpeg-turbo
 ARG JPEGTURBO_VERSION_DIR=libjpeg-turbo-${JPEGTURBO_VERSION}
 ARG JPEGTURBO_DIR=${BUILD_DIR}/libjpeg-turbo
