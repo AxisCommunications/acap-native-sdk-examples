@@ -1,13 +1,10 @@
 #!/bin/bash
 
+. "$(pwd)"/.github/utils/util-functions.sh
+
 #-------------------------------------------------------------------------------
 # Functions
 #-------------------------------------------------------------------------------
-
-print_section() {
-  local sep40="----------------------------------------"
-  printf '\n\n%s\n%s\n%s\n' "$sep40$sep40" " $*" "$sep40$sep40"
-}
 
 check_device_ip_naming() {
   local ret=0
@@ -32,33 +29,33 @@ check_device_ip_naming() {
 
   for pattern in $disallowed_names; do
     # shellcheck disable=SC2086
-    pattern_found=$(grep -nirE "$search_term" $exclude_dir_list |
+    pattern_found=$(grep -niIrE "$search_term" $exclude_dir_list |
       grep -E "$pattern" || :)
-    [ "$pattern_found" ] && __url_grep_list="$__url_grep_list\n$pattern_found"
+    [ "$pattern_found" ] && __url_grep_list=$(printf '%s\n%s' "$pattern_found" "$__url_grep_list")
   done
 
   for pattern in $disallowed_names_specials; do
     # shellcheck disable=SC2086
-    pattern_found=$(grep -nirE "$search_term" $exclude_dir_list |
+    pattern_found=$(grep -niIrE "$search_term" $exclude_dir_list |
       grep -E "(^.*:[0-9]+:| )$pattern" || :)
-    [ "$pattern_found" ] && __url_grep_list="$__url_grep_list\n$pattern_found"
+    [ "$pattern_found" ] && __url_grep_list=$(printf '%s\n%s' "$pattern_found" "$__url_grep_list")
   done
 
   if [ "$__url_grep_list" ]; then
-    printf '\n%s\n%s\n' \
-      "## Error - The following names for device IP are not allowed:" \
-      "$__url_grep_list"
-    printf '\n%s\n' "## Disallowed name patterns:"
-    for pattern in $disallowed_names; do
-      printf '%s\n' "* $pattern"
-    done
+    print_line "ERROR: The following names for device IP are not allowed:"
+    print_linebreaked_list_error "$__url_grep_list"
+
+    print_line "Disallowed name patterns:"
     for pattern in $disallowed_names_specials; do
       printf '%s\n%s\n' "* <space>$pattern" "* ^$pattern"
     done
-    printf '\n%s\n%s\n' "## Allowed name (Including URLs prefixed http://):" "* $allowed_name"
+    print_list "$disallowed_names"
+
+    print_line "Allowed name pattern (Including URLs prefixed http://):"
+    print_list "$allowed_name"
     ret=1
   else
-    printf "* All device IPs found follow allowed naming\n"
+    print_bullet_pass "All device IPs found follow allowed naming"
   fi
 
   return $ret
@@ -87,22 +84,21 @@ check_device_ip_paths() {
   print_section "Check that device URLs follow allowed pattern"
 
   # shellcheck disable=SC2086
-  __url_grep_list=$(grep -nir "$base_url" $exclude_dir_list |
+  __url_grep_list=$(grep -nIir "$base_url" $exclude_dir_list |
     grep -vE "$base_url(\`|$| |:|/axis-cgi|/index.html#[a-z]|/local)" |
     grep -vE "@$base_url" || :)
 
   if [ "$__url_grep_list" ]; then
-    printf '\n%s\n%s\n\n' \
-      "## Error - The following device URLs are not matching allowed patterns" \
-      "$__url_grep_list"
-    printf "## Allowed patterns (Including URLs prefixed http://):\n"
-    for pattern in $allowed_patterns; do
-      printf '%s\n' "* $pattern"
-    done
-    printf "\nA typical error is to copy the redirected URL that include e.g. product specific string 'camera'\n"
+    print_line "ERROR: The following device URLs are not matching allowed patterns:"
+    print_linebreaked_list_error "$__url_grep_list"
+
+    print_line "Allowed patterns (Including URLs prefixed http://):"
+    print_list "$allowed_patterns"
+
+    print_line "A typical error is to copy the redirected URL that include e.g. product specific string 'camera'"
     ret=1
   else
-    printf "* All device URLs follow pattern\n"
+    print_bullet_pass "All device URLs follow pattern"
   fi
 
   return $ret

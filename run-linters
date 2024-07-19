@@ -1,0 +1,86 @@
+#!/bin/bash
+
+SCRIPT=${0##*/}
+
+. "$(pwd)"/.github/utils/util-functions.sh
+
+# Must be run from top directory
+for dir_to_check in .git vdostream; do
+  found=$(find . -maxdepth 1 -type d -name $dir_to_check)
+  [ "$found" ] || {
+    printf '%s\n%s\n' \
+      "Error: Script needs to be called from top directory of repository" \
+      "  .github/run-all-linters"
+    exit 1
+  }
+done
+
+usage() {
+  echo "
+--------------------------------------------------------------------------------
+Run repository linters
+--------------------------------------------------------------------------------
+
+Usage:
+    $SCRIPT [--all] [--super-linter] [--custom-linter] [--help]
+
+Options:
+    -a, --all                   Run all linters
+    -sl, --super-linter         Run super-linter
+    -cl, --custom-linter        Run custom linter
+    -h, --help                  Show this help
+"
+}
+
+# Check input
+run_all=no
+run_sl=no
+run_cl=no
+exitcode_super_linter=0
+exitcode_custom_linters=0
+[ $# -gt 0 ] || {
+  usage
+  exit 0
+}
+while [ $# -gt 0 ]; do
+  case $1 in
+    -a | --all) run_all=yes ;;
+    -sl | --super-linter) run_sl=yes ;;
+    -cl | --custom-linter) run_cl=yes ;;
+    h | -h | help | --help) usage && exit 0 ;;
+    *) usage && exit 1 ;;
+  esac
+  shift
+done
+
+[ "$run_all" = yes ] || [ "$run_sl" = yes ] && {
+  printf '%s\n' "### RUN SUPER-LINTER"
+  docker run --rm \
+    -e RUN_LOCAL=true \
+    --env-file .github/super-linter.env \
+    -v "$(pwd)":/tmp/lint \
+    -w /tmp/lint ghcr.io/super-linter/super-linter:slim-v6
+  exitcode_super_linter=$?
+}
+
+[ "$run_all" = yes ] || [ "$run_cl" = yes ] && {
+  printf '\n%s' "### RUN CUSTOM LINTERS"
+  .github/run-custom-linters
+  exitcode_custom_linters=$?
+}
+
+printf '\n\n%s\n\n' "### LINT RESULT"
+if [ "$exitcode_super_linter" -eq 0 ] && [ "$exitcode_custom_linters" -eq 0 ]; then
+  print_bullet_pass "All linters passed."
+  exit 0
+else
+  [ "$run_all" = yes ] || [ "$run_sl" = yes ] && {
+    sl_error="super-linter has one or more errors, see above."
+    [ "$exitcode_super_linter" -eq 0 ] || print_bullet_error "$sl_error"
+  }
+  [ "$run_all" = yes ] || [ "$run_cl" = yes ] && {
+    cl_error="custom linters has one or more errors, see above."
+    [ "$exitcode_custom_linters" -eq 0 ] || print_bullet_error "$cl_error"
+  }
+  exit 1
+fi

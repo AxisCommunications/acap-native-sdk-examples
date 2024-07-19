@@ -1,0 +1,9 @@
+#! /bin/bash
+
+exitcode=0
+for linter in .github/custom-linters/*; do
+  if [ -x "$linter" ]; then
+    $linter || exitcode=1
+  fi
+done
+exit $exitcode
