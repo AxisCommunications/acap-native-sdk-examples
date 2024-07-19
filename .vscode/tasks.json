@@ -2,9 +2,23 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "label": "super-linter: Run all linters",
+      "label": "acap-native-sdk-examples: Run all linters",
       "type": "shell",
-      "command": "cd ${workspaceFolder} && docker run --rm -e RUN_LOCAL=true --env-file '.github/super-linter.env' -v \"$PWD\":/tmp/lint -w /tmp/lint ghcr.io/super-linter/super-linter:slim-v6",
+      "command": "cd ${workspaceFolder} && ./run-linters --all",
+      "group": "lint",
+      "problemMatcher": []
+    },
+    {
+      "label": "acap-native-sdk-examples: Run super-linter",
+      "type": "shell",
+      "command": "cd ${workspaceFolder} && ./run-linters --super-linter",
+      "group": "lint",
+      "problemMatcher": []
+    },
+    {
+      "label": "acap-native-sdk-examples: Run custom linter",
+      "type": "shell",
+      "command": "cd ${workspaceFolder} && ./run-linters --custom-linter",
       "group": "lint",
       "problemMatcher": []
     }
