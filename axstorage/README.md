@@ -84,15 +84,22 @@ build
 - **axstorage_1_0_0_armv7hf.eap** - Application package .eap file.
 - **axstorage_1_0_0_LICENSE.txt** - Copy of LICENSE file.
 
-#### Install your application
+#### Install and start the application
 
-Installing your application on an Axis device is as simple as:
+Browse to the application page of the Axis device:
 
-1. In your browser, navigate to `http://<AXIS_DEVICE_IP>/index.html#apps` where `<AXIS_DEVICE_IP>` is the IP address of your device
-2. Click on the tab **App** in the device GUI
-3. Click the **(+)** button and browse to the newly built **axstorage_1_0_0_armv7hf.eap**
-4. Click **Install**
-5. Run the application by enabling the **Start** switch
+```sh
+http://<AXIS_DEVICE_IP>/index.html#apps
+```
+
+- Click on the tab `Apps` in the device GUI
+- Enable `Allow unsigned apps` toggle
+- Click `(+ Add app)` button to upload the application file
+- Browse to the newly built ACAP application, depending on architecture:
+  - `axstorage_1_0_0_aarch64.eap`
+  - `axstorage_1_0_0_armv7hf.eap`
+- Click `Install`
+- Run the application by enabling the `Start` switch
 
 #### The expected output
 

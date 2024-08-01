@@ -57,7 +57,8 @@ building-opencv
    ```
 
 2. You should now have a `build` directory. In it is the `.eap` file that is
-   your application.  Upload the application to your camera.
+   your application.  Enable the `Allow unsigned apps` toggle and upload the
+   application to your camera.
 3. Start the application. In the `App log`, a printout from the application
    should be seen. The same log with continuous scroll can be seen by SSHing to
    the camera and running `journalctl -f`. The printout shows whether the

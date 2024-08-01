@@ -63,6 +63,9 @@ docker build . --build-arg ARCH --tag web-server:$ARCH
 
 Installing your application on an Axis video device is as simple as:
 
+Enable `Allow unsigned apps` toggle through the web interface and run the
+following command.
+
 ```sh
 docker run --rm web-server:$ARCH eap-install.sh $AXIS_DEVICE_IP $PASS install
 ```
