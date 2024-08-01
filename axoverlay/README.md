@@ -110,8 +110,14 @@ Browse to the following page (replace <AXIS_DEVICE_IP> with the IP number of you
 http://<AXIS_DEVICE_IP>/index.html#apps
 ```
 
-*Goto your device web page above > Click on the tab **App** in the device GUI > Add **(+)** sign and browse to
-the newly built **axoverlay_1_0_0_\<ARCH\>.eap** > Click **Install** > Run the application by enabling the **Start** switch*
+- Click on the tab `Apps` in the device GUI
+- Enable `Allow unsigned apps` toggle
+- Click `(+ Add app)` button to upload the application file
+- Browse to the newly built ACAP application, depending on architecture:
+  - `axoverlay_1_0_0_aarch64.eap`
+  - `axoverlay_1_0_0_armv7hf.eap`
+- Click `Install`
+- Run the application by enabling the `Start` switch
 
 #### The expected output
 

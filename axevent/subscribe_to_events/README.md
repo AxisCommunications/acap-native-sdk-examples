@@ -106,18 +106,22 @@ subscribe_to_events
 - **build/subscribe_to_events_1_0_0_armv7hf.eap** - Application package .eap file.
 - **build/subscribe_to_events_1_0_0_LICENSE.txt** - Copy of LICENSE file.
 
-#### Install your application
+#### Install and start the application
 
-Installing your application on an Axis device is as simple as:
-
-Browse to the following page (replace <AXIS_DEVICE_IP> with the IP number of your Axis device)
+Browse to the application page of the Axis device:
 
 ```sh
 http://<AXIS_DEVICE_IP>/index.html#apps
 ```
 
-*Goto your device web page above > Click on the tab **App** in the device GUI > Click Add **(+)** sign and browse to
-the newly built **subscribe_to_events_1_0_0_armv7hf.eap** > Click **Install** > Run the application by enabling the **Start** switch*
+- Click on the tab `Apps` in the device GUI
+- Enable `Allow unsigned apps` toggle
+- Click `(+ Add app)` button to upload the application file
+- Browse to the newly built ACAP application, depending on architecture:
+  - `subscribe_to_events_1_0_0_aarch64.eap`
+  - `subscribe_to_events_1_0_0_armv7hf.eap`
+- Click `Install`
+- Run the application by enabling the `Start` switch
 
 ### Test application - trigger events
 

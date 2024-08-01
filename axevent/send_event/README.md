@@ -108,18 +108,22 @@ send_event
 - **build/send_event_1_0_0_armv7hf.eap** - Application package .eap file for "send_event".
 - **build/send_event_1_0_0_LICENSE.txt** - Copy of LICENSE file.
 
-#### Install your application
+#### Install and start the application
 
-Installing your application on an Axis video device is as simple as:
-
-Browse to the following page (replace <AXIS_DEVICE_IP> with the IP number of your Axis video device)
+Browse to the application page of the Axis device:
 
 ```sh
 http://<AXIS_DEVICE_IP>/index.html#apps
 ```
 
-*Goto your device web page above > Click on the tab **App** in the device GUI > Click Add **(+)** sign and browse to
-the newly built **send_event_1_0_0_armv7hf.eap** > Click **Install** > Run the application by enabling the **Start** switch*
+- Click on the tab `Apps` in the device GUI
+- Enable `Allow unsigned apps` toggle
+- Click `(+ Add app)` button to upload the application file
+- Browse to the newly built ACAP application, depending on architecture:
+  - `send_event_1_0_0_aarch64.eap`
+  - `send_event_1_0_0_armv7hf.eap`
+- Click `Install`
+- Run the application by enabling the `Start` switch
 
 Application is now available as an application on the device and has been started to send events.
 

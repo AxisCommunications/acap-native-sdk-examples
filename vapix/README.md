@@ -104,7 +104,7 @@ chosen, one of these files should be found:
 - `vapix_example_1_0_0_aarch64.eap`
 - `vapix_example_1_0_0_armv7hf.eap`
 
-#### Install your application
+#### Install and start the application
 
 Browse to the application page of the Axis device:
 
@@ -112,8 +112,9 @@ Browse to the application page of the Axis device:
 http://<AXIS_DEVICE_IP>/index.html#apps
 ```
 
-- Click on the tab `App` in the device GUI
-- Click `(+)` sign to upload the application file
+- Click on the tab `Apps` in the device GUI
+- Enable `Allow unsigned apps` toggle
+- Click `(+ Add app)` button to upload the application file
 - Browse to the newly built ACAP application, depending on architecture:
   - `vapix_example_1_0_0_aarch64.eap`
   - `vapix_example_1_0_0_armv7hf.eap`

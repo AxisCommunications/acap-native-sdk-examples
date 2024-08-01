@@ -96,18 +96,22 @@ The working dir now contains a build folder with the following files:
 - **build/customlib_example_1_0_0_armv7hf.eap** - Application package .eap file.
 - **build/customlib_example_1_0_0_LICENSE.txt** - Copy of LICENSE file.
 
-#### Install your application
+#### Install and start the application
 
-Installing your application on an Axis device is as simple as:
-
-Browse to the following page (replace <AXIS_DEVICE_IP> with the IP number of your Axis device)
+Browse to the application page of the Axis device:
 
 ```sh
 http://<AXIS_DEVICE_IP>/index.html#apps
 ```
 
-*Go to your device web page above > Click on the tab **App** in the device GUI > Click Add **(+)** sign and browse to
-the newly built **customlib_example_1_0_0_armv7hf.eap** > Click **Install** > Run the application by enabling the **Start** switch*
+- Click on the tab `Apps` in the device GUI
+- Enable `Allow unsigned apps` toggle
+- Click `(+ Add app)` button to upload the application file
+- Browse to the newly built ACAP application, depending on architecture:
+  - `customlib_example_1_0_0_aarch64.eap`
+  - `customlib_example_1_0_0_armv7hf.eap`
+- Click `Install`
+- Run the application by enabling the `Start` switch
 
 Application custom_lib_example is now available as an application on the device.
 

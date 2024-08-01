@@ -230,12 +230,22 @@ The installable `.eap` file is found under:
 build/object_detection_app_1_0_0_<ARCH>.eap
 ```
 
-## Installing the application
+## Install and start the application
 
-To install an ACAP application, the `.eap` file in the `build` directory needs
-to be uploaded to the camera and installed. This can be done through the camera
-GUI. Then go to your camera -> Settings -> Apps -> Add -> Browse to the `.eap`
-file and press Install.
+Browse to the application page of the Axis device:
+
+```sh
+http://<AXIS_DEVICE_IP>/index.html#apps
+```
+
+- Click on the tab `Apps` in the device GUI
+- Enable `Allow unsigned apps` toggle
+- Click `(+ Add app)` button to upload the application file
+- Browse to the newly built ACAP application, depending on architecture:
+  - `object_detection_app_1_0_0_aarch64.eap`
+  - `object_detection_app_1_0_0_armv7hf.eap`
+- Click `Install`
+- Run the application by enabling the `Start` switch
 
 ## Running the application
 

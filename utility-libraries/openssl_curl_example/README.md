@@ -27,21 +27,23 @@ on a device.
 
 <!-- ToC GFM -->
 
-- [Purpose of the example](#purpose-of-the-example)
-- [OpenSSL and curl APIs](#openssl-and-curl-apis)
-- [Getting started](#getting-started)
-- [How to run the code](#how-to-run-the-code)
-  - [Build the application](#build-the-application)
-  - [Install your application](#install-your-application)
-  - [The expected output](#the-expected-output)
-    - [Transferred file](#transferred-file)
-    - [Application log](#application-log)
-- [Outline of build steps](#outline-of-build-steps)
-  - [Runtime shared library search path](#runtime-shared-library-search-path)
-- [Check build dependencies](#check-build-dependencies)
-- [Troubleshooting](#troubleshooting)
-  - [Error CURLE_PEER_FAILED_VERIFICATION (60)](#error-curle_peer_failed_verification-60)
-- [License](#license)
+- [Build custom OpenSSL and curl libraries and use them in an ACAP application](#build-custom-openssl-and-curl-libraries-and-use-them-in-an-acap-application)
+  - [Table of contents](#table-of-contents)
+  - [Purpose of the example](#purpose-of-the-example)
+  - [OpenSSL and curl APIs](#openssl-and-curl-apis)
+  - [Getting started](#getting-started)
+  - [How to run the code](#how-to-run-the-code)
+    - [Build the application](#build-the-application)
+      - [Install and start the application](#install-and-start-the-application)
+    - [The expected output](#the-expected-output)
+      - [Transferred file](#transferred-file)
+      - [Application log](#application-log)
+  - [Outline of build steps](#outline-of-build-steps)
+    - [Runtime shared library search path](#runtime-shared-library-search-path)
+  - [Check build dependencies](#check-build-dependencies)
+  - [Troubleshooting](#troubleshooting)
+    - [Error CURLE\_PEER\_FAILED\_VERIFICATION (60)](#error-curle_peer_failed_verification-60)
+  - [License](#license)
 
 <!-- /ToC -->
 
@@ -189,16 +191,22 @@ The working directory now contains a build folder with the following files:
 - **build/package.conf.orig** - Defines the application and its configuration, original file.
 - **build/param.conf** - File containing application parameters.
 
-### Install your application
+#### Install and start the application
 
-To install your application on an Axis device:
+Browse to the application page of the Axis device:
 
-1. Go to `http://<AXIS_DEVICE_IP>` where <AXIS_DEVICE_IP> is the IP number of your
-Axis device.
-2. Go to **Apps** in the device GUI.
-3. Click **+** (Add app) or (Add), and open the newly built **openssl_curl_example_1_0_0_armv7hf.eap**.
-4. Click **Install**.
-5. **Start** the application.
+```sh
+http://<AXIS_DEVICE_IP>/index.html#apps
+```
+
+- Click on the tab `Apps` in the device GUI
+- Enable `Allow unsigned apps` toggle
+- Click `(+ Add app)` button to upload the application file
+- Browse to the newly built ACAP application, depending on architecture:
+  - `openssl_curl_example_1_0_0_aarch64.eap`
+  - `openssl_curl_example_1_0_0_armv7hf.eap`
+- Click `Install`
+- Run the application by enabling the `Start` switch
 
 The `openssl_curl_example` application is now available on the device.
 
