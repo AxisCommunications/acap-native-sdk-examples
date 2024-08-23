@@ -26,7 +26,7 @@ RUN DEBIAN_FRONTEND=noninteractive \
 # Build OpenCV libraries
 #-------------------------------------------------------------------------------
 
-ARG OPENCV_VERSION=4.5.1
+ARG OPENCV_VERSION=4.10.0
 ARG OPENCV_DIR=${BUILD_DIR}/opencv
 ARG OPENCV_SRC_DIR=${OPENCV_DIR}/opencv-${OPENCV_VERSION}
 ARG OPENCV_BUILD_DIR=${OPENCV_DIR}/build
