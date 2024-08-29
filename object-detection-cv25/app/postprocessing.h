@@ -49,7 +49,7 @@ typedef struct {
 int postProcessing(float* locations,
                    float* classes,
                    int num_of_detections,
-                   char* anchor_file,
+                   const char* anchor_file,
                    int num_of_classes,
                    float score_threshold,
                    float nms_threshold,
