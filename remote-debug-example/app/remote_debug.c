@@ -16,7 +16,7 @@
 
 #include <syslog.h>
 
-int main() {
+int main(void) {
     openlog("remote_debug", LOG_PID | LOG_CONS, LOG_USER);
 
     /* Intentional error: attempting to modify a string literal */

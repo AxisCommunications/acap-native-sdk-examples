@@ -51,7 +51,10 @@
 #include "vdo-error.h"
 #include "vdo-map.h"
 #include "vdo-stream.h"
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-parameter"
 #include "vdo-types.h"
+#pragma GCC diagnostic pop
 
 #include <glib.h>
 #include <glib/gstdio.h>
@@ -68,6 +71,7 @@ static const gchar* summary    = "Encoded video client";
 
 // Facilitate graceful shutdown with CTRL-C
 static void handle_sigint(int signum) {
+    (void)signum;
     shutdown = TRUE;
 }
 

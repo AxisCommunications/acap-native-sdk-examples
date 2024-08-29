@@ -24,9 +24,12 @@
 #include <errno.h>
 #include <gmodule.h>
 #include <syslog.h>
-#include <vdo-channel.h>
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-parameter"
 #include "vdo-map.h"
+#include <vdo-channel.h>
+#pragma GCC diagnostic pop
 
 #define VDO_CHANNEL (1)
 
@@ -444,6 +447,7 @@ static void* threadEntry(void* data) {
         pthread_cond_signal(&provider->frameDeliverCond);
         pthread_mutex_unlock(&provider->frameMutex);
     }
+    return provider;
 }
 
 bool startFrameFetch(ImgProvider_t* provider) {

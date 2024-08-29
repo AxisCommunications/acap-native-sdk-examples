@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+#include "imgutils.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -128,6 +129,7 @@ unsigned char* crop_interleaved(unsigned char* image_buffer,
     // (x, y, x + w, x + h).
     // The input buffer channel layout is assumed to be interleaved
     unsigned char* crop_buffer = (unsigned char*)malloc(crop_w * crop_h * channels);
+    (void)image_h;
 
     // We go over each row affected by the crop and copy a contiguous
     // crop_buffer_width sized block of memory
@@ -145,7 +147,7 @@ unsigned char* crop_interleaved(unsigned char* image_buffer,
  * @brief An example of how to use the supplied utility functions
  *
  */
-void test_buffer_to_jpeg_file() {
+void test_buffer_to_jpeg_file(void) {
     // An example of how to use the various utility functions
     // Generates an image buffer, crops a section of it, encodes the crop to jpeg
     // and saves the jpeg to file

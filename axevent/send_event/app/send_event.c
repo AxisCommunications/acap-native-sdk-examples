@@ -42,21 +42,21 @@ static AppData* app_data = NULL;
  *
  * Send the previously declared event.
  *
- * param app_data Application data containing e.g. the event declaration id.
+ * param send_data Application data containing e.g. the event declaration id.
  * return TRUE
  */
-static gboolean send_event(AppData* app_data) {
+static gboolean send_event(AppData* send_data) {
     AXEventKeyValueSet* key_value_set = NULL;
     AXEvent* event                    = NULL;
 
     key_value_set = ax_event_key_value_set_new();
 
     // Add the variable elements of the event to the set
-    syslog(LOG_INFO, "Add value: %lf", app_data->value);
+    syslog(LOG_INFO, "Add value: %lf", send_data->value);
     ax_event_key_value_set_add_key_value(key_value_set,
                                          "Value",
                                          NULL,
-                                         &app_data->value,
+                                         &send_data->value,
                                          AX_VALUE_TYPE_DOUBLE,
                                          NULL);
 
@@ -68,14 +68,14 @@ static gboolean send_event(AppData* app_data) {
     ax_event_key_value_set_free(key_value_set);
 
     // Send the event
-    ax_event_handler_send_event(app_data->event_handler, app_data->event_id, event, NULL);
+    ax_event_handler_send_event(send_data->event_handler, send_data->event_id, event, NULL);
 
-    syslog(LOG_INFO, "Send stateful event with value: %lf", app_data->value);
+    syslog(LOG_INFO, "Send stateful event with value: %lf", send_data->value);
 
     ax_event_free(event);
 
     // Toggle value
-    app_data->value = app_data->value >= 100 ? 0 : app_data->value + 10;
+    send_data->value = send_data->value >= 100 ? 0 : send_data->value + 10;
 
     // Returning TRUE keeps the timer going
     return TRUE;

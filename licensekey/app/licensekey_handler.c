@@ -38,7 +38,8 @@
 static gchar* glob_app_name = NULL;
 
 // Checks licensekey status every 5th minute
-gboolean check_license_status(void* data) {
+static gboolean check_license_status(void* data) {
+    (void)data;
     if (licensekey_verify(glob_app_name, APP_ID, MAJOR_VERSION, MINOR_VERSION) != 1) {
         syslog(LOG_INFO, "Licensekey is invalid");
     } else {
@@ -52,6 +53,8 @@ gboolean check_license_status(void* data) {
  */
 int main(int argc, char* argv[]) {
     GMainLoop* loop;
+    if (argc != 1)
+        return EXIT_FAILURE;
 
     glob_app_name = g_path_get_basename(argv[0]);
     openlog(glob_app_name, LOG_PID | LOG_CONS, LOG_USER);

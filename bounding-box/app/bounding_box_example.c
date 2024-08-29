@@ -30,10 +30,12 @@
 volatile sig_atomic_t running = 1;
 
 static void shutdown(int status) {
+    (void)status;
     running = 0;
 }
 
-static inline void panic(const char* format, ...) {
+__attribute__((noreturn)) __attribute__((format(printf, 1, 2))) static void
+panic(const char* format, ...) {
     va_list args;
     va_start(args, format);
     vsyslog(LOG_ERR, format, args);
@@ -61,7 +63,7 @@ static inline void panic(const char* format, ...) {
 // The intended usecase is performing video content analytics on one channel,
 // then draw bounding boxes with the same coordinate-space as was used for
 // Video Content Analytics (VCA).
-void example_single_channel() {
+static void example_single_channel(void) {
     // Draw on a single view: 1
     bbox_t* bbox = bbox_view_new(1u);
     if (!bbox)
@@ -137,7 +139,7 @@ void example_single_channel() {
 // Note that if you instead run VCA once per channel, i.e. multiple images,
 // then you need to manually translate the coordinates to the global image space,
 // before they can be drawn.
-void example_multiple_channels() {
+static void example_multiple_channels(void) {
     // Draw on channel 1 and 2
     bbox_t* bbox = bbox_new(2u, 1u, 2u);
     if (!bbox)
@@ -185,7 +187,7 @@ void example_multiple_channels() {
     bbox_destroy(bbox);
 }
 
-void example_clear() {
+static void example_clear(void) {
     // Draw on a single channel: 1
     bbox_t* bbox = bbox_new(1u, 1u);
     if (!bbox)
