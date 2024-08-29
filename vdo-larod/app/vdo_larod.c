@@ -163,7 +163,6 @@ int main(int argc, char** argv) {
     void* larodInputAddr          = MAP_FAILED;
     void* larodOutput1Addr        = MAP_FAILED;
     void* larodOutput2Addr        = MAP_FAILED;
-    size_t outputBufferSize       = 0;
     int larodModelFd              = -1;
     int ppInputFd                 = -1;
     int larodInputFd              = -1;
@@ -240,7 +239,7 @@ int main(int argc, char** argv) {
         syslog(LOG_ERR, "Failed setting preprocessing parameters: %s", error->msg);
         goto end;
     }
-    if (chipString != "ambarella-cvflow") {
+    if (strcmp(chipString, "ambarella-cvflow")) {
         if (!larodMapSetStr(ppMap, "image.output.format", "rgb-interleaved", &error)) {
             syslog(LOG_ERR, "Failed setting preprocessing parameters: %s", error->msg);
             goto end;
@@ -345,7 +344,10 @@ int main(int argc, char** argv) {
     size_t rgbBufferSize = ppOutputPitches->pitches[0];
     size_t expectedSize  = inputWidth * inputHeight * CHANNELS;
     if (expectedSize != rgbBufferSize) {
-        syslog(LOG_ERR, "Expected video output size %d, actual %d", expectedSize, rgbBufferSize);
+        syslog(LOG_ERR,
+               "Expected video output size %ld, actual %ld",
+               (unsigned long)expectedSize,
+               (unsigned long)rgbBufferSize);
         goto end;
     }
     const larodTensorPitches* outputPitches = larodGetTensorPitches(outputTensors[0], &error);
@@ -353,7 +355,6 @@ int main(int argc, char** argv) {
         syslog(LOG_ERR, "Could not get pitches of tensor: %s", error->msg);
         goto end;
     }
-    outputBufferSize = outputPitches->pitches[0];
 
     // Allocate memory for input/output buffers
     syslog(LOG_INFO, "Allocate memory for input/output buffers");
@@ -423,7 +424,7 @@ int main(int argc, char** argv) {
         goto end;
     }
 
-    for (unsigned int i = 0; i < numRounds && !stopRunning; i++) {
+    for (int i = 0; i < numRounds && !stopRunning; i++) {
         struct timeval startTs, endTs;
         unsigned int elapsedMs = 0;
 
