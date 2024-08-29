@@ -24,9 +24,12 @@
 #include <errno.h>
 #include <gmodule.h>
 #include <syslog.h>
-#include <vdo-channel.h>
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-parameter"
 #include "vdo-map.h"
+#include <vdo-channel.h>
+#pragma GCC diagnostic pop
 
 #define VDO_CHANNEL (1)
 
@@ -225,11 +228,11 @@ bool chooseStreamResolution(unsigned int reqWidth,
                             unsigned int reqHeight,
                             unsigned int* chosenWidth,
                             unsigned int* chosenHeight) {
-    VdoResolutionSet* set = NULL;
-    VdoChannel* channel   = NULL;
-    GError* error         = NULL;
-    bool ret              = false;
-
+    VdoResolutionSet* set    = NULL;
+    VdoChannel* channel      = NULL;
+    GError* error            = NULL;
+    bool ret                 = false;
+    g_autoptr(VdoMap) filter = NULL;
     assert(chosenWidth);
     assert(chosenHeight);
 
@@ -243,8 +246,12 @@ bool chooseStreamResolution(unsigned int reqWidth,
         goto end;
     }
 
+    filter = vdo_map_new();
     // We filter on resolutions that are supported for VDO_FORMAT_YUV
-    g_autoptr(VdoMap) filter = vdo_map_new();
+    if (!filter) {
+        syslog(LOG_ERR, "%s: Failed to create vdo_map", __func__);
+        goto end;
+    }
     vdo_map_set_uint32(filter, "format", VDO_FORMAT_YUV);
     vdo_map_set_string(filter, "select", "all");
     set = vdo_channel_get_resolutions(channel, filter, &error);
@@ -449,6 +456,7 @@ static void* threadEntry(void* data) {
         pthread_cond_signal(&provider->frameDeliverCond);
         pthread_mutex_unlock(&provider->frameMutex);
     }
+    return provider;
 }
 
 bool startFrameFetch(ImgProvider_t* provider) {

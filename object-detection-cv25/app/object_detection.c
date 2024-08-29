@@ -66,8 +66,11 @@
 #include "imgutils.h"
 #include "larod.h"
 #include "postprocessing.h"
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-parameter"
 #include "vdo-frame.h"
 #include "vdo-types.h"
+#pragma GCC diagnostic pop
 
 /**
  * @brief Free up resources held by an array of labels.
@@ -75,7 +78,7 @@
  * @param labels An array of label string pointers.
  * @param labelFileBuffer Heap buffer containing the actual string data.
  */
-void freeLabels(char** labelsArray, char* labelFileBuffer) {
+static void freeLabels(char** labelsArray, char* labelFileBuffer) {
     free(labelsArray);
     free(labelFileBuffer);
 }
@@ -247,7 +250,8 @@ volatile sig_atomic_t stopRunning = false;
  *
  * @param sig What signal has been sent. Will always be SIGINT.
  */
-void sigintHandler(int sig) {
+static void sigintHandler(int sig) {
+    (void)sig;
     // Force an exit if SIGINT has already been sent before.
     if (stopRunning) {
         syslog(LOG_INFO, "Interrupted again, exiting immediately without clean up.");
@@ -492,7 +496,7 @@ int main(int argc, char** argv) {
     const int quality            = args.quality;
     const int numberOfDetections = args.numDetections;  // number of detections
     const int numberOfClasses    = args.numLabels;      // number of classes
-    const char* anchorFile       = args.anchorsFile;
+    char* anchorFile             = args.anchorsFile;
     const int padding            = args.padding;
 
     if (strcmp(chipString, "ambarella-cvflow") != 0) {
@@ -507,8 +511,8 @@ int main(int argc, char** argv) {
 
     // Hard coding stream resolution because CV25 devices don't support well
     // the function to pick the best resolution
-    unsigned int streamWidth  = 640;
-    unsigned int streamHeight = 360;
+    int streamWidth  = 640;
+    int streamHeight = 360;
     syslog(LOG_INFO,
            "Creating VDO image provider and creating stream %d x %d",
            streamWidth,
