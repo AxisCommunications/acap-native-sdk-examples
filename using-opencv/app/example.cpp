@@ -14,7 +14,10 @@
  * limitations under the License.
  */
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wfloat-equal"
 #include <opencv2/imgproc.hpp>
+#pragma GCC diagnostic pop
 #include <opencv2/video.hpp>
 #include <stdlib.h>
 #include <syslog.h>
@@ -23,7 +26,7 @@
 
 using namespace cv;
 
-int main(int argc, char* argv[]) {
+int main(void) {
     openlog("opencv_app", LOG_PID | LOG_CONS, LOG_USER);
     syslog(LOG_INFO, "Running OpenCV example with VDO as video source");
     ImgProvider_t* provider = NULL;

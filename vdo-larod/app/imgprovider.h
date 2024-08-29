@@ -24,8 +24,11 @@
 #include <stdatomic.h>
 #include <stdbool.h>
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-parameter"
 #include "vdo-stream.h"
 #include "vdo-types.h"
+#pragma GCC diagnostic pop
 
 #define NUM_VDO_BUFFERS (8)
 

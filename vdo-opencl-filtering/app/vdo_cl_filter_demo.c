@@ -46,10 +46,13 @@
 #include <syslog.h>
 #include <unistd.h>
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-parameter"
 #include "vdo-error.h"
 #include "vdo-map.h"
 #include "vdo-stream.h"
 #include "vdo-types.h"
+#pragma GCC diagnostic pop
 
 #define CL_TARGET_OPENCL_VERSION 120
 #include <CL/cl.h>
@@ -139,7 +142,7 @@ static cl_program create_cl_program(cl_context cont, const char* file_name, cl_i
     return prog;
 }
 
-static int free_opencl() {
+static int free_opencl(void) {
     int cl_ret;
     cl_ret = clReleaseMemObject(out_image_y);
     cl_ret |= clReleaseMemObject(out_image_cbcr);
@@ -329,6 +332,8 @@ static int do_opencl_filtering(cl_mem* in_image_y,
 }
 
 static void free_table_entry(gpointer key, gpointer value, gpointer user_data) {
+    (void)key;
+    (void)user_data;
     cl_mem mem_obj = *(cl_mem*)value;
     cl_int ret     = clReleaseMemObject(mem_obj);
     if (ret != CL_SUCCESS) {
@@ -354,6 +359,7 @@ static int map_input_buffer(void* buffer,
                             unsigned buffer_count) {
     int ret;
     static unsigned count = 0;
+    (void)area;
 
     if (g_hash_table_contains(table, buffer)) {
         *in_image_y = *((cl_mem*)g_hash_table_lookup(table, buffer));
@@ -384,7 +390,7 @@ static int map_input_buffer(void* buffer,
     return 0;
 }
 
-int main(int argc, char* argv[]) {
+int main(void) {
     GError* error           = NULL;
     FILE* output_file       = NULL;
     VdoMap* settings        = NULL;
