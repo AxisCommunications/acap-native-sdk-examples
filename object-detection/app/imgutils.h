@@ -14,10 +14,12 @@
  * limitations under the License.
  */
 
-#include <jpeglib.h>
+#include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+#include <jpeglib.h>
 
 /**
  * @brief Encode an image buffer as jpeg and store it in memory
@@ -82,4 +84,4 @@ unsigned char* crop_interleaved(unsigned char* image_buffer,
  * @brief An example of how to use the supplied utility functions
  *
  */
-void test_buffer_to_jpeg_file();
+void test_buffer_to_jpeg_file(void);

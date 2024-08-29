@@ -59,7 +59,10 @@
 #include "imgutils.h"
 #include "larod.h"
 #include "vdo-frame.h"
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-parameter"
 #include "vdo-types.h"
+#pragma GCC diagnostic pop
 
 /**
  * @brief Free up resources held by an array of labels.
@@ -67,7 +70,7 @@
  * @param labels An array of label string pointers.
  * @param labelFileBuffer Heap buffer containing the actual string data.
  */
-void freeLabels(char** labelsArray, char* labelFileBuffer) {
+static void freeLabels(char** labelsArray, char* labelFileBuffer) {
     free(labelsArray);
     free(labelFileBuffer);
 }
@@ -207,32 +210,6 @@ end:
     close(labelsFd);
 
     return ret;
-}
-
-/// Set by signal handler if an interrupt signal sent to process.
-/// Indicates that app should stop asap and exit gracefully.
-volatile sig_atomic_t stopRunning = false;
-
-/**
- * @brief Invoked on SIGINT. Makes app exit cleanly asap if invoked once, but
- * forces an immediate exit without clean up if invoked at least twice.
- *
- * @param sig What signal has been sent. Will always be SIGINT.
- */
-void sigintHandler(int sig) {
-    // Force an exit if SIGINT has already been sent before.
-    if (stopRunning) {
-        syslog(LOG_INFO, "Interrupted again, exiting immediately without clean up.");
-
-        exit(EXIT_FAILURE);
-    }
-
-    syslog(LOG_INFO,
-           "Interrupted, starting graceful termination of app. Another "
-           "interrupt signal will cause a forced exit.");
-
-    // Tell the main thread to stop running inferences asap.
-    stopRunning = true;
 }
 
 /**

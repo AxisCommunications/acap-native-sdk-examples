@@ -42,6 +42,7 @@ static GMainLoop* loop = NULL;
  * @param signal_num Signal number
  */
 static void handle_sigterm(int signo) {
+    (void)signo;
     if (loop != NULL) {
         g_main_loop_quit(loop);
     } else {
@@ -105,6 +106,8 @@ static gboolean incoming_data(GIOChannel* channel, GIOCondition cond, gpointer d
     gsize bytes_read;
     gchar timestamp[2];
     gchar str[128];
+    (void)channel;
+    (void)cond;
 
     /* We have incoming data, read it! */
     ret = g_io_channel_read_chars(iochannel, timestamp, sizeof(timestamp), &bytes_read, &error);
@@ -175,12 +178,9 @@ static gboolean send_timer_data(gpointer data) {
 /**
  * @brief Main function
  *
- * @param argc Number of arguments
- * @param argv Arguments vector
- *
  * @return Result
  */
-int main(int argc, char* argv[]) {
+int main(void) {
     gint fd                = 0;
     gint ret               = 0;
     gint status            = EXIT_FAILURE;

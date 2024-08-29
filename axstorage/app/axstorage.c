@@ -53,6 +53,7 @@ static GMainLoop* loop   = NULL;
  * @param signal_num Signal number
  */
 static void handle_sigterm(int signo) {
+    (void)signo;
     if (loop != NULL) {
         g_main_loop_quit(loop);
     } else {
@@ -150,7 +151,7 @@ static void release_disk_cb(gpointer user_data, GError* error) {
 /**
  * @brief Free disk items from disks_list
  */
-static void free_disk_item_t() {
+static void free_disk_item_t(void) {
     GList* node = NULL;
 
     for (node = g_list_first(disks_list); node != NULL; node = g_list_next(node)) {
@@ -202,6 +203,7 @@ static void setup_disk_cb(AXStorage* storage, gpointer user_data, GError* error)
     gchar* storage_id = NULL;
     gchar* path       = NULL;
     AXStorageType storage_type;
+    (void)user_data;
 
     if (storage == NULL || error != NULL) {
         syslog(LOG_ERR, "Failed to setup disk. Error: %s", error->message);
@@ -257,6 +259,7 @@ static void subscribe_cb(gchar* storage_id, gpointer user_data, GError* error) {
     gboolean writable;
     gboolean full;
     gboolean exiting;
+    (void)user_data;
 
     if (error != NULL) {
         syslog(LOG_WARNING, "Failed to subscribe to %s. Error: %s", storage_id, error->message);
@@ -389,7 +392,7 @@ static disk_item_t* new_disk_item_t(gchar* storage_id) {
  *
  * @return Result
  */
-gint main() {
+gint main(void) {
     GList* disks  = NULL;
     GList* node   = NULL;
     GError* error = NULL;
