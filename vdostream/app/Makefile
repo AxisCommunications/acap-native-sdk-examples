@@ -7,7 +7,18 @@ PKGS = gio-2.0 gio-unix-2.0 vdostream
 CFLAGS += $(shell PKG_CONFIG_PATH=$(PKG_CONFIG_PATH) pkg-config --cflags $(PKGS))
 LDLIBS += $(shell PKG_CONFIG_PATH=$(PKG_CONFIG_PATH) pkg-config --libs $(PKGS))
 
-CFLAGS += -Wall -g -O2 -Werror
+CFLAGS += -Wall \
+          -Wextra \
+          -Wformat=2 \
+          -Wpointer-arith \
+          -Wbad-function-cast \
+          -Wstrict-prototypes \
+          -Wmissing-prototypes \
+          -Winline \
+          -Wdisabled-optimization \
+          -Wfloat-equal \
+          -W \
+          -Werror
 
 all: $(PROGS)
 

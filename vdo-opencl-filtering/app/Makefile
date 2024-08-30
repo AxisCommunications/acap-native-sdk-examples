@@ -4,7 +4,19 @@ PROGS = $(PROG1)
 
 PKGS = gio-unix-2.0 glib-2.0 opencl vdostream
 
-CFLAGS += -Wall
+CFLAGS += -Wall \
+          -Wextra \
+          -Wformat=2 \
+          -Wpointer-arith \
+          -Wbad-function-cast \
+          -Wstrict-prototypes \
+          -Wmissing-prototypes \
+          -Winline \
+          -Wdisabled-optimization \
+          -Wfloat-equal \
+          -W \
+          -Werror
+
 CFLAGS += $(shell PKG_CONFIG_PATH=$(PKG_CONFIG_PATH) pkg-config --cflags $(PKGS))
 LDLIBS += $(shell PKG_CONFIG_PATH=$(PKG_CONFIG_PATH) pkg-config --libs $(PKGS))
 

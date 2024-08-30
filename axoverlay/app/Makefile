@@ -8,7 +8,18 @@ CFLAGS += $(shell PKG_CONFIG_PATH=$(PKG_CONFIG_PATH) pkg-config --cflags $(PKGS)
 LDLIBS += $(shell PKG_CONFIG_PATH=$(PKG_CONFIG_PATH) pkg-config --libs $(PKGS))
 LDFLAGS  += -s -laxoverlay
 
-CFLAGS  += -W -Wformat=2 -Wpointer-arith -Wbad-function-cast -Wstrict-prototypes -Wmissing-prototypes -Winline -Wdisabled-optimization -Wfloat-equal -Wall -Werror
+CFLAGS += -Wall \
+          -Wextra \
+          -Wformat=2 \
+          -Wpointer-arith \
+          -Wbad-function-cast \
+          -Wstrict-prototypes \
+          -Wmissing-prototypes \
+          -Winline \
+          -Wdisabled-optimization \
+          -Wfloat-equal \
+          -W \
+          -Werror
 
 all:	$(PROGS)
 

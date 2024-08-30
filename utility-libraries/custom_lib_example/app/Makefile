@@ -5,16 +5,17 @@ PROGS	= $(PROG1)
 LDLIBS += -Llib
 CFLAGS += -Icustom_build
 CFLAGS += -Wall \
-	  -Wformat=2 \
-	  -Wpointer-arith \
-	  -Wbad-function-cast \
-	  -Wstrict-prototypes \
-	  -Wmissing-prototypes \
-	  -Winline \
-	  -Wdisabled-optimization \
-	  -Wfloat-equal \
-	  -W \
-	  -Werror
+          -Wextra \
+          -Wformat=2 \
+          -Wpointer-arith \
+          -Wbad-function-cast \
+          -Wstrict-prototypes \
+          -Wmissing-prototypes \
+          -Winline \
+          -Wdisabled-optimization \
+          -Wfloat-equal \
+          -W \
+          -Werror
 
 SHLIB_DIR = ./lib
 LDFLAGS = -L$(SHLIB_DIR) -Wl,-rpath,'$$ORIGIN/lib'

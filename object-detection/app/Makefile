@@ -6,14 +6,25 @@ LIBJPEG_TURBO = /opt/build/libjpeg-turbo/build
 
 PKGS = gio-2.0 gio-unix-2.0 liblarod vdostream
 
-CFLAGS += -I$(LIBJPEG_TURBO)/include
+CFLAGS += -I$(LIBJPEG_TURBO)/include -DLAROD_API_VERSION_3
 LDLIBS  += -ljpeg
 LDFLAGS += -L./$(LIBDIR) -Wl,-rpath,'$$ORIGIN/$(LIBDIR)'
 
 CFLAGS += $(shell PKG_CONFIG_PATH=$(PKG_CONFIG_PATH) pkg-config --cflags $(PKGS))
 LDLIBS += $(shell PKG_CONFIG_PATH=$(PKG_CONFIG_PATH) pkg-config --libs $(PKGS))
 
-CFLAGS += -Wall -DLAROD_API_VERSION_3
+CFLAGS += -Wall \
+          -Wextra \
+          -Wformat=2 \
+          -Wpointer-arith \
+          -Wbad-function-cast \
+          -Wstrict-prototypes \
+          -Wmissing-prototypes \
+          -Winline \
+          -Wdisabled-optimization \
+          -Wfloat-equal \
+          -W \
+          -Werror
 
 all:	$(PROGS)
 
