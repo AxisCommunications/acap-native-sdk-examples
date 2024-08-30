@@ -48,11 +48,11 @@
  *         -o vdo.out
  */
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-parameter"
 #include "vdo-error.h"
 #include "vdo-map.h"
 #include "vdo-stream.h"
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunused-parameter"
 #include "vdo-types.h"
 #pragma GCC diagnostic pop
 

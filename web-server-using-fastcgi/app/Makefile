@@ -12,7 +12,18 @@ LDFLAGS = -L./lib -Wl,--no-as-needed,-rpath,'$$ORIGIN/lib'
 CFLAGS += -I/opt/build/uriparser/build/include
 LDLIBS += -luriparser
 
-CFLAGS += -W -Wformat=2 -Wpointer-arith -Wbad-function-cast -Winline -Wdisabled-optimization -Wfloat-equal -Wall -Werror
+CFLAGS += -Wall \
+          -Wextra \
+          -Wformat=2 \
+          -Wpointer-arith \
+          -Wbad-function-cast \
+          -Wstrict-prototypes \
+          -Wmissing-prototypes \
+          -Winline \
+          -Wdisabled-optimization \
+          -Wfloat-equal \
+          -W \
+          -Werror
 
 all:	$(PROGS)
 

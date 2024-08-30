@@ -7,18 +7,18 @@ PKGS = glib-2.0 gio-2.0 axparameter
 CFLAGS += $(shell PKG_CONFIG_PATH=$(PKG_CONFIG_PATH) pkg-config --cflags $(PKGS))
 LDLIBS += $(shell PKG_CONFIG_PATH=$(PKG_CONFIG_PATH) pkg-config --libs $(PKGS))
 
-CFLAGS += -O2 \
-          -Werror \
-          -Wall \
+CFLAGS += -Wall \
           -Wextra \
+          -Wformat=2 \
+          -Wpointer-arith \
           -Wbad-function-cast \
+          -Wstrict-prototypes \
+          -Wmissing-prototypes \
+          -Winline \
           -Wdisabled-optimization \
           -Wfloat-equal \
-          -Wformat=2 \
-          -Winline \
-          -Wmissing-prototypes \
-          -Wpointer-arith \
-          -Wstrict-prototypes
+          -W \
+          -Werror
 
 all: $(PROGS)
 

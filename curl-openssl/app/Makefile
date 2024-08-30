@@ -8,16 +8,17 @@ LDLIBS += $(shell PKG_CONFIG_PATH=$(PKG_CONFIG_PATH) pkg-config --libs $(PKGS))
 
 # Set warning flags
 CFLAGS += -Wall \
-	  -Wformat=2 \
-	  -Wpointer-arith \
-	  -Wbad-function-cast \
-	  -Wstrict-prototypes \
-	  -Wmissing-prototypes \
-	  -Winline \
-	  -Wdisabled-optimization \
-	  -Wfloat-equal \
-	  -W \
-	  -Werror
+          -Wextra \
+          -Wformat=2 \
+          -Wpointer-arith \
+          -Wbad-function-cast \
+          -Wstrict-prototypes \
+          -Wmissing-prototypes \
+          -Winline \
+          -Wdisabled-optimization \
+          -Wfloat-equal \
+          -W \
+          -Werror
 
 # Pre-process debug setting if it's set in the Dockerfile
 ifneq ($(strip $(APP_DEBUG)),)

@@ -4,8 +4,18 @@ DEBUG_DIR = debug
 
 PROGS = $(PROG1)
 
-CFLAGS += -W -Wformat=2 -Wpointer-arith -Wbad-function-cast \
-          -Winline -Wdisabled-optimization -Wfloat-equal -Wall -Werror
+CFLAGS += -Wall \
+          -Wextra \
+          -Wformat=2 \
+          -Wpointer-arith \
+          -Wbad-function-cast \
+          -Wstrict-prototypes \
+          -Wmissing-prototypes \
+          -Winline \
+          -Wdisabled-optimization \
+          -Wfloat-equal \
+          -W \
+          -Werror
 
 CFLAGS_DEBUG = -g3 -O0
 

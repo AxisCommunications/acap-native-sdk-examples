@@ -17,16 +17,17 @@ CFLAGS += -I/opt/build/curl/install/include/curl
 
 # Set warning flags
 CFLAGS += -Wall \
-	  -Wformat=2 \
-	  -Wpointer-arith \
-	  -Wbad-function-cast \
-	  -Wstrict-prototypes \
-	  -Wmissing-prototypes \
-	  -Winline \
-	  -Wdisabled-optimization \
-	  -Wfloat-equal \
-	  -W \
-	  -Werror
+          -Wextra \
+          -Wformat=2 \
+          -Wpointer-arith \
+          -Wbad-function-cast \
+          -Wstrict-prototypes \
+          -Wmissing-prototypes \
+          -Winline \
+          -Wdisabled-optimization \
+          -Wfloat-equal \
+          -W \
+          -Werror
 
 # Pre-process debug setting if it's set in the Dockerfile
 ifneq ($(strip $(APP_DEBUG)),)
