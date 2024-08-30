@@ -30,7 +30,7 @@
  * return EXIT_FAILURE if any errors occur, otherwise EXIT_SUCCESS.
  */
 
-int fcgi_run() {
+static int fcgi_run(void) {
     int count = 0;  // counter of requests
     int sock;
     FCGX_Request request;
@@ -137,7 +137,7 @@ int fcgi_run() {
     return EXIT_SUCCESS;
 }
 
-int main() {
+int main(void) {
     int ret;
     // Program loop
     ret = fcgi_run();
