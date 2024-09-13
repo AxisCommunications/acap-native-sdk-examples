@@ -11,3 +11,8 @@ super-linter.log*
 .bash*
 package.conf*
 param.conf
+**/*_LICENSE.txt
+
+// Ignore files from eap-install.sh
+**/*var_log_messages.*
+**/.eap-install.cfg

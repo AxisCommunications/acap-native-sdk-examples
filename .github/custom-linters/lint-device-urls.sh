@@ -23,6 +23,7 @@ check_device_ip_naming() {
     --exclude-dir=.git \
     --exclude-dir=build* \
     --exclude=alpine.tar \
+    --exclude=.eap-install.cfg \
     "
 
   print_section "Check device IP names on format '$allowed_name'"
