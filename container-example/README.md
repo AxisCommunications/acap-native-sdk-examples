@@ -39,7 +39,7 @@ to port 8080 on the device.
 
 ## Prerequisites
 
-- An Axis device with [container support](https://www.axis.com/support/tools/product-selector/shared/%5B%7B%22index%22%3A%5B4%2C2%5D%2C%22value%22%3A%22Yes%22%7D%5D), see more info in [Axis devices and compatibility](https://axiscommunications.github.io/acap-documentation/docs/axis-devices-and-compatibility/#acap-computer-vision-sdk-hardware-compatibility).
+- An Axis device with [container support](https://www.axis.com/support/tools/product-selector/shared/%5B%7B%22index%22%3A%5B10%2C2%5D%2C%22value%22%3A%22Yes%22%7D%5D), see more info in [Axis devices and compatibility](https://axiscommunications.github.io/acap-documentation/docs/axis-devices-and-compatibility/#acap-computer-vision-sdk-hardware-compatibility).
 - AXIS OS 11.10 or later.
 - The [Docker Compose ACAP][docker-compose-acap] version 3.0 or later,
   installed and running on the device.
