@@ -62,7 +62,7 @@ ARG OPENSSL_BUILD_DIR=${OPENSSL_BUILD_PATH}/openssl-${OPENSSL_VER}
 ARG OPENSSL_INSTALL_DIR=${SDK_LIB_PATH_BASE}
 
 WORKDIR ${OPENSSL_BUILD_PATH}
-RUN curl -O https://www.openssl.org/source/openssl-${OPENSSL_VER}.tar.gz && \
+RUN curl -L -O https://www.openssl.org/source/openssl-${OPENSSL_VER}.tar.gz && \
     tar xzvf openssl-${OPENSSL_VER}.tar.gz
 
 WORKDIR ${OPENSSL_BUILD_DIR}
