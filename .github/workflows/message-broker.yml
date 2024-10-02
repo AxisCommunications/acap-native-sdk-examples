@@ -1,30 +1,30 @@
-name: Build metadata-broker applications
+name: Build message-broker applications
 on:
   workflow_dispatch:
   push:
     paths:
-      - 'metadata-broker/**'
-      - '!metadata-broker/README.md'
-      - '.github/workflows/metadata-broker.yml'
+      - 'message-broker/**'
+      - '!message-broker/README.md'
+      - '.github/workflows/message-broker.yml'
 jobs:
   test-app:
     name: Test app
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        axis-os: ["11.11.70"]
+        axis-os: ["12.0.93"]
         arch: ["armv7hf", "aarch64"]
     env:
       EXREPO: acap-native-examples
-      EXNAME: metadata-broker
+      EXNAME: message-broker
     steps:
       - uses: actions/checkout@v4
       - uses: docker/setup-buildx-action@v3
 
       - name: Build ${{ env.example }} application
         env:
-          example: consume-analytics-scene-description
-          imagetag: ${{ env.EXREPO }}_consume-analytics-scene-description:${{ matrix.arch }}
+          example: consume-scene-metadata
+          imagetag: ${{ env.EXREPO }}_consume-scene-metadata:${{ matrix.arch }}
         run: |
           docker image rm -f $imagetag
           cd $EXNAME/$example

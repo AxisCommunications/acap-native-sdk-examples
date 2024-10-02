@@ -15,7 +15,7 @@
  */
 
 /**
- * This example creates a Metadata Broker subscriber for the
+ * This example creates a Message Broker subscriber for the
  * analytics_scene_description topic. Streamed messages are received in the
  * Analytics Data Format (ADF) and is logged to syslog.
  */

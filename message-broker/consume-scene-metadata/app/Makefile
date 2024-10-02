@@ -1,4 +1,4 @@
-PROG1	= consume_analytics_metadata
+PROG1	= consume_scene_metadata
 OBJS1	= $(PROG1).c
 PROGS	= $(PROG1)
 DEBUG_DIR = debug
