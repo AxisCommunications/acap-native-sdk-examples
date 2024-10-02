@@ -2,7 +2,7 @@
     "schemaVersion": "1.7.0",
     "acapPackageConf": {
         "setup": {
-            "appName": "consume_analytics_metadata",
+            "appName": "consume_scene_metadata",
             "vendor": "Axis Communications",
             "embeddedSdkVersion": "3.0",
             "vendorUrl": "https://www.axis.com",
