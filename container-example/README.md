@@ -2,6 +2,13 @@
 
 # An example of how to use containers in a native ACAP application
 
+> [!WARNING]
+> Container solutions are deprecated from AXIS OS 12.0.
+>
+> - `armv7hf` is no longer supported after AXIS OS 11.11.
+> - `aarch64` will be supported until the end of the AXIS OS 12 LTS cycle. After
+this period, container solutions will no longer receive updates or support.
+
 ## Overview
 
 ### Purpose
