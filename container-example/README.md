@@ -98,38 +98,31 @@ Standing in your working directory run the following commands:
 > https://docs.docker.com/network/proxy and a
 > [script for Axis devices](https://axiscommunications.github.io/acap-documentation/docs/develop/build-install-run.html#configure-network-proxy-settings) in the ACAP documentation.
 
-##### Build the application for armv7hf
-
-Pull the [Alpine linux container image][alpine] for armv7hf and save it to a
-.tar file, then build the application:
-
-```sh
-docker pull --platform="linux/arm/v7" alpine:3.19.1
-docker save -o alpine.tar alpine:3.19.1
-docker build --build-arg ARCH=armv7hf --tag container-example:armv7hf .
-docker cp $(docker create container-example:armv7hf):/opt/app ./build-armv7hf
-```
-
-##### Build the application for aarch64
-
-Pull the [Alpine linux container image][alpine] for aarch64 and save it to a
-.tar file, then build the application:
+Pull the [Alpine linux container image][alpine] and save it to a .tar file.
 
 ```sh
 docker pull --platform="linux/arm64/v8" alpine:3.19.1
 docker save -o alpine.tar alpine:3.19.1
-docker build --build-arg ARCH=aarch64 --tag container-example:aarch64 .
-docker cp $(docker create container-example:aarch64):/opt/app ./build-aarch64
+````
+
+Build the application:
+
+```sh
+docker build --tag <APP_IMAGE> .
 ```
 
-##### Extract the application
+`<APP_IMAGE>` is the name to tag the image with, e.g., `container-example:1.0`.
 
-The `build-armv7hf` and `build-aarch64` directories contain the build
-artifacts, where the ACAP application is found with suffix `.eap`, depending on
-which SDK architecture that was chosen, one of these files should be found:
+Copy the result from the container image to a local directory `build`:
 
-- `Container_Example_1_0_0_aarch64.eap`
-- `Container_Example_1_0_0_armv7hf.eap`
+```sh
+docker cp $(docker create <APP_IMAGE>):/opt/app ./build
+```
+
+The `build` directory contains the build artifacts, where the ACAP
+application is found with suffix `.eap`. This file should be found:
+
+- `Container_Example_1_0_0_aarch64.eap`.
 
 #### Install your application
 
@@ -142,9 +135,8 @@ http://<AXIS_DEVICE_IP>/index.html#apps
 - Click on the tab `Apps` in the device GUI
 - Enable `Allow unsigned apps` toggle
 - Click `(+ Add app)` button to upload the application file
-- Browse to the newly built ACAP application, depending on architecture:
+- Browse to the newly built ACAP application:
   - `Container_Example_1_0_0_aarch64.eap`
-  - `Container_Example_1_0_0_armv7hf.eap`
 - Click `Install`
 - Run the application by enabling the `Start` switch
 

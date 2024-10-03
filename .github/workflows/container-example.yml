@@ -13,12 +13,9 @@ jobs:
     strategy:
       matrix:
         include:
-          - arch: armv7hf
-            platformarch: "linux/arm/v7"
-            axis-os: 11.11.70
           - arch: aarch64
             platformarch: "linux/arm64/v8"
-            axis-os: 11.11.70
+            axis-os: 12.0.89
     env:
       EXREPO: acap-native-examples
       EXNAME: container-example
@@ -33,7 +30,7 @@ jobs:
         run: |
           docker image rm -f $imagetag
           cd $EXNAME
-          docker pull --platform=${{ matrix.platformarch}} alpine:$alpinetag
+          docker pull --platform=${{ matrix.platformarch }} alpine:$alpinetag
           docker save -o alpine.tar alpine:$alpinetag
           docker build --no-cache --tag $imagetag --build-arg ARCH=${{ matrix.arch }} .
           docker cp $(docker create $imagetag):/opt/app ./build
