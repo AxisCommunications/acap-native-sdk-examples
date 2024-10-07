@@ -1,8 +1,8 @@
 # syntax=docker/dockerfile:1
 
 ARG ARCH=armv7hf
-ARG VERSION=1.15
-ARG UBUNTU_VERSION=22.04
+ARG VERSION=12.0.0
+ARG UBUNTU_VERSION=24.04
 ARG REPO=axisecp
 ARG SDK=acap-native-sdk
 
