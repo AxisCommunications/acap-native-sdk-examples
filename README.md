@@ -6,9 +6,9 @@ AXIS Camera Application Platform (ACAP) is an open application platform from Axi
 
 The ACAP Native SDK is targeted towards users that want to develop plug-in style, event generating applications that fit well into a VMS centric system. This SDK offers high performance by integrating closely with AXIS OS and hardware. Already existing ACAP users should feel at home using this SDK and migrating from previous version ACAP 3 to this SDK should be straightforward.
 
-Please check the following guidelines for ACAP 4:
+Please check the following guidelines for ACAP application development:
 
-- [AXIS ACAP 4 SDK Documentation](https://axiscommunications.github.io/acap-documentation/)
+- [ACAP documentation](https://axiscommunications.github.io/acap-documentation/)
 - [Introduction](https://axiscommunications.github.io/acap-documentation/docs/introduction.html)
 - [Getting Started](https://axiscommunications.github.io/acap-documentation/docs/get-started.html)
 
