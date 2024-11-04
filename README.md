@@ -11,6 +11,7 @@ Please check the following guidelines for ACAP application development:
 - [ACAP documentation](https://axiscommunications.github.io/acap-documentation/)
 - [Introduction](https://axiscommunications.github.io/acap-documentation/docs/introduction.html)
 - [Getting Started](https://axiscommunications.github.io/acap-documentation/docs/get-started.html)
+- [Developer environment requisites](https://axiscommunications.github.io/acap-documentation/docs/get-started/set-up-developer-environment/pre-requisites.html)
 
 ## Getting started with the repository
 
