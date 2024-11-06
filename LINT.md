@@ -106,8 +106,7 @@ should be able to work with any editor formatting tool pointing out these files.
 ### With super-linter container interactively
 
 It might be more convenient to run super-linter interactively, e.g. for faster
-iteration of a single test or to
-[autoformat](auto-format-files-according-to-linter-rules) files.
+iteration of a single test or to [autoformat](#autoformat-files) files.
 
 Another benefit is that the container contains the same setup including tool
 versions as in GitHub Actions.
@@ -199,4 +198,4 @@ according to the configuration file on save and when typing.
 
 If your OS or distribution doesn't have a compatible clang-format version to
 install, use the approach in [Use the super-linter
-container](use-the-super-linter-container) to autoformat files.
+container](#with-super-linter-container-interactively) to autoformat files.
