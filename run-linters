@@ -27,6 +27,7 @@ Usage:
 Options:
     -a, --all                   Run all linters
     -sl, --super-linter         Run super-linter
+    -rl, --renovate-linter      Run Renovate linter
     -cl, --custom-linter        Run custom linter
     -h, --help                  Show this help
 "
@@ -35,8 +36,10 @@ Options:
 # Check input
 run_all=no
 run_sl=no
+run_rl=no
 run_cl=no
 exitcode_super_linter=0
+exitcode_renovate_linter=0
 exitcode_custom_linters=0
 [ $# -gt 0 ] || {
   usage
@@ -46,6 +49,7 @@ while [ $# -gt 0 ]; do
   case $1 in
     -a | --all) run_all=yes ;;
     -sl | --super-linter) run_sl=yes ;;
+    -rl | --renovate-linter) run_rl=yes ;;
     -cl | --custom-linter) run_cl=yes ;;
     h | -h | help | --help) usage && exit 0 ;;
     *) usage && exit 1 ;;
@@ -63,6 +67,17 @@ done
   exitcode_super_linter=$?
 }
 
+[ "$run_all" = yes ] || [ "$run_rl" = yes ] && {
+  printf '\n%s\n' "### RUN RENOVATE LINTER"
+  docker run --rm \
+    -v "$(pwd)"/.github/renovate.json:/usr/src/app/renovate.json \
+    -e RENOVATE_CONFIG_FILE=/usr/src/app/renovate.json \
+    -e LOG_LEVEL=debug \
+    -t renovate/renovate:latest \
+    renovate-config-validator
+  exitcode_renovate_linter=$?
+}
+
 [ "$run_all" = yes ] || [ "$run_cl" = yes ] && {
   printf '\n%s' "### RUN CUSTOM LINTERS"
   .github/run-custom-linters
@@ -70,13 +85,19 @@ done
 }
 
 printf '\n\n%s\n\n' "### LINT RESULT"
-if [ "$exitcode_super_linter" -eq 0 ] && [ "$exitcode_custom_linters" -eq 0 ]; then
+if [ "$exitcode_super_linter" -eq 0 ] &&
+   [ "$exitcode_renovate_linter" -eq 0 ] &&
+   [ "$exitcode_custom_linters" -eq 0 ]; then
   print_bullet_pass "All linters passed."
   exit 0
 else
   [ "$run_all" = yes ] || [ "$run_sl" = yes ] && {
     sl_error="super-linter has one or more errors, see above."
     [ "$exitcode_super_linter" -eq 0 ] || print_bullet_error "$sl_error"
+  }
+  [ "$run_all" = yes ] || [ "$run_rl" = yes ] && {
+    rl_error="Renovate linter has one or more errors, see above."
+    [ "$exitcode_renovate_linter" -eq 0 ] || print_bullet_error "$rl_error"
   }
   [ "$run_all" = yes ] || [ "$run_cl" = yes ] && {
     cl_error="custom linters has one or more errors, see above."

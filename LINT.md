@@ -12,6 +12,7 @@ get a pull request approved.
 - [Linter types](#linter-types)
   - [super-linter](#super-linter)
   - [Custom linters](#custom-linters)
+  - [Renovate configuration linter](#renovate-configuration-linter)
 - [Linters in GitHub Action](#linters-in-github-action)
 - [Run linters locally](#run-linters-locally)
   - [From command-line](#from-command-line)
@@ -28,11 +29,13 @@ get a pull request approved.
 
 ## Linter types
 
-There are two categories of linters in this repository:
+A few categories of linters can be found in this repository:
 
 - The tool [super-linter](https://github.com/super-linter/super-linter) with
   syntax checks of e.g. Markdown, Dockerfile etc.
 - Custom linters created for this repository.
+- [Renovate](https://docs.renovatebot.com/#ways-to-run-renovate) configuration
+  linter.
 
 ### super-linter
 
@@ -45,6 +48,18 @@ For details on which linters that run and the settings, see the file
 The custom linter consists of several smaller checks on e.g. example
 application structure and terminology not covered by super-linter. See the
 invoking file `.github/run-custom-linters` for what checks that are run.
+
+### Renovate configuration linter
+
+To test the Renovate configuration file `.github/renovate.json`, a few options
+are given from Renovate. This repository use a Docker container to run a test
+of the configuration file. Note that this doesn't ensure that the pull requests
+are created as you expect. The Dependency Dashboard found in the issues can
+give more information on what files it finds
+
+See [ways to run Renovate](https://docs.renovatebot.com/#ways-to-run-renovate)
+and the [config validation](https://docs.renovatebot.com/config-validation/)
+for more information.
 
 ## Linters in GitHub Action
 
