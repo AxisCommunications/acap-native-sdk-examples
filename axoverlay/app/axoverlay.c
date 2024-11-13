@@ -31,12 +31,12 @@
 #include <axoverlay.h>
 #include <cairo/cairo.h>
 #include <errno.h>
+#include <glib-unix.h>
 #include <glib.h>
 #include <syslog.h>
 
 #define PALETTE_VALUE_RANGE 255.0
 
-static GMainLoop* main_loop = NULL;
 static gint animation_timer = -1;
 static gint overlay_id      = -1;
 static gint overlay_id_text = -1;
@@ -327,47 +327,12 @@ static gboolean update_overlay_cb(gpointer user_data) {
 /**
  * brief Handles the signals.
  *
- * This function handles the signals when it is time to
- * quit the main loop.
- *
- * param signal_num Signal number.
+ * param loop Loop to quit
  */
-static void signal_handler(gint signal_num) {
-    switch (signal_num) {
-        case SIGTERM:
-        case SIGABRT:
-        case SIGINT:
-            g_main_loop_quit(main_loop);
-            break;
-        default:
-            break;
-    }
-}
-
-/**
- * brief Initialize the signal handler.
- *
- * This function handles the initialization of signals.
- *
- * return result as boolean.
- */
-static gboolean signal_handler_init(void) {
-    struct sigaction sa = {0};
-
-    if (sigemptyset(&sa.sa_mask) == -1) {
-        syslog(LOG_ERR, "Failed to initialize signal handler: %s", strerror(errno));
-        return FALSE;
-    }
-
-    sa.sa_handler = signal_handler;
-
-    if ((sigaction(SIGTERM, &sa, NULL) < 0) || (sigaction(SIGABRT, &sa, NULL) < 0) ||
-        (sigaction(SIGINT, &sa, NULL) < 0)) {
-        syslog(LOG_ERR, "Failed to install signal handler: %s", strerror(errno));
-        return FALSE;
-    }
-
-    return TRUE;
+static gboolean signal_handler(gpointer loop) {
+    g_main_loop_quit((GMainLoop*)loop);
+    syslog(LOG_INFO, "Application was stopped by SIGTERM or SIGINT.");
+    return G_SOURCE_REMOVE;
 }
 
 /***** Main function *********************************************************/
@@ -386,6 +351,7 @@ int main(int argc, char** argv) {
     (void)argc;
     (void)argv;
 
+    GMainLoop* loop    = NULL;
     GError* error      = NULL;
     GError* error_text = NULL;
     gint camera_height = 0;
@@ -393,13 +359,10 @@ int main(int argc, char** argv) {
 
     openlog(NULL, LOG_PID, LOG_USER);
 
-    if (!signal_handler_init()) {
-        syslog(LOG_ERR, "Could not set up signal handler");
-        return 1;
-    }
-
     //  Create a glib main loop
-    main_loop = g_main_loop_new(NULL, FALSE);
+    loop = g_main_loop_new(NULL, FALSE);
+    g_unix_signal_add(SIGTERM, signal_handler, loop);
+    g_unix_signal_add(SIGINT, signal_handler, loop);
 
     if (!axoverlay_is_backend_supported(AXOVERLAY_CAIRO_IMAGE_BACKEND)) {
         syslog(LOG_ERR, "AXOVERLAY_CAIRO_IMAGE_BACKEND is not supported");
@@ -486,7 +449,7 @@ int main(int argc, char** argv) {
     animation_timer = g_timeout_add_seconds(1, update_overlay_cb, NULL);
 
     // Enter main loop
-    g_main_loop_run(main_loop);
+    g_main_loop_run(loop);
 
     // Destroy the overlay
     axoverlay_destroy_overlay(overlay_id, &error);
@@ -509,7 +472,7 @@ int main(int argc, char** argv) {
     g_source_remove(animation_timer);
 
     // Release main loop
-    g_main_loop_unref(main_loop);
+    g_main_loop_unref(loop);
 
     return 0;
 }
