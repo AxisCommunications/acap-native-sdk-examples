@@ -22,6 +22,7 @@
  * limitations they impose.
  */
 #include <axsdk/axparameter.h>
+#include <glib-unix.h>
 #include <stdbool.h>
 #include <syslog.h>
 
@@ -34,19 +35,10 @@ struct message {
     char* value;
 };
 
-static GMainLoop* loop = NULL;  // Must be global, so quit_main_loop() can use it
-
-static void quit_main_loop(__attribute__((unused)) int signal_num) {
-    g_main_loop_quit(loop);
-}
-
-static void set_sigterm_and_sigint_handler(void (*handler)(int)) {
-    struct sigaction sa = {0};
-
-    sigemptyset(&sa.sa_mask);
-    sa.sa_handler = handler;
-    sigaction(SIGTERM, &sa, NULL);
-    sigaction(SIGINT, &sa, NULL);
+static gboolean signal_handler(gpointer loop) {
+    g_main_loop_quit((GMainLoop*)loop);
+    syslog(LOG_INFO, "Application was stopped by SIGTERM or SIGINT.");
+    return G_SOURCE_REMOVE;
 }
 
 // Print an error to syslog and exit the application if a fatal error occurs.
@@ -182,7 +174,8 @@ static void parameter_changed(const gchar* name, const gchar* value, gpointer ha
 }
 
 int main(void) {
-    GError* error = NULL;
+    GError* error   = NULL;
+    GMainLoop* loop = NULL;
 
     openlog(APP_NAME, LOG_PID, LOG_USER);
 
@@ -209,9 +202,9 @@ int main(void) {
 
     // Start listening to callbacks by launching a GLib main loop.
     loop = g_main_loop_new(NULL, FALSE);
-    set_sigterm_and_sigint_handler(quit_main_loop);
+    g_unix_signal_add(SIGTERM, signal_handler, loop);
+    g_unix_signal_add(SIGINT, signal_handler, loop);
     g_main_loop_run(loop);
-    syslog(LOG_INFO, "Application was stopped by SIGTERM or SIGINT.");
 
     g_main_loop_unref(loop);
     ax_parameter_free(handle);

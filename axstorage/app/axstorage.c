@@ -15,6 +15,7 @@
  */
 
 #include <errno.h>
+#include <glib-unix.h>
 #include <glib.h>
 #include <glib/gstdio.h>
 #include <signal.h>
@@ -45,36 +46,16 @@ typedef struct {
 } disk_item_t;
 
 static GList* disks_list = NULL;
-static GMainLoop* loop   = NULL;
 
 /**
- * @brief Signals handling
+ * @brief Handles the signals.
  *
- * @param signal_num Signal number
+ * @param loop Loop to quit
  */
-static void handle_sigterm(int signo) {
-    (void)signo;
-    if (loop != NULL) {
-        g_main_loop_quit(loop);
-    } else {
-        exit(EXIT_FAILURE);
-    }
-}
-
-/**
- * @brief Initialize signals
- *
- * @param signo Signal id (not used)
- */
-static void init_signals(void) {
-    struct sigaction sa;
-
-    sa.sa_flags = 0;
-
-    sigemptyset(&sa.sa_mask);
-    sa.sa_handler = handle_sigterm;
-    sigaction(SIGTERM, &sa, NULL);
-    sigaction(SIGINT, &sa, NULL);
+static gboolean signal_handler(gpointer loop) {
+    g_main_loop_quit((GMainLoop*)loop);
+    syslog(LOG_INFO, "Application was stopped by SIGTERM or SIGINT.");
+    return G_SOURCE_REMOVE;
 }
 
 /**
@@ -393,12 +374,12 @@ static disk_item_t* new_disk_item_t(gchar* storage_id) {
  * @return Result
  */
 gint main(void) {
-    GList* disks  = NULL;
-    GList* node   = NULL;
-    GError* error = NULL;
-    gint ret      = EXIT_SUCCESS;
+    GList* disks    = NULL;
+    GList* node     = NULL;
+    GError* error   = NULL;
+    GMainLoop* loop = NULL;
+    gint ret        = EXIT_SUCCESS;
 
-    init_signals();
     openlog(APP_NAME, LOG_PID, LOG_USER);
     syslog(LOG_INFO, "Start AXStorage application");
 
@@ -412,6 +393,8 @@ gint main(void) {
     }
 
     loop = g_main_loop_new(NULL, FALSE);
+    g_unix_signal_add(SIGTERM, signal_handler, loop);
+    g_unix_signal_add(SIGINT, signal_handler, loop);
 
     /* Loop through the retrieved disks and subscribe to their events. */
     for (node = g_list_first(disks); node != NULL; node = g_list_next(node)) {

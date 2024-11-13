@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+#include <glib-unix.h>
 #include <glib.h>
 #include <stdlib.h>
 #include <syslog.h>
@@ -34,36 +35,15 @@ typedef struct MyConfigAndData {
     gpointer data;
 } MyConfigAndData;
 
-static GMainLoop* loop = NULL;
-
 /**
- * @brief Signals handling
+ * @brief Handles the signals.
  *
- * @param signal_num Signal number
+ * @param loop Loop to quit
  */
-static void handle_sigterm(int signo) {
-    (void)signo;
-    if (loop != NULL) {
-        g_main_loop_quit(loop);
-    } else {
-        exit(EXIT_FAILURE);
-    }
-}
-
-/**
- * @brief Initialize signals
- *
- * @param signo Signal id (not used)
- */
-static void init_signals(void) {
-    struct sigaction sa;
-
-    sa.sa_flags = 0;
-
-    sigemptyset(&sa.sa_mask);
-    sa.sa_handler = handle_sigterm;
-    sigaction(SIGTERM, &sa, NULL);
-    sigaction(SIGINT, &sa, NULL);
+static gboolean signal_handler(gpointer loop) {
+    g_main_loop_quit((GMainLoop*)loop);
+    syslog(LOG_INFO, "Application was stopped by SIGTERM or SIGINT.");
+    return G_SOURCE_REMOVE;
 }
 
 /**
@@ -187,12 +167,14 @@ int main(void) {
     guint port0            = 0;
     AXSerialConfig* config = NULL;
     GIOChannel* iochannel  = NULL;
+    GMainLoop* loop        = NULL;
     GError* error          = NULL;
     MyConfigAndData conf_data;
 
     /* Initialization */
-    init_signals();
     loop = g_main_loop_new(NULL, FALSE);
+    g_unix_signal_add(SIGTERM, signal_handler, loop);
+    g_unix_signal_add(SIGINT, signal_handler, loop);
 
     /* Print some startup messages */
     openlog(APP_NAME, LOG_PID, LOG_LOCAL4);
