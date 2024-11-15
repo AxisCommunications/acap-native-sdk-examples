@@ -66,11 +66,8 @@
 #include "imgutils.h"
 #include "larod.h"
 #include "postprocessing.h"
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunused-parameter"
 #include "vdo-frame.h"
 #include "vdo-types.h"
-#pragma GCC diagnostic pop
 
 /**
  * @brief Free up resources held by an array of labels.

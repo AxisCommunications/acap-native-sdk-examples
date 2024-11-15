@@ -46,13 +46,10 @@
 #include <syslog.h>
 #include <unistd.h>
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunused-parameter"
 #include "vdo-error.h"
 #include "vdo-map.h"
 #include "vdo-stream.h"
 #include "vdo-types.h"
-#pragma GCC diagnostic pop
 
 #define CL_TARGET_OPENCL_VERSION 120
 #include <CL/cl.h>
