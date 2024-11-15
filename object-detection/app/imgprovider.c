@@ -25,11 +25,8 @@
 #include <gmodule.h>
 #include <syslog.h>
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunused-parameter"
 #include "vdo-map.h"
 #include <vdo-channel.h>
-#pragma GCC diagnostic pop
 
 #define VDO_CHANNEL (1)
 
