@@ -37,7 +37,7 @@ typedef struct channel_identifier {
     char* source;
 } channel_identifier_t;
 
-static void on_connection_error(mdb_error_t* error, void* user_data) {
+static void on_connection_error(const mdb_error_t* error, void* user_data) {
     (void)user_data;
 
     syslog(LOG_ERR, "Got connection error: %s, Aborting...", error->message);
