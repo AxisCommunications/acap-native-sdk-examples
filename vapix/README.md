@@ -44,6 +44,17 @@ ACAP application. Some examples:
   are JSON, XML and text. See the VAPIX documentation of the specific API for
   information of format.
 
+### Global proxy configuration
+
+- If a device has set global device proxy, it may cause issues with reaching the local host IP
+  `127.0.0.12` from the ACAP application.
+- To make the local host IP reachable when global device proxies are configured, add `127.0.0.12` to
+  the `No proxy` list. This can be done via either:
+  - The VAPIX
+    [Network Settings API](https://developer.axis.com/vapix/network-video/network-settings-api#setglobalproxyconfiguration-1).
+  - Browse to the network page at `http://<AXIS_DEVICE_IP>/index.html#system/network` and section
+    `Global proxies`.
+
 ## Getting started
 
 These instructions will guide you on how to execute the code. Below is the
