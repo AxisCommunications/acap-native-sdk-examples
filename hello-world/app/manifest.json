@@ -1,5 +1,5 @@
 {
-    "schemaVersion": "1.7.1",
+    "schemaVersion": "1.7.2",
     "acapPackageConf": {
         "setup": {
             "appName": "hello_world",
