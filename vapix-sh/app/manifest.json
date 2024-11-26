@@ -1,0 +1,17 @@
+{
+    "schemaVersion": "1.7.2",
+    "acapPackageConf": {
+        "setup": {
+            "appName": "vapix_example_sh",
+            "vendor": "Axis Communications",
+            "embeddedSdkVersion": "3.0",
+            "runMode": "never",
+            "version": "1.0.0"
+        }
+    },
+    "resources": {
+        "dbus": {
+            "requiredMethods": ["com.axis.HTTPConf1.VAPIXServiceAccounts1.GetCredentials"]
+        }
+    }
+}

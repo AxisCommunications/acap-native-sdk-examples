@@ -1,0 +1,58 @@
+#!/bin/sh -eu
+
+USERNAME=example-vapix-user
+BASEURL=http://127.0.0.12/axis-cgi
+
+# Get the VAPIX credentials from D-Bus
+CREDENTIALS=$(dbus-send --system \
+	--print-reply \
+	--dest=com.axis.HTTPConf1 \
+	/com/axis/HTTPConf1/VAPIXServiceAccounts1 \
+	com.axis.HTTPConf1.VAPIXServiceAccounts1.GetCredentials \
+	string:"$USERNAME")
+CREDENTIALS=${CREDENTIALS#*\"}
+CREDENTIALS=${CREDENTIALS%\"*}
+
+# Function that does VAPIX requests
+request() {
+	[ $# -eq 2 ] || {
+		echo "Error: expected 2 parameters but got $#" >&2
+		return 1
+	}
+
+	response=$(curl -s -u "$CREDENTIALS" -H 'Content-Type: application/json' -d "$1" "$BASEURL/$2")
+
+	error=$(echo "$response" | jq -r '.error.message // empty')
+	[ -z "$error" ] || {
+		echo "Error: $error" >&2
+		return 1
+	}
+	echo "$response"
+}
+
+# Function that reads and prints a specific item (second parameter) from a
+# basic device info property list (provided as the first parameter)
+read_property() {
+	[ $# -eq 2 ] || {
+		echo "Error: expected 2 parameters but got $#" >&2
+		return 1
+	}
+
+	echo "$2: $(echo "$1" | jq -r ".data.propertyList.$2 // empty")"
+}
+
+# Retrieve and print curl version
+curl_ver=$(curl --version)
+curl_ver=${curl_ver#* }
+curl_ver=${curl_ver%% *}
+echo "Curl version $curl_ver"
+
+# Do VAPIX request for basic device info
+REQUEST='{"apiVersion": "1.3", "method": "getAllProperties"}'
+DATA=$(request "$REQUEST" basicdeviceinfo.cgi)
+
+# Print selected parts od the retrieved basic device info
+read_property "$DATA" ProdShortName
+read_property "$DATA" Soc
+read_property "$DATA" SocSerialNumber
+
