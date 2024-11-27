@@ -1,5 +1,5 @@
 # --- Base Stage ---
-FROM tensorflow/tensorflow:1.15.5-gpu as base
+FROM tensorflow/tensorflow:1.15.5-gpu
 ARG DEBIAN_FRONTEND=noninteractive
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
