@@ -3,6 +3,7 @@
     "acapPackageConf": {
         "setup": {
             "appName": "vapix_example_sh",
+            "architecture": "all",
             "vendor": "Axis Communications",
             "embeddedSdkVersion": "3.0",
             "runMode": "never",

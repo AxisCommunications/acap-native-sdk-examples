@@ -76,7 +76,7 @@ vapix
 └── README.md
 ```
 
-- **app/vapix_example_sh** - A POSIX shellscript that comprises the application.
+- **app/vapix_example_sh** - A POSIX shell script that comprises the application.
 - **app/LICENSE** - Text file which lists all open source licensed source code distributed with the application.
 - **app/Makefile** - Makefile containing the build and link instructions for building the ACAP application.
 - **app/manifest.json** - Defines the application and its configuration. This includes additional parameters.
@@ -89,7 +89,7 @@ Below is the step by step instructions on how to execute the program. So
 basically starting with the generation of the .eap file to running it on a
 device.
 
-#### Build the application
+#### Build the application package
 
 Standing in your working directory run the following commands:
 
@@ -101,11 +101,10 @@ Standing in your working directory run the following commands:
 > [script for Axis devices](https://axiscommunications.github.io/acap-documentation/docs/develop/build-install-run.html#configure-network-proxy-settings) in the ACAP documentation.
 
 ```sh
-docker build --tag <APP_IMAGE> --build-arg ARCH=<ARCH> .
+docker build --tag <APP_IMAGE> .
 ```
 
 - `<APP_IMAGE>` is the name to tag the image with, e.g., `vapix_example_sh:1.0`
-- `<ARCH>` is the SDK architecture, `armv7hf` or `aarch64`.
 
 Copy the result from the container image to a local directory `build`:
 
@@ -113,12 +112,14 @@ Copy the result from the container image to a local directory `build`:
 docker cp $(docker create <APP_IMAGE>):/opt/app ./build
 ```
 
-The `build` directory contains the build artifacts, where the ACAP application
-is found with suffix `.eap`, depending on which SDK architecture that was
-chosen, one of these files should be found:
+The `build` directory contains the build artifacts, where the ACAP package
+is found with suffix `.eap`:
 
-- `vapix_example_sh_1_0_0_aarch64.eap`
-- `vapix_example_sh_1_0_0_armv7hf.eap`
+- `vapix_example_sh_1_0_0_all.eap`
+
+> [!NOTE]
+> Since the POSIX shell script is architecture independent, the same ACAP
+> package is used for all target devices.
 
 #### Install and start the application
 
@@ -131,9 +132,8 @@ http://<AXIS_DEVICE_IP>/index.html#apps
 - Click on the tab `Apps` in the device GUI
 - Enable `Allow unsigned apps` toggle
 - Click `(+ Add app)` button to upload the application file
-- Browse to the newly built ACAP application, depending on architecture:
-  - `vapix_example_sh_1_0_0_aarch64.eap`
-  - `vapix_example_sh_1_0_0_armv7hf.eap`
+- Browse to the newly built ACAP application:
+  - `vapix_example_sh_1_0_0_all.eap`
 - Click `Install`
 - Run the application by enabling the `Start` switch
 
