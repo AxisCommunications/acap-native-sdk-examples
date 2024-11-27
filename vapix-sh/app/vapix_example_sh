@@ -51,7 +51,7 @@ echo "Curl version $curl_ver"
 REQUEST='{"apiVersion": "1.3", "method": "getAllProperties"}'
 DATA=$(request "$REQUEST" basicdeviceinfo.cgi)
 
-# Print selected parts od the retrieved basic device info
+# Print selected parts of the retrieved basic device info
 read_property "$DATA" ProdShortName
 read_property "$DATA" Soc
 read_property "$DATA" SocSerialNumber
