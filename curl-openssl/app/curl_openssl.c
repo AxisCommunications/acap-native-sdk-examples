@@ -150,11 +150,6 @@ int main(void) {
         curl_easy_setopt(curl, CURLOPT_HEADER, 1L);
 #endif
 
-        // Set proxy if it's defined
-#ifdef APP_PROXY
-        curl_easy_setopt(curl, CURLOPT_PROXY, APP_PROXY);
-#endif
-
         // Keep example simple - skip all signal handling
         curl_easy_setopt(curl, CURLOPT_NOSIGNAL, 1L);
 
