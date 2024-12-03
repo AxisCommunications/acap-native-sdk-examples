@@ -58,14 +58,14 @@ docker build --tag <APP_IMAGE> --build-arg ARCH=<ARCH> .
 - `<APP_IMAGE>` is the name to tag the image with, e.g., `curl_openssl:1.0`
 - `<ARCH>` is the SDK architecture, `armv7hf` or `aarch64`.
 
-If the device is inside a network with a proxy, then it can be passed on as a
-build argument `APP_PROXY`:
+If the build machine is inside a network with a proxy, then it can be passed on
+as a build argument `BUILD_PROXY`:
 
 > [!IMPORTANT]
 > Pass proxy argument without `http://`.
 
 ```sh
-docker build --build-arg APP_PROXY=<MY_PROXY> --tag <APP_IMAGE> --build-arg ARCH=<ARCH> .
+docker build --build-arg BUILD_PROXY=<MY_PROXY> --tag <APP_IMAGE> --build-arg ARCH=<ARCH> .
 ```
 
 To get more verbose logging from curl, pass the build argument `APP_DEBUG=yes`:
@@ -73,6 +73,15 @@ To get more verbose logging from curl, pass the build argument `APP_DEBUG=yes`:
 ```sh
 docker build --build-arg APP_DEBUG=yes --tag <APP_IMAGE> --build-arg ARCH=<ARCH> .
 ```
+
+If the device is inside a network with a proxy, the global device proxy must be
+set to allow curl to pick it up at runtime. Set up global device proxy via either:
+
+- The VAPIX
+  [Network Settings API](https://developer.axis.com/vapix/network-video/network-settings-api#setglobalproxyconfiguration-1).
+- Browse to the network page at
+  `http://<AXIS_DEVICE_IP>/index.html#system/network` and section
+  `Global proxies`.
 
 Copy the result from the container image to a local directory `build`:
 

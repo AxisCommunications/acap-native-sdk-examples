@@ -25,11 +25,6 @@ ifneq ($(strip $(APP_DEBUG)),)
 CFLAGS += -DAPP_DEBUG="\"$(APP_DEBUG)\""
 endif
 
-# Pre-process proxy setting if it's set in the Dockerfile
-ifneq ($(strip $(APP_PROXY)),)
-CFLAGS += -DAPP_PROXY="\"$(APP_PROXY)\""
-endif
-
 all:	$(PROGS)
 
 $(PROG1): $(OBJS1)

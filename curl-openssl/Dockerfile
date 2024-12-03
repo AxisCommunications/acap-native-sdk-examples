@@ -10,10 +10,6 @@ FROM ${REPO}/${SDK}:${VERSION}-${ARCH}-ubuntu${UBUNTU_VERSION}
 ARG ARCH=armv7hf
 ARG PEM_CERT_FILE=cacert.pem
 
-# (Optional) If the network has a proxy
-ARG APP_PROXY
-ENV APP_PROXY ${APP_PROXY}
-
 # (Optional) Get more verbose logging when running the application
 ARG APP_DEBUG
 ENV APP_DEBUG ${APP_DEBUG}
@@ -33,15 +29,19 @@ COPY ./app .
 # the web server of interest. Why not use the compiled 'openssl' binary to do
 # this? It's cross compiled and will not run on a standard desktop.
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
-# APP_PROXY_SETTING need to be split
+
+# (Optional) If the network has a proxy
+ARG BUILD_PROXY
+
+# PROXY_SETTING needs to be split, ignore hadolint error
 # hadolint ignore=SC2086
-RUN APP_PROXY_SETTING= ; \
-    [ -z "$APP_PROXY" ] || APP_PROXY_SETTING="-proxy $APP_PROXY" ; \
+RUN PROXY_SETTING= ; \
+    [ -z "$BUILD_PROXY" ] || PROXY_SETTING="-proxy $BUILD_PROXY" ; \
     echo quit | openssl s_client \
     -showcerts \
     -servername www.example.com \
     -connect www.example.com:443 \
-    $APP_PROXY_SETTING \
+    $PROXY_SETTING \
     > ${PEM_CERT_FILE}
 
 #-------------------------------------------------------------------------------
