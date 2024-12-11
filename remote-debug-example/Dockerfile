@@ -4,7 +4,7 @@ ARG UBUNTU_VERSION=24.04
 ARG REPO=axisecp
 ARG SDK=acap-native-sdk
 
-FROM ${REPO}/${SDK}:${VERSION}-${ARCH}-ubuntu${UBUNTU_VERSION} as sdk-dev-base
+FROM ${REPO}/${SDK}:${VERSION}-${ARCH}-ubuntu${UBUNTU_VERSION} AS sdk-dev-base
 
 # Install gdb-multiarch to run debug on host by connecting to gdbserver on device
 # in addition, install ssh to scp gdbserver to device
@@ -48,7 +48,7 @@ RUN make && \
 # These final steps are added for test purposes and are not required for debugging
 # in a container where the application source code is mounted on, thus replacing, this
 # path.
-FROM sdk-dev-base as build-app
+FROM sdk-dev-base AS build-app
 WORKDIR /opt/app
 COPY ./app /opt/app/
 RUN . /opt/axis/acapsdk/environment-setup* && acap-build ./
