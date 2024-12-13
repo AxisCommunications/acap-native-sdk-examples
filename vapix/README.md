@@ -46,14 +46,10 @@ ACAP application. Some examples:
 
 ### Global proxy configuration
 
-- If a device has set global device proxy, it may cause issues with reaching the local host IP
-  `127.0.0.12` from the ACAP application.
-- To make the local host IP reachable when global device proxies are configured, add `127.0.0.12` to
-  the `No proxy` list. This can be done via either:
-  - The VAPIX
-    [Network Settings API](https://developer.axis.com/vapix/network-video/network-settings-api#setglobalproxyconfiguration-1).
-  - Browse to the network page at `http://<AXIS_DEVICE_IP>/index.html#system/network` and section
-    `Global proxies`.
+- If the device has set global device proxy, reaching the local virtual host
+  (127.0.0.12) is only possible if 127.0.0.12 is added to the `No proxy` list,
+  as described in
+  [Configure global device proxy](https://axiscommunications.github.io/acap-documentation/docs/develop/global-device-proxy.md#configure-global-device-proxy).
 
 ## Getting started
 
@@ -90,10 +86,9 @@ Standing in your working directory run the following commands:
 
 > [!NOTE]
 >
-> Depending on the network you are connected to, you may need to add proxy settings.
-> The file that needs these settings is: `~/.docker/config.json`. For reference please see
-> https://docs.docker.com/network/proxy and a
-> [script for Axis devices](https://axiscommunications.github.io/acap-documentation/docs/develop/build-install-run.html#configure-network-proxy-settings) in the ACAP documentation.
+> Depending on the network your local build machine is connected to, you may need to add proxy
+> settings for Docker. See
+> [Proxy in build time](https://axiscommunications.github.io/acap-documentation/docs/develop/proxy#proxy-in-build-time).
 
 ```sh
 docker build --tag <APP_IMAGE> --build-arg ARCH=<ARCH> .
