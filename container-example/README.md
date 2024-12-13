@@ -100,10 +100,9 @@ Standing in your working directory run the following commands:
 
 > [!NOTE]
 >
-> Depending on the network you are connected to, you may need to add proxy settings.
-> The file that needs these settings is: `~/.docker/config.json`. For reference please see
-> https://docs.docker.com/network/proxy and a
-> [script for Axis devices](https://axiscommunications.github.io/acap-documentation/docs/develop/build-install-run.html#configure-network-proxy-settings) in the ACAP documentation.
+> Depending on the network your local build machine is connected to, you may need to add proxy
+> settings for Docker. See
+> [Proxy in build time](https://axiscommunications.github.io/acap-documentation/docs/develop/proxy#proxy-in-build-time).
 
 Pull the [Alpine linux container image][alpine] and save it to a .tar file.
 

@@ -212,6 +212,12 @@ downloaded and added to the ACAP application via the -a flag in the
 The application is built to specification by the `Makefile` and `manifest.json`
 in the [app](app) directory. Standing in the application directory, run:
 
+> [!NOTE]
+>
+> Depending on the network your local build machine is connected to, you may need to add proxy
+> settings for Docker. See
+> [Proxy in build time](https://axiscommunications.github.io/acap-documentation/docs/develop/proxy#proxy-in-build-time).
+
 ```sh
 docker build --build-arg ARCH=<ARCH> --build-arg CHIP=<CHIP> --tag obj_detect:1.0 .
 docker cp $(docker create obj_detect:1.0):/opt/app ./build

@@ -1,7 +1,19 @@
+<!-- omit from toc -->
 # ACAP application developer topics
 
 This page is a collection of common topics related to ACAP application
 development.
+
+<!-- omit from toc -->
+## Table of contents
+
+- [Access the device](#access-the-device)
+- [Developer Mode](#developer-mode)
+- [Logs and reports](#logs-and-reports)
+  - [Access the system log](#access-the-system-log)
+  - [Access the application log](#access-the-application-log)
+  - [Access the server report](#access-the-server-report)
+- [Proxy](#proxy)
 
 ## Access the device
 
@@ -66,10 +78,21 @@ The system report can be accessed,
    curl --anyauth -u <username>:<password> http://<AXIS_DEVICE_IP>/axis-cgi/serverreport.cgi
    ```
 
+## Proxy
+
+To develop or run ACAP applications from inside a network with proxy, additional
+configuration is needed. More information about proxy and instructions on
+how to configure are available in the ACAP documentation [Proxy][proxy] page, or
+specifically in the [Proxy in build time][proxy-in-build-time] and
+[Proxy in runtime][proxy-in-runtime] sections.
+
 <!-- Links to external references -->
 <!-- markdownlint-disable MD034 -->
 [access-device-through-ssh]: https://axiscommunications.github.io/acap-documentation/docs/get-started/set-up-developer-environment/set-up-device-advanced.html#access-the-device-through-ssh
 [developer-mode]: https://axiscommunications.github.io/acap-documentation/docs/get-started/set-up-developer-environment/set-up-device-advanced.html#developer-mode
 [server-report-cgi]: https://www.axis.com/vapix-library/subjects/t10175981/section/t10036044/display?section=t10036044-t10003915
 [system-log-cgi]: https://www.axis.com/vapix-library/subjects/t10175981/section/t10036044/display?section=t10036044-t10003913
+[proxy]: https://axiscommunications.github.io/acap-documentation/docs/develop/proxy
+[proxy-in-build-time]: https://axiscommunications.github.io/acap-documentation/docs/develop/proxy#proxy-in-build-time
+[proxy-in-runtime]: https://axiscommunications.github.io/acap-documentation/docs/develop/proxy#proxy-in-runtim
 <!-- markdownlint-enable MD034 -->
