@@ -27,6 +27,7 @@
                                         // use of ACAP instead of ACAP app or
                                         // ACAP application
         ["acap", "ACAP"],
+        "EAP",
         ["yolo", "YOLO"],
         ["yolo[ ]?v(\\d+)+", "YOLOv$1"]
       ]
