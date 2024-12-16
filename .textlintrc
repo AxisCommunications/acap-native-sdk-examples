@@ -28,6 +28,15 @@
                                         // ACAP application
         ["acap", "ACAP"],
         "EAP",
+        "RGB",
+        "YUV",
+        ["dlpu['’:]?(s)?", "DLPU$1"],
+        ["cpu['’:]?(s)?", "CPU$1"],
+        ["gpu['’:]?(s)?", "GPU$1"],
+        ["tpu['’:]?(s)?", "TPU$1"],
+        ["cgi['’:]?(s)?", "CGI$1"],
+        ["soc['’:]?(s)?","SoC$1"],
+        ["system(-| )on(-| )(a-|a )?chip(s)?", "system$1on$2chip$4"],
         ["yolo", "YOLO"],
         ["yolo[ ]?v(\\d+)+", "YOLOv$1"]
       ]
