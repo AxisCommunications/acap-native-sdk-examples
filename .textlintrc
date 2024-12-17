@@ -17,7 +17,7 @@
         ["readme['’:]?(s)?", "README$1"],
         ["ax(is)?[ ]?os", "AXIS OS"],
         ["artpec[-_ ]?(\\d+)?", "ARTPEC-$1"],
-        ["vapix", "VAPIX"],
+        "VAPIX",
         "ACAP documentation",
         "ACAP Native SDK",
         "ACAP SDK",
@@ -25,7 +25,7 @@
         ["ACAPs", "ACAP applications"], // Note that it doesn't cover single
                                         // use of ACAP instead of ACAP app or
                                         // ACAP application
-        ["acap", "ACAP"],
+        "ACAP",
         "EAP",
         "RGB",
         "YUV",
@@ -36,7 +36,7 @@
         ["cgi['’:]?(s)?", "CGI$1"],
         ["soc['’:]?(s)?","SoC$1"],
         ["system(-| )on(-| )(a-|a )?chip(s)?", "system$1on$2chip$4"],
-        ["yolo", "YOLO"],
+        "YOLO",
         ["yolo[ ]?v(\\d+)+", "YOLOv$1"]
       ]
     }
