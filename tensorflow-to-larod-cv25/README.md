@@ -65,7 +65,7 @@ Compile the model using the [Ambarella toolchain](https://www.ambarella.com/tech
 > **Note**
 > It is required to be an Ambarella partner to access Ambarella tools. Visit
 > [this](https://customer.ambarella.com/ng/login?refid=EAAAALA9%2fIfpWDCn53oQJDd5FKfzsrI0fWXYseVTpgnkJHV1)
-> webpage to access the tools. If you are not an Ambarella partner, you can
+> web page to access the tools. If you are not an Ambarella partner, you can
 > get login credentials by registering in the same link.
 
 Note that the MS COCO 2017 validation dataset is downloaded during the building of the environment. This is roughly 1GB in size which means this could take a few minutes to download.

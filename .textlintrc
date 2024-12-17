@@ -5,6 +5,9 @@
   "rules": {
     "terminology": {
       "defaultTerms": true,
+      // Syntax elements to skip, e.g. Link, Table etc. Overrides the default
+      // that doesn't check blockquotes, we want to check everything.
+      "skip": [""],
       "exclude": [
         "bug[- ]fix(es)?",
         "walk-through",
