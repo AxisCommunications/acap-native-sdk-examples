@@ -45,24 +45,29 @@ tensorflow_to_larod-artpec8
 In this tutorial, we are going to be working within a Docker container environment. This is done as to get the correct version of Tensorflow installed, as well as the needed tools. The model training is part of the container image build. To start the build and training, run:
 
 ```sh
-
 docker build --tag <APP_IMAGE> .
-
 ```
 
-<APP_IMAGE> is the name to tag the image with, e.g., tf-model-training-a8:1.0
+- `<APP_IMAGE>` is the name to tag the image with, e.g., tf-model-training-a8:1.0.
+
+To train and tune for a specific amount of epochs, include the following build arguments when running:
+
+```sh
+docker build --tag <APP_IMAGE> --build-arg TRAIN_EPOCHS=<TRAIN_EPOCHS> --build-arg TUNE_EPOCHS=<TUNE_EPOCHS> .
+```
+
+- `<TRAIN_EPOCHS>` is the number of epochs to train, e.g., 2.
+- `<TUNE_EPOCHS>` is the number of epochs to tune, e.g., 2.
 
 Copy the model from the container image to a local directory:
 
 ```sh
-
 docker cp $(docker create <APP_IMAGE>):/env/training/models/converted_model.tflite ./<DESIRED_PATH>/converted_model.tflite
-
 ```
 
 Note that the MS COCO 2017 validation dataset is downloaded during the building of the environment. This is roughly 1GB in size which means this could take a few minutes to download.
 
-If your machine doesn't have the hardware requisites, like not enough GPU to train or not enough storage to save the training data, you can take a look at [train-tensorflow-model-using-aws](https://github.com/AxisCommunications/acap-sdk-tools/tree/main/train-tensorflow-model-using-aws), a tool to automatise model training with AWS.
+If your machine doesn't have the hardware requisites, like not enough GPU to train or not enough storage to save the training data, you can take a look at [train-tensorflow-model-using-aws](https://github.com/AxisCommunications/acap-sdk-tools/tree/main/train-tensorflow-model-using-aws), a tool to automatize model training with AWS.
 
 ### The example model
 
@@ -83,17 +88,19 @@ The pre-trained model is trained on the MS COCO 2017 **training** dataset, which
 
 ### Model training and quantization
 
-The following commmand in the Dockerfile starts the training process, where the `-i` flag points to the folder containing the images and the `-a` flag points to the annotation `.json`-file:
+The following command in the Dockerfile starts the training process, where the `-i` flag points to the folder containing the images and the `-a` flag points to the annotation `.json`-file:
 
- ```sh
- python training/train.py -i data/images/val2017/ -a data/annotations/instances_val2017.json
- ```
+```sh
+python training/train.py -i data/images/val2017/ -a data/annotations/instances_val2017.json
+```
 
 There are also additional flags `-e` and `-t` that point to number of epochs the model needs to be run for training and fine-tuning respectively. The default values for training and fine-tuning the model are set to 8 and 4 epochs each but could be modified accordingly. If the model is desired to be trained and fine-tuned for 2 epochs each, the above flags can be added as shown below:
 
- ```sh
- python training/train.py -i data/images/val2017/ -a data/annotations/instances_val2017.json -e 2 -t 2
- ```
+```sh
+python training/train.py -i data/images/val2017/ -a data/annotations/instances_val2017.json -e 2 -t 2
+```
+
+Or by including build arguments as described in [How to run the code](#how-to-run-the-code).
 
 If you wish to train the model with the larger COCO 2017 training set and have downloaded it as described in earlier, simply substitute `val2017` for `train2017` in the paths in the command above to use that instead.
 

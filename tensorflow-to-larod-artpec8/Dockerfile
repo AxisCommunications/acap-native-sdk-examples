@@ -6,7 +6,7 @@ SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 WORKDIR /env
 RUN mkdir -p /env/app /env/models /env/training/models
 
-# Install 
+# Install
 RUN rm /etc/apt/sources.list.d/cuda.list && \
     rm /etc/apt/sources.list.d/nvidia-ml.list && \
     apt-get update && apt-get install -y --no-install-recommends \
@@ -44,8 +44,8 @@ ARG TUNE_EPOCHS
 RUN python training/train.py \
       -i data/images/val2017/ \
       -a data/annotations/instances_val2017.json \
-      -e ${TRAIN_EPOCHS} \
-      -t ${TUNE_EPOCHS} && \
+      ${TRAIN_EPOCHS:+-e $TRAIN_EPOCHS} \
+      ${TUNE_EPOCHS:+-t $TUNE_EPOCHS} && \
     python convert_model.py \
       -i models/trained_model.pb \
       -o training/models/converted_model.tflite
