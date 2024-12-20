@@ -75,7 +75,7 @@ docker build --build-arg APP_DEBUG=yes --tag <APP_IMAGE> --build-arg ARCH=<ARCH>
 
 If the device is inside a network with a proxy, the global device proxy must be
 set to allow curl to pick it up at runtime. For reference see
-[Configure global device proxy](https://axiscommunications.github.io/acap-documentation/docs/develop/global-device-proxy.md#configure-global-device-proxy).
+[Configure global device proxy](https://axiscommunications.github.io/acap-documentation/docs/develop/proxy#configure-global-device-proxy).
 
 Copy the result from the container image to a local directory `build`:
 
