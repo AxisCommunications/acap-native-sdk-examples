@@ -2,15 +2,14 @@
 
 . "$(pwd)"/.github/utils/util-functions.sh
 
+WORKFLOWFILE=${0##*/}
+
 #-------------------------------------------------------------------------------
 # Functions
 #-------------------------------------------------------------------------------
 
 check_acap_ver_urls() {
   local ret=0
-
-  # Whitelist this file
-  local workflowfile=lint-acap-version-urls.sh
 
   # Version specific URL strings
   local acap3_type_urls="help.axis.com/acap-3-developer-guide \
@@ -40,7 +39,7 @@ check_acap_ver_urls() {
 
   # Check for incorrect URLs
   for doc_url in $search_urls; do
-    __found_doc_url=$(grep -niIr "$doc_url" --exclude $workflowfile)
+    __found_doc_url=$(grep -niIr "$doc_url" --exclude "$WORKFLOWFILE")
     [ -z "$__found_doc_url" ] || {
       print_line "ERROR: URL of ACAP version $incorrect_sdk_version found in ACAP version $correct_sdk_version."
       print_line "       URL '$doc_url' found in the following files:"
