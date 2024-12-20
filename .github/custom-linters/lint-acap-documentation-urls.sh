@@ -55,6 +55,34 @@ check_acap_ver_urls() {
   return $ret
 }
 
+check_acap_doc_no_md_in_link() {
+  local ret=0
+
+  # local search_urls="axiscommunications.github.io/acap-documentation"
+  local search_urls="axiscommunications.github.io/acap-documentation.*\.md.*"
+
+  print_section "Verify that the docs don't have links to ACAP documentation with .md"
+
+  # Check for incorrect URLs
+  for doc_url in $search_urls; do
+    # __found_doc_url=$(grep -niIrE "$doc_url.*\.md.*")
+    __found_doc_url=$(grep -niIrE "$doc_url" --exclude "$WORKFLOWFILE")
+    [ -z "$__found_doc_url" ] || {
+      print_line "ERROR: Found URL to ACAP documentation containing '.md', which gives broken link."
+      print_line "       This is due to that ACAP documentation converts Markdown to HTML."
+      print_line "       Search pattern: '$doc_url'"
+      print_linebreaked_list_error "$__found_doc_url"
+      ret=1
+    }
+  done
+
+  [ "$__found_doc_url" ] || {
+    print_bullet_pass "No ACAP documentation links found to contain '.md'."
+  }
+
+  return $ret
+}
+
 #-------------------------------------------------------------------------------
 # Main
 #-------------------------------------------------------------------------------
@@ -63,6 +91,7 @@ exit_value=0
 found_error=no
 
 if ! check_acap_ver_urls; then found_error=yes; fi
+if ! check_acap_doc_no_md_in_link; then found_error=yes; fi
 
 [ "$found_error" = no ] || exit_value=1
 
