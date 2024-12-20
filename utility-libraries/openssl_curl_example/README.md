@@ -27,23 +27,21 @@ on a device.
 
 <!-- ToC GFM -->
 
-- [Build custom OpenSSL and curl libraries and use them in an ACAP application](#build-custom-openssl-and-curl-libraries-and-use-them-in-an-acap-application)
-  - [Table of contents](#table-of-contents)
-  - [Purpose of the example](#purpose-of-the-example)
-  - [OpenSSL and curl APIs](#openssl-and-curl-apis)
-  - [Getting started](#getting-started)
-  - [How to run the code](#how-to-run-the-code)
-    - [Build the application](#build-the-application)
-      - [Install and start the application](#install-and-start-the-application)
-    - [The expected output](#the-expected-output)
-      - [Transferred file](#transferred-file)
-      - [Application log](#application-log)
-  - [Outline of build steps](#outline-of-build-steps)
-    - [Runtime shared library search path](#runtime-shared-library-search-path)
-  - [Check build dependencies](#check-build-dependencies)
-  - [Troubleshooting](#troubleshooting)
-    - [Error CURLE\_PEER\_FAILED\_VERIFICATION (60)](#error-curle_peer_failed_verification-60)
-  - [License](#license)
+- [Purpose of the example](#purpose-of-the-example)
+- [OpenSSL and curl APIs](#openssl-and-curl-apis)
+- [Getting started](#getting-started)
+- [How to run the code](#how-to-run-the-code)
+  - [Build the application](#build-the-application)
+    - [Install and start the application](#install-and-start-the-application)
+  - [The expected output](#the-expected-output)
+    - [Transferred file](#transferred-file)
+    - [Application log](#application-log)
+- [Outline of build steps](#outline-of-build-steps)
+  - [Runtime shared library search path](#runtime-shared-library-search-path)
+- [Check build dependencies](#check-build-dependencies)
+- [Troubleshooting](#troubleshooting)
+  - [Error CURLE_PEER_FAILED_VERIFICATION (60)](#error-curle_peer_failed_verification-60)
+- [License](#license)
 
 <!-- /ToC -->
 
@@ -115,7 +113,8 @@ the application on a device.
 > [!NOTE]
 >
 > Depending on the network your local build machine is connected to, you may need to add proxy
-> settings for docker. See [Proxy in build time](../DEV.md#proxy-in-build-time).
+> settings for Docker. See
+> [Proxy in build time](https://axiscommunications.github.io/acap-documentation/docs/develop/proxy#proxy-in-build-time).
 
 Standing in your working directory run:
 
