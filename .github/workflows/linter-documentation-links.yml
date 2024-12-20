@@ -22,7 +22,7 @@ jobs:
         run: |
           .github/custom-linters/lint-device-urls.sh
 
-      - name: Verify that the docs don't have links to wrong SDK format
+      - name: Verify that there are no incorrect links to ACAP documentation
         if: always()
         run: |
-          .github/custom-linters/lint-acap-version-urls.sh
+          .github/custom-linters/lint-acap-documentation-urls.sh
