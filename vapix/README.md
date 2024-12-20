@@ -49,7 +49,7 @@ ACAP application. Some examples:
 - If the device has set global device proxy, reaching the local virtual host
   (127.0.0.12) is only possible if 127.0.0.12 is added to the `No proxy` list,
   as described in
-  [Configure global device proxy](https://axiscommunications.github.io/acap-documentation/docs/develop/global-device-proxy.md#configure-global-device-proxy).
+  [Configure global device proxy](https://axiscommunications.github.io/acap-documentation/docs/develop/proxy#configure-global-device-proxy).
 
 ## Getting started
 
