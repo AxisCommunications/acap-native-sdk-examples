@@ -190,7 +190,7 @@ Unlike ARTPEC, the CV25 accelerator lacks the capability to perform bounding-box
   - Here, N denotes the total number of detections, and the 4 values are `[dy, dx, dh, dw]`.
     - In this context, `dy` and `dx` signify the vertical and horizontal shifts relative to the corresponding anchor box, while `dh` and `dw` represent the scaling of height and width in relation to the anchor box.
 
-After creating the bounding box using the locations and the anchor boxes, non-maxima suppression is applied so that overlapping boxes with lower scores are removed.
+After creating the bounding box using the locations and the anchor boxes, non-maximum suppression is applied so that overlapping boxes with lower scores are removed.
 
 If the score is higher than a threshold `args.threshold/100.0`, the results are outputted by the `syslog` function, and the object is cropped and saved into jpg form by `crop_interleaved`, `set_jpeg_configuration`, `buffer_to_jpeg`, `jpeg_to_file` methods.
 
