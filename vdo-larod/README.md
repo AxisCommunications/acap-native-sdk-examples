@@ -187,7 +187,7 @@ vdo-larod
 - **build/model** - Folder containing models used in this application.
 - **build/model/converted_model_edgetpu.tflite** - Trained model file used for Google TPU.
 - **build/model/converted_model.tflite** - Trained model file used for ARTPEC-8 and CPU with TensorFlow Lite.
-- **build/model/car_human_model_cavalry.bin** - Trained model file used for ARTPEC-8 and CV25.
+- **build/model/car_human_model_cavalry.bin** - Trained model file used for CV25.
 - **build/package.conf** - Defines the application and its configuration.
 - **build/package.conf.orig** - Defines the application and its configuration, original file.
 - **build/param.conf** - File containing application parameters.
