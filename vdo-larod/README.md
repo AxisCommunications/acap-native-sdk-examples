@@ -11,6 +11,11 @@ It is achieved by using the containerized API and toolchain images.
 
 Together with this README file you should be able to find a directory called app. That directory contains the "vdo_larod" application source code, which can easily be compiled and run with the help of the tools and step by step below.
 
+## Prerequisites
+
+- Axis camera equipped with CPU or DLPU
+- [Docker](https://docs.docker.com/get-docker/)
+
 ## Detailed outline of example application
 
 This application opens a client to VDO and starts fetching frames (in a new thread) in the YUV format. It tries to find the smallest VDO stream resolution that fits the width and height required by the neural network. The thread fetching frames is written so that it always tries to provide a frame as new as possible even if not all previous frames have been processed by larod.
@@ -45,6 +50,7 @@ vdo-larod
 │   ├── LICENSE
 │   ├── Makefile
 │   ├── manifest.json.artpec8
+│   ├── manifest.json.artpec9
 │   ├── manifest.json.cpu
 │   ├── manifest.json.cv25
 │   ├── manifest.json.edgetpu
@@ -58,7 +64,8 @@ vdo-larod
 - **app/LICENSE** - Text file which lists all open source licensed source code distributed with the application.
 - **app/Makefile** - Makefile containing the build and link instructions for building the ACAP application.
   <!-- textlint-disable -->
-- **app/manifest.json.artpec8** - Defines the application and its configuration when building for DLPU with TensorFlow Lite.
+- **app/manifest.json.artpec8** - Defines the application and its configuration when building for artpec8 DLPU with TensorFlow Lite.
+- **app/manifest.json.artpec9** - Defines the application and its configuration when building for artpec9 DLPU with TensorFlow Lite.
   <!-- textlint-enable -->
 - **app/manifest.json.cpu** - Defines the application and its configuration when building for CPU with TensorFlow Lite.
 - **app/manifest.json.cv25** - Defines the application and its configuration when building chip and model for cv25 DLPU.
@@ -112,7 +119,7 @@ docker cp $(docker create <APP_IMAGE>):/opt/app ./build
 ```
 
 - \<APP_IMAGE\> is the name to tag the image with, e.g., `vdo_larod:1.0`.
-- \<CHIP\> is the chip type. Supported values are `artpec8`, `cpu`, `cv25` and `edgetpu`.
+- \<CHIP\> is the chip type. Supported values are `artpec9`, `artpec8`, `cpu`, `cv25` and `edgetpu`.
 - \<ARCH\> is the architecture. Supported values are `armv7hf` (default) and `aarch64`.
 
 See the following sections for build commands for each chip.
@@ -123,6 +130,15 @@ To build a package for ARTPEC-8 with Tensorflow Lite, run the following commands
 
 ```sh
 docker build --build-arg ARCH=aarch64 --build-arg CHIP=artpec8 --tag <APP_IMAGE> .
+docker cp $(docker create <APP_IMAGE>):/opt/app ./build
+```
+
+#### Build for ARTPEC-9 with Tensorflow Lite
+
+To build a package for ARTPEC-9 with Tensorflow Lite, run the following commands standing in your working directory:
+
+```sh
+docker build --build-arg ARCH=aarch64 --build-arg CHIP=artpec9 --tag <APP_IMAGE> .
 docker cp $(docker create <APP_IMAGE>):/opt/app ./build
 ```
 
@@ -169,6 +185,7 @@ vdo-larod
 │   ├── Makefile
 │   ├── manifest.json
 │   ├── manifest.json.artpec8
+│   ├── manifest.json.artpec9
 │   ├── manifest.json.cpu
 │   ├── manifest.json.edgetpu
 │   ├── manifest.json.cv25
@@ -178,8 +195,8 @@ vdo-larod
 │   ├── package.conf.orig
 │   ├── param.conf
 │   ├── vdo_larod*
-│   ├── vdo_larod_{cpu,edgetpu}_1_0_0_armv7hf.eap / vdo_larod_{cv25,artpec8}_1_0_0_aarch64.eap
-│   ├── vdo_larod_{cpu,edgetpu}_1_0_0_LICENSE.txt / vdo_larod_{cv25,artpec8}_1_0_0_LICENSE.txt
+│   ├── vdo_larod_{cpu,edgetpu}_1_0_0_armv7hf.eap / vdo_larod_{cv25,artpec8,artpec9}_1_0_0_aarch64.eap
+│   ├── vdo_larod_{cpu,edgetpu}_1_0_0_LICENSE.txt / vdo_larod_{cv25,artpec8,artpec9}_1_0_0_LICENSE.txt
 │   └── vdo_larod.c
 ```
 
@@ -196,6 +213,10 @@ vdo-larod
   If chip `artpec8` has been built.
 - **build/vdo_larod_artpec8_1_0_0_aarch64.eap** - Application package .eap file.
 - **build/vdo_larod_artpec8_1_0_0_LICENSE.txt** - Copy of LICENSE file.
+
+  If chip `artpec9` has been built.
+- **build/vdo_larod_artpec9_1_0_0_aarch64.eap** - Application package .eap file.
+- **build/vdo_larod_artpec9_1_0_0_LICENSE.txt** - Copy of LICENSE file.
 
   If chip `cpu` has been built.
 - **build/vdo_larod_cpu_1_0_0_armv7hf.eap** - Application package .eap file.
@@ -223,6 +244,7 @@ http://<AXIS_DEVICE_IP>/index.html#apps
 - Browse to the newly built ACAP application, depending on architecture:
   - `vdo_larod_cv25_1_0_0_aarch64.eap`
   - `vdo_larod_artpec8_1_0_0_aarch64.eap`
+  - `vdo_larod_artpec9_1_0_0_aarch64.eap`
   - `vdo_larod_cpu_1_0_0_armv7hf.eap`
   - `vdo_larod_edgetpu_1_0_0_armv7hf.eap`
 - Click `Install`
@@ -242,12 +264,13 @@ Depending on the selected chip, different output is received.
 
 In previous larod versions, the chip was referred to as a number instead of a string. See the table below to understand the mapping:
 
-| Chips | Larod 1/2 (int) | Larod 3 (string) |
+| Chips | Larod 1 (int) | Larod 3 |
 |-------|--------------|------------------|
 | CPU with TensorFlow Lite | 2 | cpu-tflite |
 | Google TPU | 4 | google-edge-tpu-tflite |
 | Ambarella CVFlow (NN) | 6 | ambarella-cvflow |
 | ARTPEC-8 DLPU | 12 | axis-a8-dlpu-tflite |
+| ARTPEC-9 DLPU | - | a9-dlpu-tflite |
 
 #### Output - ARTPEC-8 with TensorFlow Lite
 
@@ -301,6 +324,54 @@ vdo_larod[4165]: Ran inference for 16 ms
 vdo_larod[4165]: Stop streaming video from VDO
 vdo_larod[4165]: Exit /usr/local/packages/vdo_larod/vdo_larod
 ```
+
+#### Output - ARTPEC-9 with TensorFlow Lite
+
+```sh
+----- Contents of SYSTEM_LOG for 'vdo_larod' -----
+
+
+vdo_larod[4165]: Starting /usr/local/packages/vdo_larod/vdo_larod
+vdo_larod[4165]: 'buffer.strategy': <uint32 3>
+vdo_larod[4165]: 'channel': <uint32 1>
+vdo_larod[4165]: 'format': <uint32 3>
+vdo_larod[4165]: 'height': <uint32 270>
+vdo_larod[4165]: 'width': <uint32 480>
+vdo_larod[4165]: Creating VDO image provider and creating stream 480 x 270
+vdo_larod[4165]: Dump of vdo stream settings map =====
+vdo_larod[4165]: chooseStreamResolution: We select stream w/h=480 x 270 based on VDO channel info.
+vdo_larod[4165]: Calculate crop image
+vdo_larod[4165]: Create larod models
+vdo_larod[4165]: Create preprocessing maps
+vdo_larod[4165]: Crop VDO image X=40 Y=0 (480 x 270)
+vdo_larod[4165]: Setting up larod connection with chip a9-dlpu-tflite and model /usr/local/packages/vdo_larod/models/converted_model.tflite
+vdo_larod[4165]: Available chip ids:
+vdo_larod[4165]: Chip: a9-dlpu-tflite
+vdo_larod[4165]: Chip: cpu-tflite
+vdo_larod[4165]: Chip: cpu-proc
+vdo_larod[4165]: Allocate memory for input/output buffers
+vdo_larod[4165]: Connect tensors to file descriptors
+vdo_larod[4165]: Create input/output tensors
+vdo_larod[4165]: Create job requests
+vdo_larod[4165]: Determine tensor buffer sizes
+vdo_larod[4165]: Start fetching video frames from VDO
+vdo_larod[4165]: Converted image in 14 ms
+vdo_larod[4165]: Person detected: 5.49% - Car detected: 80.00%
+vdo_larod[4165]: Ran inference for 17 ms
+vdo_larod[4165]: Converted image in 4 ms
+vdo_larod[4165]: Person detected: 4.31% - Car detected: 88.63%
+vdo_larod[4165]: Ran inference for 16 ms
+vdo_larod[4165]: Converted image in 4 ms
+vdo_larod[4165]: Person detected: 2.75% - Car detected: 75.29%
+vdo_larod[4165]: Ran inference for 16 ms
+vdo_larod[4165]: Converted image in 3 ms
+vdo_larod[4165]: Person detected: 3.14% - Car detected: 88.63%
+vdo_larod[4165]: Ran inference for 16 ms
+vdo_larod[4165]: Converted image in 3 ms
+vdo_larod[4165]: Person detected: 1.57% - Car detected: 74.51%
+vdo_larod[4165]: Ran inference for 16 ms
+vdo_larod[4165]: Stop streaming video from VDO
+vdo_larod[4165]: Exit /usr/local/packages/vdo_larod/vdo_larod
 
 #### Output - CPU with TensorFlow Lite
 

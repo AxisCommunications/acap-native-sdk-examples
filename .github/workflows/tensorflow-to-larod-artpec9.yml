@@ -1,0 +1,14 @@
+# This is a dummy file for linters, the real test is run in
+# tensorflow-to-larod-artpec8
+name: Build tensorflow-to-larod-artpec9 application
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - 'dummy-branch-that-does-not-exist'
+
+jobs:
+  dummy:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "This is a dummy workflow"

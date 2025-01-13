@@ -53,7 +53,7 @@ RUN . /opt/axis/acapsdk/environment-setup* && \
 # Download pretrained models
 WORKDIR /opt/app/model
 ARG CHIP=
-RUN if [ "$CHIP" = cpu ] || [ "$CHIP" = artpec8 ]; then \
+RUN if [ "$CHIP" = artpec8 ] || [ "$CHIP" = artpec9 ] || [ "$CHIP" = cpu ]  ; then \
         curl -L -o converted_model.tflite \
             https://github.com/google-coral/test_data/raw/master/ssd_mobilenet_v2_coco_quant_postprocess.tflite ; \
     elif [ "$CHIP" = edgetpu ]; then \

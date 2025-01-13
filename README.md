@@ -57,6 +57,8 @@ Below is the list of examples available in the repository.
   - An example that shows model conversion, model quantization, image formats and custom models.
 - [tensorflow-to-larod-artpec8](./tensorflow-to-larod-artpec8/)
   - An example that shows model conversion, model quantization, image formats and custom models on AXIS ARTPEC-8 devices.
+- [tensorflow-to-larod-artpec9](./tensorflow-to-larod-artpec9/)
+  - An example that shows model conversion, model quantization, image formats and custom models on AXIS ARTPEC-9 devices. Note that this example is pointing to [tensorflow-to-larod-artpec8](./tensorflow-to-larod-artpec8).
 - [tensorflow-to-larod-cv25](./tensorflow-to-larod-cv25/)
   - An example that shows model conversion, model quantization, image formats and custom models on AXIS CV25 devices.
 - [using-opencv](./using-opencv/)
