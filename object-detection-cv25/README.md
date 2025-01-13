@@ -273,12 +273,13 @@ Depending on selected chip, different output is received. The label file is used
 
 In the system log the chip is sometimes only mentioned as a string, they are mapped as follows:
 
-| Chips | Larod 1 (int) | Larod 3 (string) |
+| Chips | Larod 1 (int) | Larod 3 |
 |-------|--------------|------------------|
 | CPU with TensorFlow Lite | 2 | cpu-tflite |
 | Google TPU | 4 | google-edge-tpu-tflite |
 | Ambarella CVFlow (NN) | 6 | ambarella-cvflow |
 | ARTPEC-8 DLPU | 12 | axis-a8-dlpu-tflite |
+| ARTPEC-9 DLPU | - | a9-dlpu-tflite |
 
 There are four outputs from MobileNet SSD v2 (COCO) model. The number of detections, cLasses, scores, and locations are shown as below. The four location numbers stand for \[top, left, bottom, right\]. By the way, currently the saved images will be overwritten continuously, so those saved images might not all from the detections of the last frame, if the number of detections is less than previous detection numbers.
 

@@ -1,0 +1,3 @@
+# This is a dummy file for linters, the real test is run in
+# tensorflow-to-larod-artpec8
+name: Build tensorflow-to-larod-artpec9 application

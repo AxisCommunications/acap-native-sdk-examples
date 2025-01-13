@@ -15,9 +15,7 @@ ARG CHIP
 
 # Download the pretrained model
 ARG MODEL_BUCKET=https://acap-artifacts.s3.eu-north-1.amazonaws.com/models
-RUN if [ "$CHIP" = artpec8 ]; then \
-        curl -o model.zip $MODEL_BUCKET/models.aarch64.artpec8.zip ; \
-    elif [ "$CHIP" = cpu ]; then \
+RUN if [ "$CHIP" = artpec8 ] || [ "$CHIP" = artpec9 ] || [ "$CHIP" = cpu ]  ; then \
         curl -o model.zip $MODEL_BUCKET/models.aarch64.artpec8.zip ; \
     elif [ "$CHIP" = edgetpu ]; then \
         curl -o model.zip $MODEL_BUCKET/models.armv7hf.edgetpu.zip ; \
@@ -36,7 +34,7 @@ COPY ./app .
 # Build the ACAP application
 RUN cp /opt/app/manifest.json.${CHIP} /opt/app/manifest.json && \
     . /opt/axis/acapsdk/environment-setup* && \
-    if [ "$CHIP" = artpec8 ] || [ "$CHIP" = cpu ]; then \
+    if [ "$CHIP" = artpec8 ] || [ "$CHIP" = artpec9 ] || [ "$CHIP" = cpu ]  ; then \
         acap-build . -a 'models/converted_model.tflite'; \
     elif [ "$CHIP" = edgetpu ]; then \
         acap-build . -a 'models/converted_model_edgetpu.tflite'; \
