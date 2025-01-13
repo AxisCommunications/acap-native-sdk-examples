@@ -8,8 +8,7 @@ This example focuses on the application of object detection on an Axis camera eq
 
 ## Prerequisites
 
-- Axis camera equipped with CPU, an [Edge TPU](https://coral.ai/docs/edgetpu/faq/) or DLPU (for ARTPEC-8)
-- [Docker](https://docs.docker.com/get-docker/)
+- Axis camera equipped with CPU or DLPU
 
 ## Quickstart
 
@@ -23,7 +22,7 @@ The following instructions can be executed to simply run the example.
     ```
 
     where the values are found:
-    - \<CHIP\> is the chip type. Supported values are `artpec8`, `cpu` and `edgetpu`.
+    - \<CHIP\> is the chip type. Supported values are `artpec9`, `artpec8`, `cpu` and `edgetpu`.
     - \<ARCH\> is the architecture. Supported values are `armv7hf` (default) and `aarch64`.
 
 2. Find the ACAP application `.eap` file
@@ -225,7 +224,7 @@ docker cp $(docker create obj_detect:1.0):/opt/app ./build
 
 where the parameters are:
 
-- \<CHIP\> is the chip type. Supported values are `artpec8`, `cpu` and `edgetpu`.
+- \<CHIP\> is the chip type. Supported values are `artpec9`, `artpec8`, `cpu` and `edgetpu`.
 - \<ARCH\> is the architecture. Supported values are `armv7hf` (default) and `aarch64`.
 
 > N.b. The selected architecture and chip must match the targeted device.
@@ -271,12 +270,13 @@ Depending on selected chip, different output is received. The label file is used
 
 In the system log the chip is sometimes only mentioned as a string, they are mapped as follows:
 
-| Chips | Larod 1 (int) | Larod 3 (string) |
+| Chips | Larod 1 (int) | Larod 3 |
 |-------|--------------|------------------|
 | CPU with TensorFlow Lite | 2 | cpu-tflite |
 | Google TPU | 4 | google-edge-tpu-tflite |
 | Ambarella CVFlow (NN) | 6 | ambarella-cvflow |
 | ARTPEC-8 DLPU | 12 | axis-a8-dlpu-tflite |
+| ARTPEC-9 DLPU | - | a9-dlpu-tflite |
 
 There are four outputs from MobileNet SSD v2 (COCO) model. The number of detections, cLasses, scores, and locations are shown as below. The four location numbers stand for \[top, left, bottom, right\]. By the way, currently the saved images will be overwritten continuously, so those saved images might not all from the detections of the last frame, if the number of detections is less than previous detection numbers.
 

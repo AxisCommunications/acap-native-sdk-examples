@@ -15,13 +15,16 @@ jobs:
         include:
           - arch: armv7hf
             chip: cpu
-            axis-os: 12.1.60
+            axis-os: 12.2.36
           - arch: armv7hf
             chip: edgetpu
-            axis-os: 12.1.60
+            axis-os: 12.2.36
           - arch: aarch64
             chip: artpec8
-            axis-os: 12.1.60
+            axis-os: 12.2.36
+          - arch: aarch64
+            chip: artpec9
+            axis-os: 12.2.36
     env:
       EXREPO: acap-native-examples
       EXNAME: object-detection
@@ -32,7 +35,7 @@ jobs:
       - name: Build ${{ env.example }} application
         env:
           example: ${{ env.EXNAME }}-${{ matrix.chip }}
-          imagetag: ${{ env.EXREPO }}_${{ env.EXNAME }}-${{ matrix.chip }}:${{ matrix.arch }}
+          imagetag: ${{ env.EXREPO }}_${{ env.EXNAME }}_${{ matrix.chip }}:${{ matrix.arch }}
         run: |
           docker image rm -f $imagetag
           cd $EXNAME

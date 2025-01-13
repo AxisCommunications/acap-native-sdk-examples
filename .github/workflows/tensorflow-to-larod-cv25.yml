@@ -14,8 +14,6 @@ jobs:
       matrix:
         include:
           - arch: aarch64
-            chip: cv25
-            axis-os: 12.1.60
     env:
       EXREPO: acap-native-examples
       EXNAME: tensorflow-to-larod-cv25
