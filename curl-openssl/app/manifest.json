@@ -1,5 +1,5 @@
 {
-    "schemaVersion": "1.7.2",
+    "schemaVersion": "1.7.3",
     "acapPackageConf": {
         "setup": {
             "appName": "curl_openssl",
