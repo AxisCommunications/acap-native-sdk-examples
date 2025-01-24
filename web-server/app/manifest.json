@@ -2,7 +2,7 @@
 	"schemaVersion": "1.7.3",
 	"acapPackageConf": {
 		"setup": {
-			"appName": "list",
+			"appName": "web_server_rev_proxy",
 			"vendor": "Axis Communications",
 			"embeddedSdkVersion": "3.0",
 			"runMode": "never",
