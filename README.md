@@ -76,7 +76,7 @@ Below is the list of examples available in the repository.
 - [vdostream](./vdostream/)
   - An example in C that starts a vdo stream and then illustrates how to continuously capture frames from the vdo service, access the received buffer contents as well as the frame metadata.
 - [web-server](./web-server/)
-  - An example in C that runs a Monkey web server on the camera and exposes an external API with Reverse Proxy configuration in Apache Server.
+  - An example in C that serves HTTP requests by setting up the Axis device web server in a reverse proxy configuration and route to a custom web server running in the ACAP application.
 - [web-server-using-fastcgi](./web-server-using-fastcgi/)
   - An example in C and explains how to build an ACAP application that can handle HTTP requests sent to the Axis device, using the device's own web server.
 

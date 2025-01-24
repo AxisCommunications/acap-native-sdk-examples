@@ -28,6 +28,6 @@ jobs:
           docker image rm -f $imagetag
           cd $EXNAME
           docker build --no-cache --tag $imagetag --build-arg ARCH=${{ matrix.arch }} .
-          docker cp $(docker create $imagetag):/opt/monkey/examples ./build
+          docker cp $(docker create $imagetag):/opt/app ./build
           cd ..
           docker image rm -f $imagetag
