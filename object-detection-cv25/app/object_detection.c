@@ -368,7 +368,9 @@ static bool setupLarod(const char* chipString,
         ;
     }
     const larodDevice* dev = larodGetDevice(conn, chipString, 0, &error);
-    loadedModel            = larodLoadModel(conn,
+    syslog(LOG_INFO,
+           "Loading the model... This might take up to 5 minutes depending on your device model.");
+    loadedModel = larodLoadModel(conn,
                                  larodModelFd,
                                  dev,
                                  LAROD_ACCESS_PRIVATE,
@@ -378,6 +380,8 @@ static bool setupLarod(const char* chipString,
     if (!loadedModel) {
         syslog(LOG_ERR, "%s: Unable to load model: %s", __func__, error->msg);
         goto error;
+    } else {
+        syslog(LOG_INFO, "Model loaded successfully");
     }
     *larodConn = conn;
     *model     = loadedModel;

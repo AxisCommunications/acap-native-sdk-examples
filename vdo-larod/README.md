@@ -300,6 +300,8 @@ vdo_larod[4165]: Chip: axis-a8-dlpu-tflite
 vdo_larod[4165]: Chip: axis-a8-dlpu-native
 vdo_larod[4165]: Chip: axis-a8-dlpu-proc
 vdo_larod[4165]: Chip: axis-a8-gpu-proc
+vdo_larod[4165]: Loading the model... This might take up to 5 minutes depending on your device model.
+vdo_larod[4165]: Model loaded successfully
 vdo_larod[4165]: Allocate memory for input/output buffers
 vdo_larod[4165]: Connect tensors to file descriptors
 vdo_larod[4165]: Create input/output tensors
@@ -398,6 +400,8 @@ vdo_larod[1670]: Chip: google-edge-tpu-tflite
 vdo_larod[1670]: Chip: axis-ace-proc
 vdo_larod[1670]: Chip: cpu-proc
 vdo_larod[1670]: Chip: axis-a7-gpu-proc
+vdo_larod[1670]: Loading the model... This might take up to 5 minutes depending on your device model.
+vdo_larod[1670]: Model loaded successfully
 vdo_larod[1670]: Allocate memory for input/output buffers
 vdo_larod[1670]: Connect tensors to file descriptors
 vdo_larod[1670]: Create input/output tensors
@@ -449,6 +453,8 @@ vdo_larod[31476]: Chip: google-edge-tpu-tflite
 vdo_larod[31476]: Chip: axis-ace-proc
 vdo_larod[31476]: Chip: cpu-proc
 vdo_larod[31476]: Chip: axis-a7-gpu-proc
+vdo_larod[31476]: Loading the model... This might take up to 5 minutes depending on your device model.
+vdo_larod[31476]: Model loaded successfully
 vdo_larod[31476]: Allocate memory for input/output buffers
 vdo_larod[31476]: Connect tensors to file descriptors
 vdo_larod[31476]: Create input/output tensors
@@ -499,6 +505,8 @@ vdo_larod[584171]: Chip: ambarella-cvflow
 vdo_larod[584171]: Chip: ambarella-cvflow-proc
 vdo_larod[584171]: Chip: cpu-tflite
 vdo_larod[584171]: Chip: cpu-proc
+vdo_larod[584171]: Loading the model... This might take up to 5 minutes depending on your device model.
+vdo_larod[584171]: Model loaded successfully
 vdo_larod[584171]: Allocate memory for input/output buffers
 vdo_larod[584171]: Connect tensors to file descriptors
 vdo_larod[584171]: Create input/output tensors
