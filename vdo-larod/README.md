@@ -351,6 +351,8 @@ vdo_larod[4165]: Available chip ids:
 vdo_larod[4165]: Chip: a9-dlpu-tflite
 vdo_larod[4165]: Chip: cpu-tflite
 vdo_larod[4165]: Chip: cpu-proc
+vdo_larod[4165]: Loading the model... This might take up to 5 minutes depending on your device model.
+vdo_larod[4165]: Model loaded successfully
 vdo_larod[4165]: Allocate memory for input/output buffers
 vdo_larod[4165]: Connect tensors to file descriptors
 vdo_larod[4165]: Create input/output tensors
