@@ -80,9 +80,7 @@ static void sig_handler(int signum) {
     // Do nothing, just let pause in main return.
 }
 
-int main(int argc, char** argv) {
-    (void)argc;
-    (void)argv;
+int main(void) {
     syslog(LOG_INFO, "Subscriber started...");
 
     // For com.axis.analytics_scene_description.v0.beta source corresponds to the

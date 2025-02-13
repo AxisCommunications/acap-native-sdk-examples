@@ -368,9 +368,6 @@ static disk_item_t* new_disk_item_t(gchar* storage_id) {
 /**
  * @brief Main function
  *
- * @param argc Number of arguments
- * @param argv Arguments vector
- *
  * @return Result
  */
 gint main(void) {
