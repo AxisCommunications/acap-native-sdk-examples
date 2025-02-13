@@ -29,15 +29,8 @@
  * brief Main function.
  *
  * This main function writes "hello_world" to the syslog.
- *
- * param argc Number of arguments.
- * param argv Arguments vector.
  */
-int main(int argc, char** argv) {
-    /* Silence compiler warnings for unused parameters/arguments */
-    (void)argc;
-    (void)argv;
-
+int main(void) {
     /* Open the syslog to report messages for "hello_world" */
     openlog("hello_world", LOG_PID | LOG_CONS, LOG_USER);
 

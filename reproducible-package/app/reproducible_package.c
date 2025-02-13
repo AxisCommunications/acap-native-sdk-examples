@@ -29,15 +29,8 @@
  * brief Main function.
  *
  * This main function writes "Hello Reproducible World" to the syslog.
- *
- * param argc Number of arguments.
- * param argv Arguments vector.
  */
-int main(int argc, char** argv) {
-    /* Silence compiler warnings for unused parameters/arguments */
-    (void)argc;
-    (void)argv;
-
+int main(void) {
     /* Open the syslog to report messages for "reproducible_package" */
     openlog("reproducible_package", LOG_PID | LOG_CONS, LOG_USER);
 

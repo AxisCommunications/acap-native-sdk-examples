@@ -342,15 +342,8 @@ static gboolean signal_handler(gpointer loop) {
  *
  * This main function draws two plain boxes and one text, using the
  * API axoverlay.
- *
- * param argc Number of arguments.
- * param argv Arguments vector.
  */
-int main(int argc, char** argv) {
-    /* Silence compiler warnings for unused parameters/arguments */
-    (void)argc;
-    (void)argv;
-
+int main(void) {
     GMainLoop* loop    = NULL;
     GError* error      = NULL;
     GError* error_text = NULL;
