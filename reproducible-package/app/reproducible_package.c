@@ -37,8 +37,5 @@ int main(void) {
     /* Choose between { LOG_INFO, LOG_CRIT, LOG_WARN, LOG_ERR }*/
     syslog(LOG_INFO, "Hello Reproducible World!");
 
-    /* Close application logging to syslog */
-    closelog();
-
     return 0;
 }

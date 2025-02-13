@@ -144,8 +144,5 @@ int main(void) {
     // Free g_main_loop
     g_main_loop_unref(main_loop);
 
-    // Cleanup syslog
-    closelog();
-
     return 0;
 }
