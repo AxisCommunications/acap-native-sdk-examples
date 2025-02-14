@@ -1,56 +1,28 @@
 # How to make a contribution
 
-This page addresses the guidelines for the following actions below.
+Have you found an issue or have a question? Here you find different ways to
+contribute to this repository.
 
-- How to clone the repository.
-- How to make a good Pull Request (PR)
-- How to Post an issue in the issue tracker
+## Create a change and open a Pull Request
 
-## How to clone the repository on your local machine
+To make a contribution, you need to [fork the
+repository](https://docs.github.com/github/getting-started-with-github/fork-a-repo).
+Forking a repository means you create a copy of it in your GitHub account. A
+fork is necessary because by default repositories only grant you read access,
+but your fork gives you write access to make your changes. The fork lets you
+suggest changes by opening Pull Requests (PRs) from your fork to the "upstream"
+Axis repository.
 
-Please use the following commands to clone the examples repository on your local machine.
+### Guidelines for contributions
 
-### Clone it
+Before opening a PR, make sure to follow these guidelines
 
-```sh
-git clone https://github.com/AxisCommunications/acap-native-sdk-examples.git
-```
+- The sample code builds perfectly fine on your local system.
+- All [linters](LINT.md) pass.
+- Follow the [conventional commits](https://www.conventionalcommits.org)
+  message style in the commit messages.
 
-### Create your feature branch
+## Report a problem or ask a question
 
-```sh
-git checkout -b <branch_name>
-```
-
-### Commit your changes
-
-```sh
-git commit -a -m "Follow the conventional commit messages style to write this message"
-```
-
-### Push to the branch
-
-```sh
-git push origin <branch_name>
-```
-
-### Make a Pull request from GitHub GUI.
-
-## How to make a good Pull request
-
-Please consider the following guidelines before making a Pull Request.
-
-- Please make sure that the sample code builds perfectly fine on your local system.
-- Make sure that all [linters](LINT.md) pass.
-- Follow the [conventional commits](https://www.conventionalcommits.org) message style in the commit messages
-- The PR will have to meet the sample code examples standard already available in the repository.
-- Explanatory comments related to code functions are required. Please write code comments for a better understanding of the code for other developers.
-- No PR will be accepted without having a well defined README (see examples in the repository) file for the sample code.
-
-## How to post an issue in the issue tracker
-
-Please follow the guidelines below before posting an issue in the issue tracker.
-
-- Axis Camera model (e.g., MQ1615) used to execute the examples
-- Firmware version installed on the camera
-- Error(s) showed during compiling the source code
+In the [Issues](../../issues) tab, click `New issue` and choose an issue type
+and follow the instructions.
