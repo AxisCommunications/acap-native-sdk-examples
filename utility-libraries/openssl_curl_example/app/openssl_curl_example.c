@@ -241,5 +241,4 @@ int main(void) {
     }
     // Cleanup of curl global environment
     curl_global_cleanup();
-    return 0;
 }

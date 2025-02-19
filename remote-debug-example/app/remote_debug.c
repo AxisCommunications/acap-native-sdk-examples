@@ -25,6 +25,4 @@ int main(void) {
 
     /* This line will not be reached */
     syslog(LOG_INFO, "%s", message);
-
-    return 0;
 }

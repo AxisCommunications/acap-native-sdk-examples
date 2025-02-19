@@ -33,5 +33,4 @@
  */
 int main(void) {
     log_hello_world();
-    return 0;
 }

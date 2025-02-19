@@ -117,5 +117,4 @@ int main(void) {
 
     mklib_stop(context);
     g_main_loop_unref(loop);
-    return 0;
 }
