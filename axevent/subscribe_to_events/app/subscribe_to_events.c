@@ -545,6 +545,4 @@ int main(void) {
 
     // Free struct data
     g_slice_free(ptzmove, ptzmove_data);
-
-    return 0;
 }

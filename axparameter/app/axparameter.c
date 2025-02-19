@@ -208,5 +208,4 @@ int main(void) {
 
     g_main_loop_unref(loop);
     ax_parameter_free(handle);
-    return 0;
 }

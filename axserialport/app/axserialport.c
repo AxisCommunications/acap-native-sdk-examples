@@ -157,8 +157,6 @@ static gboolean send_timer_data(gpointer data) {
 
 /**
  * @brief Main function
- *
- * @return Result
  */
 int main(void) {
     gint fd                = 0;

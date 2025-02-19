@@ -210,6 +210,4 @@ gint main(void) {
 
     // Free g_main_loop
     g_main_loop_unref(main_loop);
-
-    return 0;
 }

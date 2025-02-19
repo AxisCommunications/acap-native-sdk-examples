@@ -131,6 +131,4 @@ end:
     mdb_connection_destroy(&connection);
 
     syslog(LOG_INFO, "Subscriber closed...");
-
-    return 0;
 }

@@ -148,5 +148,4 @@ int main(void) {
     free(credentials);
     curl_easy_cleanup(handle);
     curl_global_cleanup();
-    return 0;
 }
