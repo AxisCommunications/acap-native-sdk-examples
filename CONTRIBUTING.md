@@ -18,6 +18,7 @@ Axis repository.
 Before opening a PR, make sure to follow these guidelines
 
 - The sample code builds perfectly fine on your local system.
+- The update follows the [example guidelines](EXAMPLE_GUIDELINES.md).
 - All [linters](LINT.md) pass.
 - Follow the [conventional commits](https://www.conventionalcommits.org)
   message style in the commit messages.
