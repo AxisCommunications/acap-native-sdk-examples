@@ -1,0 +1,42 @@
+{
+    "schemaVersion": "1.7.2",
+    "resources": {
+        "dbus": {
+            "requiredMethods": [
+                "com.axis.Graphics2.*",
+                "com.axis.Overlay2.*"
+            ]
+        },
+        "linux": {
+            "user": {
+                "groups": ["video"]
+            }
+        }
+    },
+    "acapPackageConf": {
+        "setup": {
+            "friendlyName": "object_detection_yolov5_artpec9",
+            "appName": "object_detection_yolov5",
+            "vendor": "Axis Communications",
+            "embeddedSdkVersion": "3.0",
+            "runOptions": "/usr/local/packages/object_detection_yolov5/model/model.tflite /usr/local/packages/object_detection_yolov5/label/labels.txt  -c a9-dlpu-tflite",
+            "vendorUrl": "https://www.axis.com",
+            "runMode": "never",
+            "version": "1.0.0"
+        },
+        "configuration": {
+            "paramConfig": [
+                {
+                    "name": "ConfThresholdPercent",
+                    "default": "25",
+                    "type": "int:maxlen=3;min=0;max=100"
+                },
+                {
+                    "name": "IouThresholdPercent",
+                    "default": "5",
+                    "type": "int:maxlen=3;min=0;max=100"
+                }
+            ]
+        }
+    }
+}

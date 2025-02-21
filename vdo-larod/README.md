@@ -190,7 +190,7 @@ vdo-larod
 │   ├── manifest.json.edgetpu
 │   ├── manifest.json.cv25
 │   ├── model
-|   │   └── converted_model.tflite / converted_model_edgetpu.tflite / car_human_model_cavalry.bin
+|   │   └── model.tflite / model.bin
 │   ├── package.conf
 │   ├── package.conf.orig
 │   ├── param.conf
@@ -202,9 +202,8 @@ vdo-larod
 
 - **build/manifest.json** - Defines the application and its configuration.
 - **build/model** - Folder containing models used in this application.
-- **build/model/converted_model_edgetpu.tflite** - Trained model file used for Google TPU.
-- **build/model/converted_model.tflite** - Trained model file used for ARTPEC-8 and CPU with TensorFlow Lite.
-- **build/model/car_human_model_cavalry.bin** - Trained model file used for CV25.
+- **build/model/model.tflite** - Trained model file used for ARTPEC-8, ARTPEC-9, and CPU, or trained model file used for Google TPU, depending on `<CHIP>`.
+- **build/model/model.bin** - Trained model file used for CV25.
 - **build/package.conf** - Defines the application and its configuration.
 - **build/package.conf.orig** - Defines the application and its configuration, original file.
 - **build/param.conf** - File containing application parameters.
@@ -291,7 +290,7 @@ vdo_larod[4165]: Calculate crop image
 vdo_larod[4165]: Create larod models
 vdo_larod[4165]: Create preprocessing maps
 vdo_larod[4165]: Crop VDO image X=40 Y=0 (480 x 270)
-vdo_larod[4165]: Setting up larod connection with chip axis-a8-dlpu-tflite and model /usr/local/packages/vdo_larod/models/converted_model.tflite
+vdo_larod[4165]: Setting up larod connection with chip axis-a8-dlpu-tflite and model /usr/local/packages/vdo_larod/model/model.tflite
 vdo_larod[4165]: Available chip ids:
 vdo_larod[4165]: Chip: cpu-tflite
 vdo_larod[4165]: Chip: axis-ace-proc
@@ -346,7 +345,7 @@ vdo_larod[4165]: Calculate crop image
 vdo_larod[4165]: Create larod models
 vdo_larod[4165]: Create preprocessing maps
 vdo_larod[4165]: Crop VDO image X=40 Y=0 (480 x 270)
-vdo_larod[4165]: Setting up larod connection with chip a9-dlpu-tflite and model /usr/local/packages/vdo_larod/models/converted_model.tflite
+vdo_larod[4165]: Setting up larod connection with chip a9-dlpu-tflite and model /usr/local/packages/vdo_larod/model/model.tflite
 vdo_larod[4165]: Available chip ids:
 vdo_larod[4165]: Chip: a9-dlpu-tflite
 vdo_larod[4165]: Chip: cpu-tflite
@@ -395,7 +394,7 @@ vdo_larod[1670]: Calculate crop image
 vdo_larod[1670]: Create larod models
 vdo_larod[1670]: Create preprocessing maps
 vdo_larod[1670]: Crop VDO image X=40 Y=0 (480 x 270)
-vdo_larod[1670]: Setting up larod connection with chip cpu-tflite and model /usr/local/packages/vdo_larod/models/converted_model.tflite
+vdo_larod[1670]: Setting up larod connection with chip cpu-tflite and model /usr/local/packages/vdo_larod/model/model.tflite
 vdo_larod[1670]: Available chip ids:
 vdo_larod[1670]: Chip: cpu-tflite
 vdo_larod[1670]: Chip: google-edge-tpu-tflite
@@ -447,7 +446,7 @@ vdo_larod[31476]: Calculate crop image
 vdo_larod[31476]: Create larod models
 vdo_larod[31476]: Create preprocessing maps
 vdo_larod[31476]: Crop VDO image X=40 Y=0 (480 x 270)
-vdo_larod[31476]: Setting up larod connection with chip google-edge-tpu-tflite and model file /usr/local/packages/vdo_larod/models/converted_model_edgetpu.tflite
+vdo_larod[31476]: Setting up larod connection with chip google-edge-tpu-tflite and model file /usr/local/packages/vdo_larod/model/model.tflite
 vdo_larod[31476]: Available chip ids:
 vdo_larod[31476]: Chip: axis-a7-gpu-tflite
 vdo_larod[31476]: Chip: cpu-tflite
@@ -501,7 +500,7 @@ vdo_larod[584171]: Calculate crop image
 vdo_larod[584171]: Create larod models
 vdo_larod[584171]: Create preprocessing maps
 vdo_larod[584171]: Crop VDO image X=40 Y=0 (480 x 270)
-vdo_larod[584171]: Setting up larod connection with chip ambarella-cvflow and model file /usr/local/packages/vdo_larod/models/car_human_model_cavalry.bin
+vdo_larod[584171]: Setting up larod connection with chip ambarella-cvflow and model file /usr/local/packages/vdo_larod/model/model.bin
 vdo_larod[584171]: Available chip ids:
 vdo_larod[584171]: Chip: ambarella-cvflow
 vdo_larod[584171]: Chip: ambarella-cvflow-proc
