@@ -28,4 +28,4 @@ $(PROG1): $(OBJS1)
 	$(STRIP) $@
 
 clean:
-	rm -rf $(PROGS) *.o core *.eap* *_LICENSE.txt debug tmp* package.conf* param.conf
+	rm -rf $(PROGS) *.o *.eap* *_LICENSE.txt package.conf* param.conf tmp* $(DEBUG_DIR) core

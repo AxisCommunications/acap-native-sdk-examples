@@ -1,4 +1,4 @@
 all:
 
 clean:
-	rm -f *.eap* alpine.tar
+	rm -f *.eap* *_LICENSE.txt package.conf* param.conf tmp* alpine.tar

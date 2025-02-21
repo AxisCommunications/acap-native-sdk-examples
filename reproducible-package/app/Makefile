@@ -37,4 +37,4 @@ $(PROG1): $(OBJS1)
 	$(STRIP) $@
 
 clean:
-	rm -f $(PROGS) *.o core *.conf* *.eap* *_LICENSE.txt
+	rm -f $(PROGS) *.o *.eap* *_LICENSE.txt package.conf* param.conf tmp* *.conf*

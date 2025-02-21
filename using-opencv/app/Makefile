@@ -1,4 +1,4 @@
-TARGET = opencv_app
+PROGS = opencv_app
 OBJECTS = $(wildcard *.cpp)
 
 PKGS = gio-2.0 gio-unix-2.0 vdostream
@@ -13,11 +13,11 @@ LDLIBS += -lm -lopencv_video -lopencv_imgproc -lopencv_core -lpthread
 
 .PHONY: all clean
 
-all: $(TARGET)
+all: $(PROGS)
 
-$(TARGET): $(OBJECTS)
+$(PROGS): $(OBJECTS)
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) $(LDLIBS) $^ -o $@ ; \
 	$(STRIP) --strip-unneeded $@
 
 clean:
-	$(RM) *.o $(TARGET) *.eap* *_LICENSE.txt pa*
+	rm -f $(PROGS) *.o *.eap* *_LICENSE.txt package.conf* param.conf tmp*

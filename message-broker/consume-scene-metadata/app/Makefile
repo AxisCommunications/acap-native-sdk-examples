@@ -34,4 +34,4 @@ $(PROG1): $(OBJS1)
 	$(STRIP) $@
 
 clean:
-	rm -rf $(PROGS) $(DEBUG_DIR) *.o *.eap* *_LICENSE.txt package.conf* param.conf tmp*
+	rm -rf $(PROGS) *.o *.eap* *_LICENSE.txt package.conf* param.conf tmp* $(DEBUG_DIR)
