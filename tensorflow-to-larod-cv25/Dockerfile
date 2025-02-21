@@ -34,11 +34,9 @@ RUN curl --limit-rate 1G -o annotations_trainval2017.zip $ANNOTATION_URL && \
 
 # Get pretrained models
 WORKDIR /env
-ARG MODEL_URL=https://acap-ml-model-storage.s3.amazonaws.com/tensorflow_to_larod_models.cv25.zip
-RUN curl -o models.zip $MODEL_URL && \
-   unzip -q models.zip  && \
-   rm models.zip && \
-   cp /env/models/car_human_model_cavalry.bin /env/app/
+ARG MODEL_URL=https://acap-ml-models.s3.amazonaws.com/tenosrflow_to_larod_resnet/cv25/custom_resnet_car_human_256.bin
+RUN curl -o resnet_car_human_256.bin $MODEL_URL && \
+    cp /env/resnet_car_human_256.bin /env/app/
 
 RUN pip3 install --no-cache-dir Pillow==8.0.0
 

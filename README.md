@@ -46,6 +46,8 @@ Below is the list of examples available in the repository.
   - An example of object detection, cropping and saving detected objects into JPEG files.
 - [object-detection-cv25](./object-detection-cv25/)
   - An example of object detection, cropping and saving detected objects into JPEG files on AXIS CV25 devices.
+- [object-detection-yolov5](./object-detection-yolov5/)
+  - An example of object detection using YOLOv5, drawing bounding boxes around detected objects on the video stream.
 - [remote-debug-example](./remote-debug-example/)
   - An example of how to remote debug an ACAP application.
 - [reproducible-package](./reproducible-package/)

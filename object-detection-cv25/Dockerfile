@@ -53,8 +53,9 @@ RUN . /opt/axis/acapsdk/environment-setup* && \
 # Download pretrained models
 WORKDIR /opt/app/model
 ARG CHIP=cv25
-RUN curl -o converted_model.bin https://acap-ml-model-storage.s3.amazonaws.com/SSD_Mobilenet_Ambarella/ambarella_ssd.bin && \
-    curl -o anchor_boxes.bin  https://acap-ml-model-storage.s3.amazonaws.com/SSD_Mobilenet_Ambarella/anchor_boxes.bin
+ARG MODEL_BUCKET=https://acap-ml-models.s3.amazonaws.com/ssd_mobilenet
+RUN curl -o model.bin $MODEL_BUCKET/ssd_mobilenet_v2_cv25_coco_300.bin && \
+    curl -o anchor_boxes.bin $MODEL_BUCKET/ssd_mobilenet_v2_cv25_coco_300_anchor_boxes.bin
 
 WORKDIR /opt/app/label
 RUN curl -L -o labels.txt https://github.com/google-coral/test_data/raw/master/coco_labels.txt
@@ -68,5 +69,5 @@ COPY ./app .
 RUN cp /opt/app/manifest.json.${CHIP} /opt/app/manifest.json && \
     . /opt/axis/acapsdk/environment-setup* && acap-build . \
     -a 'label/labels.txt' \
-    -a 'model/converted_model.bin' \
+    -a 'model/model.bin' \
     -a 'model/anchor_boxes.bin'

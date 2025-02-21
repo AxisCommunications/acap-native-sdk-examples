@@ -1,0 +1,42 @@
+name: Build object-detection-yolov5 application
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'object-detection-yolov5/**'
+      - '!object-detection-yolov5/README.md'
+      - '.github/workflows/object-detection-yolov5.yml'
+jobs:
+  test-app:
+    name: Test app
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - arch: aarch64
+            chip: cpu
+            axis-os: 12.2.44
+          - arch: aarch64
+            chip: artpec8
+            axis-os: 12.2.44
+          - arch: aarch64
+            chip: artpec9
+            axis-os: 12.2.44
+    env:
+      EXREPO: acap-native-examples
+      EXNAME: object-detection-yolov5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+
+      - name: Build ${{ env.example }} application
+        env:
+          example: ${{ env.EXNAME }}-${{ matrix.chip }}
+          imagetag: ${{ env.EXREPO }}_${{ env.EXNAME }}-${{ matrix.chip }}:${{ matrix.arch }}
+        run: |
+          docker image rm -f $imagetag
+          cd $EXNAME
+          docker build --no-cache --build-arg CHIP=${{ matrix.chip }} --build-arg ARCH=${{ matrix.arch }} --tag $imagetag .
+          docker cp $(docker create $imagetag):/opt/app ./build_${{ matrix.chip }}
+          cd ..
+          docker image rm -f $imagetag
