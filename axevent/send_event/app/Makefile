@@ -20,4 +20,4 @@ CFLAGS += -Wall \
 all:	$(PROG)
 
 clean:
-	rm -f $(PROG) *.o *.eap *_LICENSE.txt
+	rm -f $(PROG) *.o *.eap* *_LICENSE.txt package.conf* param.conf tmp*

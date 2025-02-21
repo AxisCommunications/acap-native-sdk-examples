@@ -19,8 +19,8 @@ CFLAGS += -Wall \
 all:	$(PROGS)
 
 $(PROG1): $(OBJS1)
-	$(CC) $^ $(CFLAGS) $(LIBS) -o $@
+	$(CC) $^ $(CFLAGS) -o $@
 	$(STRIP) $@
 
 clean:
-	rm -f $(PROGS) *.o core *.eap
+	rm -f $(PROGS) *.o *.eap* *_LICENSE.txt package.conf* param.conf tmp*

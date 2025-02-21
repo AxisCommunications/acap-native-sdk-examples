@@ -27,4 +27,4 @@ $(PROG1): $(OBJS1)
 	$(CC) $(CFLAGS) $(LDFLAGS) $(LDLIBS)  $^ $(LIBS) $(LDLIBS) $(SHLIBS) -o $@
 
 clean:
-	rm -f $(PROGS) *.o *.eap *_LICENSE.txt package.conf* param.conf
+	rm -f $(PROGS) *.o *.eap* *_LICENSE.txt package.conf* param.conf tmp*
