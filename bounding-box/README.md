@@ -2,7 +2,7 @@
 
 # ACAP application drawing bounding boxes
 
-This example demonstrates how to draw burnt-in bounding boxes on selected video sources/channels using the [Bounding Box](https://axiscommunications.github.io/acap-documentation/docs/api/native-sdk-api.html#bbox-api) API.
+This example demonstrates how to draw burnt-in bounding boxes on selected video sources/channels using the [Bounding Box](https://developer.axis.com/acap/api/native-sdk-api/#bounding-box-api) API.
 
 The aim of this API is to solve one common use-case, supporting all new chips in Axis products and utilizing the most optimized drawing mechanism available for each chip. Meanwhile, the Axoverlay API which is show-cased in the [axoverlay](https://github.com/AxisCommunications/acap-native-sdk-examples/tree/main/axoverlay/) example exposes advanced ARTPEC specific overlay functionality.
 
@@ -40,7 +40,7 @@ A [view area](https://www.axis.com/vapix-library/subjects/t10175981/section/t101
 
 Multiple streams can be created from the same view area, but the same boxes will be drawn on all of the streams. For instance you can have one view area dedicated to live streams with bounding boxes and another view area dedicated to recording streams without any bounding boxes.
 
-The typical use-case is to analyze the full view of the camera also referred to as [input](https://axiscommunications.github.io/acap-documentation/docs/api/src/api/vdostream/html/vdo-stream_8h.html). The benefit with this approach is that you can draw boxes around the detected objects in any number of view areas, see `bbox_new`.
+The typical use-case is to analyze the full view of the camera also referred to as [input](https://developer.axis.com/acap/api/src/api/vdostream/html/vdo-stream_8h.html). The benefit with this approach is that you can draw boxes around the detected objects in any number of view areas, see `bbox_new`.
 
 However using the view areas feature it's possible to predefine a cropped region of interest, this might result in higher framerates as uninteresting parts of the image are discarded. The trade-off is that bounding boxes can then only be drawn in that single view area, see `bbox_view_new`.
 
@@ -52,7 +52,7 @@ Standing in your working directory run the following commands:
 >
 > Depending on the network your local build machine is connected to, you may need to add proxy
 > settings for Docker. See
-> [Proxy in build time](https://axiscommunications.github.io/acap-documentation/docs/develop/proxy#proxy-in-build-time).
+> [Proxy in build time](https://developer.axis.com/acap/develop/proxy/#proxy-in-build-time).
 
 ```sh
 docker build --tag <APP_IMAGE> --build-arg ARCH=<ARCH> .

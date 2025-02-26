@@ -3,7 +3,7 @@
 # ACAP applications using the Message Broker API
 
 This directory contains ACAP application examples that interacts with the
-[Message Broker API](https://axiscommunications.github.io/acap-documentation/docs/api/native-sdk-api.html#message-broker-api).
+[Message Broker API](https://developer.axis.com/acap/api/native-sdk-api/#message-broker-api).
 
 ## Example applications
 

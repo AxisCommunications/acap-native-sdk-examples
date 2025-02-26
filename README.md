@@ -8,10 +8,9 @@ The ACAP Native SDK is targeted towards users that want to develop plug-in style
 
 Please check the following guidelines for ACAP application development:
 
-- [ACAP documentation](https://axiscommunications.github.io/acap-documentation/)
-- [Introduction](https://axiscommunications.github.io/acap-documentation/docs/introduction.html)
-- [Getting Started](https://axiscommunications.github.io/acap-documentation/docs/get-started.html)
-- [Developer environment requisites](https://axiscommunications.github.io/acap-documentation/docs/get-started/set-up-developer-environment/pre-requisites.html)
+- [ACAP documentation](https://developer.axis.com/acap/)
+- [Introduction](https://developer.axis.com/acap/introduction/what-is-acap)
+- [Getting Started](https://developer.axis.com/acap/get-started/set-up-developer-environment/pre-requisites)
 
 ## Getting started with the repository
 
@@ -70,7 +69,7 @@ Below is the list of examples available in the repository.
   <!-- textlint-enable -->
   - An example in C that retrieves VAPIX credentials over D-Bus and makes VAPIX calls over a loopback interface.
 - [vdo-larod](./vdo-larod/)
-  - An example in C that loads a pretrained person-car classification model to the [Machine learning API (Larod)](https://axiscommunications.github.io/acap-documentation/docs/api/native-sdk-api.html#machine-learning-api-larod) and then uses the [Video capture API (VDO)](https://axiscommunications.github.io/acap-documentation/docs/api/native-sdk-api.html#video-capture-api-vdo) to fetch video frames in YUV format and finally run inference.
+  - An example in C that loads a pretrained person-car classification model to the [Machine learning API (Larod)](https://developer.axis.com/acap/api/native-sdk-api/#machine-learning-api-larod) and then uses the [Video capture API (VDO)](https://developer.axis.com/acap/api/native-sdk-api/#video-capture-api-vdo) to fetch video frames in YUV format and finally run inference.
 - [vdo-opencl-filtering](./vdo-opencl-filtering/)
   - An example that illustrates how to capture frames from the vdo service, access the received buffer, and finally perform a GPU accelerated Sobel filtering with OpenCL.
 - [vdostream](./vdostream/)
@@ -97,7 +96,7 @@ or migrating from an old version of ACAP SDK.
 If you encounter issues with the examples, make sure your product is running the latest firmware version or one that is compatible with the ACAP SDK used.
 The examples use the ACAP SDK during the build process, of which each version is compatible with a set of firmware versions.
 The specific SDK version that each example is based on is specified in the Dockerfile used to build the application, through the `VERSION` variable.
-The full compatibility schema for ACAP SDK version and firmware version is available at [Compatibility for Native SDK](https://axiscommunications.github.io/acap-documentation/docs/api/native-sdk-api.html#compatibility).
+The full compatibility schema for ACAP SDK version and firmware version is available at [Compatibility for Native SDK](https://developer.axis.com/acap/api/native-sdk-api/#compatibility).
 
 If the issue persists with a compatible firmware, please create an issue containing the information specified in the template below.
 

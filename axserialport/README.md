@@ -39,7 +39,7 @@ Standing in your working directory run the following commands:
 >
 > Depending on the network your local build machine is connected to, you may need to add proxy
 > settings for Docker. See
-> [Proxy in build time](https://axiscommunications.github.io/acap-documentation/docs/develop/proxy#proxy-in-build-time).
+> [Proxy in build time](https://developer.axis.com/acap/develop/proxy/#proxy-in-build-time).
 
 ```sh
 docker build --tag <APP_IMAGE> .

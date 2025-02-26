@@ -4,8 +4,8 @@
 
 This README file explains how to build an ACAP application that uses:
 
-- the [Video capture API (VDO)](https://axiscommunications.github.io/acap-documentation/docs/api/native-sdk-api.html#video-capture-api-vdo) to fetch frames from e.g. a camera
-- the [Machine learning API (Larod)](https://axiscommunications.github.io/acap-documentation/docs/api/native-sdk-api.html#machine-learning-api-larod) to load a graph model and run preprocessing and classification inferences
+- the [Video capture API (VDO)](https://developer.axis.com/acap/api/native-sdk-api/#video-capture-api-vdo) to fetch frames from e.g. a camera
+- the [Machine learning API (Larod)](https://developer.axis.com/acap/api/native-sdk-api/#machine-learning-api-larod) to load a graph model and run preprocessing and classification inferences
 
 It is achieved by using the containerized API and toolchain images.
 
@@ -92,7 +92,7 @@ Below is the step by step instructions on how to execute the program. So basical
 >
 > Depending on the network your local build machine is connected to, you may need to add proxy
 > settings for Docker. See
-> [Proxy in build time](https://axiscommunications.github.io/acap-documentation/docs/develop/proxy#proxy-in-build-time).
+> [Proxy in build time](https://developer.axis.com/acap/develop/proxy/#proxy-in-build-time).
 
 Depending on selected chip, different models are trained and are used for running laord.
 In this example, model files are downloaded from an AWS S3 bucket,

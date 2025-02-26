@@ -88,11 +88,11 @@ specifically in the [Proxy in build time][proxy-in-build-time] and
 
 <!-- Links to external references -->
 <!-- markdownlint-disable MD034 -->
-[access-device-through-ssh]: https://axiscommunications.github.io/acap-documentation/docs/get-started/set-up-developer-environment/set-up-device-advanced.html#access-the-device-through-ssh
-[developer-mode]: https://axiscommunications.github.io/acap-documentation/docs/get-started/set-up-developer-environment/set-up-device-advanced.html#developer-mode
+[access-device-through-ssh]: https://developer.axis.com/acap/get-started/set-up-developer-environment/set-up-device-advanced/#access-the-device-through-ssh
+[developer-mode]: https://developer.axis.com/acap/get-started/set-up-developer-environment/set-up-device-advanced/#disable-developer-mode
 [server-report-cgi]: https://www.axis.com/vapix-library/subjects/t10175981/section/t10036044/display?section=t10036044-t10003915
 [system-log-cgi]: https://www.axis.com/vapix-library/subjects/t10175981/section/t10036044/display?section=t10036044-t10003913
-[proxy]: https://axiscommunications.github.io/acap-documentation/docs/develop/proxy
-[proxy-in-build-time]: https://axiscommunications.github.io/acap-documentation/docs/develop/proxy#proxy-in-build-time
-[proxy-in-runtime]: https://axiscommunications.github.io/acap-documentation/docs/develop/proxy#proxy-in-runtim
+[proxy]: https://developer.axis.com/acap/develop/proxy
+[proxy-in-build-time]: https://developer.axis.com/acap/develop/proxy/#proxy-in-build-time
+[proxy-in-runtime]: https://developer.axis.com/acap/develop/proxy/#proxy-in-runtime
 <!-- markdownlint-enable MD034 -->
