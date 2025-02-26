@@ -4,7 +4,7 @@
 
 This example demonstrates how to draw burnt-in bounding boxes on selected video sources/channels using the [Bounding Box](https://developer.axis.com/acap/api/native-sdk-api/#bounding-box-api) API.
 
-The aim of this API is to solve one common use-case, supporting all new chips in Axis products and utilizing the most optimized drawing mechanism available for each chip. Meanwhile, the Axoverlay API which is show-cased in the [axoverlay](https://github.com/AxisCommunications/acap-native-sdk-examples/tree/main/axoverlay/) example exposes advanced ARTPEC specific overlay functionality.
+The aim of this API is to solve one common use-case, supporting all new chips in Axis products and utilizing the most optimized drawing mechanism available for each chip. Meanwhile, the Axoverlay API which is show-cased in the [axoverlay](../axoverlay) example exposes advanced ARTPEC specific overlay functionality.
 
 ## Project structure
 
