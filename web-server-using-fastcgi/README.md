@@ -40,7 +40,7 @@ using-fastcgi
 
 ### Manifest schema HTTP configuration
 
-To correctly set up an application that integrates with the Apache web server it is necessary to add some special configuration in the `app/manifest.json` file following the [manifest schema](https://axiscommunications.github.io/acap-documentation/docs/develop/manifest-schemas).
+To correctly set up an application that integrates with the Apache web server it is necessary to add some special configuration in the `app/manifest.json` file following the [manifest schema](https://developer.axis.com/acap/develop/manifest-schemas/).
 
 ```json
 "acapPackageConf": {
@@ -72,7 +72,7 @@ Standing in your working directory run the following commands:
 >
 > Depending on the network your local build machine is connected to, you may need to add proxy
 > settings for Docker. See
-> [Proxy in build time](https://axiscommunications.github.io/acap-documentation/docs/develop/proxy#proxy-in-build-time).
+> [Proxy in build time](https://developer.axis.com/acap/develop/proxy/#proxy-in-build-time).
 
 ```sh
 docker build --tag <APP_IMAGE> .

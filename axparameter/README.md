@@ -3,7 +3,7 @@
 # ACAP application using parameters
 
 This example shows how to handle system-wide and application-defined parameters using the
-[AXParameter library](https://axiscommunications.github.io/acap-documentation/docs/api/native-sdk-api.html#parameter-api).
+[AXParameter library](https://developer.axis.com/acap/api/native-sdk-api/#parameter-api).
 Emphasis has been put on the use of callback functions and some of the limitations they impose.
 
 ## Project structure
@@ -76,7 +76,7 @@ Standing in your working directory run the following commands:
 >
 > Depending on the network your local build machine is connected to, you may need to add proxy
 > settings for Docker. See
-> [Proxy in build time](https://axiscommunications.github.io/acap-documentation/docs/develop/proxy#proxy-in-build-time).
+> [Proxy in build time](https://developer.axis.com/acap/develop/proxy/#proxy-in-build-time).
 
 ```sh
 docker build --tag <APP_IMAGE> --build-arg ARCH=<ARCH> .

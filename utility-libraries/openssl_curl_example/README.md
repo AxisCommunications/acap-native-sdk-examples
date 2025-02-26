@@ -1,5 +1,5 @@
 *Copyright (C) 2022, Axis Communications AB, Lund, Sweden. All Rights Reserved.*
-
+<!-- omit from toc -->
 # Build custom OpenSSL and curl libraries and use them in an ACAP application
 
 > [!IMPORTANT]
@@ -23,6 +23,7 @@ The application uses these libraries to transfer content from a web server
 `www.example.com` with HTTPS and a CA certificate to the application directory
 on a device.
 
+<!-- omit from toc -->
 ## Table of contents
 
 <!-- ToC GFM -->
@@ -40,7 +41,7 @@ on a device.
   - [Runtime shared library search path](#runtime-shared-library-search-path)
 - [Check build dependencies](#check-build-dependencies)
 - [Troubleshooting](#troubleshooting)
-  - [Error CURLE_PEER_FAILED_VERIFICATION (60)](#error-curle_peer_failed_verification-60)
+  - [Error CURLE\_PEER\_FAILED\_VERIFICATION (60)](#error-curle_peer_failed_verification-60)
 - [License](#license)
 
 <!-- /ToC -->
@@ -57,7 +58,7 @@ building the ACAP application. That is because the older `libc` from the SDK
 can't find these newer symbols and functions.
 - **Don't depend on all available libraries in SDK** - It's recommended to only
   use `libc` and the documented [ACAP
-API](https://axiscommunications.github.io/acap-documentation/docs/api/native-sdk-api.html)
+API](https://developer.axis.com/acap/api/native-sdk-api)
 libraries in the SDK. Don't use other libraries from the SDK in an ACAP
 application.  Instead, download, compile and bundle libraries such as
 `libcrypto.so` and `libssl.so` (OpenSSL) and `libcurl.so` (curl) with the ACAP
@@ -114,7 +115,7 @@ the application on a device.
 >
 > Depending on the network your local build machine is connected to, you may need to add proxy
 > settings for Docker. See
-> [Proxy in build time](https://axiscommunications.github.io/acap-documentation/docs/develop/proxy#proxy-in-build-time).
+> [Proxy in build time](https://developer.axis.com/acap/develop/proxy/#proxy-in-build-time).
 
 Standing in your working directory run:
 
@@ -257,7 +258,7 @@ which are also available in the SDK, by accident.  To achieve this, we
 recommend removing any OpenSSL or curl libraries in the SDK library path.
 
    Why not remove these libraries from the SDK? The [Licensekey
-API](https://axiscommunications.github.io/acap-documentation/docs/api/native-sdk-api.html#license-key-api)
+API](https://developer.axis.com/acap/api/native-sdk-api/#license-key-api)
 has a dependency on `libcrypto`.
 
 2. **Build OpenSSL libraries** - The SDK environment is sourced to compile with

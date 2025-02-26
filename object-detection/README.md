@@ -55,7 +55,7 @@ unsigned int streamHeight = 0;
 chooseStreamResolution(args.width, args.height, &streamWidth, &streamHeight);
 ```
 
-Then, the [createImgProvider](app/imgprovider.c#L95) method is used to return an ImgProvider with the selected [output format](https://axiscommunications.github.io/acap-documentation/docs/api/src/api/vdostream/html/vdo-types_8h.html#a5ed136c302573571bf325c39d6d36246).
+Then, the [createImgProvider](app/imgprovider.c#L95) method is used to return an ImgProvider with the selected [output format](https://developer.axis.com/acap/api/src/api/vdostream/html/vdo-types_8h.html#a5ed136c302573571bf325c39d6d36246).
 
 ```c
 provider = createImgProvider(streamWidth, streamHeight, 2, VDO_FORMAT_YUV);
@@ -71,7 +71,7 @@ provider_raw = createImgProvider(rawWidth, rawHeight, 2, VDO_FORMAT_YUV);
 
 #### Setting up the larod interface
 
-Then similar with [tensorflow-to-larod](../tensorflow-to-larod), the [larod](https://axiscommunications.github.io/acap-documentation/docs/api/src/api/larod/html/index.html) interface needs to be set up. The [setupLarod](app/object_detection.c#L314) method is used to create a conncection to larod and select the hardware to use the model.
+Then similar with [tensorflow-to-larod](../tensorflow-to-larod), the [larod](https://developer.axis.com/acap/api/src/api/larod/html/index.html) interface needs to be set up. The [setupLarod](app/object_detection.c#L291) method is used to create a connection to larod and select the hardware to use the model.
 
 ```c
 int larodModelFd = -1;
@@ -215,7 +215,7 @@ in the [app](app) directory. Standing in the application directory, run:
 >
 > Depending on the network your local build machine is connected to, you may need to add proxy
 > settings for Docker. See
-> [Proxy in build time](https://axiscommunications.github.io/acap-documentation/docs/develop/proxy#proxy-in-build-time).
+> [Proxy in build time](https://developer.axis.com/acap/develop/proxy/#proxy-in-build-time).
 
 ```sh
 docker build --build-arg ARCH=<ARCH> --build-arg CHIP=<CHIP> --tag obj_detect:1.0 .

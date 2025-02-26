@@ -13,7 +13,7 @@ acting as a CGI.
 Another example that serves HTTP requests is
 [web-server-using-fastcgi](../web-server-using-fastcgi), where the Axis device
 web server and the supported ACAP API
-[FastCGI](https://axiscommunications.github.io/acap-documentation/docs/api/native-sdk-api.html#fastcgi)
+[FastCGI](https://developer.axis.com/acap/api/native-sdk-api/#fastcgi)
 are used.
 
 ## Reverse proxy configuration in Apache server
@@ -92,7 +92,7 @@ Standing in your working directory run the following commands:
 >
 > Depending on the network your local build machine is connected to, you may need to add proxy
 > settings for Docker. See
-> [Proxy in build time](https://axiscommunications.github.io/acap-documentation/docs/develop/proxy#proxy-in-build-time).
+> [Proxy in build time](https://developer.axis.com/acap/develop/proxy/#proxy-in-build-time).
 
 ```sh
 docker build --tag <APP_IMAGE> --build-arg ARCH=<ARCH> .

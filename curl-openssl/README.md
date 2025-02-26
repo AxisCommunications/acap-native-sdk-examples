@@ -48,7 +48,7 @@ Standing in your working directory run the following commands:
 >
 > Depending on the network your local build machine is connected to, you may need to add proxy
 > settings for Docker. See
-> [Proxy in build time](https://axiscommunications.github.io/acap-documentation/docs/develop/proxy#proxy-in-build-time).
+> [Proxy in build time](https://developer.axis.com/acap/develop/proxy/#proxy-in-build-time).
 
 ```sh
 docker build --tag <APP_IMAGE> --build-arg ARCH=<ARCH> .
@@ -75,7 +75,7 @@ docker build --build-arg APP_DEBUG=yes --tag <APP_IMAGE> --build-arg ARCH=<ARCH>
 
 If the device is inside a network with a proxy, the global device proxy must be
 set to allow curl to pick it up at runtime. For reference see
-[Configure global device proxy](https://axiscommunications.github.io/acap-documentation/docs/develop/proxy#configure-global-device-proxy).
+[Configure global device proxy](https://developer.axis.com/acap/develop/proxy/#configure-global-device-proxy).
 
 Copy the result from the container image to a local directory `build`:
 

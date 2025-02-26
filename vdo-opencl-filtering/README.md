@@ -37,7 +37,7 @@ vdo-opencl-filtering
 
 The example is done for a captured video stream in YUV NV12 format. For different stream formats the OpenCL program must be altered.
 
-This example requires OpenCL 1.2 with GPU accelleration, see [SDK user manual](https://axiscommunications.github.io/acap-documentation/docs/api/native-sdk-api.html#opencl).
+This example requires OpenCL 1.2 with GPU acceleration, see the [ACAP API page](https://developer.axis.com/acap/api/native-sdk-api/#opencl) for more information.
 
 ### How to run the code
 
@@ -51,7 +51,7 @@ Standing in your working directory run the following commands:
 >
 > Depending on the network your local build machine is connected to, you may need to add proxy
 > settings for Docker. See
-> [Proxy in build time](https://axiscommunications.github.io/acap-documentation/docs/develop/proxy#proxy-in-build-time).
+> [Proxy in build time](https://developer.axis.com/acap/develop/proxy/#proxy-in-build-time).
 
 ```sh
 docker build --tag <APP_IMAGE> --build-arg ARCH=<ARCH> .

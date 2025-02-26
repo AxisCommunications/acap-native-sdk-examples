@@ -28,7 +28,7 @@ ACAP application. Some examples:
 - The credentials should be re-fetched each time the ACAP application starts
   and should only be kept in memory by the ACAP application, not stored in any
   file.
-- See more information of this feature in [ACAP documentation](https://axiscommunications.github.io/acap-documentation/docs/develop/VAPIX-access-for-ACAP-applications.html).
+- See more information of this feature in [ACAP documentation](https://developer.axis.com/acap/develop/VAPIX-access-for-ACAP-applications).
 
 #### Versions
 
@@ -49,7 +49,7 @@ ACAP application. Some examples:
 - If the device has set global device proxy, reaching the local virtual host
   (127.0.0.12) is only possible if 127.0.0.12 is added to the `No proxy` list,
   as described in
-  [Configure global device proxy](https://axiscommunications.github.io/acap-documentation/docs/develop/proxy#configure-global-device-proxy).
+  [Configure global device proxy](https://developer.axis.com/acap/develop/proxy/#configure-global-device-proxy).
 
 ## Getting started
 
@@ -88,7 +88,7 @@ Standing in your working directory run the following commands:
 >
 > Depending on the network your local build machine is connected to, you may need to add proxy
 > settings for Docker. See
-> [Proxy in build time](https://axiscommunications.github.io/acap-documentation/docs/develop/proxy#proxy-in-build-time).
+> [Proxy in build time](https://developer.axis.com/acap/develop/proxy/#proxy-in-build-time).
 
 ```sh
 docker build --tag <APP_IMAGE> --build-arg ARCH=<ARCH> .
