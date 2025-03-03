@@ -22,6 +22,7 @@
  * major and minor application version.
  *
  */
+#include <glib-unix.h>
 #include <glib.h>
 #include <licensekey.h>
 #include <stdio.h>
@@ -36,6 +37,17 @@
 #define CHECK_SECS 300
 
 static gchar* glob_app_name = NULL;
+
+/**
+ * @brief Handles the signals.
+ *
+ * @param loop Loop to quit
+ */
+static gboolean signal_handler(gpointer loop) {
+    g_main_loop_quit((GMainLoop*)loop);
+    syslog(LOG_INFO, "Application was stopped by SIGTERM or SIGINT.");
+    return G_SOURCE_REMOVE;
+}
 
 // Checks licensekey status every 5th minute
 static gboolean check_license_status(void* data) {
@@ -63,6 +75,12 @@ int main(int argc, char* argv[]) {
     check_license_status(NULL);
     g_timeout_add_seconds(CHECK_SECS, check_license_status, NULL);
 
+    g_unix_signal_add(SIGTERM, signal_handler, loop);
+    g_unix_signal_add(SIGINT, signal_handler, loop);
     g_main_loop_run(loop);
+
+    g_main_loop_unref(loop);
+    g_free(glob_app_name);
+
     return EXIT_SUCCESS;
 }
