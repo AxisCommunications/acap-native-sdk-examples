@@ -15,13 +15,13 @@ jobs:
         include:
           - arch: aarch64
             chip: cpu
-            axis-os: 12.2.44
+            axis-os: 12.3.56
           - arch: aarch64
             chip: artpec8
-            axis-os: 12.2.44
+            axis-os: 12.3.56
           - arch: aarch64
             chip: artpec9
-            axis-os: 12.2.44
+            axis-os: 12.3.56
     env:
       EXREPO: acap-native-examples
       EXNAME: object-detection-yolov5

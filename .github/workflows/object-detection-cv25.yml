@@ -15,7 +15,7 @@ jobs:
         include:
           - arch: aarch64
             chip: cv25
-            axis-os: 12.2.52
+            axis-os: 12.3.56
     env:
       EXREPO: acap-native-examples
       EXNAME: object-detection-cv25
