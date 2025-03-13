@@ -7,10 +7,6 @@
     "ignorePaths": ["container-example/**"],
     "packageRules": [
         {
-            "groupName": "Update of files using super-linter",
-            "matchFileNames": ["LINT.md", "run-linters", ".github/workflows/linter.y(a)?ml" ]
-        },
-        {
             "matchUpdateTypes": ["minor", "patch", "pin", "digest"],
             "automerge": true
         },
@@ -19,16 +15,6 @@
             "enabled": false
         }
     ],
-  "customManagers": [
-    {
-      "customType": "regex",
-      "description": "Update super-linter",
-      "fileMatch": ["LINT.md", "run-linters"],
-      "depNameTemplate": "docker",
-      "datasourceTemplate": "docker",
-      "matchStrings": [".*ghcr.io/super-linter/super-linter:(?<currentValue>.*?)\\n"]
-    }
-  ],
     "rebaseWhen": "behind-base-branch",
     "vulnerabilityAlerts": {
         "labels": ["security"]

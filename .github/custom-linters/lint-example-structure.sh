@@ -1,6 +1,6 @@
 #!/bin/bash
 
-. "$(pwd)"/.github/utils/util-functions.sh
+. "$(git rev-parse --show-toplevel)"/.github/utils/util-functions.sh
 
 #-------------------------------------------------------------------------------
 # Functions

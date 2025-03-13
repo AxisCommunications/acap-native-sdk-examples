@@ -2,7 +2,7 @@
 
 SCRIPT=${0##*/}
 
-. "$(pwd)"/.github/utils/util-functions.sh
+. "$(git rev-parse --show-toplevel)"/.github/utils/util-functions.sh
 
 # Must be run from top directory
 for dir_to_check in .git vdostream; do
@@ -63,7 +63,7 @@ done
     -e RUN_LOCAL=true \
     --env-file .github/super-linter.env \
     -v "$(pwd)":/tmp/lint \
-    -w /tmp/lint ghcr.io/super-linter/super-linter:slim-v6
+    -w /tmp/lint ghcr.io/super-linter/super-linter:slim-v7
   exitcode_super_linter=$?
 }
 

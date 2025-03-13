@@ -137,7 +137,7 @@ docker run --rm \
   -v $PWD:/tmp/lint \
   -w /tmp/lint \
   --entrypoint /bin/bash \
-  -it ghcr.io/super-linter/super-linter:slim-v6
+  -it ghcr.io/super-linter/super-linter:slim-v7
 ```
 
 Then from the container terminal, the following commands can lint the codebase
@@ -182,7 +182,7 @@ docker run --rm \
   -v $PWD:/tmp/lint \
   -w /tmp/lint \
   --entrypoint /bin/bash \
-  -it ghcr.io/super-linter/super-linter:slim-v6
+  -it ghcr.io/super-linter/super-linter:slim-v7
 
 # Autoformat C and C++ files (second line change all)
 clang-format -i <path/to/file>
@@ -206,7 +206,7 @@ compatible, but can't be guaranteed.
 
 | super-linter | clang-format | Likely compatible clang-format versions |
 | ------------ | ------------ | --------------------------------------- |
-| slim-v6      | 17           | 15-17                                   |
+| slim-v7      | 17           | 15-17                                   |
 
 If the setup is correct, the extension will automatically format the code
 according to the configuration file on save and when typing.
