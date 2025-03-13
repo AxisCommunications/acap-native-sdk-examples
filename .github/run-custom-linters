@@ -1,9 +1,15 @@
 #! /bin/bash
 
+. "$(git rev-parse --show-toplevel)"/.github/utils/util-functions.sh
+
 exitcode=0
-for linter in .github/custom-linters/*; do
+start_dir=$PWD
+git_top_dir="$(git rev-parse --show-toplevel)"
+custom_linters_dir="$git_top_dir/.github/custom-linters"
+for linter in "$custom_linters_dir"/*; do
   if [ -x "$linter" ]; then
     $linter || exitcode=1
   fi
 done
+cd "$start_dir" || :
 exit $exitcode

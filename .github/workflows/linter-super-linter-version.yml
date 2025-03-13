@@ -1,0 +1,22 @@
+name: Check version of super-linter in all places
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - 'main'
+  pull_request:
+    branches:
+      - '**'
+
+jobs:
+  test:
+    name: Check super-linter version
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - name: Verify that super-linter version is aligned to workflow file
+        if: always()
+        run: |
+          .github/custom-linters/lint-super-linter-version.sh
