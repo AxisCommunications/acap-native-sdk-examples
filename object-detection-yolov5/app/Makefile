@@ -29,4 +29,4 @@ $(PROG1): $(OBJS1)
 	$(CC) $(CFLAGS) $^ $(LDLIBS) -o $@
 
 clean:
-	rm -rf $(PROGS) *.o *.eap* *_LICENSE.txt package.conf* param.conf tmp* manifest.json
+	rm -f $(PROGS) *.o *.eap* *_LICENSE.txt package.conf* param.conf tmp* manifest.json
