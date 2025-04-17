@@ -1,0 +1,12 @@
+{
+    "schemaVersion": "1.7.3",
+    "acapPackageConf": {
+        "setup": {
+            "appName": "hello_rust",
+            "vendor": "Axis Communications",
+            "version": "1.0.0",
+            "runMode": "never",
+            "embeddedSdkVersion": "3.0"
+        }
+    }
+}

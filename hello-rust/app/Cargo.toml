@@ -1,0 +1,16 @@
+[package]
+name = "hello_rust"
+version = "0.0.0"
+edition = "2021"
+publish = false
+
+[dependencies]
+log = "0.4.22"
+acap-logging = "0.1.0"
+
+[profile.release]
+opt-level = "s"
+strip = "symbols"
+lto = true
+panic = "abort"
+codegen-units = 1
