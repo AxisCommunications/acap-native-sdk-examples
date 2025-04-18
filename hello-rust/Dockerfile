@@ -6,12 +6,19 @@ ARG SDK=acap-native-sdk
 
 FROM ${REPO}/${SDK}:${VERSION}-${ARCH}-ubuntu${UBUNTU_VERSION}
 
-RUN apt-get update && apt-get install -y build-essential curl && rm -rf /var/lib/apt/lists/*
-RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+RUN apt-get update \
+ && apt-get install --no-install-recommends -y \
+      build-essential \
+      curl \
+ && rm -rf /var/lib/apt/lists/*
+
+RUN set -o \
+ && curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+
 ENV PATH="/root/.cargo/bin:${PATH}"
 
-RUN . /opt/axis/acapsdk/environment-setup* && \
-    if [ "$OECORE_TARGET_ARCH" = "armv7hf" ]; then \
+RUN . /opt/axis/acapsdk/environment-setup* \
+ && if [ "$OECORE_TARGET_ARCH" = "armv7hf" ]; then \
         rustup target add armv7-unknown-linux-gnueabihf && \
         echo "export CARGO_BUILD_TARGET=armv7-unknown-linux-gnueabihf" >> /opt/axis/acapsdk/rust-environment-setup && \
         echo 'export CARGO_TARGET_THUMBV7NEON_UNKNOWN_LINUX_GNUEABIHF_LINKER=${CC%% *}' >> /opt/axis/acapsdk/rust-environment-setup; \
@@ -19,8 +26,8 @@ RUN . /opt/axis/acapsdk/environment-setup* && \
         rustup target add aarch64-unknown-linux-gnu && \
         echo "export CARGO_BUILD_TARGET=aarch64-unknown-linux-gnu" >> /opt/axis/acapsdk/rust-environment-setup && \
         echo 'export CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_LINKER=${CC%% *}' >> /opt/axis/acapsdk/rust-environment-setup; \
-    fi && \
-    echo "export CARGO_TARGET_RUSTFLAGS='-C link-args=--sysroot=${OECORE_TARGET_SYSROOT}'" >> /opt/axis/acapsdk/rust-environment-setup
+    fi \
+ && echo "export CARGO_TARGET_RUSTFLAGS='-C link-args=--sysroot=${OECORE_TARGET_SYSROOT}'" >> /opt/axis/acapsdk/rust-environment-setup
 
 COPY ./app /opt/app/
 WORKDIR /opt/app
