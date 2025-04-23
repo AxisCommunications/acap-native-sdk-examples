@@ -212,11 +212,23 @@ static void adjustment_cb(gint id,
     (void)overlay_y;
     (void)user_data;
 
-    syslog(LOG_INFO, "Adjust callback for overlay: %i x %i", *overlay_width, *overlay_height);
-    syslog(LOG_INFO, "Adjust callback for stream: %i x %i", stream->width, stream->height);
-
+    /* Set overlay resolution in case of rotation */
     *overlay_width  = stream->width;
     *overlay_height = stream->height;
+    if (stream->rotation == 90 || stream->rotation == 270) {
+        *overlay_width  = stream->height;
+        *overlay_height = stream->width;
+    }
+
+    syslog(LOG_INFO,
+           "Stream or rotation changed, overlay resolution is now: %i x %i",
+           *overlay_width,
+           *overlay_height);
+    syslog(LOG_INFO,
+           "Stream or rotation changed, stream resolution is now: %i x %i",
+           stream->width,
+           stream->height);
+    syslog(LOG_INFO, "Stream or rotation changed, rotation angle is now: %i", stream->rotation);
 }
 
 /**
@@ -256,29 +268,30 @@ static void render_overlay_cb(gpointer rendering_context,
     syslog(LOG_INFO, "Render callback for camera: %i", stream->camera);
     syslog(LOG_INFO, "Render callback for overlay: %i x %i", overlay_width, overlay_height);
     syslog(LOG_INFO, "Render callback for stream: %i x %i", stream->width, stream->height);
+    syslog(LOG_INFO, "Render callback for rotation: %i", stream->rotation);
 
     if (id == overlay_id) {
         //  Clear background by drawing a "filled" rectangle
         val = index2cairo(0);
         cairo_set_source_rgba(rendering_context, val, val, val, val);
         cairo_set_operator(rendering_context, CAIRO_OPERATOR_SOURCE);
-        cairo_rectangle(rendering_context, 0, 0, stream->width, stream->height);
+        cairo_rectangle(rendering_context, 0, 0, overlay_width, overlay_height);
         cairo_fill(rendering_context);
 
         //  Draw a top rectangle in toggling color
-        draw_rectangle(rendering_context, 0, 0, stream->width, stream->height / 4, top_color, 9.6);
+        draw_rectangle(rendering_context, 0, 0, overlay_width, overlay_height / 4, top_color, 9.6);
 
         //  Draw a bottom rectangle in toggling color
         draw_rectangle(rendering_context,
                        0,
-                       stream->height * 3 / 4,
-                       stream->width,
-                       stream->height,
+                       overlay_height * 3 / 4,
+                       overlay_width,
+                       overlay_height,
                        bottom_color,
                        2.0);
     } else if (id == overlay_id_text) {
         //  Show text in black
-        draw_text(rendering_context, stream->width / 2, stream->height / 2);
+        draw_text(rendering_context, overlay_width / 2, overlay_height / 2);
     } else {
         syslog(LOG_INFO, "Unknown overlay id!");
     }
