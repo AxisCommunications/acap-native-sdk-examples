@@ -1,12 +1,24 @@
 *Copyright (C) 2021, Axis Communications AB, Lund, Sweden. All Rights Reserved.*
 
-# Serve HTTP requests in an ACAP application
+# Serve HTTP requests through reverse proxy
 
 This example demonstrates how to setup the Axis device web server (Apache) in a
 [Reverse Proxy](https://httpd.apache.org/docs/2.4/howto/reverse_proxy.html)
 configuration, where HTTP requests to the application are routed to a web server
-[Monkey](https://github.com/monkey/monkey) running in the ACAP application and
-acting as a CGI.
+[Monkey](https://github.com/monkey/monkey) running inside the ACAP application
+and acting as a CGI.
+
+The advantage of a webserver proxy is that when porting existing code to your
+ACAP application, its request handling can remain largely unmodified. This eases
+the task of sharing code between platforms. The webserver proxy method enforces
+a URL routing scheme as follows:
+
+`http://<AXIS_DEVICE_IP>/local/<appName>/<apiPath>`
+
+With `<appName>` and `<apiPath>` as defined in the manifest.
+
+Note that this example shows the reverse proxy concept using Monkey, but you are
+free to use any webserver of your choice.
 
 ## Alternative approach
 
@@ -26,6 +38,12 @@ The Apache server is configured using the `manifest.json` file in an ACAP
 application. In `manifest.json` under `configuration`, it is possible to specify
 a `settingPage` and a `reverseProxy` where the latter will connect the Monkey
 server to the Apache server.
+
+Prior to manifest 1.5.0, reverse proxy was only supported through the
+postinstall script. The manifest based method is more strict on URLs in order to
+avoid name clashes that could occur in the old mechanism. When upgrading, your
+URLs will change to the format shown in
+[Serve HTTP requests through reverse proxy](#serve-http-requests-through-reverse-proxy).
 
 The web server running in the ACAP application can also be exposed directly to
 the network by allowing external access to the port in the network
@@ -68,7 +86,7 @@ web-server
 
 - Apache Reverse Proxy can not translate content with absolute addresses (i.e.
   /image.png) in the HTML page. Use only relative content (i.e. image.png or
-../image.png)). More information how to handle relative URLs correctly with a
+../image.png). More information how to handle relative URLs correctly with a
 reverse proxy
 [here](https://serverfault.com/questions/561892/how-to-handle-relative-urls-correctly-with-a-reverse-proxy).
 
@@ -144,11 +162,6 @@ curl -u<USER>:<PASSWORD> --anyauth http://<AXIS_DEVICE_IP>/local/web_server_rev_
 As can be seen it's HTML code, browse to web page
 `http://<AXIS_DEVICE_IP>/local/web_server_rev_proxy/my_web_server`
 for seeing it rendered.
-
-> [!NOTE]
->
-> - The API path is `<AXIS_DEVICE_IP>/local/<appName>/<apiPath>` where
->   `appName` and `apiPath` are fields from `manifest.json`.
 
 The application log can be found by either
 
