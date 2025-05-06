@@ -1,0 +1,14 @@
+[package]
+name = "hello_rust"
+version = "0.0.0"
+edition = "2021"
+publish = false
+
+[dependencies]
+
+[profile.release]
+opt-level = "s"
+strip = "symbols"
+lto = true
+panic = "abort"
+codegen-units = 1
