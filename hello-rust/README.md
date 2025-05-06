@@ -144,9 +144,6 @@ http://<AXIS_DEVICE_IP>/axis-cgi/admin/systemlog.cgi?appname=hello_rust
 
 2025-04-17T20:24:33.559+00:00 axis-b8a44fc09016 [ INFO    ] hello_rust[140843]: Hello stderr!
 2025-04-17T20:24:33.559+00:00 axis-b8a44fc09016 [ INFO    ] hello_rust[140843]: Hello stdout!
-2025-04-17T20:24:33.560+00:00 axis-b8a44fc09016 [ INFO    ] axis-b8a44fc09016 hello_rust[140843]: Hello info!
-2025-04-17T20:24:33.560+00:00 axis-b8a44fc09016 [ WARNING ] axis-b8a44fc09016 hello_rust[140843]: Hello warn!
-2025-04-17T20:24:33.579+00:00 axis-b8a44fc09016 [ ERR     ] axis-b8a44fc09016 hello_rust[140843]: Hello error!
 ```
 
 ## License
