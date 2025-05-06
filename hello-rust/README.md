@@ -1,5 +1,11 @@
 *Copyright (C) 2025, Axis Communications AB, Lund, Sweden. All Rights Reserved.*
 
+> [!Important]
+>
+> Rust is not among the [supported languages](https://developer.axis.com/acap/acap-sdk-version-3/develop-applications/supported-languages/) for ACAP development.
+> However, the SDK can package any executable, and Rust’s [platform support](https://doc.rust-lang.org/beta/rustc/platform-support.html) includes both `aarch64` and `armv7hf`.
+> Additionally, the community-driven project [acap-rs](https://github.com/AxisCommunications/acap-rs) offers tools to simplify ACAP app development in Rust.
+
 # A hello-world ACAP application using manifest and Rust
 
 This README file explains how to build a simple Hello World manifest ACAP application using Rust. It is achieved by using the containerized API and toolchain images.
