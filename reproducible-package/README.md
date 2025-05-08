@@ -19,6 +19,14 @@ and the steps taken in this example are:
 for more complex applications. See the link above for more tips on how to get
 your application reproducible.
 
+> [!IMPORTANT]
+> These instructions may not ensure reproducible builds across different machines.
+> 
+> This is because permission bits are preserved, and different systems may set them differently.
+> For example, executable files — such as shell scripts — and symlinks may have:
+> - `lrwxr-xr-x` on macOS, and
+> - `lrwxrwxrwx` on an Ubuntu GitHub runner.
+
 ## Getting started
 
 Below is the structure and scripts used in the example:
