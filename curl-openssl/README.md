@@ -57,8 +57,9 @@ docker build --tag <APP_IMAGE> --build-arg ARCH=<ARCH> .
 - `<APP_IMAGE>` is the name to tag the image with, e.g., `curl_openssl:1.0`
 - `<ARCH>` is the SDK architecture, `armv7hf` or `aarch64`.
 
-If the build machine is inside a network with a proxy, then it can be passed on
-as a build argument `BUILD_PROXY`:
+During build time, `openssl s_client` is used to fetch the CA certificate for `www.example.com`.
+Since `openssl s_client` can't pick up proxy environment variables automatically, you need to pass
+it as a build argument `BUILD_PROXY`:
 
 > [!IMPORTANT]
 > Pass proxy argument without `http://`.
@@ -72,10 +73,6 @@ To get more verbose logging from curl, pass the build argument `APP_DEBUG=yes`:
 ```sh
 docker build --build-arg APP_DEBUG=yes --tag <APP_IMAGE> --build-arg ARCH=<ARCH> .
 ```
-
-If the device is inside a network with a proxy, the global device proxy must be
-set to allow curl to pick it up at runtime. For reference see
-[Configure global device proxy](https://developer.axis.com/acap/develop/proxy/#configure-global-device-proxy).
 
 Copy the result from the container image to a local directory `build`:
 
@@ -159,6 +156,10 @@ http://<AXIS_DEVICE_IP>/axis-cgi/admin/systemlog.cgi?appname=curl_openssl
 You can achieve basic debugging in the shape of more verbose curl output by
 using the build option `--build-arg APP_DEBUG=yes`. This can give more insights
 to curl error codes.
+
+If the Axis device is inside a network with a proxy, the global device proxy
+must be set to allow curl to pick it up at runtime. For reference see
+[Configure global device proxy](https://developer.axis.com/acap/develop/proxy/#configure-global-device-proxy).
 
 ### Error CURLE_PEER_FAILED_VERIFICATION (60)
 

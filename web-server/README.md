@@ -90,12 +90,6 @@ web-server
 reverse proxy
 [here](https://serverfault.com/questions/561892/how-to-handle-relative-urls-correctly-with-a-reverse-proxy).
 
-## Proxy settings
-
-Depending on the network, you might need proxy settings in the following file: *~/.docker/config.json
-
-For reference please see: https://docs.docker.com/network/proxy/.
-
 ### How to run the code
 
 Below is the step by step instructions on how to execute the program. So
