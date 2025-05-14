@@ -51,7 +51,7 @@ example-name
   - All source code should have a copyright header.
 - **Dockerfile**
   - Don't add proxy variables like `http_proxy` and `https_proxy` in the
-    example.  See the [Proxy](https://developer.axis.com/acap/develop/proxy)
+    example. See the [Proxy](https://developer.axis.com/acap/develop/proxy)
     section for how to work with proxy in build time.
 
 ### README
