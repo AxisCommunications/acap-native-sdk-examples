@@ -27,6 +27,15 @@
 #include <syslog.h>
 #include <unistd.h>
 
+// Select scene or frame normalized coordinates.
+//
+// Scene coordinate system is normalized to [0,0]-[1,1] and follows the filmed scene,
+// i.e. static objects in the world have the same coordinates regardless of global rotation.
+//
+// Frame coordinate system is normalized and aligned with the camera frame,
+// i.e. top-left is [0,0] and bottom-right is [1,1].
+static bool scene_normalized = true;
+
 volatile sig_atomic_t running = 1;
 
 static void shutdown(int status) {
@@ -68,6 +77,11 @@ static void example_single_channel(void) {
     bbox_t* bbox = bbox_view_new(1u);
     if (!bbox)
         panic("Failed creating: %s", strerror(errno));
+
+    if (scene_normalized)
+        bbox_coordinates_scene_normalized(bbox);
+    else
+        bbox_coordinates_frame_normalized(bbox);
 
     bbox_clear(bbox);  // Remove all old bounding-boxes
 
@@ -222,9 +236,16 @@ int main(void) {
     init_signals();
 
     for (bool once = true; running; once = false) {
+        scene_normalized = true;
         example_single_channel();
-        example_multiple_channels();
+
         example_clear();
+
+        scene_normalized = false;
+        example_single_channel();
+
+        example_multiple_channels();
+
         if (once)
             syslog(LOG_INFO, "All examples succeeded.");
     }
