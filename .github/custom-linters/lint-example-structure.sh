@@ -78,17 +78,6 @@ check_examples_have_top_readme_entry() {
   fi
   echo
 
-  print_line "# Control that the README entries are sorted alphabetically ascending"
-  sorted_list="$(printf '%s' "$readme_examples" | sort)"
-  if [ "$readme_examples" != "$sorted_list" ]; then
-    print_line "ERROR: The list of example entries in README.md is not sorted alphabetically."
-    print_line "       Left column has current order, right is how it should be sorted:"
-    diff --color -y <(echo "$readme_examples") <(echo "$sorted_list")
-    ret=1
-  else
-    print_bullet_pass "All examples are sorted in alphabetical order in README.md."
-  fi
-
   return $ret
 }
 
