@@ -20,40 +20,31 @@ This repository contains a set of application examples which aims to enrich the 
 
 Below is the list of examples available in the repository.
 
-- [axevent](./axevent/)
-  - Examples in C that illustrate how to subscribe to and send events.
-- [axoverlay](./axoverlay/)
-  - An example in C that illustrates how to draw plain boxes and text as overlays in a stream.
-- [axparameter](./axparameter/)
-  - An example in C that demonstrates how to manage application-defined parameters, allowing you to add, remove, set, get, and register callback functions for parameter value updates.
-- [axserialport](./axserialport/)
-  - An example in C that shows the use of the serial port API.
-- [axstorage](./axstorage/)
-  - An example in C that shows how to use available storage devices.
-- [bounding-box](./bounding-box/)
-  - An example in C that demonstrates how to portably draw burnt-in bounding boxes on selected video sources or channels.
-- [container-example](./container-example/)
-  - An example that demonstrates the use of containers in a native ACAP application.
-- [curl-openssl](./curl-openssl/)
-  - An example that use curl and OpenSSL libraries to retrieve a file securely from an external server.
+The examples are organized into logical groups to help you find the most relevant starting point for your application development needs. Each group contains examples that build upon similar concepts or complement each other in functionality.
+
+### Introduction
+
 - [hello-world](./hello-world/)
   - A simple hello world C application.
-- [licensekey](./licensekey/)
-  - An example in C that illustrates how to check the licensekey status.
-- [message-broker](./message-broker/)
-  - Examples that showcase how to use the Message Broker API.
+
+### Streaming video
+
+- [vdostream](./vdostream/)
+  - An example in C that starts a vdo stream and then illustrates how to continuously capture frames from the vdo service, access the received buffer contents as well as the frame metadata.
+
+### Machine learning
+
+#### Object Detection
+
 - [object-detection](./object-detection/)
   - An example of object detection, cropping and saving detected objects into JPEG files.
 - [object-detection-cv25](./object-detection-cv25/)
   - An example of object detection, cropping and saving detected objects into JPEG files on AXIS CV25 devices.
 - [object-detection-yolov5](./object-detection-yolov5/)
   - An example of object detection using YOLOv5, drawing bounding boxes around detected objects on the video stream.
-- [remote-debug-example](./remote-debug-example/)
-  - An example of how to remote debug an ACAP application.
-- [reproducible-package](./reproducible-package/)
-  - An example of how to create a reproducible application package.
-- [shell-script-example](./shell-script-example)
-  - A simple hello world shell script application.
+
+#### Train and convert models for Axis devices
+
 - [tensorflow-to-larod](./tensorflow-to-larod/)
   - An example that shows model conversion, model quantization, image formats and custom models.
 - [tensorflow-to-larod-artpec8](./tensorflow-to-larod-artpec8/)
@@ -62,26 +53,74 @@ Below is the list of examples available in the repository.
   - An example that shows model conversion, model quantization, image formats and custom models on AXIS ARTPEC-9 devices. Note that this example is pointing to [tensorflow-to-larod-artpec8](./tensorflow-to-larod-artpec8).
 - [tensorflow-to-larod-cv25](./tensorflow-to-larod-cv25/)
   - An example that shows model conversion, model quantization, image formats and custom models on AXIS CV25 devices.
+- [vdo-larod](./vdo-larod/)
+  - An example in C that loads one of the Tensorflow models trained with the tensorflow-to-larod* examples to the [Machine learning API (Larod)](https://developer.axis.com/acap/api/native-sdk-api/#machine-learning-api-larod) and then uses the [Video capture API (VDO)](https://developer.axis.com/acap/api/native-sdk-api/#video-capture-api-vdo) to fetch video frames in YUV format and finally run inference.
+
+### Build custom libraries for an application
+
 - [using-opencv](./using-opencv/)
   - An example that shows how to build, bundle and use OpenCV in an application.
 - [utility-libraries](./utility-libraries/)
   - These examples covers how to build, bundle and use external libraries.
-  <!-- textlint-disable terminology -->
-- [vapix](./vapix/)
-  <!-- textlint-enable -->
-  - An example in C that retrieves VAPIX credentials over D-Bus and makes VAPIX calls over a loopback interface.
-- [vdo-larod](./vdo-larod/)
-  - An example in C that loads a pretrained person-car classification model to the [Machine learning API (Larod)](https://developer.axis.com/acap/api/native-sdk-api/#machine-learning-api-larod) and then uses the [Video capture API (VDO)](https://developer.axis.com/acap/api/native-sdk-api/#video-capture-api-vdo) to fetch video frames in YUV format and finally run inference.
+
+### Graphical components
+
+- [axoverlay](./axoverlay/)
+  - An example in C that illustrates how to draw plain boxes and text as overlays in a stream.
+- [bounding-box](./bounding-box/)
+  - An example in C that demonstrates how to portably draw burnt-in bounding boxes on selected video sources or channels.
 - [vdo-opencl-filtering](./vdo-opencl-filtering/)
   - An example that illustrates how to capture frames from the vdo service, access the received buffer, and finally perform a GPU accelerated Sobel filtering with OpenCL.
-- [vdostream](./vdostream/)
-  - An example in C that starts a vdo stream and then illustrates how to continuously capture frames from the vdo service, access the received buffer contents as well as the frame metadata.
+
+### Networking and web interface
+
+- [curl-openssl](./curl-openssl/)
+  - An example that use curl and OpenSSL libraries to retrieve a file securely from an external server.
 - [web-server](./web-server/)
   - An example in C that serves HTTP requests by setting up the Axis device web server in a reverse proxy configuration and route to a custom web server running in the ACAP application.
 - [web-server-using-fastcgi](./web-server-using-fastcgi/)
   - An example in C and explains how to build an ACAP application that can handle HTTP requests sent to the Axis device, using the device's own web server.
 
-### Docker Hub image
+### Event handling
+
+- [axevent](./axevent/)
+  - Examples in C that illustrate how to subscribe to and send events.
+
+### Parameter handling
+
+- [axparameter](./axparameter/)
+  - An example in C that demonstrates how to manage application-defined parameters, allowing you to add, remove, set, get, and register callback functions for parameter value updates.
+
+### Debugging and testing
+
+- [remote-debug-example](./remote-debug-example/)
+  - An example of how to remote debug an ACAP application.
+
+### Container applications
+
+- [container-example](./container-example/)
+  - An example that demonstrates the use of containers in a native ACAP application.
+
+### Miscellaneous
+
+- [axserialport](./axserialport/)
+  - An example in C that shows the use of the serial port API.
+- [axstorage](./axstorage/)
+  - An example in C that shows how to use available storage devices.
+- [licensekey](./licensekey/)
+  - An example in C that illustrates how to check the licensekey status.
+- [message-broker](./message-broker/)
+  - Examples that showcase how to use the Message Broker API.
+- [reproducible-package](./reproducible-package/)
+  - An example of how to create a reproducible application package.
+- [shell-script-example](./shell-script-example)
+  - A simple hello world shell script application.
+  <!-- textlint-disable terminology -->
+- [vapix](./vapix/)
+  <!-- textlint-enable -->
+  - An example in C that retrieves VAPIX credentials over D-Bus and makes VAPIX calls over a loopback interface.
+
+## Docker Hub image
 
 The ACAP Native SDK image can be used as a basis for custom built images to run your application or as a developer environment inside the container.
 
