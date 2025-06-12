@@ -33,6 +33,7 @@
 #include <errno.h>
 #include <glib-unix.h>
 #include <glib.h>
+#include <stdlib.h>
 #include <syslog.h>
 
 #define PALETTE_VALUE_RANGE 255.0
@@ -357,6 +358,8 @@ static gboolean signal_handler(gpointer loop) {
  * API axoverlay.
  */
 int main(void) {
+    // Set XDG cache home to application's localdata directory for fontconfig
+    setenv("XDG_CACHE_HOME", "/usr/local/packages/axoverlay/localdata", 1);
     GMainLoop* loop    = NULL;
     GError* error      = NULL;
     GError* error_text = NULL;
