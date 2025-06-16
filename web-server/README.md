@@ -5,7 +5,7 @@
 This example demonstrates how to setup the Axis device web server (Apache) in a
 [Reverse Proxy](https://httpd.apache.org/docs/2.4/howto/reverse_proxy.html)
 configuration, where HTTP requests to the application are routed to a web server
-[Monkey](https://github.com/monkey/monkey) running inside the ACAP application
+[CivetWeb](https://github.com/civetweb/civetweb) running inside the ACAP application
 and acting as a CGI.
 
 The advantage of a webserver proxy is that when porting existing code to your
@@ -17,7 +17,7 @@ a URL routing scheme as follows:
 
 With `<appName>` and `<apiPath>` as defined in the manifest.
 
-Note that this example shows the reverse proxy concept using Monkey, but you are
+Note that this example shows the reverse proxy concept using CivetWeb, but you are
 free to use any webserver of your choice.
 
 ## Alternative approach
@@ -36,7 +36,7 @@ route the requests to a web server running in the ACAP application.
 
 The Apache server is configured using the `manifest.json` file in an ACAP
 application. In `manifest.json` under `configuration`, it is possible to specify
-a `settingPage` and a `reverseProxy` where the latter will connect the Monkey
+a `settingPage` and a `reverseProxy` where the latter will connect the CivetWeb
 server to the Apache server.
 
 Prior to manifest 1.5.0, reverse proxy was only supported through the
@@ -51,21 +51,15 @@ configuration for the device. There are disadvantages with exposing Web
 Server directly to the network such as non standard ports and no reuse of
 authentication, TLS and other features that comes with Apache Server.
 
-## Monkey web server
+## CivetWeb web server
 
-Monkey is a fast and lightweight web server for Linux. It has been designed to
-be very scalable with low memory and CPU consumption, the perfect solution for
-Embedded Linux and high end production environments. Besides the common
-features as HTTP server, it expose a flexible C API which aims to behave as a
-fully HTTP development framework, so it can be extended as desired through the
-plugins interface. The Monkey Web Server
-[documentation](https://github.com/monkey/monkey-docs/) describes the
-configuration in detail.
-
-> [!NOTE]
-> The main license of the Monkey repository is Apache, but some files
-> are licensed under other types such as GPL. Make sure to control how it
-> affects your application in order to be compliant.
+CivetWeb is an embeddable C web server for Linux. It is a great solution
+for running a web server on embedded Linux. Apart from being a
+HTTP server, it has a C API which can be extended as desired. The CivetWeb Web
+Server [documentation](https://github.com/civetweb/civetweb/) describes the
+configuration in detail. CivetWeb is open source, and will contain different
+licenses depending on the features you build it with. Please see
+[CivetWeb's repository](https://github.com/civetweb/civetweb/) for more information.
 
 ## Getting started
 
@@ -75,12 +69,16 @@ structure used in the example:
 ```sh
 web-server
 ├── app
-│   ├── LICENSE - Text file which lists all open source licensed source code distributed with the application
-│   └── manifest.json - Defines the application and its configuration
-├── Dockerfile - Docker file with the specified Axis container image to build the example specified
-├── monkey.patch - Patch for using monkey examples in a native ACAP
-└── README.md - Step by step instructions on how to run the example
+│   ├── LICENSE
+│   └── manifest.json
+├── Dockerfile
+└── README.md
 ```
+
+- **app/LICENSE** - Lists open source licensed source code in the application.
+- **app/manifest.json** - Defines the application and its configuration.
+- **Dockerfile** - Builds an Axis container image and the specified example.
+- **README.md** - Step by step instructions on how to run the example.
 
 ## Limitations
 
@@ -102,7 +100,8 @@ Standing in your working directory run the following commands:
 
 > [!NOTE]
 >
-> Depending on the network your local build machine is connected to, you may need to add proxy
+> Depending on the network your local build machine is connected to,
+you may need to add proxy
 > settings for Docker. See
 > [Proxy in build time](https://developer.axis.com/acap/develop/proxy/#proxy-in-build-time).
 
@@ -148,9 +147,23 @@ http://<AXIS_DEVICE_IP>/index.html#apps
 A user can make a HTTP request to the application API using e.g. `curl`
 
 ```sh
-curl -u<USER>:<PASSWORD> --anyauth http://<AXIS_DEVICE_IP>/local/web_server_rev_proxy/my_web_server
-<html><body><h1>ACAP application with reverse proxy web server</h1><pre><br>Application name:      web_server_rev_proxy<br>Reverse proxy path:    /local/web_server_rev_proxy/my_web_server<br>Request timestamp:     Fri Jan 24 14:54:47 2025
-</pre></body></html>
+curl -u <USER>:<PASSWORD> --anyauth http://<AXIS_DEVICE_IP>/local/web_server_rev_proxy/my_web_server
+```
+
+Where the expected output is
+
+```sh
+<html>
+ <head><link rel="stylesheet" href="style.css"/></head>
+ <title>
+  ACAP Web Server Example
+ </title>
+ <body>
+  <h1>ACAP Web Server Example</h1>
+  Welcome to the web server example, this server is based on the 
+        <a href="https://github.com/civetweb/civetweb">CivetWeb</a> C library.
+ </body>
+</html>
 ```
 
 As can be seen it's HTML code, browse to web page
