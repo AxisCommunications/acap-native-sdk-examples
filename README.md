@@ -32,6 +32,13 @@ The examples are organized into logical groups to help you find the most relevan
 - [vdostream](./vdostream/)
   - An example in C that starts a vdo stream and then illustrates how to continuously capture frames from the vdo service, access the received buffer contents as well as the frame metadata.
 
+### Audio
+
+- [audio-capture](./audio-capture/)
+  - Example in C that illustrate how to capture audio.
+- [audio-playback](./audio-playback/)
+  - Example in C that illustrate how to play audio.
+
 ### Machine learning
 
 #### Object Detection
