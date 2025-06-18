@@ -15,7 +15,7 @@ jobs:
         include:
           - arch: aarch64
             platformarch: "linux/arm64/v8"
-            axis-os: 12.4.59
+            axis-os: 12.5.56
     env:
       EXREPO: acap-native-examples
       EXNAME: container-example
