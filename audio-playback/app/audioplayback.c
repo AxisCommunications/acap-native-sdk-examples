@@ -290,7 +290,7 @@ static const struct pw_registry_events registry_events = {
 };
 
 /**
- * Main function that starts a stream with target node as argument.
+ * Main function that starts the main loop.
  */
 int main(int argc, char* argv[]) {
     struct impl impl = {0};
