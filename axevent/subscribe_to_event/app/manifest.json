@@ -1,5 +1,5 @@
 {
-    "schemaVersion": "1.7.3",
+    "schemaVersion": "1.7.4",
     "acapPackageConf": {
         "setup": {
             "friendlyName": "subscribe_to_event",
