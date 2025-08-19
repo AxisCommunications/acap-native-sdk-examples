@@ -26,22 +26,22 @@
 #define PORT "2001"
 volatile sig_atomic_t application_running = 1;
 
+__attribute__((noreturn)) __attribute__((format(printf, 1, 2))) static void
+panic(const char* format, ...) {
+    va_list arg;
+    va_start(arg, format);
+    vsyslog(LOG_ERR, format, arg);
+    va_end(arg);
+    exit(1);
+}
+
 static void stop_application(int status) {
     (void)status;
     application_running = 0;
 }
 
-static int RootHandler(struct mg_connection* conn, void* cb_data __attribute__((unused))) {
-    mg_printf(conn,
-              "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\nConnection: "
-              "close\r\n\r\n");
-    FILE* html_file   = fopen("html/index.html", "r");
-    int FILE_STR_SIZE = 128;
-    char file_str[FILE_STR_SIZE];
-    while (fgets(file_str, FILE_STR_SIZE, html_file)) {
-        mg_printf(conn, "%s", file_str);
-    }
-    fclose(html_file);
+static int root_handler(struct mg_connection* conn, void* cb_data __attribute__((unused))) {
+    mg_send_file(conn, "html/index.html");
     return 1;
 }
 
@@ -49,29 +49,27 @@ int main(void) {
     signal(SIGTERM, stop_application);
     signal(SIGINT, stop_application);
 
+    mg_init_library(0);
+
+    struct mg_callbacks callbacks = {0};
     const char* options[] =
         {"listening_ports", PORT, "request_timeout_ms", "10000", "error_log_file", "error.log", 0};
 
-    struct mg_callbacks callbacks;
-    struct mg_context* context;
+    struct mg_context* context = mg_start(&callbacks, 0, options);
+    if (!context) {
+        panic("Something went wrong when starting the web server");
+    }
 
-    mg_init_library(0);
-
-    memset(&callbacks, 0, sizeof(callbacks));
-
-    context = mg_start(&callbacks, 0, options);
     syslog(LOG_INFO, "Server has started");
 
-    mg_set_request_handler(context, "/", RootHandler, 0);
-
-    if (context == NULL) {
-        syslog(LOG_INFO, "Something went wrong when starting the web server.\n");
-        return EXIT_FAILURE;
-    }
+    mg_set_request_handler(context, "/", root_handler, 0);
 
     while (application_running) {
         sleep(1);
     }
+
+    mg_stop(context);
+    mg_exit_library();
 
     return EXIT_SUCCESS;
 }
