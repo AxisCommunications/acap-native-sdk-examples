@@ -23,6 +23,7 @@ all: $(TARGET) custom_link
 
 $(TARGET): $(OBJS)
 	$(CC) $(CFLAGS) -shared $^ -o $@
+	$(STRIP) $@
 
 custom_link:
 	ln -sf libcustom.so.$(MAJORVER).$(MINORVER).$(PATCH) libcustom.so.$(MAJORVER)
