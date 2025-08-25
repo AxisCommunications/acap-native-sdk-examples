@@ -1,6 +1,7 @@
-PROGS     = axstorage
-SRCS      = axstorage.c
-OBJS      = $(SRCS:.c=.o)
+PROG1	= axstorage
+OBJS1	= $(PROG1).c
+
+PROGS	= $(PROG1)
 
 PKGS = glib-2.0 gio-2.0 axstorage
 
@@ -20,10 +21,11 @@ CFLAGS += -Wall \
           -W \
           -Werror
 
-all: $(PROGS)
+all:	$(PROGS)
 
-$(PROGS): $(OBJS)
-	$(CC) $(LDFLAGS) $^ $(LIBS) $(LDLIBS) -o $@
+$(PROG1): $(OBJS1)
+	$(CC) $^ $(CFLAGS) $(LIBS) $(LDFLAGS) -lm $(LDLIBS) -o $@
+	$(STRIP) $@
 
 clean:
 	rm -f $(PROGS) *.o *.eap* *_LICENSE.txt package.conf* param.conf tmp*
