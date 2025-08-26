@@ -20,19 +20,18 @@
  * This application is a basic pipewire application using a pipewire mainloop to
  * process audio data.
  *
- * The application starts an audio stream that plays a sine tone. The log
- * messages can be followed with the command:
+ * The application starts an audio stream for each output node that plays a sine
+ * tone. The log messages can be followed with the command:
  *
  * journalctl -t audioplayback -f
  *
- * The application expects one argument on the command line which is the name of
- * the pipewire node to play audio to.
+ * The application listens for registry events to find the nodes to play audio
+ * to.
  *
  * Suppose that you have gone through the steps of installation. Then you can
  * also run it on your device like this:
  *
- *     /usr/local/packages/audioplayback/audioplayback \
- *         AudioDevice0Output0
+ *     /usr/local/packages/audioplayback/audioplayback
  *
  * and then the output will go to stderr instead of the system log.
  */
@@ -291,7 +290,7 @@ static const struct pw_registry_events registry_events = {
 };
 
 /**
- * Main function that starts a stream with target node as argument.
+ * Main function that starts the main loop.
  */
 int main(int argc, char* argv[]) {
     struct impl impl = {0};

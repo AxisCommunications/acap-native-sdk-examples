@@ -23,7 +23,7 @@ all:  $(PROGS)
 
 $(PROG1): $(OBJS1)
 	install -d $(DEBUG_DIR)
-	$(CC) $^ $(CFLAGS) $(CFLAGS_DEBUG) -o $(DEBUG_DIR)/$@
+	$(CC) $^ $(CFLAGS) $(LIBS) $(LDFLAGS) $(CFLAGS_DEBUG) -o $(DEBUG_DIR)/$@
 	cp $(DEBUG_DIR)/$@ .
 	$(STRIP) $@
 

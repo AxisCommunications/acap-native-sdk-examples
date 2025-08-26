@@ -31,7 +31,8 @@ all:	$(PROGS)
 $(PROG1): $(OBJS1)
 	mkdir -p $(LIBDIR)
 	cp $(LIBJPEG_TURBO)/lib/*.so* $(LIBDIR)/
-	$(CC) $(CFLAGS) $(LDFLAGS) $^ $(LDLIBS) -o $@
+	$(CC) $^ $(CFLAGS) $(LIBS) $(LDFLAGS) -lm $(LDLIBS) -o $@
+	$(STRIP) $@
 
 clean:
 	rm -rf $(PROGS) *.o *.eap* *_LICENSE.txt package.conf* param.conf tmp* $(LIBDIR) manifest.json

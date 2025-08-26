@@ -1,5 +1,5 @@
 # --- Base Stage ---
-FROM tensorflow/tensorflow:latest-gpu-py3
+FROM tensorflow/tensorflow:2.4.2-gpu
 ARG DEBIAN_FRONTEND=noninteractive
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 

@@ -1,5 +1,5 @@
 PROG1	= axoverlay
-OBJS1	= axoverlay.c
+OBJS1	= $(PROG1).c
 
 PROGS	= $(PROG1)
 

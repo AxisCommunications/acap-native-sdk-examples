@@ -20,20 +20,19 @@
  * This application is a basic pipewire application using a pipewire mainloop to
  * process audio data.
  *
- * The application starts an audio stream and calculates the peak values for
- * all of all samples for all channels over a 5 second interval and prints them
- * to the system log. The log messages can be followed with the command:
+ * The application starts an audio stream and calculates the peak sample values
+ * for all channels of all nodes over a 5 second interval and prints them to the
+ * system log. The log messages can be followed with the command:
  *
  * journalctl -t audiocapture -f
  *
- * The application expects one argument on the command line which is the name of
- * the pipewire node to capture audio from.
+ * The application listens for registry events to find the nodes to capture
+ * audio from.
  *
  * Suppose that you have gone through the steps of installation. Then you can
  * also run it on your device like this:
  *
- *     /usr/local/packages/audiocapture/audiocapture \
- *         AudioDevice0Input0.Unprocessed
+ *     /usr/local/packages/audiocapture/audiocapture
  *
  * and then the output will go to stderr instead of the system log.
  */
@@ -321,7 +320,7 @@ static const struct pw_registry_events registry_events = {
 };
 
 /**
- * Main function that starts a stream with target node as argument.
+ * Main function that starts the main loop.
  */
 int main(int argc, char* argv[]) {
     struct impl impl = {0};

@@ -33,7 +33,7 @@ $(PROG1): $(OBJS1)
 	# Additional prints for visibility
 	@printf "SOURCE_DATE_EPOCH: $(SOURCE_DATE_EPOCH)\n"
 	@printf "BUILD_DATE: $(BUILD_DATE)\n"
-	$(CC) $^ $(CFLAGS) $(LIBS) -o $@
+	$(CC) $^ $(CFLAGS) $(LIBS) $(LDFLAGS) -lm $(LDLIBS) -o $@
 	$(STRIP) $@
 
 clean:
