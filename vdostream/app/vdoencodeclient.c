@@ -55,6 +55,8 @@
 
 #include <glib.h>
 #include <glib/gstdio.h>
+// Needed for g_autoptr
+#include <glib-object.h>
 #include <signal.h>
 #include <stdlib.h>
 #include <syslog.h>
@@ -140,11 +142,13 @@ static gboolean set_format(VdoMap* settings, gchar* format, GError** error) {
  * --output [output filename]
  */
 int main(int argc, char* argv[]) {
-    GError* error      = NULL;
-    gchar* format      = "h264";
-    guint frames       = G_MAXUINT;
-    gchar* output_file = "/dev/null";
-    FILE* dest_f       = NULL;
+    g_autoptr(GError) error    = NULL;
+    g_autoptr(VdoMap) settings = NULL;
+    g_autoptr(VdoMap) info     = NULL;
+    gchar* format              = "h264";
+    guint frames               = G_MAXUINT;
+    gchar* output_file         = "/dev/null";
+    FILE* dest_f               = NULL;
 
     openlog(NULL, LOG_PID, LOG_USER);
 
@@ -188,7 +192,7 @@ int main(int argc, char* argv[]) {
         goto exit;
     }
 
-    VdoMap* settings = vdo_map_new();
+    settings = vdo_map_new();
     if (!set_format(settings, format, &error))
         goto exit;
 
@@ -198,14 +202,10 @@ int main(int argc, char* argv[]) {
 
     // Create a new stream
     stream = vdo_stream_new(settings, NULL, &error);
-    g_clear_object(&settings);
     if (!stream)
         goto exit;
 
-    if (!vdo_stream_attach(stream, NULL, &error))
-        goto exit;
-
-    VdoMap* info = vdo_stream_get_info(stream, &error);
+    info = vdo_stream_get_info(stream, &error);
     if (!info)
         goto exit;
 
@@ -214,9 +214,7 @@ int main(int argc, char* argv[]) {
            format,
            vdo_map_get_uint32(info, "width", 0),
            vdo_map_get_uint32(info, "height", 0),
-           vdo_map_get_uint32(info, "framerate", 0));
-
-    g_clear_object(&info);
+           (unsigned int)(vdo_map_get_double(info, "framerate", 0.0) + 0.5));
 
     // Start the stream
     if (!vdo_stream_start(stream, &error))
@@ -224,32 +222,38 @@ int main(int argc, char* argv[]) {
 
     // Loop until interrupt by Ctrl-C or reaching G_MAXUINT
     for (guint n = 0; n < frames; ++n) {
-        // Lifetimes of buffer and frame are linked, no need to free frame
-        VdoBuffer* buffer = vdo_stream_get_buffer(stream, &error);
-        VdoFrame* frame   = vdo_buffer_get_frame(buffer);
-
-        // Error occurred
-        if (!frame)
+        // SIGINT occurred
+        if (shutdown)
             goto exit;
 
-        // SIGINT occurred
-        if (shutdown) {
-            vdo_stream_buffer_unref(stream, &buffer, NULL);
+        g_autoptr(VdoBuffer) buffer = vdo_stream_get_buffer(stream, &error);
+        if (!buffer && g_error_matches(error, VDO_ERROR, VDO_ERROR_NO_DATA))
+            continue;  // Transient error -> Retry
+
+        // Maintenance/Installation in progress (e.g. Global-Rotation)
+        if (!buffer && vdo_error_is_expected(&error)) {
+            // This may happen and then the stream needs to be created again
+            // and restarted
             goto exit;
         }
+
+        // Error occurred
+        if (!buffer)
+            goto exit;
+
+        // Lifetimes of buffer and frame are linked, no need to free frame
+        VdoFrame* frame = vdo_buffer_get_frame(buffer);
 
         print_frame(frame);
 
         gpointer data = vdo_buffer_get_data(buffer);
         if (!data) {
             g_set_error(&error, VDO_CLIENT_ERROR, 0, "Failed to get data: %m");
-            vdo_stream_buffer_unref(stream, &buffer, NULL);
             goto exit;
         }
 
         if (!fwrite(data, vdo_frame_get_size(frame), 1, dest_f)) {
             g_set_error(&error, VDO_CLIENT_ERROR, 0, "Failed to write frame: %m");
-            vdo_stream_buffer_unref(stream, &buffer, NULL);
             goto exit;
         }
 
@@ -271,9 +275,6 @@ exit:
 
     if (dest_f)
         fclose(dest_f);
-
-    g_clear_error(&error);
-    g_clear_object(&stream);
 
     g_option_context_free(context);
 
