@@ -36,7 +36,7 @@
 #include "model.h"
 #include "model_params.h"  //Generated at build time
 #include "panic.h"
-
+#include "vdo-error.h"
 #include "vdo-frame.h"
 #include "vdo-types.h"
 #include <axsdk/axparameter.h>
@@ -106,29 +106,9 @@ static bbox_t* setup_bbox(void) {
     return bbox;
 }
 
-static void find_corners(float x,
-                         float y,
-                         float w,
-                         float h,
-                         int rotation,
-                         float* x1,
-                         float* y1,
-                         float* x2,
-                         float* y2) {
-    switch (rotation) {
-        case 180:
-            *x1 = 1.0 - fmax(0.0, x - (w / 2));
-            *y1 = 1.0 - fmax(0.0, y - (h / 2));
-            *x2 = 1.0 - fmin(1.0, x + (w / 2));
-            *y2 = 1.0 - fmin(1.0, y + (h / 2));
-            break;
-        default:
-            *x1 = fmax(0.0, x - (w / 2));
-            *y1 = fmax(0.0, y - (h / 2));
-            *x2 = fmin(1.0, x + (w / 2));
-            *y2 = fmin(1.0, y + (h / 2));
-            break;
-    }
+static unsigned int elapsed_ms(struct timeval* start_ts, struct timeval* end_ts) {
+    return (unsigned int)(((end_ts->tv_sec - start_ts->tv_sec) * 1000) +
+                          ((end_ts->tv_usec - start_ts->tv_usec) / 1000));
 }
 
 static float intersection_over_union(float x1,
@@ -214,20 +194,15 @@ static void filter_detections(uint8_t* tensor,
     non_maximum_suppression(tensor, iou_threshold, model_params, invalid_detections);
 }
 
-static unsigned int elapsed_ms(struct timeval* start_ts, struct timeval* end_ts) {
-    return (unsigned int)(((end_ts->tv_sec - start_ts->tv_sec) * 1000) +
-                          ((end_ts->tv_usec - start_ts->tv_usec) / 1000));
-}
-
-static void find_detection_class(uint8_t* tensor,
-                                 int detection_idx,
-                                 model_params_t* model_params,
-                                 float* highest_class_likelihood,
-                                 int* label_idx) {
-    int size_per_detection = model_params->size_per_detection;
-    float qt_zero_point    = model_params->quantization_zero_point;
-    float qt_scale         = model_params->quantization_scale;
-
+static void determine_class_and_object_likelihood(uint8_t* tensor,
+                                                  int detection_idx,
+                                                  int size_per_detection,
+                                                  float qt_zero_point,
+                                                  float qt_scale,
+                                                  float* highest_class_likelihood,
+                                                  int* label_idx,
+                                                  float* object_likelihood) {
+    // Find what class this object is
     for (int j = 5; j < size_per_detection; j++) {
         float class_likelihood =
             (tensor[size_per_detection * detection_idx + j] - qt_zero_point) * qt_scale;
@@ -236,9 +211,43 @@ static void find_detection_class(uint8_t* tensor,
             *label_idx                = j - 5;
         }
     }
+
+    *object_likelihood =
+        (tensor[size_per_detection * detection_idx + 4] - qt_zero_point) * qt_scale;
+}
+
+static void
+find_corners(float x, float y, float w, float h, float* x1, float* y1, float* x2, float* y2) {
+    *x1 = fmax(0.0, x - (w / 2));
+    *y1 = fmax(0.0, y - (h / 2));
+    *x2 = fmin(1.0, x + (w / 2));
+    *y2 = fmin(1.0, y + (h / 2));
+}
+
+static void determine_bbox_coordinates(uint8_t* tensor,
+                                       int detection_idx,
+                                       int size_per_detection,
+                                       float qt_zero_point,
+                                       float qt_scale,
+                                       float* x1,
+                                       float* y1,
+                                       float* x2,
+                                       float* y2) {
+    // Get coordinates for the object
+    float x = (tensor[size_per_detection * detection_idx + 0] - qt_zero_point) * qt_scale;
+    float y = (tensor[size_per_detection * detection_idx + 1] - qt_zero_point) * qt_scale;
+    float w = (tensor[size_per_detection * detection_idx + 2] - qt_zero_point) * qt_scale;
+    float h = (tensor[size_per_detection * detection_idx + 3] - qt_zero_point) * qt_scale;
+    find_corners(x, y, w, h, x1, y1, x2, y2);
 }
 
 int main(int argc, char** argv) {
+    g_autoptr(GError) vdo_error           = NULL;
+    img_provider_t* image_provider        = NULL;
+    model_provider_t* model_provider      = NULL;
+    model_tensor_output_t* tensor_outputs = NULL;
+    bbox_t* bbox                          = NULL;
+
     openlog(APP_NAME, LOG_PID | LOG_CONS, LOG_USER);
 
     // Stop main loop at signal
@@ -287,25 +296,56 @@ int main(int argc, char** argv) {
 
     ax_parameter_free(axparameter_handle);
 
+    VdoFormat vdo_format = VDO_FORMAT_YUV;
+    double vdo_framerate = 30.0;
+
+    if (!g_strcmp0(args.device_name, "a9-dlpu-tflite")) {
+        // Possible to run RGB on ARTPEC-9
+        vdo_format = VDO_FORMAT_RGB;
+    }
+
     // Choose a valid stream resolution since only certain resolutions are allowed
     unsigned int stream_width  = 0;
     unsigned int stream_height = 0;
-    choose_stream_resolution(model_params->input_width,
-                             model_params->input_height,
-                             &stream_width,
-                             &stream_height);
+    if (!choose_stream_resolution(model_params->input_width,
+                                  model_params->input_height,
+                                  vdo_format,
+                                  "native",
+                                  "all",
+                                  &stream_width,
+                                  &stream_height)) {
+        syslog(LOG_ERR, "%s: Failed choosing stream resolution", __func__);
+        goto end;
+    }
+    syslog(LOG_INFO,
+           "Creating VDO image provider and creating stream %u x %u",
+           stream_width,
+           stream_height);
 
-    img_provider_t* image_provider =
-        create_img_provider(stream_width, stream_height, 2, VDO_FORMAT_YUV);
+    image_provider = create_img_provider(stream_width, stream_height, 2, vdo_format, vdo_framerate);
+    if (!image_provider) {
+        panic("%s: Could not create image provider", __func__);
+    }
 
-    model_provider_t* model_provider = create_model_provider(model_params->input_width,
-                                                             model_params->input_height,
-                                                             stream_width,
-                                                             stream_height,
-                                                             model_params->num_classes,
-                                                             model_params->num_detections,
-                                                             args.model_file,
-                                                             args.device_name);
+    size_t number_output_tensors = 0;
+    model_provider               = create_model_provider(model_params->input_width,
+                                           model_params->input_height,
+                                           image_provider->width,
+                                           image_provider->height,
+                                           image_provider->pitch,
+                                           image_provider->format,
+                                           VDO_FORMAT_RGB,
+                                           args.model_file,
+                                           args.device_name,
+                                           false,
+                                           &number_output_tensors);
+    if (!model_provider) {
+        panic("%s: Could not create model provider", __func__);
+    }
+    tensor_outputs = calloc(number_output_tensors, sizeof(model_tensor_output_t));
+    if (!tensor_outputs) {
+        panic("%s: Could not allocate tensor outputs", __func__);
+    }
 
     char** labels = NULL;          // This is the array of label strings. The label
                                    // entries points into the large label_file_data buffer.
@@ -315,37 +355,87 @@ int main(int argc, char** argv) {
     parse_labels(&labels, &label_file_data, args.labels_file, &num_labels);
 
     syslog(LOG_INFO, "Start fetching video frames from VDO");
-    start_frame_fetch(image_provider);
+    if (!img_provider_start(image_provider)) {
+        panic("%s: Could not start image provider", __func__);
+    }
 
-    bbox_t* bbox = setup_bbox();
+    bbox = setup_bbox();
+
+    int size_per_detection = model_params->size_per_detection;
+    float qt_zero_point    = model_params->quantization_zero_point;
+    float qt_scale         = model_params->quantization_scale;
 
     while (running) {
         struct timeval start_ts, end_ts;
+        unsigned int preprocessing_ms = 0;
+        unsigned int inference_ms     = 0;
+        unsigned int total_elapsed_ms = 0;
 
-        // Get latest frame from image pipeline.
-        VdoBuffer* buf = get_last_frame_blocking(image_provider);
-        if (!buf) {
-            panic("Buffer empty in provider");
+        g_autoptr(VdoBuffer) vdo_buf = img_provider_get_frame(image_provider);
+        if (!vdo_buf) {
+            // This can only happen if it is global rotation then
+            // the stream has to be restarted because rotation has been changed.
+            syslog(
+                LOG_INFO,
+                "No buffer because of changed global rotation. Application needs to be restarted");
+            goto end;
         }
-
-        // Get data from latest frame.
-        uint8_t* nv12_data = (uint8_t*)vdo_buffer_get_data(buf);
-
-        // Convert data to the correct format
+        // If needed convert and scale/crop to correct input format and resolution
+        // Its up to the model provider to decide if needed or not
+        // If not needed the model_run_preprocessing will return true without
+        // any work
         gettimeofday(&start_ts, NULL);
-        model_run_preprocessing(model_provider, nv12_data);
+        if (!model_run_preprocessing(model_provider, vdo_buf)) {
+            // No power
+            if (!vdo_stream_buffer_unref(image_provider->vdo_stream, &vdo_buf, &vdo_error)) {
+                if (!vdo_error_is_expected(&vdo_error)) {
+                    panic("%s: Unexpexted error: %s", __func__, vdo_error->message);
+                }
+                g_clear_error(&vdo_error);
+            }
+            img_provider_flush_all_frames(image_provider);
+            continue;
+        }
         gettimeofday(&end_ts, NULL);
-        syslog(LOG_INFO, "Ran pre-processing for %u ms", elapsed_ms(&start_ts, &end_ts));
+
+        preprocessing_ms = (unsigned int)(((end_ts.tv_sec - start_ts.tv_sec) * 1000) +
+                                          ((end_ts.tv_usec - start_ts.tv_usec) / 1000));
+        syslog(LOG_INFO, "Ran pre-processing for %u ms", preprocessing_ms);
 
         // Retrieve detections from data
         gettimeofday(&start_ts, NULL);
-        uint8_t* output_tensor = model_run_inference(model_provider);
+        if (!model_run_inference(model_provider, vdo_buf)) {
+            // No power
+            if (!vdo_stream_buffer_unref(image_provider->vdo_stream, &vdo_buf, &vdo_error)) {
+                if (!vdo_error_is_expected(&vdo_error)) {
+                    panic("%s: Unexpexted error: %s", __func__, vdo_error->message);
+                }
+                g_clear_error(&vdo_error);
+            }
+            img_provider_flush_all_frames(image_provider);
+            continue;
+        }
         gettimeofday(&end_ts, NULL);
-        syslog(LOG_INFO, "Ran inference for %u ms", elapsed_ms(&start_ts, &end_ts));
 
+        inference_ms = (unsigned int)(((end_ts.tv_sec - start_ts.tv_sec) * 1000) +
+                                      ((end_ts.tv_usec - start_ts.tv_usec) / 1000));
+        syslog(LOG_INFO, "Ran inference for %u ms", inference_ms);
+
+        total_elapsed_ms = inference_ms + preprocessing_ms;
+
+        // Check if the framerate from vdo should be changed
+        img_provider_update_framerate(image_provider, total_elapsed_ms);
+
+        for (size_t i = 0; i < number_output_tensors; i++) {
+            if (!model_get_tensor_output_info(model_provider, i, &tensor_outputs[i])) {
+                panic("Failed to get output tensor info for %zu", i);
+            }
+        }
+
+        uint8_t* tensor_data = tensor_outputs[0].data;
         // Parse the output
         gettimeofday(&start_ts, NULL);
-        filter_detections(output_tensor,
+        filter_detections(tensor_data,
                           conf_threshold,
                           iou_threshold,
                           model_params,
@@ -356,6 +446,7 @@ int main(int argc, char** argv) {
         bbox_clear(bbox);
 
         int valid_detection_count = 0;
+
         for (int i = 0; i < model_params->num_detections; i++) {
             if (invalid_detections[i] == 1) {
                 continue;
@@ -363,44 +454,40 @@ int main(int argc, char** argv) {
 
             valid_detection_count++;
 
-            int size_per_detection = model_params->size_per_detection;
-            float qt_zero_point    = model_params->quantization_zero_point;
-            float qt_scale         = model_params->quantization_scale;
-
-            float x = (output_tensor[size_per_detection * i + 0] - qt_zero_point) * qt_scale;
-            float y = (output_tensor[size_per_detection * i + 1] - qt_zero_point) * qt_scale;
-            float w = (output_tensor[size_per_detection * i + 2] - qt_zero_point) * qt_scale;
-            float h = (output_tensor[size_per_detection * i + 3] - qt_zero_point) * qt_scale;
-            float object_likelihood =
-                (output_tensor[size_per_detection * i + 4] - qt_zero_point) * qt_scale;
-
-            // Find what class this object is
-            float highest_class_likelihood = 0.0f;
+            float highest_class_likelihood = 0.0;
             int label_idx                  = 0;
-            find_detection_class(output_tensor,
-                                 i,
-                                 model_params,
-                                 &highest_class_likelihood,
-                                 &label_idx);
+            float object_likelihood        = 0.0;
 
-            // Corner coordinates of bounding box depends on stream rotation
-            float x1, y1, x2, y2;
-            int rotation = (int)get_stream_rotation(image_provider);
-            find_corners(x, y, w, h, rotation, &x1, &y1, &x2, &y2);
-
+            determine_class_and_object_likelihood(tensor_data,
+                                                  i,
+                                                  size_per_detection,
+                                                  qt_zero_point,
+                                                  qt_scale,
+                                                  &highest_class_likelihood,
+                                                  &label_idx,
+                                                  &object_likelihood);
             // Log info about object
             syslog(LOG_INFO,
-                   "Object %d: Label=%s, Object Likelihood=%.2f, Class Likelihood=%.2f, "
-                   "Bounding Box: [%.2f, %.2f, %.2f, %.2f]",
+                   "Object %d: Label=%s, Object Likelihood=%.2f, Class Likelihood=%.2f, ",
                    valid_detection_count,
                    labels[label_idx],
                    object_likelihood,
-                   highest_class_likelihood,
-                   x1,
-                   y1,
-                   x2,
-                   y2);
+                   highest_class_likelihood);
 
+            float x1, y1, x2, y2;
+            determine_bbox_coordinates(tensor_data,
+                                       i,
+                                       size_per_detection,
+                                       qt_zero_point,
+                                       qt_scale,
+                                       &x1,
+                                       &y1,
+                                       &x2,
+                                       &y2);
+            syslog(LOG_INFO, "Bounding Box: [%.2f, %.2f, %.2f, %.2f]", x1, y1, x2, y2);
+
+            // No need to compensate for rotation since bbox will handle this
+            bbox_coordinates_frame_normalized(bbox);
             bbox_rectangle(bbox, x1, y1, x2, y2);
         }
 
@@ -408,13 +495,16 @@ int main(int argc, char** argv) {
             panic("Failed to commit box drawer");
         }
 
-        // Release frame reference to provider.
-        return_frame(image_provider, buf);
+        // This will allow vdo to fill this buffer with data again
+        if (!vdo_stream_buffer_unref(image_provider->vdo_stream, &vdo_buf, &vdo_error)) {
+            if (!vdo_error_is_expected(&vdo_error)) {
+                panic("%s: Unexpexted error: %s", __func__, vdo_error->message);
+            }
+            g_clear_error(&vdo_error);
+        }
     }
 
-    syslog(LOG_INFO, "Stop streaming video from VDO");
-    stop_frame_fetch(image_provider);
-
+end:
     // Cleanup
     free(model_params);
     if (image_provider) {
@@ -423,6 +513,7 @@ int main(int argc, char** argv) {
     if (model_provider) {
         destroy_model_provider(model_provider);
     }
+    free(tensor_outputs);
     free(labels);
     free(label_file_data);
     bbox_destroy(bbox);
