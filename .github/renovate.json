@@ -1,25 +1,3 @@
 {
-    "timezone": "Europe/Stockholm",
-    "schedule": ["at any time"],
-    "extends": ["config:recommended", ":prHourlyLimitNone"],
-    "configMigration": true,
-    "labels": ["dependencies"],
-    "ignorePaths": ["container-example/**"],
-    "packageRules": [
-        {
-            "matchUpdateTypes": ["minor", "patch", "pin", "digest"],
-            "automerge": true
-        },
-        {
-            "matchManagers": ["dockerfile"],
-            "enabled": false
-        }
-    ],
-    "rebaseWhen": "behind-base-branch",
-    "vulnerabilityAlerts": {
-        "labels": ["security"]
-    },
-    "minimumReleaseAge": "7 days",
-    "prCreation": "not-pending",
-    "dependencyDashboard": true
+  "enabled": false
 }
