@@ -1,6 +1,7 @@
 PROG1	= object_detection_yolov5
 OBJS1	= $(PROG1).c argparse.c imgprovider.c model.c panic.c labelparse.c
 PROGS	= $(PROG1)
+DEBUG_DIR = debug
 
 PKGS = axparameter bbox gio-2.0 gio-unix-2.0 liblarod vdostream
 
@@ -26,8 +27,10 @@ CFLAGS += -Wall \
 all:	$(PROGS)
 
 $(PROG1): $(OBJS1)
-	$(CC) $^ $(CFLAGS) $(LIBS) $(LDFLAGS) -lm $(LDLIBS) -o $@
+	install -d $(DEBUG_DIR)
+	$(CC) $^ $(CFLAGS) $(LIBS) $(LDFLAGS) -lm $(LDLIBS) -o $(DEBUG_DIR)/$@
+	cp $(DEBUG_DIR)/$@ .
 	$(STRIP) $@
 
 clean:
-	rm -f $(PROGS) *.o *.eap* *_LICENSE.txt package.conf* param.conf tmp* manifest.json
+	rm -rf $(PROGS) *.o *.eap* *_LICENSE.txt package.conf* param.conf tmp* manifest.json $(DEBUG_DIR)

@@ -4,6 +4,7 @@ MAJORVER = 1
 MINORVER = 0
 PATCH    = 0
 TARGET   = libcustom.so.$(MAJORVER).$(MINORVER).$(PATCH)
+DEBUG_DIR = debug
 
 CFLAGS += -I.
 CFLAGS += -Wall \
@@ -22,7 +23,9 @@ CFLAGS += -Wall \
 all: $(TARGET) custom_link
 
 $(TARGET): $(OBJS)
-	$(CC) $(CFLAGS) -shared $^ -o $@
+	install -d $(DEBUG_DIR)
+	$(CC) $(CFLAGS) -shared $^ -o $(DEBUG_DIR)/$@
+	cp $(DEBUG_DIR)/$@ .
 	$(STRIP) $@
 
 custom_link:
@@ -30,4 +33,4 @@ custom_link:
 	ln -sf libcustom.so.$(MAJORVER) libcustom.so
 
 clean:
-	rm -rf libcustom*
+	rm -rf libcustom* $(DEBUG_DIR)

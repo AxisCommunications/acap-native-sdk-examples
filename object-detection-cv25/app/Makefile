@@ -3,6 +3,7 @@ OBJS1	= $(PROG1).c argparse.c imgprovider.c imgutils.c postprocessing.c
 PROGS	= $(PROG1)
 LIBDIR = lib
 LIBJPEG_TURBO = /opt/build/libjpeg-turbo/build
+DEBUG_DIR = debug
 
 PKGS = gio-2.0 gio-unix-2.0 liblarod vdostream
 
@@ -29,10 +30,12 @@ CFLAGS += -Wall \
 all:	$(PROGS)
 
 $(PROG1): $(OBJS1)
+	install -d $(DEBUG_DIR)
 	mkdir -p $(LIBDIR)
 	cp $(LIBJPEG_TURBO)/lib/*.so* $(LIBDIR)/
-	$(CC) $^ $(CFLAGS) $(LIBS) $(LDFLAGS) -lm $(LDLIBS) -o $@
+	$(CC) $^ $(CFLAGS) $(LIBS) $(LDFLAGS) -lm $(LDLIBS) -o $(DEBUG_DIR)/$@
+	cp $(DEBUG_DIR)/$@ .
 	$(STRIP) $@
 
 clean:
-	rm -rf $(PROGS) *.o *.eap* *_LICENSE.txt package.conf* param.conf tmp* $(LIBDIR) manifest.json
+	rm -rf $(PROGS) *.o *.eap* *_LICENSE.txt package.conf* param.conf tmp* $(LIBDIR) manifest.json $(DEBUG_DIR)
