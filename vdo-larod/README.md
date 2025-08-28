@@ -18,12 +18,12 @@ Together with this README file you should be able to find a directory called app
 
 ## Detailed outline of example application
 
-This application opens a client to VDO and starts fetching frames (in a new thread) in the YUV format. It tries to find the smallest VDO stream resolution that fits the width and height required by the neural network. The thread fetching frames is written so that it always tries to provide a frame as new as possible even if not all previous frames have been processed by larod.
+This application opens a client to VDO and starts fetching frames (in a new thread) in the YUV format. It tries to find the smallest VDO stream resolution that fits the width and height required by the neural network.
 
 Steps in application:
 
 1. Fetch image data from VDO.
-2. Preprocess the images (crop to 480x270, scale and color convert) using larod with libyuv backend (depending on platform).
+2. Preprocess the images (crop to 480x270 (if needed), scale and color convert) using larod with libyuv backend (depending on platform).
 3. Run inferences using the trained model on a specific chip with the preprocessing output as input on a larod backend specified by a command-line argument.
 4. The model's confidence scores for the presence of person and car in the image are printed as the output.
 5. Repeat for 5 iterations.
@@ -32,7 +32,8 @@ See the manifest.json.* files to change the configuration on chip, image size, n
 
 ## Which backends and models are supported?
 
-Unless you modify the app to your own needs you should only use our pretrained model that takes 480x270 RGB images as input, and that outputs an array of 2 confidence scores of person and car in the format of `float32`.
+Unless you modify the app to your own needs you should only use our pretrained model that takes 480x270 (256x256 for Ambarella CV25 and Google TPU) RGB images as input,
+and that outputs an array of 2 confidence scores of person and car in the format of `float32`.
 
 You can run the example with any inference backend as long as you can provide it with a model as described above.
 
@@ -45,8 +46,6 @@ vdo-larod
 ├── app
 │   ├── imgprovider.c
 │   ├── imgprovider.h
-│   ├── utility-functions.c
-│   ├── utility-functions.h
 │   ├── LICENSE
 │   ├── Makefile
 │   ├── manifest.json.artpec8
@@ -54,6 +53,10 @@ vdo-larod
 │   ├── manifest.json.cpu
 │   ├── manifest.json.cv25
 │   ├── manifest.json.edgetpu
+│   ├── model.c
+│   ├── model.h
+│   ├── panic.c
+│   ├── panic.h
 │   └── vdo_larod.c
 ├── Dockerfile
 └── README.md
@@ -70,6 +73,7 @@ vdo-larod
 - **app/manifest.json.cpu** - Defines the application and its configuration when building for CPU with TensorFlow Lite.
 - **app/manifest.json.cv25** - Defines the application and its configuration when building chip and model for cv25 DLPU.
 - **app/manifest.json.edgetpu** - Defines the application and its configuration when building chip and model for Google TPU.
+- **app/panic.c/h** - Utility for exiting the program on error
 - **app/vdo_larod.c** - Application using larod, written in C.
 - **Dockerfile** - Docker file with the specified Axis toolchain and API container to build the example specified.
 - **README.md** - Step by step instructions on how to run the example.
@@ -178,8 +182,6 @@ vdo-larod
 ├── build
 │   ├── imgprovider.c
 │   ├── imgprovider.h
-│   ├── utility-functions.c
-│   ├── utility-functions.h
 │   ├── lib
 │   ├── LICENSE
 │   ├── Makefile
@@ -193,6 +195,8 @@ vdo-larod
 |   │   └── model.tflite / model.bin
 │   ├── package.conf
 │   ├── package.conf.orig
+│   └── panic.c
+│   └── panic.h
 │   ├── param.conf
 │   ├── vdo_larod*
 │   ├── vdo_larod_{cpu,edgetpu}_1_0_0_armv7hf.eap / vdo_larod_{cv25,artpec8,artpec9}_1_0_0_aarch64.eap
@@ -277,52 +281,20 @@ In previous larod versions, the chip was referred to as a number instead of a st
 ----- Contents of SYSTEM_LOG for 'vdo_larod' -----
 
 
-vdo_larod[4165]: Starting /usr/local/packages/vdo_larod/vdo_larod
-vdo_larod[4165]: 'buffer.strategy': <uint32 3>
-vdo_larod[4165]: 'channel': <uint32 1>
-vdo_larod[4165]: 'format': <uint32 3>
-vdo_larod[4165]: 'height': <uint32 270>
-vdo_larod[4165]: 'width': <uint32 480>
-vdo_larod[4165]: Creating VDO image provider and creating stream 480 x 270
-vdo_larod[4165]: Dump of vdo stream settings map =====
-vdo_larod[4165]: chooseStreamResolution: We select stream w/h=480 x 270 based on VDO channel info.
-vdo_larod[4165]: Calculate crop image
-vdo_larod[4165]: Create larod models
-vdo_larod[4165]: Create preprocessing maps
-vdo_larod[4165]: Crop VDO image X=40 Y=0 (480 x 270)
-vdo_larod[4165]: Setting up larod connection with chip axis-a8-dlpu-tflite and model /usr/local/packages/vdo_larod/model/model.tflite
-vdo_larod[4165]: Available chip ids:
-vdo_larod[4165]: Chip: cpu-tflite
-vdo_larod[4165]: Chip: axis-ace-proc
-vdo_larod[4165]: Chip: cpu-proc
-vdo_larod[4165]: Chip: axis-a8-dlpu-tflite
-vdo_larod[4165]: Chip: axis-a8-dlpu-native
-vdo_larod[4165]: Chip: axis-a8-dlpu-proc
-vdo_larod[4165]: Chip: axis-a8-gpu-proc
-vdo_larod[4165]: Loading the model... This might take up to 5 minutes depending on your device model.
-vdo_larod[4165]: Model loaded successfully
-vdo_larod[4165]: Allocate memory for input/output buffers
-vdo_larod[4165]: Connect tensors to file descriptors
-vdo_larod[4165]: Create input/output tensors
-vdo_larod[4165]: Create job requests
-vdo_larod[4165]: Determine tensor buffer sizes
-vdo_larod[4165]: Start fetching video frames from VDO
-vdo_larod[4165]: Converted image in 14 ms
-vdo_larod[4165]: Person detected: 5.49% - Car detected: 80.00%
-vdo_larod[4165]: Ran inference for 17 ms
-vdo_larod[4165]: Converted image in 4 ms
-vdo_larod[4165]: Person detected: 4.31% - Car detected: 88.63%
-vdo_larod[4165]: Ran inference for 16 ms
-vdo_larod[4165]: Converted image in 4 ms
-vdo_larod[4165]: Person detected: 2.75% - Car detected: 75.29%
-vdo_larod[4165]: Ran inference for 16 ms
-vdo_larod[4165]: Converted image in 3 ms
-vdo_larod[4165]: Person detected: 3.14% - Car detected: 88.63%
-vdo_larod[4165]: Ran inference for 16 ms
-vdo_larod[4165]: Converted image in 3 ms
-vdo_larod[4165]: Person detected: 1.57% - Car detected: 74.51%
-vdo_larod[4165]: Ran inference for 16 ms
-vdo_larod[4165]: Stop streaming video from VDO
+vdo_larod[584171]: Starting /usr/local/packages/vdo_larod/vdo_larod
+vdo_larod[584171]: chooseStreamResolution: We select stream w/h=480 x 270 based on VDO channel info.
+vdo_larod[584171]: Creating VDO image provider and creating stream 480 x 270
+vdo_larod[584171]: Setting up larod connection with chip axis-a8-dlpu-tflite and model file /usr/local/packages/vdo_larod/model/model.tflite
+vdo_larod[584171]: Loading the model... This might take up to 5 minutes depending on your device model.
+vdo_larod[584171]: Model loaded successfully
+vdo_larod[584171]: Created mmaped model output 0 with size 1
+vdo_larod[584171]: Created mmaped model output 1 with size 1
+vdo_larod[584171]: Start fetching video frames from VDO
+
+vdo_larod[584171]: Ran pre-processing for 2 ms
+vdo_larod[584171]: Ran inference for 16 ms
+vdo_larod[584171]: Person detected: 65.14% - Car detected: 11.92%
+
 vdo_larod[4165]: Exit /usr/local/packages/vdo_larod/vdo_larod
 ```
 
@@ -331,101 +303,44 @@ vdo_larod[4165]: Exit /usr/local/packages/vdo_larod/vdo_larod
 ```sh
 ----- Contents of SYSTEM_LOG for 'vdo_larod' -----
 
+vdo_larod[584171]: Starting /usr/local/packages/vdo_larod/vdo_larod
+vdo_larod[584171]: chooseStreamResolution: We select stream w/h=480 x 270 based on VDO channel info.
+vdo_larod[584171]: Creating VDO image provider and creating stream 480 x 270
+vdo_larod[584171]: Setting up larod connection with chip a9-dlpu-tflite and model file /usr/local/packages/vdo_larod/model/model.tflite
+vdo_larod[584171]: Loading the model... This might take up to 5 minutes depending on your device model.
+vdo_larod[584171]: Model loaded successfully
+vdo_larod[584171]: Created mmaped model output 0 with size 1
+vdo_larod[584171]: Created mmaped model output 1 with size 1
+vdo_larod[584171]: Start fetching video frames from VDO
 
-vdo_larod[4165]: Starting /usr/local/packages/vdo_larod/vdo_larod
-vdo_larod[4165]: 'buffer.strategy': <uint32 3>
-vdo_larod[4165]: 'channel': <uint32 1>
-vdo_larod[4165]: 'format': <uint32 3>
-vdo_larod[4165]: 'height': <uint32 270>
-vdo_larod[4165]: 'width': <uint32 480>
-vdo_larod[4165]: Creating VDO image provider and creating stream 480 x 270
-vdo_larod[4165]: Dump of vdo stream settings map =====
-vdo_larod[4165]: chooseStreamResolution: We select stream w/h=480 x 270 based on VDO channel info.
-vdo_larod[4165]: Calculate crop image
-vdo_larod[4165]: Create larod models
-vdo_larod[4165]: Create preprocessing maps
-vdo_larod[4165]: Crop VDO image X=40 Y=0 (480 x 270)
-vdo_larod[4165]: Setting up larod connection with chip a9-dlpu-tflite and model /usr/local/packages/vdo_larod/model/model.tflite
-vdo_larod[4165]: Available chip ids:
-vdo_larod[4165]: Chip: a9-dlpu-tflite
-vdo_larod[4165]: Chip: cpu-tflite
-vdo_larod[4165]: Chip: cpu-proc
-vdo_larod[4165]: Loading the model... This might take up to 5 minutes depending on your device model.
-vdo_larod[4165]: Model loaded successfully
-vdo_larod[4165]: Allocate memory for input/output buffers
-vdo_larod[4165]: Connect tensors to file descriptors
-vdo_larod[4165]: Create input/output tensors
-vdo_larod[4165]: Create job requests
-vdo_larod[4165]: Determine tensor buffer sizes
-vdo_larod[4165]: Start fetching video frames from VDO
-vdo_larod[4165]: Converted image in 14 ms
-vdo_larod[4165]: Person detected: 5.49% - Car detected: 80.00%
-vdo_larod[4165]: Ran inference for 17 ms
-vdo_larod[4165]: Converted image in 4 ms
-vdo_larod[4165]: Person detected: 4.31% - Car detected: 88.63%
-vdo_larod[4165]: Ran inference for 16 ms
-vdo_larod[4165]: Converted image in 4 ms
-vdo_larod[4165]: Person detected: 2.75% - Car detected: 75.29%
-vdo_larod[4165]: Ran inference for 16 ms
-vdo_larod[4165]: Converted image in 3 ms
-vdo_larod[4165]: Person detected: 3.14% - Car detected: 88.63%
-vdo_larod[4165]: Ran inference for 16 ms
-vdo_larod[4165]: Converted image in 3 ms
-vdo_larod[4165]: Person detected: 1.57% - Car detected: 74.51%
-vdo_larod[4165]: Ran inference for 16 ms
-vdo_larod[4165]: Stop streaming video from VDO
+vdo_larod[584171]: Ran pre-processing for 2 ms
+vdo_larod[584171]: Ran inference for 7 ms
+vdo_larod[584171]: Person detected: 65.14% - Car detected: 11.92%
+
 vdo_larod[4165]: Exit /usr/local/packages/vdo_larod/vdo_larod
+```
 
 #### Output - CPU with TensorFlow Lite
 
 ```sh
 ----- Contents of SYSTEM_LOG for 'vdo_larod' -----
 
-vdo_larod[1670]: Starting /usr/local/packages/vdo_larod/vdo_larod
-vdo_larod[1670]: 'buffer.strategy': <uint32 3>
-vdo_larod[1670]: 'channel': <uint32 1>
-vdo_larod[1670]: 'format': <uint32 3>
-vdo_larod[1670]: 'height': <uint32 270>
-vdo_larod[1670]: 'width': <uint32 480>
-vdo_larod[1670]: Creating VDO image provider and creating stream 480 x 270
-vdo_larod[1670]: Dump of vdo stream settings map =====
-vdo_larod[1670]: chooseStreamResolution: We select stream w/h=480 x 270 based on VDO channel info.
-vdo_larod[1670]: Calculate crop image
-vdo_larod[1670]: Create larod models
-vdo_larod[1670]: Create preprocessing maps
-vdo_larod[1670]: Crop VDO image X=40 Y=0 (480 x 270)
-vdo_larod[1670]: Setting up larod connection with chip cpu-tflite and model /usr/local/packages/vdo_larod/model/model.tflite
-vdo_larod[1670]: Available chip ids:
-vdo_larod[1670]: Chip: cpu-tflite
-vdo_larod[1670]: Chip: google-edge-tpu-tflite
-vdo_larod[1670]: Chip: axis-ace-proc
-vdo_larod[1670]: Chip: cpu-proc
-vdo_larod[1670]: Chip: axis-a7-gpu-proc
-vdo_larod[1670]: Loading the model... This might take up to 5 minutes depending on your device model.
-vdo_larod[1670]: Model loaded successfully
-vdo_larod[1670]: Allocate memory for input/output buffers
-vdo_larod[1670]: Connect tensors to file descriptors
-vdo_larod[1670]: Create input/output tensors
-vdo_larod[1670]: Create job requests
-vdo_larod[1670]: Determine tensor buffer sizes
-vdo_larod[1670]: Start fetching video frames from VDO
-vdo_larod[1670]: Converted image in 10 ms
-vdo_larod[1670]: Ran inference for 2295 ms
-vdo_larod[1670]: Person detected: 34.12% - Car detected: 3.92%
-vdo_larod[1670]: Converted image in 9 ms
-vdo_larod[1670]: Ran inference for 2247 ms
-vdo_larod[1670]: Person detected: 34.12% - Car detected: 3.92%
-vdo_larod[1670]: Converted image in 11 ms
-vdo_larod[1670]: Ran inference for 2200 ms
-vdo_larod[1670]: Person detected: 34.12% - Car detected: 3.92%
-vdo_larod[1670]: Converted image in 9 ms
-vdo_larod[1670]: Ran inference for 2392 ms
-vdo_larod[1670]: Person detected: 34.12% - Car detected: 3.92%
-vdo_larod[1670]: Converted image in 11 ms
-vdo_larod[1670]: Ran inference for 2074 ms
-vdo_larod[1670]: Stop streaming video from VDO
-vdo_larod[1670]: Person detected: 34.12% - Car detected: 3.92%
-vdo_larod[1670]: Exit /usr/local/packages/vdo_larod/vdo_larod
+vdo_larod[584171]: Starting /usr/local/packages/vdo_larod/vdo_larod
+vdo_larod[584171]: chooseStreamResolution: We select stream w/h=480 x 270 based on VDO channel info.
+vdo_larod[584171]: Creating VDO image provider and creating stream 480 x 270
+vdo_larod[584171]: Setting up larod connection with chip cpu-tflite and model file /usr/local/packages/vdo_larod/model/model.tflite
+vdo_larod[584171]: Loading the model... This might take up to 5 minutes depending on your device model.
+vdo_larod[584171]: Model loaded successfully
+vdo_larod[584171]: Created mmaped model output 0 with size 1
+vdo_larod[584171]: Created mmaped model output 1 with size 1
+vdo_larod[584171]: Start fetching video frames from VDO
+
+vdo_larod[584171]: Ran pre-processing for 3 ms
+vdo_larod[584171]: Ran inference for 2594 ms
+vdo_larod[584171]: Change VDO stream framerate to 1.000000 because of too long inference time
+vdo_larod[584171]: Person detected: 65.14% - Car detected: 11.92%
+
+vdo_larod[4165]: Exit /usr/local/packages/vdo_larod/vdo_larod
 ```
 
 #### Output - Google TPU
@@ -433,52 +348,21 @@ vdo_larod[1670]: Exit /usr/local/packages/vdo_larod/vdo_larod
 ```sh
 ----- Contents of SYSTEM_LOG for 'vdo_larod' -----
 
-vdo_larod[31476]: Starting /usr/local/packages/vdo_larod/vdo_larod
-vdo_larod[31476]: 'buffer.strategy': <uint32 3>
-vdo_larod[31476]: 'channel': <uint32 1>
-vdo_larod[31476]: 'format': <uint32 3>
-vdo_larod[31476]: 'height': <uint32 270>
-vdo_larod[31476]: 'width': <uint32 480>
-vdo_larod[31476]: Creating VDO image provider and creating stream 480 x 270
-vdo_larod[31476]: Dump of vdo stream settings map =====
-vdo_larod[31476]: chooseStreamResolution: We select stream w/h=480 x 270 based on VDO channel info.
-vdo_larod[31476]: Calculate crop image
-vdo_larod[31476]: Create larod models
-vdo_larod[31476]: Create preprocessing maps
-vdo_larod[31476]: Crop VDO image X=40 Y=0 (480 x 270)
-vdo_larod[31476]: Setting up larod connection with chip google-edge-tpu-tflite and model file /usr/local/packages/vdo_larod/model/model.tflite
-vdo_larod[31476]: Available chip ids:
-vdo_larod[31476]: Chip: axis-a7-gpu-tflite
-vdo_larod[31476]: Chip: cpu-tflite
-vdo_larod[31476]: Chip: google-edge-tpu-tflite
-vdo_larod[31476]: Chip: axis-ace-proc
-vdo_larod[31476]: Chip: cpu-proc
-vdo_larod[31476]: Chip: axis-a7-gpu-proc
-vdo_larod[31476]: Loading the model... This might take up to 5 minutes depending on your device model.
-vdo_larod[31476]: Model loaded successfully
-vdo_larod[31476]: Allocate memory for input/output buffers
-vdo_larod[31476]: Connect tensors to file descriptors
-vdo_larod[31476]: Create input/output tensors
-vdo_larod[31476]: Create job requests
-vdo_larod[31476]: Determine tensor buffer sizes
-vdo_larod[31476]: Start fetching video frames from VDO
-vdo_larod[31476]: Converted image in 14 ms
-vdo_larod[31476]: Person detected: 62.35% - Car detected: 11.37%
-vdo_larod[31476]: Ran inference for 19 ms
-vdo_larod[31476]: Converted image in 7 ms
-vdo_larod[31476]: Person detected: 62.35% - Car detected: 10.59%
-vdo_larod[31476]: Ran inference for 6 ms
-vdo_larod[31476]: Converted image in 9 ms
-vdo_larod[31476]: Person detected: 62.35% - Car detected: 12.16%
-vdo_larod[31476]: Ran inference for 6 ms
-vdo_larod[31476]: Converted image in 7 ms
-vdo_larod[31476]: Ran inference for 6 ms
-vdo_larod[31476]: Person detected: 64.31% - Car detected: 12.16%
-vdo_larod[31476]: Converted image in 6 ms
-vdo_larod[31476]: Person detected: 60.39% - Car detected: 11.37%
-vdo_larod[31476]: Ran inference for 5 ms
-vdo_larod[31476]: Stop streaming video from VDO
-vdo_larod[31476]: Exit /usr/local/packages/vdo_larod/vdo_larod```
+vdo_larod[584171]: Starting /usr/local/packages/vdo_larod/vdo_larod
+vdo_larod[584171]: chooseStreamResolution: We select stream w/h=256 x 256 based on VDO channel info.
+vdo_larod[584171]: Creating VDO image provider and creating stream 256 x 256
+vdo_larod[584171]: Setting up larod connection with chip google-edge-tpu-tflite and model file /usr/local/packages/vdo_larod/model/model.tflite
+vdo_larod[584171]: Loading the model... This might take up to 5 minutes depending on your device model.
+vdo_larod[584171]: Model loaded successfully
+vdo_larod[584171]: Created mmaped model output 0 with size 1
+vdo_larod[584171]: Created mmaped model output 1 with size 1
+vdo_larod[584171]: Start fetching video frames from VDO
+
+vdo_larod[584171]: Ran pre-processing for 2 ms
+vdo_larod[584171]: Ran inference for 16 ms
+vdo_larod[584171]: Person detected: 65.14% - Car detected: 11.92%
+
+vdo_larod[4165]: Exit /usr/local/packages/vdo_larod/vdo_larod
 ```
 
 #### Output - CV25
@@ -488,51 +372,18 @@ vdo_larod[31476]: Exit /usr/local/packages/vdo_larod/vdo_larod```
 
 
 vdo_larod[584171]: Starting /usr/local/packages/vdo_larod/vdo_larod
-vdo_larod[584171]: 'buffer.strategy': <uint32 3>
-vdo_larod[584171]: 'channel': <uint32 1>
-vdo_larod[584171]: 'format': <uint32 3>
-vdo_larod[584171]: 'height': <uint32 270>
-vdo_larod[584171]: 'width': <uint32 480>
-vdo_larod[584171]: Creating VDO image provider and creating stream 480 x 270
-vdo_larod[584171]: Dump of vdo stream settings map =====
-vdo_larod[584171]: chooseStreamResolution: We select stream w/h=480 x 270 based on VDO channel info.
-vdo_larod[584171]: Calculate crop image
-vdo_larod[584171]: Create larod models
-vdo_larod[584171]: Create preprocessing maps
-vdo_larod[584171]: Crop VDO image X=40 Y=0 (480 x 270)
+vdo_larod[584171]: chooseStreamResolution: We select stream w/h=256 x 256 based on VDO channel info.
+vdo_larod[584171]: Creating VDO image provider and creating stream 256 x 256
 vdo_larod[584171]: Setting up larod connection with chip ambarella-cvflow and model file /usr/local/packages/vdo_larod/model/model.bin
-vdo_larod[584171]: Available chip ids:
-vdo_larod[584171]: Chip: ambarella-cvflow
-vdo_larod[584171]: Chip: ambarella-cvflow-proc
-vdo_larod[584171]: Chip: cpu-tflite
-vdo_larod[584171]: Chip: cpu-proc
 vdo_larod[584171]: Loading the model... This might take up to 5 minutes depending on your device model.
 vdo_larod[584171]: Model loaded successfully
-vdo_larod[584171]: Allocate memory for input/output buffers
-vdo_larod[584171]: Connect tensors to file descriptors
-vdo_larod[584171]: Create input/output tensors
-vdo_larod[584171]: Determine tensor buffer sizes
-vdo_larod[584171]: createAndMapTmpFile: Setting up a temp fd with pattern /tmp/larod.in.test-XXXXXX and size 150528
-vdo_larod[584171]: createAndMapTmpFile: Setting up a temp fd with pattern /tmp/larod.out.test-XXXXXX and size 32032
-vdo_larod[584171]: createAndMapTmpFile: Setting up a temp fd with pattern /tmp/larod.pp.test-XXXXXX and size 115200
-vdo_larod[584171]: Create job requests
+vdo_larod[584171]: Created mmaped model output 0 with size 32
+vdo_larod[584171]: Created mmaped model output 1 with size 32
 vdo_larod[584171]: Start fetching video frames from VDO
-vdo_larod[584171]: Converted image in 7 ms
-vdo_larod[584171]: CV25 Person detected: 65.14% - Car detected: 11.92%
-vdo_larod[584171]: Ran inference for 49 ms
-vdo_larod[584171]: Converted image in 7 ms
-vdo_larod[584171]: CV25 Person detected: 67.92% - Car detected: 11.92%
-vdo_larod[584171]: Ran inference for 48 ms
-vdo_larod[584171]: Converted image in 7 ms
-vdo_larod[584171]: CV25 Person detected: 65.14% - Car detected: 13.29%
-vdo_larod[584171]: Ran inference for 48 ms
-vdo_larod[584171]: Converted image in 6 ms
-vdo_larod[584171]: CV25 Person detected: 67.92% - Car detected: 13.29%
-vdo_larod[584171]: Ran inference for 48 ms
-vdo_larod[584171]: Converted image in 6 ms
-vdo_larod[584171]: CV25 Person detected: 65.14% - Car detected: 11.92%
-vdo_larod[584171]: Ran inference for 48 ms
-vdo_larod[584171]: Stop streaming video from VDO
+vdo_larod[584171]: Ran pre-processing for 1 ms
+vdo_larod[584171]: Ran inference for 50 ms
+vdo_larod[584171]: Person detected: 65.14% - Car detected: 11.92%
+
 vdo_larod[584171]: Exit /usr/local/packages/vdo_larod/vdo_larod
 ```
 

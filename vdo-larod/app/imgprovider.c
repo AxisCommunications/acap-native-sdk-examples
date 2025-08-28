@@ -22,453 +22,383 @@
 
 #include <assert.h>
 #include <errno.h>
+#include <glib-object.h>
 #include <gmodule.h>
+#include <math.h>
+#include <poll.h>
 #include <syslog.h>
 
+#include "panic.h"
 #include "vdo-map.h"
 #include <vdo-channel.h>
+#include <vdo-error.h>
 
-#define VDO_CHANNEL (1)
+G_DEFINE_AUTOPTR_CLEANUP_FUNC(VdoResolutionSet, g_free);
 
-/**
- * brief Set up a stream through VDO.
- *
- * Set up stream settings, allocate image buffers and map memory.
- *
- * param provider ImageProvider pointer.
- * param w Requested stream width.
- * param h Requested stream height.
- * param provider Pointer to ImgProvider starting the stream.
- * return False if any errors occur, otherwise true.
- */
-static bool createStream(ImgProvider_t* provider, unsigned int w, unsigned int h);
+// Use the first input channel
+#define VDO_INPUT_CHANNEL (1)
+
+#define IMG_PROVIDER_ANALYSIS_MAX (10)
 
 /**
- * brief Allocate VDO buffers on a stream.
+ * @brief Calculate a new img provider framerate based on inference time
  *
- * Note that buffers are not relased upon error condition.
+ * @param provider        The img provider to be used
+ * @param analysis_time   Time in ms for the analysis
  *
- * param provider ImageProvider pointer.
- * param vdoStream VDO stream for buffer allocation.
- * return False if any errors occur, otherwise true.
+ * @return void
  */
-static bool allocateVdoBuffers(ImgProvider_t* provider, VdoStream* vdoStream);
-
-/**
- * brief Release references to the buffers we allocated in createStream().
- *
- * param provider Pointer to ImgProvider owning the buffer references.
- */
-static void releaseVdoBuffers(ImgProvider_t* provider);
-
-/**
- * brief Starting point function for the thread fetching frames.
- *
- * Responsible for fetching buffers/frames from VDO and re-enqueue buffers back
- * to VDO when they are not needed by the application. The ImgProvider always
- * keeps one or several of the most recent frames available in the application.
- * There are two queues involved: deliveredFrames and processedFrames.
- * - deliveredFrames are frames delivered from VDO and
- *   not processed by the client.
- * - processedFrames are frames that the client has consumed and handed
- *   back to the ImgProvider.
- * The thread works roughly like this:
- * 1. The thread blocks on vdo_stream_get_buffer() until VDO deliver a new
- * frame.
- * 2. The fresh frame is put at the end of the deliveredFrame queue. If the
- *    client want to fetch a frame the item at the end of deliveredFrame
- *    list is returned.
- * 3. If there are any frames in the processedFrames list one of these are
- *    enqueued back to VDO to keep the flow of buffers.
- * 4. If the processedFrames list is empty we instead check if there are
- *    frames available in the deliveredFrames list. We want to make sure
- *    there is at least numAppFrames buffers available to the client to
- *    fetch. If there are more than numAppFrames in deliveredFrames we
- *    pick the first buffer (oldest) in the list and enqueue it to VDO.
-
- * param data Pointer to ImgProvider owning thread.
- * return Pointer to unused return data.
- */
-static void* threadEntry(void* data);
-
-ImgProvider_t*
-createImgProvider(unsigned int w, unsigned int h, unsigned int numFrames, VdoFormat format) {
-    bool mtxInitialized  = false;
-    bool condInitialized = false;
-
-    ImgProvider_t* provider = calloc(1, sizeof(ImgProvider_t));
-    if (!provider) {
-        syslog(LOG_ERR, "%s: Unable to allocate ImgProvider: %s", __func__, strerror(errno));
-        goto errorExit;
-    }
-
-    provider->vdoFormat    = format;
-    provider->numAppFrames = numFrames;
-
-    if (pthread_mutex_init(&provider->frameMutex, NULL)) {
-        syslog(LOG_ERR, "%s: Unable to initialize mutex: %s", __func__, strerror(errno));
-        goto errorExit;
-    }
-    mtxInitialized = true;
-
-    if (pthread_cond_init(&provider->frameDeliverCond, NULL)) {
-        syslog(LOG_ERR,
-               "%s: Unable to initialize condition variable: %s",
-               __func__,
-               strerror(errno));
-        goto errorExit;
-    }
-    condInitialized = true;
-
-    provider->deliveredFrames = g_queue_new();
-    if (!provider->deliveredFrames) {
-        syslog(LOG_ERR, "%s: Unable to create deliveredFrames queue!", __func__);
-        goto errorExit;
-    }
-
-    provider->processedFrames = g_queue_new();
-    if (!provider->processedFrames) {
-        syslog(LOG_ERR, "%s: Unable to create processedFrames queue!", __func__);
-        goto errorExit;
-    }
-
-    if (!createStream(provider, w, h)) {
-        syslog(LOG_ERR, "%s: Could not create VDO stream!", __func__);
-        goto errorExit;
-    }
-
-    return provider;
-
-errorExit:
-    if (mtxInitialized) {
-        pthread_mutex_destroy(&provider->frameMutex);
-    }
-    if (condInitialized) {
-        pthread_cond_destroy(&provider->frameDeliverCond);
-    }
-    if (provider->deliveredFrames) {
-        g_queue_free(provider->deliveredFrames);
-    }
-    if (provider->processedFrames) {
-        g_queue_free(provider->processedFrames);
-    }
-
-    free(provider);
-
-    return NULL;
-}
-
-void destroyImgProvider(ImgProvider_t* provider) {
-    if (!provider) {
-        syslog(LOG_ERR, "%s: Invalid pointer to ImgProvider", __func__);
+static void calculate_new_framerate(img_provider_t* provider, unsigned int analysis_time) {
+    if (analysis_time > 201) {
+        provider->framerate = 1.0;
+        provider->frametime = 1001;
         return;
     }
-
-    releaseVdoBuffers(provider);
-
-    pthread_mutex_destroy(&provider->frameMutex);
-    pthread_cond_destroy(&provider->frameDeliverCond);
-
-    g_queue_free(provider->deliveredFrames);
-    g_queue_free(provider->processedFrames);
-
-    free(provider);
+    if (analysis_time < 34) {
+        provider->framerate = 30.0;
+        provider->frametime = 34;
+    } else if (analysis_time < 41) {
+        provider->framerate = 25.0;
+        provider->frametime = 41;
+    } else if (analysis_time < 51) {
+        provider->framerate = 20.0;
+        provider->frametime = 51;
+    } else if (analysis_time < 67) {
+        provider->framerate = 15.0;
+        provider->frametime = 67;
+    } else if (analysis_time < 101) {
+        provider->framerate = 10.0;
+        provider->frametime = 101;
+    } else if (analysis_time < 201) {
+        provider->framerate = 5.0;
+        provider->frametime = 201;
+    }
+    if (provider->framerate > provider->requested_framerate) {
+        provider->framerate = provider->requested_framerate;
+        provider->frametime = (unsigned int)((1 / provider->framerate) * 1000);
+    }
 }
 
-bool allocateVdoBuffers(ImgProvider_t* provider, VdoStream* vdoStream) {
-    GError* error = NULL;
-    bool ret      = false;
+static void update_framerate(img_provider_t* provider, unsigned analysis_time) {
+    g_autoptr(GError) error    = NULL;
+    unsigned int old_frametime = provider->frametime;
 
-    assert(provider);
-    assert(vdoStream);
-
-    for (size_t i = 0; i < NUM_VDO_BUFFERS; i++) {
-        provider->vdoBuffers[i] = vdo_stream_buffer_alloc(vdoStream, NULL, &error);
-        if (provider->vdoBuffers[i] == NULL) {
-            syslog(LOG_ERR,
-                   "%s: Failed creating VDO buffer: %s",
-                   __func__,
-                   (error != NULL) ? error->message : "N/A");
-            goto errorExit;
+    calculate_new_framerate(provider, analysis_time);
+    if (old_frametime != provider->frametime) {
+        if (!vdo_stream_set_framerate(provider->vdo_stream, provider->framerate, &error)) {
+            panic("%s: Failed to change framerate: %s", __func__, error->message);
         }
-
-        // Make a 'speculative' vdo_buffer_get_data() call to trigger a
-        // memory mapping of the buffer. The mapping is cached in the VDO
-        // implementation.
-        void* dummyPtr = vdo_buffer_get_data(provider->vdoBuffers[i]);
-        if (!dummyPtr) {
-            syslog(LOG_ERR,
-                   "%s: Failed initializing buffer memmap: %s",
-                   __func__,
-                   (error != NULL) ? error->message : "N/A");
-            goto errorExit;
-        }
-
-        if (!vdo_stream_buffer_enqueue(vdoStream, provider->vdoBuffers[i], &error)) {
-            syslog(LOG_ERR,
-                   "%s: Failed enqueue VDO buffer: %s",
-                   __func__,
-                   (error != NULL) ? error->message : "N/A");
-            goto errorExit;
-        }
-    }
-
-    ret = true;
-
-errorExit:
-    g_clear_error(&error);
-
-    return ret;
-}
-
-bool chooseStreamResolution(unsigned int reqWidth,
-                            unsigned int reqHeight,
-                            unsigned int* chosenWidth,
-                            unsigned int* chosenHeight) {
-    VdoResolutionSet* set = NULL;
-    VdoChannel* channel   = NULL;
-    GError* error         = NULL;
-    bool ret              = false;
-
-    assert(chosenWidth);
-    assert(chosenHeight);
-
-    // Retrieve channel resolutions
-    channel = vdo_channel_get(VDO_CHANNEL, &error);
-    if (!channel) {
-        syslog(LOG_ERR,
-               "%s: Failed vdo_channel_get(): %s",
-               __func__,
-               (error != NULL) ? error->message : "N/A");
-        goto end;
-    }
-    set = vdo_channel_get_resolutions(channel, NULL, &error);
-    if (!set) {
-        syslog(LOG_ERR,
-               "%s: Failed vdo_channel_get_resolutions(): %s",
-               __func__,
-               (error != NULL) ? error->message : "N/A");
-        goto end;
-    }
-
-    // Find smallest VDO stream resolution that fits the requested size.
-    ssize_t bestResolutionIdx       = -1;
-    unsigned int bestResolutionArea = UINT_MAX;
-    for (ssize_t i = 0; (gsize)i < set->count; ++i) {
-        VdoResolution* res = &set->resolutions[i];
-        if ((res->width >= reqWidth) && (res->height >= reqHeight)) {
-            unsigned int area = res->width * res->height;
-            if (area < bestResolutionArea) {
-                bestResolutionIdx  = i;
-                bestResolutionArea = area;
-            }
-        }
-    }
-
-    // If we got a reasonable w/h from the VDO channel info we use that
-    // for creating the stream. If that info for some reason was empty we
-    // fall back to trying to create a stream with client-supplied w/h.
-    *chosenWidth = reqWidth;
-    *chosenWidth = reqHeight;
-    if (bestResolutionIdx >= 0) {
-        *chosenWidth  = set->resolutions[bestResolutionIdx].width;
-        *chosenHeight = set->resolutions[bestResolutionIdx].height;
         syslog(LOG_INFO,
-               "%s: We select stream w/h=%u x %u based on VDO channel info.\n",
-               __func__,
-               *chosenWidth,
-               *chosenHeight);
-    } else {
-        syslog(LOG_WARNING,
-               "%s: VDO channel info contains no reslution info. Fallback "
-               "to client-requested stream resolution.",
-               __func__);
+               "Change VDO stream framerate because of the mean analysis time %u ms",
+               analysis_time);
+        syslog(LOG_INFO, "New framerate is %f", provider->framerate);
+        // Flush all frames in vdo so the latest is used
+        img_provider_flush_all_frames(provider);
     }
-
-    ret = true;
-
-end:
-    g_clear_object(&channel);
-    g_free(set);
-    g_clear_error(&error);
-
-    return ret;
 }
 
-bool createStream(ImgProvider_t* provider, unsigned int w, unsigned int h) {
-    VdoMap* vdoMap = vdo_map_new();
-    GError* error  = NULL;
-    bool ret       = false;
+img_provider_t* create_img_provider(unsigned int width,
+                                    unsigned int height,
+                                    unsigned int num_buffers,
+                                    VdoFormat format,
+                                    double framerate) {
+    g_autoptr(VdoMap) vdo_settings = vdo_map_new();
+    g_autoptr(GError) error        = NULL;
 
-    if (!vdoMap) {
-        syslog(LOG_ERR, "%s: Failed to create vdo_map", __func__);
-        goto end;
+    img_provider_t* provider = (img_provider_t*)calloc(1, sizeof(img_provider_t));
+    if (!provider) {
+        panic("%s: Unable to allocate ImgProvider: %s", __func__, strerror(errno));
     }
 
-    vdo_map_set_uint32(vdoMap, "channel", VDO_CHANNEL);
-    vdo_map_set_uint32(vdoMap, "format", provider->vdoFormat);
-    vdo_map_set_uint32(vdoMap, "width", w);
-    vdo_map_set_uint32(vdoMap, "height", h);
-    // We will use buffer_alloc() and buffer_unref() calls.
-    vdo_map_set_uint32(vdoMap, "buffer.strategy", VDO_BUFFER_STRATEGY_EXPLICIT);
+    provider->format       = format;
+    provider->buffer_count = num_buffers;
+    provider->vdo_stream   = NULL;
+    provider->fd           = -1;
+
+    if (!vdo_settings) {
+        panic("%s: Failed to create vdo_map", __func__);
+    }
+
+    // Set input so the image is taken from the fist sensor channel
+    vdo_map_set_uint32(vdo_settings, "input", VDO_INPUT_CHANNEL);
+    // If channel is used it corresponds to the camera keyword in the rtsp url
+    // Note that channel 1 may be a viewarea or a sensor channel its all
+    // dependent on the product
+    // channel = 0 corresponds the overview keyword in the rtsp url
+    // vdo_map_set_uint32(vdoMap, "channel", 1);
+
+    // format is the image format that is supplied from vdo
+    vdo_map_set_uint32(vdo_settings, "format", format);
+    vdo_map_set_uint32(vdo_settings, "width", width);
+    vdo_map_set_uint32(vdo_settings, "height", height);
+    // Set initial framerate
+    vdo_map_set_double(vdo_settings, "framerate", framerate);
+    // Make it possible to change the framerate for the stream after it is started
+    vdo_map_set_boolean(vdo_settings, "dynamic.framerate", true);
+    // It is not needed to set buffer.strategy since VDO_BUFFER_STRATEGY_INFINITE is default
+    // vdo_map_set_uint32(vdo_settings, "buffer.strategy", VDO_BUFFER_STRATEGY_INFINITE);
+
+    // The number of buffers that vdo will allocate for this stream
+    // Normally two buffers are enough and using too many buffers will use
+    // more memory in the product.
+    vdo_map_set_uint32(vdo_settings, "buffer.count", provider->buffer_count);
+
+    // The vdo_stream_get_buffer is non blocking and will return immediately
+    // Then we need to poll instead when it is ok to get a buffer
+    vdo_map_set_boolean(vdo_settings, "socket.blocking", false);
 
     syslog(LOG_INFO, "Dump of vdo stream settings map =====");
-    vdo_map_dump(vdoMap);
+    vdo_map_dump(vdo_settings);
 
-    VdoStream* vdoStream = vdo_stream_new(vdoMap, NULL, &error);
-    if (!vdoStream) {
-        syslog(LOG_ERR,
-               "%s: Failed creating vdo stream: %s",
-               __func__,
-               (error != NULL) ? error->message : "N/A");
-        goto errorExit;
+    // Create a vdo stream using the vdoMap filled in above
+    g_autoptr(VdoStream) vdo_stream = vdo_stream_new(vdo_settings, NULL, &error);
+    if (!vdo_stream) {
+        panic("%s: Failed creating vdo stream: %s", __func__, error->message);
     }
 
-    if (!allocateVdoBuffers(provider, vdoStream)) {
-        syslog(LOG_ERR, "%s: Failed setting up VDO buffers!", __func__);
-        goto errorExit;
+    // Get the info map from the vdo stream.
+    // This will contain values how the stream was actually created and may
+    // differ from the settings map used above
+    // The most useful is width/height and pitch since these values will follow rotation
+    // and will be the resolution that the buffers from vdo have.
+    g_autoptr(VdoMap) vdo_info = vdo_stream_get_info(vdo_stream, &error);
+    if (!vdo_info) {
+        panic("%s: Failed to get info map for stream: %s", __func__, error->message);
     }
 
-    // Start the actual VDO streaming.
-    if (!vdo_stream_start(vdoStream, &error)) {
-        syslog(LOG_ERR,
-               "%s: Failed starting stream: %s",
-               __func__,
-               (error != NULL) ? error->message : "N/A");
-        goto errorExit;
-    }
+    provider->pitch               = vdo_map_get_uint32(vdo_info, "pitch", width);
+    provider->height              = vdo_map_get_uint32(vdo_info, "height", height);
+    provider->width               = vdo_map_get_uint32(vdo_info, "width", width);
+    provider->framerate           = vdo_map_get_double(vdo_info, "framerate", framerate);
+    provider->rotation            = vdo_map_get_uint32(vdo_info, "rotation", 0);
+    provider->channel             = vdo_map_get_uint32(vdo_info, "channel", 0);
+    provider->requested_framerate = framerate;
 
-    provider->vdoStream = vdoStream;
+    // Calculate the time between the images from vdo
+    provider->frametime            = (unsigned int)((1 / provider->framerate) * 1000);
+    provider->mean_analysis_time   = 0;
+    provider->analysis_frame_count = 0;
+    provider->tot_analysis_time    = 0;
 
-    ret = true;
+    provider->vdo_stream = g_steal_pointer(&vdo_stream);
 
-    goto end;
-
-errorExit:
-    // Clean up allocated buffers if any
-    releaseVdoBuffers(provider);
-
-end:
-    // Always do this
-    g_object_unref(vdoMap);
-    g_clear_error(&error);
-    return ret;
+    return provider;
 }
 
-static void releaseVdoBuffers(ImgProvider_t* provider) {
-    if (!provider->vdoStream) {
-        return;
-    }
+void destroy_img_provider(img_provider_t* provider) {
+    assert(provider);
 
-    for (size_t i = 0; i < NUM_VDO_BUFFERS; i++) {
-        if (provider->vdoBuffers[i] != NULL) {
-            vdo_stream_buffer_unref(provider->vdoStream, &provider->vdoBuffers[i], NULL);
-        }
-    }
+    g_clear_object(&provider->vdo_stream);
+
+    free(provider);
 }
 
-VdoBuffer* getLastFrameBlocking(ImgProvider_t* provider) {
-    VdoBuffer* returnBuf = NULL;
-    pthread_mutex_lock(&provider->frameMutex);
+bool img_provider_update_framerate(img_provider_t* provider, unsigned analysis_time) {
+    assert(provider);
 
-    while (g_queue_get_length(provider->deliveredFrames) < 1) {
-        if (pthread_cond_wait(&provider->frameDeliverCond, &provider->frameMutex)) {
-            syslog(LOG_ERR, "%s: Failed to wait on condition: %s", __func__, strerror(errno));
-            goto errorExit;
+    provider->analysis_frame_count++;
+    provider->tot_analysis_time += analysis_time;
+    if (provider->analysis_frame_count == IMG_PROVIDER_ANALYSIS_MAX) {
+        provider->mean_analysis_time = provider->tot_analysis_time / provider->analysis_frame_count;
+
+        // If the analysis time is higher or lower than the time between frames from
+        // vdo change the framerate so the latest frame will be fetched from vdo
+        if (provider->frametime < provider->mean_analysis_time && provider->frametime < 201) {
+            update_framerate(provider, provider->mean_analysis_time);
+        } else if (provider->frametime > provider->mean_analysis_time) {
+            update_framerate(provider, provider->mean_analysis_time);
         }
-    }
-
-    returnBuf = g_queue_pop_tail(provider->deliveredFrames);
-
-errorExit:
-    pthread_mutex_unlock(&provider->frameMutex);
-
-    return returnBuf;
-}
-
-void returnFrame(ImgProvider_t* provider, VdoBuffer* buffer) {
-    pthread_mutex_lock(&provider->frameMutex);
-
-    g_queue_push_tail(provider->processedFrames, buffer);
-
-    pthread_mutex_unlock(&provider->frameMutex);
-}
-
-static void* threadEntry(void* data) {
-    GError* error           = NULL;
-    ImgProvider_t* provider = (ImgProvider_t*)data;
-
-    while (!provider->shutDown) {
-        // Block waiting for a frame from VDO
-        VdoBuffer* newBuffer = vdo_stream_get_buffer(provider->vdoStream, &error);
-
-        if (!newBuffer) {
-            // Fail but we continue anyway hoping for the best.
-            syslog(LOG_WARNING,
-                   "%s: Failed fetching frame from vdo: %s",
-                   __func__,
-                   (error != NULL) ? error->message : "N/A");
-            g_clear_error(&error);
-            continue;
-        }
-        pthread_mutex_lock(&provider->frameMutex);
-
-        g_queue_push_tail(provider->deliveredFrames, newBuffer);
-
-        VdoBuffer* oldBuffer = NULL;
-
-        // First check if there are any frames returned from app
-        // processing
-        if (g_queue_get_length(provider->processedFrames) > 0) {
-            oldBuffer = g_queue_pop_head(provider->processedFrames);
-        } else {
-            // Client specifies the number-of-recent-frames it needs to collect
-            // in one chunk (numAppFrames). Thus only enqueue buffers back to
-            // VDO if we have collected more buffers than numAppFrames.
-            if (g_queue_get_length(provider->deliveredFrames) > provider->numAppFrames) {
-                oldBuffer = g_queue_pop_head(provider->deliveredFrames);
-            }
-        }
-
-        if (oldBuffer) {
-            if (!vdo_stream_buffer_enqueue(provider->vdoStream, oldBuffer, &error)) {
-                // Fail but we continue anyway hoping for the best.
-                syslog(LOG_WARNING,
-                       "%s: Failed enqueueing buffer to vdo: %s",
-                       __func__,
-                       (error != NULL) ? error->message : "N/A");
-                g_clear_error(&error);
-            }
-        }
-        g_object_unref(newBuffer);  // Release the ref from vdo_stream_get_buffer
-        pthread_cond_signal(&provider->frameDeliverCond);
-        pthread_mutex_unlock(&provider->frameMutex);
-    }
-    return NULL;
-}
-
-bool startFrameFetch(ImgProvider_t* provider) {
-    if (pthread_create(&provider->fetcherThread, NULL, threadEntry, provider)) {
-        syslog(LOG_ERR,
-               "%s: Failed to start thread fetching frames from vdo: %s",
-               __func__,
-               strerror(errno));
-        return false;
+        provider->mean_analysis_time   = 0;
+        provider->analysis_frame_count = 0;
+        provider->tot_analysis_time    = 0;
     }
 
     return true;
 }
 
-bool stopFrameFetch(ImgProvider_t* provider) {
-    provider->shutDown = true;
+bool img_provider_start(img_provider_t* provider) {
+    g_autoptr(GError) error = NULL;
+    assert(provider);
 
-    if (pthread_join(provider->fetcherThread, NULL)) {
-        syslog(LOG_ERR,
-               "%s: Failed to join thread fetching frames from vdo: %s",
-               __func__,
-               strerror(errno));
-        return false;
+    // Start the actual VDO streaming.
+    // The internal buffers will then be filled at the framerate set to vdo
+    // or if default the capture frequency
+    if (!vdo_stream_start(provider->vdo_stream, &error)) {
+        panic("%s: Failed to start stream: %s", __func__, error->message);
     }
+
+    // Get the stream fd from vdo to be used for polling
+    int fd = vdo_stream_get_fd(provider->vdo_stream, &error);
+    if (fd < 0) {
+        panic("%s: Failed to get fd for stream: %s", __func__, error->message);
+    }
+    provider->fd = fd;
+    return true;
+}
+
+VdoBuffer* img_provider_get_frame(img_provider_t* provider) {
+    g_autoptr(GError) error = NULL;
+    assert(provider);
+
+    struct pollfd fds = {
+        .fd     = provider->fd,
+        .events = POLL_IN,
+    };
+    while (true) {
+        int status = 0;
+        do {
+            // If poll returns -1 then errno is set
+            // if the errno is set to EINTR then just
+            // continue this loop
+            status = poll(&fds, 1, -1);
+        } while (status == -1 && errno == EINTR);
+
+        if (status < 0) {
+            panic("%s: Failed to poll fd: %s", __func__, strerror(errno));
+        }
+
+        // Get video frame from the imaging pipeline
+        // If the inference time is too long this may not be the latest buffer since
+        // vdo will fill up its internal buffers and give out the oldest one
+        g_autoptr(VdoBuffer) vdo_buf = vdo_stream_get_buffer(provider->vdo_stream, &error);
+        if (!vdo_buf) {
+            if (g_error_matches(error, VDO_ERROR, VDO_ERROR_NO_DATA)) {
+                g_clear_object(&error);
+                continue;  // Transient Error -> Retry
+            }
+            // Maintenance/Installation in progress (e.g Global Rotation)
+            if (vdo_error_is_expected(&error)) {
+                syslog(LOG_INFO, "Likely global rotation: %s", error->message);
+                return NULL;
+            } else {
+                panic("%s: Unexpexted error: %s", __func__, error->message);
+            }
+        }
+        return g_steal_pointer(&vdo_buf);
+    }
+}
+
+void img_provider_flush_all_frames(img_provider_t* provider) {
+    g_autoptr(GError) error = NULL;
+    assert(provider);
+    // Read out all buffers from vdo
+    while (true) {
+        // Since this call will be non blocking it will return immediately
+        g_autoptr(VdoBuffer) read_vdo_buf = vdo_stream_get_buffer(provider->vdo_stream, NULL);
+        // if readVdoBuf is NULL it means that all buffers have been fetched from vdo
+        if (!read_vdo_buf) {
+            break;
+        }
+        if (!vdo_stream_buffer_unref(provider->vdo_stream, &read_vdo_buf, &error)) {
+            if (!vdo_error_is_expected(&error)) {
+                panic("%s: Unexpexted error: %s", __func__, error->message);
+            }
+        }
+    }
+}
+
+bool choose_stream_resolution(unsigned int req_width,
+                              unsigned int req_height,
+                              VdoFormat format,
+                              const char* aspect_ratio,
+                              const char* select,
+                              unsigned int* chosen_width,
+                              unsigned int* chosen_height) {
+    g_autoptr(VdoResolutionSet) set     = NULL;
+    g_autoptr(VdoChannel) channel       = NULL;
+    g_autoptr(GError) error             = NULL;
+    g_autoptr(VdoMap) resolution_filter = vdo_map_new();
+
+    assert(chosen_width);
+    assert(chosen_height);
+
+    // Retrieve channel resolutions for the input 1 channel
+    // This channel is normally the one to use since it will be
+    // the image sensor channel
+    g_autoptr(VdoMap) ch_desc = vdo_map_new();
+    vdo_map_set_uint32(ch_desc, "input", VDO_INPUT_CHANNEL);
+    channel = vdo_channel_get_ex(ch_desc, &error);
+    if (!channel) {
+        panic("%s: Failed vdo_channel_get(): %s", __func__, error->message);
+    }
+
+    // Retrieve min max resolutions for this format
+    vdo_map_set_uint32(resolution_filter, "format", format);
+    vdo_map_set_string(resolution_filter, "select", "minmax");
+    if (select != NULL) {
+        vdo_map_set_string(resolution_filter, "select", select);
+    }
+    if (aspect_ratio) {
+        vdo_map_set_string(resolution_filter, "aspect_ratio", aspect_ratio);
+    }
+    set = vdo_channel_get_resolutions(channel, resolution_filter, &error);
+    if (!set) {
+        panic("%s: Failed vdo_channel_get_resolutions(): %s", __func__, error->message);
+    }
+
+    // For all try to find the closest match or an exact match
+    if (select != NULL && !g_strcmp0(select, "all")) {
+        // Find smallest VDO stream resolution that fits the requested size.
+        ssize_t best_resolution_idx       = -1;
+        unsigned int best_resolution_area = UINT_MAX;
+        for (ssize_t i = 0; i < (ssize_t)set->count; ++i) {
+            VdoResolution* res = &set->resolutions[i];
+            if ((res->width >= req_width) && (res->height >= req_height)) {
+                unsigned int area = res->width * res->height;
+                if (area < best_resolution_area) {
+                    best_resolution_idx  = i;
+                    best_resolution_area = area;
+                }
+            }
+        }
+
+        // If we got a reasonable w/h from the VDO channel info we use that
+        // for creating the stream. If that info for some reason was empty we
+        // fall back to trying to create a stream with client-supplied w/h.
+        *chosen_width  = req_width;
+        *chosen_height = req_height;
+        if (best_resolution_idx >= 0) {
+            *chosen_width  = set->resolutions[best_resolution_idx].width;
+            *chosen_height = set->resolutions[best_resolution_idx].height;
+        } else {
+            syslog(LOG_WARNING,
+                   "%s: VDO channel info contains no reslution info. Fallback "
+                   "to client-requested stream resolution.",
+                   __func__);
+        }
+    } else {
+        // Check towards min and max.
+        *chosen_width  = req_width;
+        *chosen_height = req_height;
+
+        // Check the requested width and height towards max resolution
+        if (req_width > set->resolutions[1].width || req_height > set->resolutions[1].height) {
+            *chosen_width  = set->resolutions[1].width;
+            *chosen_height = set->resolutions[1].height;
+            syslog(LOG_WARNING,
+                   "%s: Requested width or height larger than max resolution."
+                   "Limit the requested resolution to max %ux%u.",
+                   __func__,
+                   set->resolutions[1].width,
+                   set->resolutions[1].height);
+        }
+        // Check the requested width and height towards min resolution
+        if (req_width < set->resolutions[0].width || req_height < set->resolutions[0].height) {
+            *chosen_width  = set->resolutions[0].width;
+            *chosen_height = set->resolutions[0].height;
+            syslog(LOG_WARNING,
+                   "%s: Requested width or height smaller than min resolution."
+                   "Limit the requested resolution to min %ux%u.",
+                   __func__,
+                   set->resolutions[0].width,
+                   set->resolutions[0].height);
+        }
+    }
+    syslog(LOG_INFO,
+           "%s: We select stream w/h=%u x %u based on VDO channel info.\n",
+           __func__,
+           *chosen_width,
+           *chosen_height);
 
     return true;
 }
