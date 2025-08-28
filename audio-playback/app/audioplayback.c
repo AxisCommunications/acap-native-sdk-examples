@@ -41,8 +41,11 @@
 #include <stdlib.h>
 #include <string.h>
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wtype-limits"
 #include <pipewire/pipewire.h>
 #include <spa/param/audio/format-utils.h>
+#pragma GCC diagnostic pop
 
 #define FREQUENCY 440
 #define VOLUME    0.5f
