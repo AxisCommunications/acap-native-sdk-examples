@@ -277,8 +277,8 @@ bool chooseStreamResolution(unsigned int reqWidth,
     // If we got a reasonable w/h from the VDO channel info we use that
     // for creating the stream. If that info for some reason was empty we
     // fall back to trying to create a stream with client-supplied w/h.
-    *chosenWidth = reqWidth;
-    *chosenWidth = reqHeight;
+    *chosenWidth  = reqWidth;
+    *chosenHeight = reqHeight;
     if (bestResolutionIdx >= 0) {
         *chosenWidth  = set->resolutions[bestResolutionIdx].width;
         *chosenHeight = set->resolutions[bestResolutionIdx].height;
