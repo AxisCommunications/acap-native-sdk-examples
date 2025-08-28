@@ -18,6 +18,8 @@ building-opencv
 │   ├── LICENSE
 │   ├── Makefile - The Makefile specifying how the ACAP should be built
 │   └── manifest.json - A file specifying execution-related options for the ACAP
+│   ├── panic.cpp - Utility for exiting the program on error
+│   ├── panic.h - panic headers
 ├── Dockerfile - Specification of the container used to build the ACAP
 ├── README.md
 └── sources.list - Text file specifying repositories for armhf packages
