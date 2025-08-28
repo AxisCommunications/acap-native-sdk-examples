@@ -105,7 +105,7 @@ example specified.
 [Bounding Box API](https://developer.axis.com/acap/api/native-sdk-api/#bounding-box-api).
 5. Run the main program loop:
     1. Fetch image data from VDO.
-    2. Convert image data to the correct format with the Larod pre-processing job.
+    2. Convert image data to the correct format with the Larod pre-processing job, if needed.
     3. Run inference with the Larod model inference job.
     4. Perform YOLOv5-specific parsing of the output.
     5. Draw bounding boxes and log details about the detected objects.
@@ -318,18 +318,29 @@ Initially, the log will show this:
 ```sh
 ----- Contents of SYSTEM_LOG for 'object_detection_yolov5' -----
 
-[ INFO    ] object_detection_yolov5[1197318]: Model input size w/h: 640 x 640
-[ INFO    ] object_detection_yolov5[1197318]: Quantization scale: 0.004191
-[ INFO    ] object_detection_yolov5[1197318]: Quantization zero point: 0.000000
-[ INFO    ] object_detection_yolov5[1197318]: Number of classes: 80
-[ INFO    ] object_detection_yolov5[1197318]: Number of detections: 25200
-[ INFO    ] object_detection_yolov5[1197318]: Axparameter ConfThresholdPercent: 25
-[ INFO    ] object_detection_yolov5[1197318]: Axparameter IouThresholdPercent: 5
-[ INFO    ] object_detection_yolov5[1197318]: choose_stream_resolution: We select stream w/h=1280 x 720 based on VDO channel info.
-[ INFO    ] object_detection_yolov5[1197318]: Setting up larod connection with device axis-a8-dlpu-tflite
-[ INFO    ] object_detection_yolov5[1197318]: Loading the model... This might take up to 5 minutes depending on your device model.
-[ INFO    ] object_detection_yolov5[1197318]: Model loaded successfully
-[ INFO    ] object_detection_yolov5[1197318]: Start fetching video frames from VDO
+[ INFO    ] object_detection_yolov5[975576]: Model input size w/h: 640 x 640
+[ INFO    ] object_detection_yolov5[975576]: Quantization scale: 0.004191
+[ INFO    ] object_detection_yolov5[975576]: Quantization zero point: 0.000000
+[ INFO    ] object_detection_yolov5[975576]: Number of classes: 80
+[ INFO    ] object_detection_yolov5[975576]: Number of detections: 25200
+[ INFO    ] object_detection_yolov5[975576]: Axparameter ConfThresholdPercent: 25
+[ INFO    ] object_detection_yolov5[975576]: Axparameter IouThresholdPercent: 5
+[ INFO    ] object_detection_yolov5[975576]: choose_stream_resolution: We select stream w/h=1280 x 720 based on VDO channel info.
+[ INFO    ] object_detection_yolov5[975576]: Creating VDO image provider and creating stream 1280 x 720
+[ INFO    ] object_detection_yolov5[975576]: Dump of vdo stream settings map =====
+[ INFO    ] object_detection_yolov5[975576]: 'buffer.count'-----: <uint32 2>
+[ INFO    ] object_detection_yolov5[975576]: 'dynamic.framerate': <true>
+[ INFO    ] object_detection_yolov5[975576]: 'format'-----------: <uint32 3>
+[ INFO    ] object_detection_yolov5[975576]: 'framerate'--------: <30.0>
+[ INFO    ] object_detection_yolov5[975576]: 'height'-----------: <uint32 720>
+[ INFO    ] object_detection_yolov5[975576]: 'input'------------: <uint32 1>
+[ INFO    ] object_detection_yolov5[975576]: 'socket.blocking'--: <false>
+[ INFO    ] object_detection_yolov5[975576]: 'width'------------: <uint32 1280>
+[ INFO    ] object_detection_yolov5[975576]: Setting up larod connection with device axis-a8-dlpu-tflite
+[ INFO    ] object_detection_yolov5[975576]: Loading the model... This might take up to 5 minutes depending on your device model.
+[ INFO    ] object_detection_yolov5[975576]: Model loaded successfully
+[ INFO    ] object_detection_yolov5[975576]: Created mmaped model output 0 with size 2142000
+[ INFO    ] object_detection_yolov5[975576]: Start fetching video frames from VDO
 ```
 
 While the ACAP application is running, information about each frame will be logged. The log shows run
@@ -337,12 +348,15 @@ times for pre-processing, inference, and parsing. Following that, each detected 
 logged. Below is the output log of a frame where one truck and two cars have been detected:
 
 ```sh
-[ INFO    ] object_detection_yolov5[1197318]: Ran pre-processing for 20 ms
-[ INFO    ] object_detection_yolov5[1197318]: Ran inference for 60 ms
-[ INFO    ] object_detection_yolov5[1197318]: Ran parsing for 1 ms
-[ INFO    ] object_detection_yolov5[1197318]: Object 1: Label=truck, Object Likelihood=0.57, Class Likelihood=0.75, Bounding Box: [0.99, 0.54, 0.91, 0.46]
-[ INFO    ] object_detection_yolov5[1197318]: Object 2: Label=car, Object Likelihood=0.75, Class Likelihood=0.91, Bounding Box: [0.68, 0.48, 0.61, 0.43]
-[ INFO    ] object_detection_yolov5[1197318]: Object 3: Label=car, Object Likelihood=0.83, Class Likelihood=0.94, Bounding Box: [0.43, 0.49, 0.36, 0.44]
+[ INFO    ] object_detection_yolov5[975576]: Ran pre-processing for 20 ms
+[ INFO    ] object_detection_yolov5[975576]: Ran inference for 60 ms
+[ INFO    ] object_detection_yolov5[975576]: Ran parsing for 1 ms
+[ INFO    ] object_detection_yolov5[975576]: Object 1: Label=truck, Object Likelihood=0.57, Class Likelihood=0.75,
+[ INFO    ] object_detection_yolov5[975576]: Bounding Box: [0.99, 0.54, 0.91, 0.46]
+[ INFO    ] object_detection_yolov5[975576]: Object 2: Label=car, Object Likelihood=0.75, Class Likelihood=0.91,
+[ INFO    ] object_detection_yolov5[975576]: Bounding Box: [0.68, 0.48, 0.61, 0.43]
+[ INFO    ] object_detection_yolov5[975576]: Object 3: Label=car, Object Likelihood=0.83, Class Likelihood=0.94,
+[ INFO    ] object_detection_yolov5[975576]: Bounding Box: [0.43, 0.49, 0.36, 0.44]
 ```
 
 ## License
