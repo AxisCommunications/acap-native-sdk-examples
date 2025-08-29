@@ -1,6 +1,7 @@
 PROG1	= vdo_larod
 OBJS1	= $(PROG1).c imgprovider.c panic.c model.c
 PROGS	= $(PROG1)
+DEBUG_DIR = debug
 
 PKGS = gio-2.0 gio-unix-2.0 liblarod vdostream
 
@@ -27,8 +28,10 @@ CFLAGS += -Wall \
 all:	$(PROGS)
 
 $(PROG1): $(OBJS1)
-	$(CC) $^ $(CFLAGS) $(LIBS) $(LDFLAGS) -lm $(LDLIBS) -o $@
+	install -d $(DEBUG_DIR)
+	$(CC) $^ $(CFLAGS) $(LIBS) $(LDFLAGS) -lm $(LDLIBS) -o $(DEBUG_DIR)/$@
+	cp $(DEBUG_DIR)/$@ .
 	$(STRIP) $@
 
 clean:
-	rm -f $(PROGS) *.o *.eap* *_LICENSE.txt package.conf* param.conf tmp* manifest.json
+	rm -rf $(PROGS) *.o *.eap* *_LICENSE.txt package.conf* param.conf tmp* manifest.json $(DEBUG_DIR)

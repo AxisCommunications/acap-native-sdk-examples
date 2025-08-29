@@ -2,6 +2,7 @@ PROG1	= axserialport
 OBJS1	= $(PROG1).c
 
 PROGS	= $(PROG1)
+DEBUG_DIR = debug
 
 PKGS = glib-2.0 axserialport
 
@@ -24,8 +25,10 @@ CFLAGS += -Wall \
 all:	$(PROGS)
 
 $(PROG1): $(OBJS1)
-	$(CC) $^ $(CFLAGS) $(LIBS) $(LDFLAGS) -lm $(LDLIBS) -o $@
+	install -d $(DEBUG_DIR)
+	$(CC) $^ $(CFLAGS) $(LIBS) $(LDFLAGS) -lm $(LDLIBS) -o $(DEBUG_DIR)/$@
+	cp $(DEBUG_DIR)/$@ .
 	$(STRIP) $@
 
 clean:
-	rm -f $(PROGS) *.o *.eap* *_LICENSE.txt package.conf* param.conf tmp*
+	rm -rf $(PROGS) *.o *.eap* *_LICENSE.txt package.conf* param.conf tmp* $(DEBUG_DIR)

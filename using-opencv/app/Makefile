@@ -1,5 +1,6 @@
 PROGS = opencv_app
 OBJECTS = $(wildcard *.cpp)
+DEBUG_DIR = debug
 
 PKGS = gio-2.0 gio-unix-2.0 vdostream
 
@@ -16,8 +17,10 @@ LDLIBS += -lm -lopencv_video -lopencv_imgproc -lopencv_core
 all: $(PROGS)
 
 $(PROGS): $(OBJECTS)
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) $(LDLIBS) $^ -o $@ ; \
+	install -d $(DEBUG_DIR)
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) $(LDLIBS) $^ -o $(DEBUG_DIR)/$@ ; \
+	cp $(DEBUG_DIR)/$@ .
 	$(STRIP) --strip-unneeded $@
 
 clean:
-	rm -f $(PROGS) *.o *.eap* *_LICENSE.txt package.conf* param.conf tmp*
+	rm -rf $(PROGS) *.o *.eap* *_LICENSE.txt package.conf* param.conf tmp* $(DEBUG_DIR)

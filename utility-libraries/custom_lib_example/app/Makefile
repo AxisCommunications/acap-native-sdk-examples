@@ -1,6 +1,7 @@
 PROG1	= customlib_example
 OBJS1	= $(PROG1).c
 PROGS	= $(PROG1)
+DEBUG_DIR = debug
 
 LDLIBS += -Llib
 CFLAGS += -Icustom_build
@@ -24,8 +25,10 @@ SHLIBS += -lcustom
 all:	$(PROGS)
 
 $(PROG1): $(OBJS1)
-	$(CC) $(CFLAGS) $(LDFLAGS) $(LDLIBS)  $^ $(LIBS) $(LDLIBS) $(SHLIBS) -o $@
+	install -d $(DEBUG_DIR)
+	$(CC) $(CFLAGS) $(LDFLAGS) $(LDLIBS)  $^ $(LIBS) $(LDLIBS) $(SHLIBS) -o $(DEBUG_DIR)/$@
+	cp $(DEBUG_DIR)/$@ .
 	$(STRIP) $@
 
 clean:
-	rm -f $(PROGS) *.o *.eap* *_LICENSE.txt package.conf* param.conf tmp*
+	rm -rf $(PROGS) *.o *.eap* *_LICENSE.txt package.conf* param.conf tmp* $(DEBUG_DIR)

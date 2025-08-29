@@ -1,5 +1,6 @@
 PROG1	= reproducible_package
 OBJS1	= $(PROG1).c
+DEBUG_DIR = debug
 
 PROGS	= $(PROG1)
 
@@ -33,8 +34,10 @@ $(PROG1): $(OBJS1)
 	# Additional prints for visibility
 	@printf "SOURCE_DATE_EPOCH: $(SOURCE_DATE_EPOCH)\n"
 	@printf "BUILD_DATE: $(BUILD_DATE)\n"
-	$(CC) $^ $(CFLAGS) $(LIBS) $(LDFLAGS) -lm $(LDLIBS) -o $@
+	install -d $(DEBUG_DIR)
+	$(CC) $^ $(CFLAGS) $(LIBS) $(LDFLAGS) -lm $(LDLIBS) -o $(DEBUG_DIR)/$@
+	cp $(DEBUG_DIR)/$@ .
 	$(STRIP) $@
 
 clean:
-	rm -f $(PROGS) *.o *.eap* *_LICENSE.txt package.conf* param.conf tmp* *.conf*
+	rm -rf $(PROGS) *.o *.eap* *_LICENSE.txt package.conf* param.conf tmp* *.conf* $(DEBUG_DIR)

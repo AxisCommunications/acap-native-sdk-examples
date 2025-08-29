@@ -2,6 +2,7 @@ PROG1 = web_server_rev_proxy
 OBJS1 = $(PROG1).c
 PROGS = $(PROG1)
 LIBDIR = lib
+DEBUG_DIR = debug
 
 PKGS = glib-2.0 civetweb
 
@@ -26,8 +27,10 @@ CFLAGS += -Wall \
 all:	$(PROGS)
 
 $(PROG1): $(OBJS1)
-	$(CC) $^ $(CFLAGS) $(LIBS) $(LDFLAGS) -lm $(LDLIBS) -o $@
+	install -d $(DEBUG_DIR)
+	$(CC) $^ $(CFLAGS) $(LIBS) $(LDFLAGS) -lm $(LDLIBS) -o $(DEBUG_DIR)/$@
+	cp $(DEBUG_DIR)/$@ .
 	$(STRIP) $@
 
 clean:
-	rm -rf $(PROGS) *.o *.eap* *_LICENSE.txt package.conf* param.conf tmp* $(LIBDIR)
+	rm -rf $(PROGS) *.o *.eap* *_LICENSE.txt package.conf* param.conf tmp* $(LIBDIR) $(DEBUG_DIR)
