@@ -1,4 +1,4 @@
-PROG1	= reproducible_package
+PROG1	= $(shell jq -r '.acapPackageConf.setup.appName' manifest.json)
 OBJS1	= $(PROG1).c
 DEBUG_DIR = debug
 

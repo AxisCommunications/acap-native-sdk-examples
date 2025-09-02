@@ -1,4 +1,4 @@
-PROG1	= object_detection_yolov5
+PROG1	= $(shell jq -r '.acapPackageConf.setup.appName' manifest.json)
 OBJS1	= $(PROG1).c argparse.c imgprovider.c model.c panic.c labelparse.c
 PROGS	= $(PROG1)
 DEBUG_DIR = debug

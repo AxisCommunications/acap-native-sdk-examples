@@ -18,7 +18,6 @@ RUN DEBIAN_FRONTEND=noninteractive \
 
 # Build GDB server
 ARG GDB_VERSION=9.2
-ARG GDB_REPOSITORY=https://ftp.gnu.org/gnu/gdb
 ARG GDB_ARCHIVE=gdb-${GDB_VERSION}.tar.gz
 ARG GDB_BASE_DIR=/opt/build/gdb
 ARG GDB_SOURCE_DIR=$GDB_BASE_DIR/src
@@ -29,7 +28,10 @@ ARG GDB_INSTALL_DIR=${GDB_BASE_DIR}
 ARG GDB_SERVER_BIN_DIR=${GDB_BASE_DIR}/bin
 
 WORKDIR $GDB_BASE_DIR
-RUN curl -sSL -O $GDB_REPOSITORY/$GDB_ARCHIVE
+
+# Download GDB with mirror fallback
+RUN curl -sSL -O https://sourceware.org/pub/gdb/releases/$GDB_ARCHIVE || \
+    curl -sSL -O https://ftp.gnu.org/gnu/gdb/$GDB_ARCHIVE
 
 WORKDIR $GDB_SOURCE_DIR
 RUN tar -xf $GDB_BASE_DIR/$GDB_ARCHIVE -C $GDB_SOURCE_DIR --strip-components=1

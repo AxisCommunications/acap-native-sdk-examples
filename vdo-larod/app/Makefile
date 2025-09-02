@@ -1,4 +1,4 @@
-PROG1	= vdo_larod
+PROG1	= $(shell jq -r '.acapPackageConf.setup.appName' manifest.json)
 OBJS1	= $(PROG1).c imgprovider.c panic.c model.c
 PROGS	= $(PROG1)
 DEBUG_DIR = debug
