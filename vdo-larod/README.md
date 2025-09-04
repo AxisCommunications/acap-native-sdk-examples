@@ -18,21 +18,22 @@ Together with this README file you should be able to find a directory called app
 
 ## Detailed outline of example application
 
-This application opens a client to VDO and starts fetching frames (in a new thread) in the YUV format. It tries to find the smallest VDO stream resolution that fits the width and height required by the neural network.
+This application opens a client to VDO and starts fetching frames in the YUV format. It tries to find the smallest VDO stream resolution that fits the width and height required by the neural network.
 
 Steps in application:
 
 1. Fetch image data from VDO.
-2. Preprocess the images (crop to 480x270 (if needed), scale and color convert) using larod with libyuv backend (depending on platform).
+2. Preprocess the images (crop to the size required by the neural network (if needed), scale and color convert) using larod with libyuv backend (depending on platform).
 3. Run inferences using the trained model on a specific chip with the preprocessing output as input on a larod backend specified by a command-line argument.
-4. The model's confidence scores for the presence of person and car in the image are printed as the output.
-5. Repeat for 5 iterations.
+4. Measure the total inference time (preprocessing and inference time) and determine if the framerate of the vdo streams needs to be adjusted.
+5. The model's confidence scores for the presence of person and car in the image are printed as the output.
+6. Repeat until the user ends the application.
 
 See the manifest.json.* files to change the configuration on chip, image size, number of iterations and model path.
 
 ## Which backends and models are supported?
 
-Unless you modify the app to your own needs you should only use our pretrained model that takes 480x270 (256x256 for Ambarella CV25 and Google TPU) RGB images as input,
+Unless you modify the app to your own needs you should only use our pretrained model that takes 480x270 (256x256 for Ambarella CV25 and Google TPU) RGB (interleaved or planar) images as input,
 and that outputs an array of 2 confidence scores of person and car in the format of `float32`.
 
 You can run the example with any inference backend as long as you can provide it with a model as described above.
@@ -63,7 +64,6 @@ vdo-larod
 ```
 
 - **app/imgprovider.c/h** - Implementation of vdo parts, written in C.
-- **app/utility-functions.c/h** - Contains all the necessary helper functions written in C that are used while building the ACAP application.
 - **app/LICENSE** - Text file which lists all open source licensed source code distributed with the application.
 - **app/Makefile** - Makefile containing the build and link instructions for building the ACAP application.
   <!-- textlint-disable -->
