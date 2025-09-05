@@ -54,9 +54,9 @@ check_examples_have_top_readme_entry() {
   print_section "Verify that all examples have an entry in top-README"
 
   # Find directories that do not start with dot
-  acap_list="$(find . -maxdepth 1 -type d -printf '%f\n' |
-               grep -v '^[.]' |
-               sort)"
+  acap_list="$(find . -maxdepth 1 -type d | sed 's|^\./||' |
+             grep -v '^[.]' |
+             sort)"
 
   # Find lines starting with '* ['
   # The grep removes anything but '[*]', then remove entries with space

@@ -146,7 +146,7 @@ Standing in your working directory run the following commands:
 > [!NOTE]
 >
 > Depending on the network your local build machine is connected to, you may need to add proxy
-> settings for docker. See [Proxy in build time](../DEV.md#proxy-in-build-time).
+> settings for Docker. See [Proxy in build time](../DEV.md#proxy-in-build-time).
 
 ```sh
 docker build --tag <APP_IMAGE> --build-arg ARCH=<ARCH> .

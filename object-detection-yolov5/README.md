@@ -218,7 +218,7 @@ installed. In order to apply the changes, the ACAP application must be restarted
 ### Dockerfile parameters
 
 The model `.tflite` file and the labels `.txt` file are provided through the `Dockerfile`. In this
-example, these files are downloaded using the `curl` command.
+example, these files are downloaded using the cURL command.
 
 ### Model-specific parameters
 

@@ -84,9 +84,8 @@ web-server
 
 - Apache Reverse Proxy can not translate content with absolute addresses (i.e.
   /image.png) in the HTML page. Use only relative content (i.e. image.png or
-../image.png). More information how to handle relative URLs correctly with a
-reverse proxy
-[here](https://serverfault.com/questions/561892/how-to-handle-relative-urls-correctly-with-a-reverse-proxy).
+../image.png). See [how to handle relative URLs correctly with a reverse proxy](https://serverfault.com/questions/561892/how-to-handle-relative-urls-correctly-with-a-reverse-proxy)
+for more information.
 
 ### How to run the code
 
@@ -144,7 +143,7 @@ http://<AXIS_DEVICE_IP>/index.html#apps
 
 #### The expected output
 
-A user can make a HTTP request to the application API using e.g. `curl`
+A user can make a HTTP request to the application API using e.g. cURL
 
 ```sh
 curl -u <USER>:<PASSWORD> --anyauth http://<AXIS_DEVICE_IP>/local/web_server_rev_proxy/my_web_server

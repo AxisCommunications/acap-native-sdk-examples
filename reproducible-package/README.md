@@ -128,7 +128,7 @@ SOURCE_DATE_EPOCH=$(git log -1 --pretty=%ct) acap-build .
 ```
 
 **N.b.** To be able to use the Git log as in this example you will have to run
-the docker container from the top directory where the `.git` directory is placed.
+the Docker container from the top directory where the `.git` directory is placed.
 
 ## License
 

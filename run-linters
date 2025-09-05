@@ -58,12 +58,27 @@ while [ $# -gt 0 ]; do
 done
 
 [ "$run_all" = yes ] || [ "$run_sl" = yes ] && {
+  # Super Linter version - update this when upgrading
+  SUPER_LINTER_VERSION="slim-v8"
+
   printf '%s\n' "### RUN SUPER-LINTER"
-  docker run --rm \
-    -e RUN_LOCAL=true \
-    --env-file .github/super-linter.env \
-    -v "$(pwd)":/tmp/lint \
-    -w /tmp/lint ghcr.io/super-linter/super-linter:slim-v7
+
+  # Use x86_64 emulation on ARM64 systems (Apple Silicon)
+  if [ "$(uname -m)" = "arm64" ] || [ "$(uname -m)" = "aarch64" ]; then
+    printf '%s\n' "Note: Using x86_64 emulation for Super Linter ${SUPER_LINTER_VERSION} on Apple Silicon"
+    docker run --rm \
+      --platform linux/amd64 \
+      -e RUN_LOCAL=true \
+      --env-file .github/super-linter.env \
+      -v "$(pwd)":/tmp/lint \
+      -w /tmp/lint "ghcr.io/super-linter/super-linter:${SUPER_LINTER_VERSION}"
+  else
+    docker run --rm \
+      -e RUN_LOCAL=true \
+      --env-file .github/super-linter.env \
+      -v "$(pwd)":/tmp/lint \
+      -w /tmp/lint "ghcr.io/super-linter/super-linter:${SUPER_LINTER_VERSION}"
+  fi
   exitcode_super_linter=$?
 }
 
