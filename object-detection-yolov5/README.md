@@ -95,11 +95,12 @@ example specified.
 
 1. Retrieve parameters using the
 [Parameter API](https://developer.axis.com/acap/api/native-sdk-api/#parameter-api).
-2. Start a thread for continuously fetching frames with
+2. Select a resolution from vdo dependent on the neural network resolution and use a resolution
+that has the same aspect ratio as the native aspect ratio.
 [Video capture API (VDO)](https://developer.axis.com/acap/api/native-sdk-api/#video-capture-api-vdo).
 3. Create two Larod jobs with
 [Machine learning API (Larod)](https://developer.axis.com/acap/api/native-sdk-api/#machine-learning-api-larod):
-    - Pre-processing job.
+    - Pre-processing job. (Only created if needed)
     - Model inference job.
 4. Setup the style of bounding boxes using the
 [Bounding Box API](https://developer.axis.com/acap/api/native-sdk-api/#bounding-box-api).
@@ -107,8 +108,9 @@ example specified.
     1. Fetch image data from VDO.
     2. Convert image data to the correct format with the Larod pre-processing job, if needed.
     3. Run inference with the Larod model inference job.
-    4. Perform YOLOv5-specific parsing of the output.
-    5. Draw bounding boxes and log details about the detected objects.
+    4. Measure the total inference time (preprocessing and inference time) and adjust the framerate of the vdo stream if needed.
+    5. Perform YOLOv5-specific parsing of the output.
+    6. Draw bounding boxes and log details about the detected objects.
 
 ## Train YOLOv5
 
@@ -253,6 +255,12 @@ docker build --tag <APP_IMAGE> --build-arg ARCH=<ARCH> --build-arg CHIP=<CHIP> .
 - `<APP_IMAGE>` is the name to tag the image with, e.g., `object_detection_yolov5:1.0`.
 - `<ARCH>` is the SDK architecture, `armv7hf` or `aarch64`.
 - `<CHIP>` is the chip type, `artpec9`, `artpec8`, or `cpu`.
+
+> [!NOTE]
+> This example may not build on Apple Silicon computers due to a Docker compatibility issue.
+> To work around this, you can disable the "Use Rosetta for x86_64/amd64 emulation on Apple Silicon" option in Docker Desktop's General settings: **Settings → General → Virtual Machine Options**
+>
+> Note that disabling Rosetta allows the example to build successfully, but performance may be impacted as some optimizations for emulation are turned off. So, turn it on and off when needed.
 
 Copy the result from the container image to a local directory `build`:
 
