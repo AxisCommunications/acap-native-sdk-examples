@@ -1,4 +1,4 @@
-PROG	= subscribe_to_events
+PROG	= $(shell jq -r '.acapPackageConf.setup.appName' manifest.json)
 
 PKGS = glib-2.0 axevent
 CFLAGS += $(shell PKG_CONFIG_PATH=$(PKG_CONFIG_PATH) pkg-config --cflags $(PKGS))

@@ -1,4 +1,4 @@
-PROG1	= object_detection
+PROG1	= $(shell jq -r '.acapPackageConf.setup.appName' manifest.json)
 OBJS1	= $(PROG1).c argparse.c imgprovider.c imgutils.c
 PROGS	= $(PROG1)
 LIBDIR = lib

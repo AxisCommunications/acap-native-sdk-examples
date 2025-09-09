@@ -1,4 +1,4 @@
-PROGS = opencv_app
+PROGS = $(shell jq -r '.acapPackageConf.setup.appName' manifest.json)
 OBJECTS = $(wildcard *.cpp)
 DEBUG_DIR = debug
 

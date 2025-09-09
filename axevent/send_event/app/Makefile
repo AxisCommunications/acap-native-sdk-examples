@@ -1,4 +1,4 @@
-PROG1	= send_event
+PROG1	= $(shell jq -r '.acapPackageConf.setup.appName' manifest.json)
 OBJS1	= $(PROG1).c
 
 PROGS	= $(PROG1)
