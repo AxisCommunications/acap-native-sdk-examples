@@ -53,7 +53,7 @@ docker build --tag <APP_IMAGE> .
 <APP_IMAGE> is the name to tag the image with, e.g., audioplayback:1.0
 
 Default architecture is **armv7hf**. To build for **aarch64** it's possible to
-update the *ARCH* variable in the Dockerfile or to set it in the docker build
+update the *ARCH* variable in the Dockerfile or to set it in the `docker build`
 command via build argument:
 
 ```sh

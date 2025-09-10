@@ -17,7 +17,7 @@ ACAP application. Some examples:
 ## Outline of example
 
 1. Retrieve VAPIX credentials through a D-Bus API.
-2. Use curl to make a HTTP POST request to VAPIX API **Basic device
+2. Use cURL to make a HTTP POST request to VAPIX API **Basic device
    information** on dedicated local host IP `127.0.0.12`.
 3. Parse out fields from the answer
 
@@ -148,7 +148,7 @@ The log shows a few parsed values from the VAPIX API response.
 
 > [!NOTE]
 >
-> The curl and Jansson versions mentioned in the example log are only for representation
+> The cURL and Jansson versions mentioned in the example log are only for representation
 > purpose. They may vary according to the library version available and linked from
 > AXIS OS on which the application runs.
 

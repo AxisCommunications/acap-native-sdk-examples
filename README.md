@@ -82,7 +82,7 @@ The examples are organized into logical groups to help you find the most relevan
 ### Networking and web interface
 
 - [curl-openssl](./curl-openssl/)
-  - An example that use curl and OpenSSL libraries to retrieve a file securely from an external server.
+  - An example that use cURL and OpenSSL libraries to retrieve a file securely from an external server.
 - [web-server](./web-server/)
   - An example in C that serves HTTP requests by setting up the Axis device web server in a reverse proxy configuration and route to a custom web server running in the ACAP application.
 - [web-server-using-fastcgi](./web-server-using-fastcgi/)

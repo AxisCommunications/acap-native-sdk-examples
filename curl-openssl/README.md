@@ -1,10 +1,10 @@
 *Copyright (C) 2024, Axis Communications AB, Lund, Sweden. All Rights Reserved.*
 
-# ACAP application using curl and OpenSSL
+# ACAP application using cURL and OpenSSL
 
-This example demonstrate how to transfer content from a web server `www.example.com` to the application directory by using [OpenSSL](https://www.openssl.org/) and [curl](https://curl.se/) APIs from the SDK.
+This example demonstrate how to transfer content from a web server `www.example.com` to the application directory by using [OpenSSL](https://www.openssl.org/) and [cURL](https://curl.se/) APIs from the SDK.
 
-## curl and OpenSSL
+## cURL and OpenSSL
 
 Documentation of API functions used in this example:
 
@@ -68,7 +68,7 @@ it as a build argument `BUILD_PROXY`:
 docker build --build-arg BUILD_PROXY=<MY_PROXY> --tag <APP_IMAGE> --build-arg ARCH=<ARCH> .
 ```
 
-To get more verbose logging from curl, pass the build argument `APP_DEBUG=yes`:
+To get more verbose logging from cURL, pass the build argument `APP_DEBUG=yes`:
 
 ```sh
 docker build --build-arg APP_DEBUG=yes --tag <APP_IMAGE> --build-arg ARCH=<ARCH> .
@@ -135,7 +135,7 @@ http://<AXIS_DEVICE_IP>/axis-cgi/admin/systemlog.cgi?appname=curl_openssl
 ```
 
 > [!NOTE]
-> curl and OpenSSL versions mentioned in the example log are for only representation
+> cURL and OpenSSL versions mentioned in the example log are for only representation
 > purpose. They may vary according to the library version available and linked from
 > AXIS OS on which the application runs.
 
@@ -153,17 +153,17 @@ http://<AXIS_DEVICE_IP>/axis-cgi/admin/systemlog.cgi?appname=curl_openssl
 
 ## Troubleshooting
 
-You can achieve basic debugging in the shape of more verbose curl output by
+You can achieve basic debugging in the shape of more verbose cURL output by
 using the build option `--build-arg APP_DEBUG=yes`. This can give more insights
-to curl error codes.
+to cURL error codes.
 
 If the Axis device is inside a network with a proxy, the global device proxy
-must be set to allow curl to pick it up at runtime. For reference see
+must be set to allow cURL to pick it up at runtime. For reference see
 [Configure global device proxy](https://developer.axis.com/acap/develop/proxy/#configure-global-device-proxy).
 
 ### Error CURLE_PEER_FAILED_VERIFICATION (60)
 
-Build example with debug options to get more log output from curl. If this is
+Build example with debug options to get more log output from cURL. If this is
 logged:
 
 ```txt

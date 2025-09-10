@@ -32,7 +32,7 @@ application executable is a shell script that runs `docker compose up` when star
 `docker compose down` before exiting. This requires that a Docker compose file has been written, describing
 how to run the container(s).
 
-In order for this to work, we need to have docker compose functionality included in the device, which
+In order for this to work, we need to have `docker compose` functionality included in the device, which
 means another ACAP application must first be installed: the [Docker Compose ACAP][docker-compose-acap].
 
 In this way we are able to construct a native ACAP application that consists of one or several containers
@@ -104,7 +104,7 @@ Standing in your working directory run the following commands:
 > settings for Docker. See
 > [Proxy in build time](https://developer.axis.com/acap/develop/proxy/#proxy-in-build-time).
 
-Pull the [Alpine linux container image][alpine] and save it to a .tar file.
+Pull the [Alpine Linux container image][alpine] and save it to a .tar file.
 
 ```sh
 docker pull --platform="linux/arm64/v8" alpine:3.19.1

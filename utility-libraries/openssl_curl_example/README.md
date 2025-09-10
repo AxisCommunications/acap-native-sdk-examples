@@ -1,6 +1,6 @@
 *Copyright (C) 2022, Axis Communications AB, Lund, Sweden. All Rights Reserved.*
 <!-- omit from toc -->
-# Build custom OpenSSL and curl libraries and use them in an ACAP application
+# Build custom OpenSSL and cURL libraries and use them in an ACAP application
 
 > [!IMPORTANT]
 >
@@ -16,7 +16,7 @@
 > Open SSL can be migrated to use and link OpenSSL 3.X available in ACAP Native SDK 1.14 / AXIS OS 11.10 onwards.
 
 This example shows you how to build custom versions of
-[OpenSSL](https://www.openssl.org/) and [curl](https://curl.se/) from
+[OpenSSL](https://www.openssl.org/) and [cURL](https://curl.se/) from
 source by using the SDK, and how to bundle them for use in an ACAP application.
 
 The application uses these libraries to transfer content from a web server
@@ -29,7 +29,7 @@ on a device.
 <!-- ToC GFM -->
 
 - [Purpose of the example](#purpose-of-the-example)
-- [OpenSSL and curl APIs](#openssl-and-curl-apis)
+- [OpenSSL and cURL APIs](#openssl-and-curl-apis)
 - [Getting started](#getting-started)
 - [How to run the code](#how-to-run-the-code)
   - [Build the application](#build-the-application)
@@ -61,19 +61,19 @@ can't find these newer symbols and functions.
 API](https://developer.axis.com/acap/api/native-sdk-api)
 libraries in the SDK. Don't use other libraries from the SDK in an ACAP
 application.  Instead, download, compile and bundle libraries such as
-`libcrypto.so` and `libssl.so` (OpenSSL) and `libcurl.so` (curl) with the ACAP
+`libcrypto.so` and `libssl.so` (OpenSSL) and `libcurl.so` (cURL) with the ACAP
 application.
 - **Check the runtime dependencies** - Check that the runtime dependencies, and
   the location where the built application binary and libraries look for
 dependencies are correct.
-- **OpenSSL and curl** - Two common libraries where curl uses OpenSSL when
+- **OpenSSL and cURL** - Two common libraries where cURL uses OpenSSL when
   being built. This example shows how to handle such a setup.
 
 For more details on how this is implemented in the example, see [outline of
 build steps](#outline-of-build-steps), or have a look at the
 [Dockerfile](./Dockerfile) which has some helpful comments.
 
-## OpenSSL and curl APIs
+## OpenSSL and cURL APIs
 
 Documentation of API functions used in this example:
 
@@ -126,7 +126,7 @@ docker build --tag <APP_IMAGE> .
 <APP_IMAGE> is the image tag name, for example, openssl_curl_example:1.0
 
 The default architecture is **armv7hf**. To build for **aarch64** it's possible to
-update the *ARCH* variable in the Dockerfile or to set it in the docker build
+update the *ARCH* variable in the Dockerfile or to set it in the `docker build`
 command via build argument:
 
 ```sh
@@ -143,7 +143,7 @@ docker build --build-arg APP_PROXY=<MY_PROXY> --tag <APP_IMAGE> .
 > **IMPORTANT**
 > Pass proxy argument without `http://`.
 
-To get more verbose logging from curl, pass the following build argument:
+To get more verbose logging from cURL, pass the following build argument:
 
 ```sh
 docker build --build-arg APP_DEBUG=yes --tag <APP_IMAGE> .
@@ -181,7 +181,7 @@ The working directory now contains a build folder with the following files:
 ```
 
 - **build/cacert.pem** - CA certificate file for remote server verification.
-- **build/lib** - Folder containing compiled library files for openssl and libcurl.
+- **build/lib** - Folder containing compiled library files for OpenSSL and libcurl.
 - **build/openssl_curl_example** - Application executable binary file.
 - **build/openssl_curl_example_1_0_0_LICENSE.txt** - Copy of LICENSE file.
 - **build/openssl_curl_example_1_0_0_armv7hf.eap** - Application package .eap file.
@@ -255,7 +255,7 @@ http://<AXIS_DEVICE_IP>/axis-cgi/admin/systemlog.cgi?appname=openssl_curl_exampl
 1. **Prepare build environment** - We want to build all libraries with the
    `libc` version of the SDK and avoid using `libssl`, `libcrypto` or `libcurl`
 which are also available in the SDK, by accident.  To achieve this, we
-recommend removing any OpenSSL or curl libraries in the SDK library path.
+recommend removing any OpenSSL or cURL libraries in the SDK library path.
 
    Why not remove these libraries from the SDK? The [Licensekey
 API](https://developer.axis.com/acap/api/native-sdk-api/#license-key-api)
@@ -267,10 +267,10 @@ has a dependency on `libcrypto`.
 
    The option `--prefix` is set to the SDK library path to get the built
 library, header, and pkgconfig files to be installed here. This is to
-facilitate the build of curl which needs to link to both `libc` in the SDK
+facilitate the build of cURL which needs to link to both `libc` in the SDK
 library path and the OpenSSL libraries.
 
-3. **Build curl library** - The SDK environment is sourced to compile
+3. **Build cURL library** - The SDK environment is sourced to compile
    `libcurl.so` with the `libc` version in the SDK, and the two OpenSSL
 libraries from the previous step. Since the OpenSSL libraries have been
 installed to the SDK library path, no additional library path is required for
@@ -306,7 +306,7 @@ still runs, but with the versions used in AXIS OS, which is not recommended.
 For the ACAP application it's required to set the runtime shared library search
 path in the Makefile to use the bundled libraries.
 
-If you don't set the runtime shared library search path for OpenSSL and curl
+If you don't set the runtime shared library search path for OpenSSL and cURL
 libraries, the application may still run and seem to use the correct versions
 of the libraries, see the version logged in the [application
 log](#application-log). But it might be hard to decide
@@ -317,7 +317,7 @@ By [checking the linking](#check-build-dependencies) of the libraries, you can
 notice that in building without the runtime path, the libraries will link to
 the version in AXIS OS. This would perhaps be more important if the libraries
 were to be used as standalone instead of the ACAP application, but in this
-example we make sure that both OpenSSL and curl libraries are built with a
+example we make sure that both OpenSSL and cURL libraries are built with a
 runtime path pointing to the ACAP application library directory.
 
 ## Check build dependencies
@@ -360,13 +360,13 @@ Here you can see that the application binary uses the bundled libraries.
 
 ## Troubleshooting
 
-You can achieve basic debugging in the shape of more verbose curl output by
+You can achieve basic debugging in the shape of more verbose cURL output by
 using the build option `--build-arg APP_DEBUG=yes`. This can give more insights
-to curl error codes.
+to cURL error codes.
 
 ### Error CURLE_PEER_FAILED_VERIFICATION (60)
 
-Build example with debug options to get more log output from curl. If this is
+Build example with debug options to get more log output from cURL. If this is
 logged:
 
 ```txt
