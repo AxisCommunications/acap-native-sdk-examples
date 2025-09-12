@@ -71,7 +71,7 @@ If your machine doesn't have the hardware requisites, like not enough GPU to tra
 
 ### The example model
 
-In this tutorial, we'll train a simple model with one input and two outputs. The input to the model is a FP32 RGB image scaled to the [0, 1] range and of shape `(480, 270, 3)`.
+In this tutorial, we'll train a simple model with one input and two outputs. The input to the model is a FP32 RGB image scaled to the [0, 1] range and of shape `(256, 256, 3)`.
 The output of the model are two separate tensors of shape `(1,)`, representing the model's confidences for the presence of `person`  and `car`. The outputs are configured as such, and not as one tensor with a SoftMax activation, in order to demonstrate how to use multiple outputs.
 However, the general process of making a camera-compatible model is the same irrespective of the dimensions or number of inputs or outputs.
 
@@ -84,7 +84,7 @@ In order to produce a model with BatchNormalization layers that are fused with t
 Specifically, the convolutional layers need to not use bias, e.g., for Keras Conv2D layers have the `use_bias=False` parameter set, and the layer order needs to be: `convolutional layer -> batch normalization -> relu`.
 This will "fold" , or "fuse", the batch normalization, which increases performance.
 
-The pre-trained model is trained on the MS COCO 2017 **training** dataset, which is significantly larger than the supplied MS COCO 2017 **validation** dataset. After training it for 8 epochs and fine-tuning the model with quantization for 4 epochs, it achieves around 85% validation accuracy on both the people output and the car output with 6.6 million parameters. This model is saved in the frozen graph format in the `/env/output_models` directory.
+To replicate the model training used for the model in [vdo-larod](../vdo-larod/), utilize the MS COCO 2017 **training** dataset, which is significantly larger than the provided MS COCO 2017 **validation** dataset. After training for 12 epochs and fine-tuning the model with quantization for 1 epoch, it achieves good accuracy on both people and cars.
 
 ### Model training and quantization
 

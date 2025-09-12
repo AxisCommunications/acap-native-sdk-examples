@@ -147,9 +147,9 @@ if __name__ == '__main__':
     parser.add_argument('-a', '--annotations', type=str, required=True,
                         help='path to the .json-file containing COCO instance \
                         annotations')
-    parser.add_argument('--input-width', type=int, default=480,
+    parser.add_argument('--input-width', type=int, default=256,
                         help='The width of the model\'s input image')
-    parser.add_argument('--input-height', type=int, default=270,
+    parser.add_argument('--input-height', type=int, default=256,
                         help='The height of the model\'s input image')
     parser.add_argument('-e', '--training-epochs', type=int, default=8,
                         help='number of training epochs')
@@ -158,7 +158,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     print('Using TensorFlow version: {}'.format(tf.__version__))
-    data_generator = DataGenerator(args.images, args.annotations, batch_size=8,
+    data_generator = DataGenerator(args.images, args.annotations, batch_size=16,
                                    width=args.input_width, height=args.input_height)
 
     trained_model_path = '/env/models/fp32_model/model'

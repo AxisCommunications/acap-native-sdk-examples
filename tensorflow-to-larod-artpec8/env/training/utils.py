@@ -33,8 +33,8 @@ class SimpleCOCODataGenerator(Sequence):
         reprocesses it to simply output whether a certain class exists in
         a given image.
     """
-    def __init__(self, samples_dir, annotation_path, width=480, height=270,
-                 batch_size=2, shuffle=True, balance=True):
+    def __init__(self, samples_dir, annotation_path, width=256, height=256,
+                 batch_size=16, shuffle=True, balance=True):
         """ Initializes the data generator.
 
         Args:
@@ -168,10 +168,6 @@ class SimpleCOCODataGenerator(Sequence):
         for i, annotation in enumerate(batch_annotations):
             img_path = os.path.join(self.samples_dir, annotation['file_name'])
             img = Image.open(img_path).resize((self.width, self.height))
-
-            # Horizontal flipping with p=0.5
-            if np.random.random() >= 0.5:
-                img = img.transpose(Image.FLIP_LEFT_RIGHT)
 
             X[i, ] = np.array(img)
             y_person[i, ] = annotation['has_person']

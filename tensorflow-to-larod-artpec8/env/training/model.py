@@ -54,7 +54,7 @@ def _residual_block(x, n_filters, strides):
     return x
 
 
-def create_model(n_blocks=4, n_filters=16, input_shape=(480, 270, 3)):
+def create_model(n_blocks=4, n_filters=16, input_shape=(256, 256, 3)):
     """ Defines and instantiates a model.
 
     Args:

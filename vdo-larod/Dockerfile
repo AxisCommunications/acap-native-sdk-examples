@@ -16,7 +16,7 @@ ARG CHIP
 # Download the pretrained model
 ARG MODEL_BUCKET=https://acap-ml-models.s3.amazonaws.com/tensorflow_to_larod_resnet
 RUN if [ "$CHIP" = artpec8 ] || [ "$CHIP" = artpec9 ] || [ "$CHIP" = cpu ]  ; then \
-        curl -o model.tflite $MODEL_BUCKET/custom_resnet_artpec8_car_human_480x270.tflite ; \
+        curl -o model.tflite $MODEL_BUCKET/custom_resnet_artpec8_car_human_256.tflite ; \
     elif [ "$CHIP" = edgetpu ]; then \
         curl -o model.tflite $MODEL_BUCKET/custom_resnet_edgetpu_car_human_256.tflite ; \
     elif [ "$CHIP" = cv25 ]; then \
