@@ -477,9 +477,6 @@ int main(int argc, char** argv) {
     size_t numLabels    = 0;                 // Number of entries in the labels array.
     char* labelFileData = NULL;  // Buffer holding the complete collection of label strings.
 
-    // Open the syslog to report messages for "object_detection"
-    openlog("object_detection", LOG_PID | LOG_CONS, LOG_USER);
-
     args_t args;
     if (!parseArgs(argc, argv, &args)) {
         syslog(LOG_ERR, "%s: Could not parse arguments", __func__);

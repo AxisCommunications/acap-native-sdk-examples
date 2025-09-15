@@ -231,8 +231,6 @@ static void init_signals(void) {
 }
 
 int main(void) {
-    openlog(NULL, LOG_PID, LOG_USER);
-
     init_signals();
 
     for (bool once = true; running; once = false) {

@@ -17,8 +17,6 @@
 #include <syslog.h>
 
 int main(void) {
-    openlog("remote_debug", LOG_PID | LOG_CONS, LOG_USER);
-
     /* Intentional error: attempting to modify a string literal */
     char* message = "Hello World!";
     message[0]    = 'h';  // This will cause a segmentation fault

@@ -248,8 +248,6 @@ int main(int argc, char** argv) {
     model_tensor_output_t* tensor_outputs = NULL;
     bbox_t* bbox                          = NULL;
 
-    openlog(APP_NAME, LOG_PID | LOG_CONS, LOG_USER);
-
     // Stop main loop at signal
     signal(SIGTERM, shutdown);
     signal(SIGINT, shutdown);

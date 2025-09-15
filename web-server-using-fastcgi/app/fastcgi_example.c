@@ -37,7 +37,6 @@ static int fcgi_run(void) {
     char* socket_path = NULL;
     int status;
 
-    openlog(NULL, LOG_PID, LOG_DAEMON);
     socket_path = getenv(FCGI_SOCKET_NAME);
 
     if (!socket_path) {

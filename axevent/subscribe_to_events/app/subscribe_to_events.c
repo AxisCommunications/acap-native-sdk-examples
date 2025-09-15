@@ -513,8 +513,6 @@ int main(void) {
     // Initialize main loop
     main_loop = g_main_loop_new(NULL, FALSE);
 
-    // Set up the user logging to syslog
-    openlog(NULL, LOG_PID, LOG_USER);
     syslog(LOG_INFO, "Started logging from subscribe event application");
 
     // Create an event handler

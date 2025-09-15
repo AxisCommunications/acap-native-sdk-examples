@@ -177,8 +177,6 @@ int main(void) {
     GError* error   = NULL;
     GMainLoop* loop = NULL;
 
-    openlog(APP_NAME, LOG_PID, LOG_USER);
-
     // Passing in APP_NAME gives access to this application's parameters without qualifiers and
     // makes it possible to add or remove parameters.
     AXParameter* handle = ax_parameter_new(APP_NAME, &error);

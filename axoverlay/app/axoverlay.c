@@ -366,8 +366,6 @@ int main(void) {
     gint camera_height = 0;
     gint camera_width  = 0;
 
-    openlog(NULL, LOG_PID, LOG_USER);
-
     //  Create a glib main loop
     loop = g_main_loop_new(NULL, FALSE);
     g_unix_signal_add(SIGTERM, signal_handler, loop);

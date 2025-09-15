@@ -125,8 +125,6 @@ int main(void) {
     guint subscription            = 0;
     guint token                   = 1234;
 
-    // Set up the user logging to syslog
-    openlog(NULL, LOG_PID, LOG_USER);
     syslog(LOG_INFO, "Started logging from subscribe event application");
 
     // Event handler

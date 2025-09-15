@@ -408,9 +408,6 @@ int main(void) {
     const char* kernel_name          = FILTER_SOBEL_3X3;
     enum render_area cur_render_area = HALF_AREA;
 
-    /* Open connection to syslog */
-    openlog(NULL, LOG_PID, LOG_USER);
-
     /* Set up VDO */
     settings = vdo_map_new();
     vdo_map_set_uint32(settings, "format", VDO_FORMAT_YUV);

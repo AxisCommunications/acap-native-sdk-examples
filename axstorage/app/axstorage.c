@@ -27,8 +27,6 @@
 /* AX Storage library. */
 #include <axsdk/axstorage.h>
 
-#define APP_NAME "axstorage"
-
 /**
  * disk_item_t represents one storage device and its values.
  */
@@ -377,7 +375,6 @@ gint main(void) {
     GMainLoop* loop = NULL;
     gint ret        = EXIT_SUCCESS;
 
-    openlog(APP_NAME, LOG_PID, LOG_USER);
     syslog(LOG_INFO, "Start AXStorage application");
 
     disks = ax_storage_list(&error);

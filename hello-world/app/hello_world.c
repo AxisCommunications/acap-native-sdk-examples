@@ -31,9 +31,6 @@
  * This main function writes "hello_world" to the syslog.
  */
 int main(void) {
-    /* Open the syslog to report messages for "hello_world" */
-    openlog("hello_world", LOG_PID | LOG_CONS, LOG_USER);
-
     /* Choose between { LOG_INFO, LOG_CRIT, LOG_WARNING, LOG_ERR }*/
     syslog(LOG_INFO, "Hello World!");
 }

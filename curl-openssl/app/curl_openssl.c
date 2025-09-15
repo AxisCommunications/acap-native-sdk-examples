@@ -114,9 +114,6 @@ int main(void) {
                               "/usr/local/packages/curl_openssl/localdata/www.example.com.txt",
                               NULL};
 
-    // Start logging
-    openlog(NULL, LOG_PID, LOG_USER);
-
     // Log the curl and openssl library versions used in the code
     curl_version_info_data* ver = curl_version_info(CURLVERSION_NOW);
     syslog(LOG_INFO,

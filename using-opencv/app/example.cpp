@@ -29,7 +29,6 @@
 using namespace cv;
 
 int main(void) {
-    openlog("opencv_app", LOG_PID | LOG_CONS, LOG_USER);
     syslog(LOG_INFO, "Running OpenCV example with VDO as video source");
     img_provider_t* image_provider = nullptr;
     g_autoptr(GError) vdo_error    = nullptr;
