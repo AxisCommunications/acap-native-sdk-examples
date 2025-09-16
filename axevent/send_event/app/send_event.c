@@ -190,8 +190,6 @@ gint main(void) {
     GMainLoop* main_loop = NULL;
     gdouble start_value  = 0.0;
 
-    // Set up the user logging to syslog
-    openlog(NULL, LOG_PID, LOG_USER);
     syslog(LOG_INFO, "Started logging from send event application");
 
     // Event handler

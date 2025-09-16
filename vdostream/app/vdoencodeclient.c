@@ -150,8 +150,6 @@ int main(int argc, char* argv[]) {
     gchar* output_file         = "/dev/null";
     FILE* dest_f               = NULL;
 
-    openlog(NULL, LOG_PID, LOG_USER);
-
     GOptionEntry options[] = {
         {"format",
          't',

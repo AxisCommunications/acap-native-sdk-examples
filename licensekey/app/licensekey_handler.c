@@ -69,8 +69,7 @@ int main(int argc, char* argv[]) {
         return EXIT_FAILURE;
 
     glob_app_name = g_path_get_basename(argv[0]);
-    openlog(glob_app_name, LOG_PID | LOG_CONS, LOG_USER);
-    loop = g_main_loop_new(NULL, FALSE);
+    loop          = g_main_loop_new(NULL, FALSE);
 
     check_license_status(NULL);
     g_timeout_add_seconds(CHECK_SECS, check_license_status, NULL);

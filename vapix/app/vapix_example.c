@@ -128,8 +128,6 @@ static const char* read_property(const json_t* all_props, const char* prop_name)
 }
 
 int main(void) {
-    openlog(NULL, LOG_PID, LOG_USER);
-
     syslog(LOG_INFO, "Curl version %s", curl_version_info(CURLVERSION_NOW)->version);
     syslog(LOG_INFO, "Jansson version %s", JANSSON_VERSION);
 

@@ -31,9 +31,6 @@
  * This main function writes "Hello Reproducible World" to the syslog.
  */
 int main(void) {
-    /* Open the syslog to report messages for "reproducible_package" */
-    openlog("reproducible_package", LOG_PID | LOG_CONS, LOG_USER);
-
     /* Choose between { LOG_INFO, LOG_CRIT, LOG_WARN, LOG_ERR }*/
     syslog(LOG_INFO, "Hello Reproducible World!");
 }

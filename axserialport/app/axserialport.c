@@ -23,8 +23,6 @@
 /* AX Serial Port library. */
 #include <axsdk/axserialport.h>
 
-#define APP_NAME "axserialport"
-
 /**
  * MyConfigAndData contains application configuration and data.
  */
@@ -175,7 +173,6 @@ int main(void) {
     g_unix_signal_add(SIGINT, signal_handler, loop);
 
     /* Print some startup messages */
-    openlog(APP_NAME, LOG_PID, LOG_LOCAL4);
     syslog(LOG_INFO, "Starting AxSerialPort application");
 
     /* Create a configuration for the first port (port0) */

@@ -56,8 +56,6 @@
 #include "vdo-frame.h"
 #include "vdo-types.h"
 
-#define APP_NAME "vdo_larod"
-
 volatile sig_atomic_t running = 1;
 
 static void shutdown(int status) {
@@ -77,8 +75,6 @@ int main(int argc, char** argv) {
     img_provider_t* image_provider        = NULL;
     model_provider_t* model_provider      = NULL;
     model_tensor_output_t* tensor_outputs = NULL;
-
-    openlog(APP_NAME, LOG_PID | LOG_CONS, LOG_USER);
 
     // Stop main loop at signal
     signal(SIGTERM, shutdown);
