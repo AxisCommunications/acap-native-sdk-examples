@@ -16,6 +16,7 @@
 
 #pragma once
 
+#include "imgprovider.h"
 #include "larod.h"
 #include "vdo-buffer.h"
 #include "vdo-error.h"
@@ -42,7 +43,6 @@ typedef struct model_provider {
     size_t num_inputs;
     larodTensor** output_tensors;
     size_t num_outputs;
-    larodMap* crop_map;
 
     size_t image_buffer_size;
 
@@ -52,10 +52,12 @@ typedef struct model_provider {
 
     bool use_preprocessing;
 
+    img_info_t* img_info;
     model_tensor_output_t* model_output_tensors;
+    const char* device_name;
+    larodModel* model;
+    larodMap* crop_map;
 } model_provider_t;
-
-bool model_run_preprocessing(model_provider_t* provider, VdoBuffer* vdo_buf);
 
 bool model_run_inference(model_provider_t* provider, VdoBuffer* vdo_buf);
 
@@ -63,16 +65,17 @@ bool model_get_tensor_output_info(model_provider_t* provider,
                                   unsigned int tensor_output_index,
                                   model_tensor_output_t* tensor_output);
 
-model_provider_t* create_model_provider(unsigned int input_width,
-                                        unsigned int input_height,
-                                        unsigned int stream_width,
-                                        unsigned int stream_height,
-                                        unsigned int stream_pitch,
-                                        VdoFormat image_format,
-                                        VdoFormat model_format,
-                                        char* model_file,
-                                        char* device_name,
-                                        bool allow_input_crop,
-                                        size_t* num_output_tensors);
+img_info_t model_provider_get_model_metadata(model_provider_t* provider);
 
-void destroy_model_provider(model_provider_t* provider);
+bool model_provider_update_image_metadata(model_provider_t* provider, img_info_t* img_info);
+
+void model_provider_update_crop(model_provider_t* provider,
+                                uint32_t clip_x,
+                                uint32_t clip_y,
+                                uint32_t clip_w,
+                                uint32_t clip_h);
+
+model_provider_t*
+model_provider_new(char* model_file, char* device_name, size_t* num_output_tensors);
+
+void model_provider_destroy(model_provider_t* provider);

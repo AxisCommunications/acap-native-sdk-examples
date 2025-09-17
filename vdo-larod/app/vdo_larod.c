@@ -21,15 +21,11 @@
  * outputs values corresponding to either person or car.
  *
  * The application expects four arguments on the command line in the
- * following order: DEVICENAME MODEL WIDTH HEIGHT.
+ * following order: DEVICENAME MODEL.
  *
  * First argument, DEVICENAME, is a string that is the larod device name
  *
  * Second argument, MODEL, is a string describing path to the model.
- *
- * Third argument, WIDTH, is an unsigned integer for the input width.
- *
- * Fourth argument, HEIGHT, is an unsigned integer for the input height.
  *
  */
 
@@ -69,12 +65,12 @@ static void shutdown(int status) {
 int main(int argc, char** argv) {
     char* device_name                     = argv[1];
     char* model_file                      = argv[2];
-    const unsigned int input_width        = atoi(argv[3]);
-    const unsigned int input_height       = atoi(argv[4]);
     g_autoptr(GError) vdo_error           = NULL;
     img_provider_t* image_provider        = NULL;
     model_provider_t* model_provider      = NULL;
     model_tensor_output_t* tensor_outputs = NULL;
+    img_info_t model_metadata             = {0};
+    img_info_t image_metadata             = {0};
 
     // Stop main loop at signal
     signal(SIGTERM, shutdown);
@@ -82,64 +78,71 @@ int main(int argc, char** argv) {
 
     syslog(LOG_INFO, "Starting %s", argv[0]);
 
-    if (argc != 5) {
+    if (argc != 3) {
         syslog(LOG_ERR,
                "Invalid number of arguments. Required arguments are: "
-               "DEVICENAME MODEL_PATH WIDTH HEIGHT");
+               "DEVICENAME MODEL_PATH");
         goto end;
     }
 
-    VdoFormat image_format = VDO_FORMAT_YUV;
-    VdoFormat model_format = VDO_FORMAT_RGB;
-    double vdo_framerate   = 30.0;
+    double vdo_framerate           = 30.0;
+    unsigned int vdo_input_channel = 1;
 
-    // Choose a valid stream resolution since only certain resolutions are allowed
-    unsigned int stream_width  = 0;
-    unsigned int stream_height = 0;
-    if (!choose_stream_resolution(input_width,
-                                  input_height,
-                                  image_format,
-                                  NULL,
-                                  "all",
-                                  &stream_width,
-                                  &stream_height)) {
-        syslog(LOG_ERR, "%s: Failed choosing stream resolution", __func__);
-        goto end;
-    }
-
-    syslog(LOG_INFO,
-           "Creating VDO image provider and creating stream %u x %u",
-           stream_width,
-           stream_height);
-
-    if (strcmp(device_name, "ambarella-cvflow") == 0) {
-        model_format = VDO_FORMAT_PLANAR_RGB;
-    }
-
-    image_provider =
-        create_img_provider(stream_width, stream_height, 2, image_format, vdo_framerate);
-    if (!image_provider) {
-        panic("%s: Could not create image provider", __func__);
-    }
-
+    // Start by loading the model and get the model metadata
     size_t number_output_tensors = 0;
-    model_provider               = create_model_provider(input_width,
-                                           input_height,
-                                           image_provider->width,
-                                           image_provider->height,
-                                           image_provider->pitch,
-                                           image_format,
-                                           model_format,
-                                           model_file,
-                                           device_name,
-                                           true,
-                                           &number_output_tensors);
+    model_provider = model_provider_new(model_file, device_name, &number_output_tensors);
     if (!model_provider) {
         panic("%s: Could not create model provider", __func__);
     }
+
     tensor_outputs = calloc(number_output_tensors, sizeof(model_tensor_output_t));
     if (!tensor_outputs) {
         panic("%s: Could not allocate tensor outputs", __func__);
+    }
+
+    // Get the model format and model input dimension and pitches
+    model_metadata = model_provider_get_model_metadata(model_provider);
+
+    // Set crop as scale method meaning that if possible use vdo to get a center cropped
+    // image if the native aspect ratio does not match the model resolution aspect ratio.
+    image_provider = img_provider_new(vdo_input_channel, &model_metadata, 2, vdo_framerate, "crop");
+    if (!image_provider) {
+        // It is considered an error if the img provider can not supply the
+        // requested stream
+        panic("%s: Could not create image provider", __func__);
+    }
+
+    image_metadata = img_provider_get_image_metadata(image_provider);
+    model_provider_update_image_metadata(model_provider, &image_metadata);
+
+    // An cropped image is required
+    // If VDO couldn't supply the correct resolution
+    // use larod to perform the crop instead.
+    if (image_metadata.width != model_metadata.width ||
+        image_metadata.height != model_metadata.height) {
+        // Calculate crop image
+        // 1. The crop area shall fill the input image either horizontally or
+        //    vertically.
+        // 2. The crop area shall have the same aspect ratio as the output image.
+        unsigned int input_width   = model_metadata.width;
+        unsigned int input_height  = model_metadata.height;
+        unsigned int stream_width  = image_metadata.width;
+        unsigned int stream_height = image_metadata.height;
+
+        syslog(LOG_INFO, "Calculate crop image");
+        float dest_WH_ratio = (float)input_width / (float)input_height;
+        float crop_w        = (float)stream_width;
+        float crop_h        = crop_w / dest_WH_ratio;
+        if (crop_h > (float)stream_height) {
+            crop_h = (float)stream_height;
+            crop_w = crop_h * dest_WH_ratio;
+        }
+        unsigned int clip_w = (unsigned int)crop_w;
+        unsigned int clip_h = (unsigned int)crop_h;
+        unsigned int clip_x = (stream_width - clip_w) / 2;
+        unsigned int clip_y = (stream_height - clip_h) / 2;
+        syslog(LOG_INFO, "Crop input image X=%d Y=%d (%d x %d)", clip_x, clip_y, clip_w, clip_h);
+        model_provider_update_crop(model_provider, clip_x, clip_y, clip_w, clip_h);
     }
 
     syslog(LOG_INFO, "Start fetching video frames from VDO");
@@ -149,7 +152,6 @@ int main(int argc, char** argv) {
 
     while (running) {
         struct timeval start_ts, end_ts;
-        unsigned int preprocessing_ms = 0;
         unsigned int inference_ms     = 0;
         unsigned int total_elapsed_ms = 0;
 
@@ -157,30 +159,9 @@ int main(int argc, char** argv) {
         if (!vdo_buf) {
             // This can only happen if it is global rotation then
             // the stream has to be restarted because rotation has been changed.
-            syslog(
-                LOG_INFO,
-                "No buffer because of changed global rotation. Application needs to be restarted");
-            goto end;
+            panic("%s: No buffer because of changed global rotation.", __func__);
         }
         // Convert data to the correct format
-        gettimeofday(&start_ts, NULL);
-        if (!model_run_preprocessing(model_provider, vdo_buf)) {
-            // No power
-            if (!vdo_stream_buffer_unref(image_provider->vdo_stream, &vdo_buf, &vdo_error)) {
-                if (!vdo_error_is_expected(&vdo_error)) {
-                    panic("%s: Unexpexted error: %s", __func__, vdo_error->message);
-                }
-                g_clear_error(&vdo_error);
-            }
-            img_provider_flush_all_frames(image_provider);
-            continue;
-        }
-        gettimeofday(&end_ts, NULL);
-
-        preprocessing_ms = (unsigned int)(((end_ts.tv_sec - start_ts.tv_sec) * 1000) +
-                                          ((end_ts.tv_usec - start_ts.tv_usec) / 1000));
-        syslog(LOG_INFO, "Ran pre-processing for %u ms", preprocessing_ms);
-
         gettimeofday(&start_ts, NULL);
         if (!model_run_inference(model_provider, vdo_buf)) {
             // No power
@@ -199,7 +180,7 @@ int main(int argc, char** argv) {
                                       ((end_ts.tv_usec - start_ts.tv_usec) / 1000));
         syslog(LOG_INFO, "Ran inference for %u ms", inference_ms);
 
-        total_elapsed_ms = inference_ms + preprocessing_ms;
+        total_elapsed_ms = inference_ms;
 
         // Check if the framerate from vdo should be changed
         img_provider_update_framerate(image_provider, total_elapsed_ms);
@@ -239,10 +220,10 @@ int main(int argc, char** argv) {
     }
 end:
     if (image_provider) {
-        destroy_img_provider(image_provider);
+        img_provider_destroy(image_provider);
     }
     if (model_provider) {
-        destroy_model_provider(model_provider);
+        model_provider_destroy(model_provider);
     }
     free(tensor_outputs);
 

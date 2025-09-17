@@ -18,12 +18,17 @@ Together with this README file you should be able to find a directory called app
 
 ## Detailed outline of example application
 
-This application opens a client to VDO and starts fetching frames in the YUV format. It tries to find the smallest VDO stream resolution that fits the width and height required by the neural network.
+This application opens a client to VDO and starts fetching frames in the RGB or YUV format dependent on platform.
+Vdo is used to determine if a format is supported or not.
+The application will try to get the same resolution as requested from VDO. The only limit is the min and max
+resolution received from VDO.
+When using this it is important to also check the image so it looks good on the used camera.
 
 Steps in application:
 
 1. Fetch image data from VDO.
-2. Preprocess the images (crop to the size required by the neural network (if needed), scale and color convert) using larod with libyuv backend (depending on platform).
+2. If needed preprocess the images (crop to the size required by the neural network (if needed), scale and color convert) using larod with either cpu-proc (libyuv)
+or ambarella-cvflow-proc backend.
 3. Run inferences using the trained model on a specific chip with the preprocessing output as input on a larod backend specified by a command-line argument.
 4. Measure the total inference time (preprocessing and inference time) and determine if the framerate of the vdo streams needs to be adjusted.
 5. The model's confidence scores for the presence of person and car in the image are printed as the output.
@@ -281,24 +286,22 @@ In previous larod versions, the chip was referred to as a number instead of a st
 ----- Contents of SYSTEM_LOG for 'vdo_larod' -----
 
 vdo_larod[141742]: Starting /usr/local/packages/vdo_larod/vdo_larod
-vdo_larod[141742]: choose_stream_resolution: We select stream w/h=480 x 270 based on VDO channel info.
-vdo_larod[141742]: Creating VDO image provider and creating stream 480 x 270
+vdo_larod[141742]: Setting up larod connection with chip axis-a8-dlpu-tflite and model file /usr/local/packages/vdo_larod/model/model.tflite
+vdo_larod[141742]: Loading the model... This might take up to 5 minutes depending on your device model.
+vdo_larod[141742]: Model loaded successfully
+vdo_larod[3991067]: Detected model format RGB and input resolution 256x256
+vdo_larod[141742]: Created mmaped model output 0 with size 1
+vdo_larod[141742]: Created mmaped model output 1 with size 1
+vdo_larod[141742]: choose_stream_resolution: We select stream w/h=256 x 256 with format yuv based on VDO channel info.
+vdo_larod[141742]: Dump of vdo stream settings map =====
 vdo_larod[141742]: 'buffer.count'-----: <uint32 2>
 vdo_larod[141742]: 'dynamic.framerate': <true>
 vdo_larod[141742]: 'format'-----------: <uint32 3>
 vdo_larod[141742]: 'framerate'--------: <30.0>
-vdo_larod[141742]: 'height'-----------: <uint32 270>
+vdo_larod[141742]: 'height'-----------: <uint32 256>
 vdo_larod[141742]: 'input'------------: <uint32 1>
 vdo_larod[141742]: 'socket.blocking'--: <false>
-vdo_larod[141742]: 'width'------------: <uint32 480>
-vdo_larod[141742]: Dump of vdo stream settings map =====
-vdo_larod[141742]: Setting up larod connection with chip axis-a8-dlpu-tflite and model file /usr/local/packages/vdo_larod/model/model.tflite
-vdo_larod[141742]: Loading the model... This might take up to 5 minutes depending on your device model.
-vdo_larod[141742]: Model loaded successfully
-vdo_larod[141742]: Calculate crop image
-vdo_larod[141742]: Crop input image X=105 Y=0 (270 x 270)
-vdo_larod[141742]: Created mmaped model output 0 with size 1
-vdo_larod[141742]: Created mmaped model output 1 with size 1
+vdo_larod[141742]: 'width'------------: <uint32 256>
 
 vdo_larod[141742]: Ran pre-processing for 3 ms
 vdo_larod[141742]: Ran inference for 14 ms
@@ -314,26 +317,23 @@ vdo_larod[141742]: Exit /usr/local/packages/vdo_larod/vdo_larod
 
 
 vdo_larod[3991067]: Starting /usr/local/packages/vdo_larod/vdo_larod
-vdo_larod[3991067]: choose_stream_resolution: We select stream w/h=480 x 360 based on VDO channel info.
-vdo_larod[3991067]: Creating VDO image provider and creating stream 480 x 360
-vdo_larod[3991067]: 'buffer.count'-----: <uint32 2>
-vdo_larod[3991067]: 'dynamic.framerate': <true>
-vdo_larod[3991067]: 'format'-----------: <uint32 3>
-vdo_larod[3991067]: 'framerate'--------: <30.0>
-vdo_larod[3991067]: 'height'-----------: <uint32 360>
-vdo_larod[3991067]: 'input'------------: <uint32 1>
-vdo_larod[3991067]: 'socket.blocking'--: <false>
-vdo_larod[3991067]: 'width'------------: <uint32 480>
-vdo_larod[3991067]: Dump of vdo stream settings map =====
 vdo_larod[3991067]: Setting up larod connection with chip a9-dlpu-tflite and model file /usr/local/packages/vdo_larod/model/model.tflite
 vdo_larod[3991067]: Loading the model... This might take up to 5 minutes depending on your device model.
 vdo_larod[3991067]: Model loaded successfully
-vdo_larod[3991067]: Calculate crop image
-vdo_larod[3991067]: Crop input image X=0 Y=60 (360 x 360)
+vdo_larod[3991067]: Detected model format RGB and input resolution 256x256
 vdo_larod[3991067]: Created mmaped model output 0 with size 1
 vdo_larod[3991067]: Created mmaped model output 1 with size 1
+vdo_larod[3991067]: choose_stream_resolution: We select stream w/h=256 x 256 with format rgb interleaved based on VDO channel info.
+vdo_larod[3991067]: Dump of vdo stream settings map =====
+vdo_larod[3991067]: 'buffer.count'-----: <uint32 2>
+vdo_larod[3991067]: 'dynamic.framerate': <true>
+vdo_larod[3991067]: 'format'-----------: <uint32 8>
+vdo_larod[3991067]: 'framerate'--------: <30.0>
+vdo_larod[3991067]: 'height'-----------: <uint32 256>
+vdo_larod[3991067]: 'input'------------: <uint32 1>
+vdo_larod[3991067]: 'socket.blocking'--: <false>
+vdo_larod[3991067]: 'width'------------: <uint32 256>
 vdo_larod[3991067]: Start fetching video frames from VDO
-vdo_larod[3991067]: Ran pre-processing for 13 ms
 vdo_larod[3991067]: Ran inference for 5 ms
 vdo_larod[3991067]: Person detected: 100.00% - Car detected: 3.14%
 
@@ -346,28 +346,25 @@ vdo_larod[3991067]: Exit /usr/local/packages/vdo_larod/vdo_larod
 ----- Contents of SYSTEM_LOG for 'vdo_larod' -----
 
 vdo_larod[145071]: Starting /usr/local/packages/vdo_larod/vdo_larod
-vdo_larod[145071]: choose_stream_resolution: We select stream w/h=480 x 270 based on VDO channel info.
-vdo_larod[145071]: Creating VDO image provider and creating stream 480 x 270
-vdo_larod[145071]: Dump of vdo stream settings map =====
-vdo_larod[145071]: 'buffer.count'-----: <uint32 2>
-vdo_larod[145071]: 'dynamic.framerate': <true>
-vdo_larod[145071]: 'format'-----------: <uint32 3>
-vdo_larod[145071]: 'framerate'--------: <30.0>
-vdo_larod[145071]: 'height'-----------: <uint32 270>
-vdo_larod[145071]: 'input'------------: <uint32 1>
-vdo_larod[145071]: 'socket.blocking'--: <false>
-vdo_larod[145071]: 'width'------------: <uint32 480>
 vdo_larod[145071]: Setting up larod connection with chip cpu-tflite and model file /usr/local/packages/vdo_larod/model/model.tflite
-vdo_larod[145071]: Loading the model... This might take up to 5 minutes depending on your device model.
-vdo_larod[145071]: Model loaded successfully
-vdo_larod[145071]: Calculate crop image
-vdo_larod[145071]: Crop input image X=105 Y=0 (270 x 270)
-vdo_larod[145071]: Created mmaped model output 0 with size 1
-vdo_larod[145071]: Created mmaped model output 1 with size 1
-vdo_larod[145071]: Start fetching video frames from VDO
-vdo_larod[145071]: Ran pre-processing for 3 ms
-vdo_larod[145071]: Ran inference for 545 ms
-vdo_larod[145071]: Person detected: 100.00% - Car detected: 3.14%
+vdo_larod[3991067]: Loading the model... This might take up to 5 minutes depending on your device model.
+vdo_larod[3991067]: Model loaded successfully
+vdo_larod[3991067]: Detected model format RGB and input resolution 256x256
+vdo_larod[3991067]: Created mmaped model output 0 with size 1
+vdo_larod[3991067]: Created mmaped model output 1 with size 1
+vdo_larod[3991067]: choose_stream_resolution: We select stream w/h=256 x 256 with format rgb interleaved based on VDO channel info.
+vdo_larod[3991067]: Dump of vdo stream settings map =====
+vdo_larod[3991067]: 'buffer.count'-----: <uint32 2>
+vdo_larod[3991067]: 'dynamic.framerate': <true>
+vdo_larod[3991067]: 'format'-----------: <uint32 8>
+vdo_larod[3991067]: 'framerate'--------: <30.0>
+vdo_larod[3991067]: 'height'-----------: <uint32 256>
+vdo_larod[3991067]: 'input'------------: <uint32 1>
+vdo_larod[3991067]: 'socket.blocking'--: <false>
+vdo_larod[3991067]: 'width'------------: <uint32 256>
+vdo_larod[3991067]: Start fetching video frames from VDO
+vdo_larod[3991067]: Ran inference for 340 ms
+vdo_larod[3991067]: Person detected: 100.00% - Car detected: 3.14%
 
 vdo_larod[145071]: Exit /usr/local/packages/vdo_larod/vdo_larod
 ```
@@ -378,13 +375,23 @@ vdo_larod[145071]: Exit /usr/local/packages/vdo_larod/vdo_larod
 ----- Contents of SYSTEM_LOG for 'vdo_larod' -----
 
 vdo_larod[584171]: Starting /usr/local/packages/vdo_larod/vdo_larod
-vdo_larod[584171]: chooseStreamResolution: We select stream w/h=256 x 256 based on VDO channel info.
-vdo_larod[584171]: Creating VDO image provider and creating stream 256 x 256
 vdo_larod[584171]: Setting up larod connection with chip google-edge-tpu-tflite and model file /usr/local/packages/vdo_larod/model/model.tflite
 vdo_larod[584171]: Loading the model... This might take up to 5 minutes depending on your device model.
 vdo_larod[584171]: Model loaded successfully
+vdo_larod[584171]: Detected model format RGB and input resolution 256x256
 vdo_larod[584171]: Created mmaped model output 0 with size 1
 vdo_larod[584171]: Created mmaped model output 1 with size 1
+vdo_larod[584171]: chooseStreamResolution: We select stream w/h=256 x 256 based with format yuv based on VDO channel info.
+vdo_larod[3991067]: Dump of vdo stream settings map =====
+vdo_larod[3991067]: 'buffer.count'-----: <uint32 2>
+vdo_larod[3991067]: 'dynamic.framerate': <true>
+vdo_larod[3991067]: 'format'-----------: <uint32 3>
+vdo_larod[3991067]: 'framerate'--------: <30.0>
+vdo_larod[3991067]: 'height'-----------: <uint32 256>
+vdo_larod[3991067]: 'input'------------: <uint32 1>
+vdo_larod[3991067]: 'socket.blocking'--: <false>
+vdo_larod[3991067]: 'width'------------: <uint32 256>
+vdo_larod[584171]: Use preprocessing with input format yuv and output format rgb-interleaved
 vdo_larod[584171]: Start fetching video frames from VDO
 
 vdo_larod[584171]: Ran pre-processing for 2 ms
@@ -401,15 +408,24 @@ vdo_larod[4165]: Exit /usr/local/packages/vdo_larod/vdo_larod
 
 
 vdo_larod[584171]: Starting /usr/local/packages/vdo_larod/vdo_larod
-vdo_larod[584171]: chooseStreamResolution: We select stream w/h=256 x 256 based on VDO channel info.
-vdo_larod[584171]: Creating VDO image provider and creating stream 256 x 256
 vdo_larod[584171]: Setting up larod connection with chip ambarella-cvflow and model file /usr/local/packages/vdo_larod/model/model.bin
 vdo_larod[584171]: Loading the model... This might take up to 5 minutes depending on your device model.
 vdo_larod[584171]: Model loaded successfully
+vdo_larod[584171]: Detected model format PLANAR RGB and input resolution 256x256
 vdo_larod[584171]: Created mmaped model output 0 with size 32
 vdo_larod[584171]: Created mmaped model output 1 with size 32
+vdo_larod[584171]: chooseStreamResolution: We select stream w/h=256 x 256 with format planar rgb based on VDO channel info.
+vdo_larod[3991067]: Dump of vdo stream settings map =====
+vdo_larod[3991067]: 'buffer.count'-----: <uint32 2>
+vdo_larod[3991067]: 'dynamic.framerate': <true>
+vdo_larod[3991067]: 'format'-----------: <uint32 9>
+vdo_larod[3991067]: 'framerate'--------: <30.0>
+vdo_larod[3991067]: 'height'-----------: <uint32 256>
+vdo_larod[3991067]: 'input'------------: <uint32 1>
+vdo_larod[3991067]: 'socket.blocking'--: <false>
+vdo_larod[3991067]: 'width'------------: <uint32 256>
+
 vdo_larod[584171]: Start fetching video frames from VDO
-vdo_larod[584171]: Ran pre-processing for 1 ms
 vdo_larod[584171]: Ran inference for 50 ms
 vdo_larod[584171]: Person detected: 65.14% - Car detected: 11.92%
 
