@@ -44,7 +44,7 @@ The examples are organized into logical groups to help you find the most relevan
 #### Object Detection
 
 - [object-detection](./object-detection/)
-  - An example of object detection, cropping and saving detected objects into JPEG files.
+  - An example of object detection, drawing bounding boxes around detected objects on the video stream.
 - [object-detection-cv25](./object-detection-cv25/)
   - An example of object detection, cropping and saving detected objects into JPEG files on AXIS CV25 devices.
 - [object-detection-yolov5](./object-detection-yolov5/)

@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2018-2021, Axis Communications AB, Lund, Sweden
+ * Copyright (C) 2025, Axis Communications AB, Lund, Sweden
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,21 +14,19 @@
  * limitations under the License.
  */
 
-/**
- * This header file parses the arguments to the application.
- */
+#include "panic.h"
 
-#pragma once
+#include <stdarg.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <syslog.h>
 
-#include <stddef.h>
-
-#include "larod.h"
-
-typedef struct args_t {
-    char* model_file;
-    char* labels_file;
-    unsigned threshold;
-    char* device_name;
-} args_t;
-
-void parse_args(int argc, char** argv, args_t* args);
+// Function definition for panic
+__attribute__((noreturn)) __attribute__((format(printf, 1, 2))) void panic(const char* format,
+                                                                           ...) {
+    va_list arg;
+    va_start(arg, format);
+    vsyslog(LOG_ERR, format, arg);
+    va_end(arg);
+    exit(1);
+}

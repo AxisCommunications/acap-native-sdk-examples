@@ -1,239 +1,147 @@
 *Copyright (C) 2021, Axis Communications AB, Lund, Sweden. All Rights Reserved.*
+<!-- omit from toc -->
+# Object Detection Example for SSD MobileNet v2 (COCO)
 
-# Object Detection Example
+This example shows how to apply a pretrained SSD MobileNet v2 (COCO) object detection model on an Axis camera.
+The model is downloaded through the Dockerfile from the [Google Coral](https://coral.ai/models/object-detection/) repository.
 
-## Overview
+This example uses the following APIs:
 
-This example focuses on the application of object detection on an Axis camera equipped with an Edge TPU, but can also be easily configured to run on CPU or ARTPEC-8 cameras (DLPU). A pretrained model [MobileNet SSD v2 (COCO)] is used to detect the location of 90 types of different objects. The model is downloaded through the Dockerfile from the google-coral repository. The detected objects are saved in /tmp folder for further usage.
+- [Machine learning API (Larod)](https://developer.axis.com/acap/api/native-sdk-api/#machine-learning-api-larod)
+- [Video capture API (VDO)](https://developer.axis.com/acap/api/native-sdk-api/#video-capture-api-vdo)
+- [Bounding Box API](https://developer.axis.com/acap/api/native-sdk-api/#bounding-box-api)
 
-## Prerequisites
+Below is an example showing how the bounding boxes are drawn around the detected objects on the
+stream.
 
-- Axis camera equipped with CPU or DLPU
+![Object-detection image](object-detection.jpeg)
 
-## Quickstart
+## Project structure
 
-The following instructions can be executed to simply run the example.
+The files for building the application are organized in the following structure.
 
-1. Compile the ACAP application:
-
-    ```sh
-    docker build --build-arg ARCH=<ARCH> --build-arg CHIP=<CHIP> --tag obj_detect:1.0 .
-    docker cp $(docker create obj_detect:1.0):/opt/app ./build
-    ```
-
-    where the values are found:
-    - \<CHIP\> is the chip type. Supported values are `artpec9`, `artpec8`, `cpu` and `edgetpu`.
-    - \<ARCH\> is the architecture. Supported values are `armv7hf` (default) and `aarch64`.
-
-2. Find the ACAP application `.eap` file
-
-    ```sh
-    build/object_detection_app_1_0_0_<ARCH>.eap
-    ```
-
-3. Install and start the ACAP application on your camera through the camera web GUI
-
-4. SSH to the camera
-
-5. View its log to see the ACAP application output:
-
-    ```sh
-    tail -f /var/volatile/log/info.log | grep object_detection
-    ```
-
-## Designing the application
-
-The whole principle is similar to the [vdo-larod](../vdo-larod). In this example, the original stream has a resolution of 1920x1080, while MobileNet SSD COCO requires an input size of 300x300, so we set up two different streams: one is for MobileNet model, another is used to crop a higher resolution jpg image.
-
-### Setting up the MobileNet stream
-
-There are two methods used to obtain a proper resolution. The [chooseStreamResolution](app/imgprovider.c#L221) method is used to select the smallest stream and assign them into streamWidth and streamHeight.
-
-```c
-unsigned int streamWidth = 0;
-unsigned int streamHeight = 0;
-chooseStreamResolution(args.width, args.height, &streamWidth, &streamHeight);
+```sh
+object-detection
+├── app
+│   ├── argparse.c
+│   ├── argparse.h
+│   ├── imgprovider.c
+│   ├── imgprovider.h
+│   ├── labelparse.c
+│   ├── labelparse.h
+│   ├── LICENSE
+│   ├── Makefile
+│   ├── manifest.json.artpec8
+│   ├── manifest.json.artpec9
+│   ├── manifest.json.cpu
+│   ├── manifest.json.edgetpu
+│   ├── model.c
+│   ├── model.h
+│   ├── object_detection.c
+│   ├── panic.c
+│   ├── panic.h
+├── Dockerfile
+└── README.md
 ```
 
-Then, the [createImgProvider](app/imgprovider.c#L95) method is used to return an ImgProvider with the selected [output format](https://developer.axis.com/acap/api/src/api/vdostream/html/vdo-types_8h.html#a5ed136c302573571bf325c39d6d36246).
+- **app/argparse.c/h** - Program argument parser.
+- **app/imgprovider.c/h** - Implementation of VDO parts.
+- **app/labelparse.c/h** - Parse file of labels.
+- **app/LICENSE** - Text file which lists all open source licensed source code distributed with the
+application.
+- **app/Makefile** - Makefile containing the build and link instructions for building the ACAP
+application.
+- **app/manifest.json.artpec8** - Defines the application and its configuration when building for
+ARTPEC-8 DLPU cameras with TensorFlow Lite.
+- **app/manifest.json.artpec9** - Defines the application and its configuration when building for
+ARTPEC-9 DLPU cameras with TensorFlow Lite.
+- **app/manifest.json.cpu** - Defines the application and its configuration when building for
+CPU with TensorFlow Lite.
+- **app/manifest.json.edgetpu** - Defines the application and its configuration when building for
+ARTPEC-7 DLPU (Using Google EdgeTPU) cameras with TensorFlow Lite.
+- **app/object_detection.c** - Application source code in C.
+- **app/model.c/h** - Implementation of Larod parts.
+- **app/panic.c/h** - Utility for exiting the program on error.
+- **Dockerfile** -  Assembles an image containing the ACAP Native SDK and builds the application using it.
+- **README.md** - Step by step instructions on how to run the example.
 
-```c
-provider = createImgProvider(streamWidth, streamHeight, 2, VDO_FORMAT_YUV);
-```
+<!-- omit from toc -->
+## Table of contents
 
-#### Setting up the crop stream
+- [Project structure](#project-structure)
+- [Outline of example](#outline-of-example)
+- [ACAP application parameters](#acap-application-parameters)
+  - [Dockerfile parameters](#dockerfile-parameters)
+  - [Model-specific parameters](#model-specific-parameters)
+- [Build the application](#build-the-application)
+- [Install and start the application](#install-and-start-the-application)
+- [Expected output](#expected-output)
+  - [Application log](#application-log)
+- [License](#license)
 
-The original resolution `args.raw_width` x `args.raw_height` is used to crop a higher resolution image.
+## Outline of example
 
-```c
-provider_raw = createImgProvider(rawWidth, rawHeight, 2, VDO_FORMAT_YUV);
-```
+1. Load the model using [Larod](https://developer.axis.com/acap/api/native-sdk-api/#machine-learning-api-larod)
+to determine the width and height and the number of output tensors.
+2. Create a stream from [VDO](https://developer.axis.com/acap/api/native-sdk-api/#video-capture-api-vdo) in order to get frames that can be sent to Larod for inference.
+3. A Larod model inference job is created. If the image provided by VDO doesn't match the input format or resolution needed for the inference job, a pre-processing job is also created.
+4. Setup the style of bounding boxes using the
+[Bounding Box API](https://developer.axis.com/acap/api/native-sdk-api/#bounding-box-api).
+5. Run the main program loop:
+    1. Fetch image data from VDO.
+    2. If needed, convert image data to the correct format with the Larod pre-processing job.
+    3. Run inference with the Larod model inference job.
+    4. Perform MobileNet SSD V2 (Coco) parsing of the output.
+    5. Measure the total inference time (preprocessing, inference and postprocessing time) and adjust the framerate of the vdo stream if needed.
+    6. Draw bounding boxes and log details about the detected objects.
 
-#### Setting up the larod interface
+## ACAP application parameters
 
-Then similar with [tensorflow-to-larod](../tensorflow-to-larod), the [larod](https://developer.axis.com/acap/api/src/api/larod/html/index.html) interface needs to be set up. The [setupLarod](app/object_detection.c#L291) method is used to create a connection to larod and select the hardware to use the model.
+### Dockerfile parameters
 
-```c
-int larodModelFd = -1;
-larodConnection* conn = NULL;
-larodModel* model = NULL;
-setupLarod(chipString, larodModelFd, &conn, &model);
-```
+The model `.tflite` file and the labels `.txt` file are provided through the `Dockerfile`. In this
+example, these files are downloaded using the `curl` command.
 
-The [createAndMapTmpFile](app/object_detection.c#L251) method is used to create temporary files to store the input and output tensors.
+### Model-specific parameters
 
-```c
-char CONV_INP_FILE_PATTERN[] = "/tmp/larod.in.test-XXXXXX";
-char CONV_OUT1_FILE_PATTERN[] = "/tmp/larod.out1.test-XXXXXX";
-char CONV_OUT2_FILE_PATTERN[] = "/tmp/larod.out2.test-XXXXXX";
-char CONV_OUT3_FILE_PATTERN[] = "/tmp/larod.out3.test-XXXXXX";
-char CONV_OUT4_FILE_PATTERN[] = "/tmp/larod.out4.test-XXXXXX";
-void* larodInputAddr = MAP_FAILED;
-void* larodOutput1Addr = MAP_FAILED;
-void* larodOutput2Addr = MAP_FAILED;
-void* larodOutput3Addr = MAP_FAILED;
-void* larodOutput4Addr = MAP_FAILED;
-int larodInputFd = -1;
-int larodOutput1Fd = -1;
-int larodOutput2Fd = -1;
-int larodOutput3Fd = -1;
-int larodOutput4Fd = -1;
+The below arguments are passed to the program via the `manifest.json` file. Note that the paths to **MODEL** and **LABELSFILE** should be passed according to their location on the device.
 
-createAndMapTmpFile(CONV_INP_FILE_PATTERN,  rawWidth * rawHeight * CHANNELS, &larodInputAddr, &larodInputFd);
-createAndMapTmpFile(CONV_OUT1_FILE_PATTERN, TENSOR1SIZE, &larodOutput1Addr, &larodOutput1Fd);
-createAndMapTmpFile(CONV_OUT2_FILE_PATTERN, TENSOR2SIZE, &larodOutput2Addr, &larodOutput2Fd);
-createAndMapTmpFile(CONV_OUT3_FILE_PATTERN, TENSOR3SIZE, &larodOutput3Addr, &larodOutput3Fd);
-createAndMapTmpFile(CONV_OUT4_FILE_PATTERN, TENSOR4SIZE, &larodOutput4Addr, &larodOutput4Fd);
-```
+- **MODEL** - The location of the model file (Mandatory).
+- **THRESHOLD** - Threshold if a detection should be displayed using Bbox.
+- **LABELSFILE** - The path to the labels txt file.
 
-In terms of the crop part, another temporary file is created.
+## Build the application
 
-```c
-char CROP_FILE_PATTERN[] = "/tmp/crop.test-XXXXXX";
-void* cropAddr = MAP_FAILED;
-int cropFd = -1;
-
-createAndMapTmpFile(CROP_FILE_PATTERN, rawWidth * rawHeight * CHANNELS, &cropAddr, &cropFd);
-```
-
-The `larodCreateModelInputs` and `larodCreateModelOutputs` methods map the preprocessing input and output tensors with the model.
-
-```c
-size_t ppInputs = 0;
-size_t ppOutputs = 0;
-ppInputTensors = larodCreateModelInputs(ppModel, &ppInputs, &error);
-ppOutputTensors = larodCreateModelOutputs(ppModel, &ppOutputs, &error);
-```
-
-The `larodSetTensorFd` method then maps each tensor to the corresponding file descriptor to allow IO.
-
-```c
-larodSetTensorFd(ppInputTensors[0], larodInputFd, &error);
-larodSetTensorFd(ppOutputTensors[0], larodOutput1Fd, &error);
-larodSetTensorFd(ppOutputTensors[1], larodOutput2Fd, &error);
-larodSetTensorFd(ppOutputTensors[2], larodOutput3Fd, &error);
-larodSetTensorFd(ppOutputTensors[3], larodOutput4Fd, &error);
-```
-
-Finally, the `larodCreateJobRequest` method creates an inference request to use the model.
-
-```c
-infReq = larodCreateJobRequest(ppModel, ppInputTensors, ppNumInputs, ppOutputTensors, ppNumOutputs, cropMap, &error);
-```
-
-#### Fetching a frame and performing inference
-
-By using the `getLastFrameBlocking` method, a  buffer containing the latest image is retrieved from the `ImgProvider` created earlier. Then `vdo_buffer_get_data` method is used to extract NV12 data from the buffer.
-
-```c
-VdoBuffer* buf = getLastFrameBlocking(provider);
-uint8_t* nv12Data = (uint8_t*) vdo_buffer_get_data(buf);
-```
-
-Axis cameras outputs frames on the NV12 YUV format. As this is not normally used as input format to deep learning models,
-conversion to e.g., RGB might be needed. This is done by creating a pre-processing job request `ppReq` using the function `larodCreateJobRequest`.
-
-```c
-ppReq = larodCreateJobRequest(ppModel, ppInputTensors, ppNumInputs, ppOutputTensors, ppNumOutputs, cropMap, &error);
-```
-
-The image data is then converted from NV12 format to interleaved uint8_t RGB format by running the `larodRunJob` function on the above defined pre-processing job request `ppReq`.
-
-```c
-larodRunJob(conn, ppReq, &error)
-```
-
-By using the `larodRunJob` function on inference request `infReq`, the predictions from the MobileNet are saved into the specified addresses.
-
-```c
-larodRunJob(conn, infReq, &error);
-```
-
-There are four outputs from the Object Detection model, and each object's location are described in the form of \[top, left, bottom, right\].
-
-```c
-float* locations = (float*) larodOutput1Addr;
-float* classes = (float*) larodOutput2Addr;
-float* scores = (float*) larodOutput3Addr;
-float* numberofdetections = (float*) larodOutput4Addr;
-```
-
-If the score is higher than a threshold `args.threshold/100.0`, the results are outputted by the `syslog` function, and the object is cropped and saved into jpg form by `crop_interleaved`, `set_jpeg_configuration`, `buffer_to_jpeg`, `jpeg_to_file` methods.
-
-```c
-syslog(LOG_INFO, "Object %d: Classes: %s - Scores: %f - Locations: [%f,%f,%f,%f]",
-i, class_name[(int) classes[i]], scores[i], top, left, bottom, right);
-
-unsigned char* crop_buffer = crop_interleaved(cropAddr, rawWidth, rawHeight, CHANNELS,
-                                          crop_x, crop_y, crop_w, crop_h);
-
-buffer_to_jpeg(crop_buffer, &jpeg_conf, &jpeg_size, &jpeg_buffer);
-
-jpeg_to_file(file_name, jpeg_buffer, jpeg_size);
-```
-
-## Building the application
-
-An ACAP application contains a manifest file defining the package configuration.
-The file is named `manifest.json.<CHIP>` and can be found in the [app](app)
-directory. The Dockerfile will depending on the chip type(see below) copy the
-file to the required name format `manifest.json`. The noteworthy attribute for
-this tutorial is the `runOptions` attribute which allows arguments to be given
-to the application and here is handled by the `argparse` lib. The
-argument order, defined by [app/argparse.c](app/argparse.c), is `<model_path
-input_resolution_width input_resolution_height output_size_in_bytes
-raw_video_resolution_width raw_video_resolution_height threshold>`.
-
-In the Dockerfile a `.tflite` model file corresponding to the chosen chip is
-downloaded and added to the ACAP application via the -a flag in the
-`acap-build` command.
-
-The application is built to specification by the `Makefile` and `manifest.json`
-in the [app](app) directory. Standing in the application directory, run:
+Standing in your working directory run the following commands:
 
 > [!NOTE]
 >
-> Depending on the network your local build machine is connected to, you may need to add proxy
+> - Depending on the network your local build machine is connected to, you may need to add proxy
 > settings for Docker. See
-> [Proxy in build time](https://developer.axis.com/acap/develop/proxy/#proxy-in-build-time).
+> [Proxy in build time](https://developer.axis.com/acap/develop/proxy).
+>
 
 ```sh
-docker build --build-arg ARCH=<ARCH> --build-arg CHIP=<CHIP> --tag obj_detect:1.0 .
-docker cp $(docker create obj_detect:1.0):/opt/app ./build
+docker build --tag <APP_IMAGE> --build-arg ARCH=<ARCH> --build-arg CHIP=<CHIP> .
 ```
 
-where the parameters are:
+- `<APP_IMAGE>` is the name to tag the image with, e.g., `object_detection:1.0`.
+- `<ARCH>` is the SDK architecture, `armv7hf` or `aarch64`.
+- `<CHIP>` is the chip type, `artpec9`, `artpec8`, `cpu` or `edgetup`
 
-- \<CHIP\> is the chip type. Supported values are `artpec9`, `artpec8`, `cpu` and `edgetpu`.
-- \<ARCH\> is the architecture. Supported values are `armv7hf` (default) and `aarch64`.
-
-> N.b. The selected architecture and chip must match the targeted device.
-
-The installable `.eap` file is found under:
+Copy the result from the container image to a local directory `build`:
 
 ```sh
-build/object_detection_app_1_0_0_<ARCH>.eap
+docker cp $(docker create <APP_IMAGE>):/opt/app ./build
 ```
+
+The `build` directory contains the build artifacts, where the ACAP application is found with suffix
+`.eap`, depending on ARTPEC-8, ARTPEC-9, edgetpu or CPU:
+
+- `object_detection_artpec8_1_0_0_<ARCH>.eap`.
+- `object_detection_artpec9_1_0_0_<ARCH>.eap`.
+- `object_detection_cpu_1_0_0_<ARCH>.eap`.
+- `object_detection_edgetpu_1_0_0_<ARCH>.eap`.
 
 ## Install and start the application
 
@@ -246,21 +154,32 @@ http://<AXIS_DEVICE_IP>/index.html#apps
 - Click on the tab `Apps` in the device GUI
 - Enable `Allow unsigned apps` toggle
 - Click `(+ Add app)` button to upload the application file
-- Browse to the newly built ACAP application, depending on architecture:
-  - `object_detection_app_1_0_0_aarch64.eap`
-  - `object_detection_app_1_0_0_armv7hf.eap`
+- Browse to the newly built ACAP application:
+  - `object_detection_<CHIP>_1_0_0_<ARCH>.eap`
 - Click `Install`
 - Run the application by enabling the `Start` switch
 
-## Running the application
+## Expected output
 
-In the Apps view of the camera, press the icon for your ACAP application. A
-window will pop up which allows you to start the application. Press the Start
-icon to run the algorithm.
+This example uses the
+[Bounding Box API](https://developer.axis.com/acap/api/native-sdk-api/#bounding-box-api)
+to visualize the output from the SSD MobileNet v2 model. With the Bounding Box API, it is possible to draw
+bounding boxes directly on the device stream. View the stream by following the instructions:
 
-With the algorithm started, we can view the output by either pressing `App log`
-in the same window, or connect with SSH into the device and view the log with
-the following command:
+1. Click on the tab `Video` in the device GUI.
+2. Click `Stream` in the drop down menu.
+
+> [!NOTE]
+>
+> When detecting fast moving objects, the bounding box might lag behind the object depending on how
+> long the pre-processing and inference time is.
+
+### Application log
+
+The application log can be found by either:
+
+- Browsing to `http://<AXIS_DEVICE_IP>/axis-cgi/admin/systemlog.cgi?appname=object_detection`.
+- Browsing to the application page and click the `App log`.
 
 ```sh
 tail -f /var/volatile/log/info.log | grep object_detection
@@ -268,25 +187,15 @@ tail -f /var/volatile/log/info.log | grep object_detection
 
 Depending on selected chip, different output is received. The label file is used for identifying objects.
 
-In the system log the chip is sometimes only mentioned as a string, they are mapped as follows:
-
-| Chips | Larod 1 (int) | Larod 3 |
-|-------|--------------|------------------|
-| CPU with TensorFlow Lite | 2 | cpu-tflite |
-| Google TPU | 4 | google-edge-tpu-tflite |
-| Ambarella CVFlow (NN) | 6 | ambarella-cvflow |
-| ARTPEC-8 DLPU | 12 | axis-a8-dlpu-tflite |
-| ARTPEC-9 DLPU | - | a9-dlpu-tflite |
-
-There are four outputs from MobileNet SSD v2 (COCO) model. The number of detections, cLasses, scores, and locations are shown as below. The four location numbers stand for \[top, left, bottom, right\]. By the way, currently the saved images will be overwritten continuously, so those saved images might not all from the detections of the last frame, if the number of detections is less than previous detection numbers.
+There are four outputs from SSD MobileNet v2 (COCO) model. The number of detections, classes, scores, and locations are shown as below. The four location numbers stand for \[top, left, bottom, right\].
 
 ```sh
-[ INFO    ] object_detection[645]: Object 1: Classes: 2 car - Scores: 0.769531 - Locations: [0.750146,0.086451,0.894765,0.299347]
-[ INFO    ] object_detection[645]: Object 2: Classes: 2 car - Scores: 0.335938 - Locations: [0.005453,0.101417,0.045346,0.144171]
-[ INFO    ] object_detection[645]: Object 3: Classes: 2 car - Scores: 0.308594 - Locations: [0.109673,0.005128,0.162298,0.050947]
+[ INFO    ] object_detection[645]: Object 0: Classes: 2 car - Scores: 0.769531 - Locations: [0.750146,0.086451,0.894765,0.299347]
+[ INFO    ] object_detection[645]: Object 1: Classes: 2 car - Scores: 0.335938 - Locations: [0.005453,0.101417,0.045346,0.144171]
+[ INFO    ] object_detection[645]: Object 2: Classes: 2 car - Scores: 0.308594 - Locations: [0.109673,0.005128,0.162298,0.050947]
 ```
 
-The detected objects with a score higher than a threshold are saved into /tmp folder in .jpg form as well.
+The detected objects with a score higher than a threshold will be drawn using bbox and logged.
 
 ## License
 

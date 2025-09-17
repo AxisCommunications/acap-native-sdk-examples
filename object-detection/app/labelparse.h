@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2018-2021, Axis Communications AB, Lund, Sweden
+ * Copyright (C) 2025, Axis Communications AB, Lund, Sweden
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,21 +14,11 @@
  * limitations under the License.
  */
 
-/**
- * This header file parses the arguments to the application.
- */
-
 #pragma once
 
-#include <stddef.h>
+#include <stdlib.h>
 
-#include "larod.h"
-
-typedef struct args_t {
-    char* model_file;
-    char* labels_file;
-    unsigned threshold;
-    char* device_name;
-} args_t;
-
-void parse_args(int argc, char** argv, args_t* args);
+void parse_labels(char*** labels_ptr,
+                  char** label_file_buffer,
+                  const char* labels_path,
+                  size_t* num_labels_ptr);
