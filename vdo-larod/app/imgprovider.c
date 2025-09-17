@@ -35,10 +35,9 @@
 
 G_DEFINE_AUTOPTR_CLEANUP_FUNC(VdoResolutionSet, g_free);
 
-// Use the first input channel
-#define VDO_INPUT_CHANNEL (1)
-
 #define IMG_PROVIDER_ANALYSIS_MAX (10)
+
+#define MIN_SIZE 64
 
 /**
  * @brief Calculate a new img provider framerate based on inference time
@@ -50,32 +49,31 @@ G_DEFINE_AUTOPTR_CLEANUP_FUNC(VdoResolutionSet, g_free);
  */
 static void calculate_new_framerate(img_provider_t* provider, unsigned int analysis_time) {
     if (analysis_time > 201) {
-        provider->framerate = 1.0;
-        provider->frametime = 1001;
+        provider->img_info->framerate = 1.0;
+        provider->frametime           = 1001;
         return;
     }
     if (analysis_time < 34) {
-        provider->framerate = 30.0;
-        provider->frametime = 34;
+        provider->img_info->framerate = 30.0;
+        provider->frametime           = 34;
     } else if (analysis_time < 41) {
-        provider->framerate = 25.0;
-        provider->frametime = 41;
+        provider->img_info->framerate = 25.0;
+        provider->frametime           = 41;
     } else if (analysis_time < 51) {
-        provider->framerate = 20.0;
-        provider->frametime = 51;
+        provider->img_info->framerate = 20.0;
+        provider->frametime           = 51;
     } else if (analysis_time < 67) {
-        provider->framerate = 15.0;
-        provider->frametime = 67;
+        provider->img_info->framerate = 15.0;
+        provider->frametime           = 67;
     } else if (analysis_time < 101) {
-        provider->framerate = 10.0;
-        provider->frametime = 101;
+        provider->img_info->framerate = 10.0;
+        provider->frametime           = 101;
     } else if (analysis_time < 201) {
-        provider->framerate = 5.0;
-        provider->frametime = 201;
+        provider->img_info->framerate = 5.0;
+        provider->frametime           = 201;
     }
-    if (provider->framerate > provider->requested_framerate) {
-        provider->framerate = provider->requested_framerate;
-        provider->frametime = (unsigned int)((1 / provider->framerate) * 1000);
+    if (provider->img_info->framerate > provider->wanted_framerate) {
+        provider->img_info->framerate = provider->wanted_framerate;
     }
 }
 
@@ -85,32 +83,190 @@ static void update_framerate(img_provider_t* provider, unsigned analysis_time) {
 
     calculate_new_framerate(provider, analysis_time);
     if (old_frametime != provider->frametime) {
-        if (!vdo_stream_set_framerate(provider->vdo_stream, provider->framerate, &error)) {
+        if (!vdo_stream_set_framerate(provider->vdo_stream,
+                                      provider->img_info->framerate,
+                                      &error)) {
             panic("%s: Failed to change framerate: %s", __func__, error->message);
         }
         syslog(LOG_INFO,
-               "Change VDO stream framerate because of the mean analysis time %u ms",
+               "Change VDO stream framerate to %f because of the mean analysis time %u ms",
+               provider->img_info->framerate,
                analysis_time);
-        syslog(LOG_INFO, "New framerate is %f", provider->framerate);
         // Flush all frames in vdo so the latest is used
         img_provider_flush_all_frames(provider);
     }
 }
 
-img_provider_t* create_img_provider(unsigned int width,
-                                    unsigned int height,
-                                    unsigned int num_buffers,
-                                    VdoFormat format,
-                                    double framerate) {
+static bool choose_stream_resolution(unsigned int input_channel,
+                                     img_info_t* img_info,
+                                     const char* image_fit,
+                                     unsigned int* chosen_width,
+                                     unsigned int* chosen_height,
+                                     VdoFormat* format) {
+    g_autoptr(VdoResolutionSet) set     = NULL;
+    g_autoptr(VdoChannel) channel       = NULL;
+    g_autoptr(GError) error             = NULL;
+    g_autoptr(VdoMap) resolution_filter = vdo_map_new();
+    const char* select                  = "all";
+    const char* aspect_ratio            = "native";
+    bool ambarella_workaround           = false;
+
+    *format = img_info->format;
+
+    assert(chosen_width);
+    assert(chosen_height);
+
+    g_autoptr(VdoMap) ch_desc = vdo_map_new();
+    vdo_map_set_uint32(ch_desc, "input", input_channel);
+    channel = vdo_channel_get_ex(ch_desc, &error);
+    if (!channel) {
+        panic("%s: Failed vdo_channel_get(): %s", __func__, error->message);
+    }
+
+    // Only ambarella based cameras have PLANAR RGB as model input
+    if (*format == VDO_FORMAT_PLANAR_RGB) {
+        vdo_map_set_uint32(resolution_filter, "format", VDO_FORMAT_YUV);
+        vdo_map_set_string(resolution_filter, "select", "minmax");
+        set = vdo_channel_get_resolutions(channel, resolution_filter, &error);
+        if (!set || set->count == 0) {
+            panic("%s: Not possible to get any resolution from vdo for %u", __func__, *format);
+        }
+        // The minimum width will be 64 on 12.6 and later
+        if (set->resolutions[0].width > MIN_SIZE) {
+            ambarella_workaround = true;
+            *format              = VDO_FORMAT_YUV;
+        }
+    }
+
+    // Start to see if the supplied image format is available on this
+    // product. If not default to yuv
+    vdo_map_set_uint32(resolution_filter, "format", *format);
+    if (!g_strcmp0(image_fit, "crop")) {
+        aspect_ratio = NULL;
+        if (!ambarella_workaround) {
+            // Try to get the choosen resolution from vdo
+            // The only limits is the min and max resolution
+            select = "minmax";
+        } else {
+            select = "all";
+        }
+    }
+    vdo_map_set_string(resolution_filter, "select", select);
+    if (aspect_ratio) {
+        vdo_map_set_string(resolution_filter, "aspect_ratio", aspect_ratio);
+    }
+    set = vdo_channel_get_resolutions(channel, resolution_filter, &error);
+    if (!set || set->count == 0) {
+        // The supplied format is not supported, default to YUV
+        if (set) {
+            free(set);
+        }
+        if (*format == VDO_FORMAT_YUV) {
+            panic("%s: Not possible to get any resolution from vdo for %u", __func__, *format);
+        }
+        *format = VDO_FORMAT_YUV;
+        vdo_map_set_uint32(resolution_filter, "format", *format);
+        set = vdo_channel_get_resolutions(channel, resolution_filter, &error);
+        if (!set || set->count == 0) {
+            panic("%s: Not possible to get any resolution from vdo for %u", __func__, *format);
+        }
+    }
+
+    // For all try to find the closest match or an exact match
+    if (!g_strcmp0(select, "all")) {
+        // Find smallest VDO stream resolution that fits the requested size.
+        ssize_t best_resolution_idx       = -1;
+        unsigned int best_resolution_area = UINT_MAX;
+        for (ssize_t i = 0; i < (ssize_t)set->count; ++i) {
+            VdoResolution* res = &set->resolutions[i];
+            if ((res->width >= img_info->width) && (res->height >= img_info->height)) {
+                unsigned int area = res->width * res->height;
+                if (area < best_resolution_area) {
+                    best_resolution_idx  = i;
+                    best_resolution_area = area;
+                }
+            }
+        }
+
+        // If we got a reasonable w/h from the VDO channel info we use that
+        // for creating the stream. If that info for some reason was empty we
+        // fall back to trying to create a stream with client-supplied w/h.
+        *chosen_width  = img_info->width;
+        *chosen_height = img_info->height;
+        if (best_resolution_idx >= 0) {
+            *chosen_width  = set->resolutions[best_resolution_idx].width;
+            *chosen_height = set->resolutions[best_resolution_idx].height;
+        } else {
+            syslog(LOG_WARNING,
+                   "%s: VDO channel info contains no reslution info. Fallback "
+                   "to client-requested stream resolution.",
+                   __func__);
+        }
+    } else {
+        // Check towards min and max.
+        *chosen_width  = img_info->width;
+        *chosen_height = img_info->height;
+
+        // Check the requested width and height towards max resolution
+        if (img_info->width > set->resolutions[1].width ||
+            img_info->height > set->resolutions[1].height) {
+            *chosen_width  = set->resolutions[1].width;
+            *chosen_height = set->resolutions[1].height;
+            syslog(LOG_WARNING,
+                   "%s: Requested width or height larger than max resolution."
+                   "Limit the requested resolution to max %ux%u.",
+                   __func__,
+                   set->resolutions[1].width,
+                   set->resolutions[1].height);
+        }
+        // Check the requested width and height towards min resolution
+        if (img_info->width < set->resolutions[0].width ||
+            img_info->height < set->resolutions[0].height) {
+            *chosen_width  = set->resolutions[0].width;
+            *chosen_height = set->resolutions[0].height;
+            syslog(LOG_WARNING,
+                   "%s: Requested width or height smaller than min resolution."
+                   "Limit the requested resolution to min %u x %u.",
+                   __func__,
+                   set->resolutions[0].width,
+                   set->resolutions[0].height);
+        }
+    }
+    const char* format_str = "rgb interleaved";
+    if (*format == VDO_FORMAT_YUV) {
+        format_str = "yuv";
+    } else if (*format == VDO_FORMAT_PLANAR_RGB) {
+        format_str = "planar rgb";
+    }
+    syslog(LOG_INFO,
+           "%s: We select stream w/h=%u x %u with format %s based on VDO channel info.\n",
+           __func__,
+           *chosen_width,
+           *chosen_height,
+           format_str);
+
+    return true;
+}
+
+img_info_t img_provider_get_image_metadata(img_provider_t* provider) {
+    return *provider->img_info;
+}
+
+img_provider_t* img_provider_new(unsigned int input_channel,
+                                 img_info_t* img_info,
+                                 unsigned int num_buffers,
+                                 double framerate,
+                                 char* image_fit) {
     g_autoptr(VdoMap) vdo_settings = vdo_map_new();
     g_autoptr(GError) error        = NULL;
+    unsigned int chosen_width      = 0;
+    unsigned int chosen_height     = 0;
 
     img_provider_t* provider = (img_provider_t*)calloc(1, sizeof(img_provider_t));
     if (!provider) {
         panic("%s: Unable to allocate ImgProvider: %s", __func__, strerror(errno));
     }
 
-    provider->format       = format;
     provider->buffer_count = num_buffers;
     provider->vdo_stream   = NULL;
     provider->fd           = -1;
@@ -119,20 +275,24 @@ img_provider_t* create_img_provider(unsigned int width,
         panic("%s: Failed to create vdo_map", __func__);
     }
 
-    // Set input so the image is taken from the fist sensor channel
-    vdo_map_set_uint32(vdo_settings, "input", VDO_INPUT_CHANNEL);
-    // If channel is used it corresponds to the camera keyword in the rtsp url
-    // Note that channel 1 may be a viewarea or a sensor channel its all
-    // dependent on the product
-    // channel = 0 corresponds the overview keyword in the rtsp url
-    // vdo_map_set_uint32(vdoMap, "channel", 1);
+    // Start to get the best match for the provided img_info
+    if (!choose_stream_resolution(input_channel,
+                                  img_info,
+                                  image_fit,
+                                  &chosen_width,
+                                  &chosen_height,
+                                  &img_info->format)) {
+        panic("%s:Failed to choose stream resolution", __func__);
+    }
+
+    vdo_map_set_uint32(vdo_settings, "input", input_channel);
 
     // format is the image format that is supplied from vdo
-    vdo_map_set_uint32(vdo_settings, "format", format);
-    vdo_map_set_uint32(vdo_settings, "width", width);
-    vdo_map_set_uint32(vdo_settings, "height", height);
+    vdo_map_set_uint32(vdo_settings, "format", img_info->format);
     // Set initial framerate
     vdo_map_set_double(vdo_settings, "framerate", framerate);
+    vdo_map_set_uint32(vdo_settings, "width", chosen_width);
+    vdo_map_set_uint32(vdo_settings, "height", chosen_height);
     // Make it possible to change the framerate for the stream after it is started
     vdo_map_set_boolean(vdo_settings, "dynamic.framerate", true);
     // It is not needed to set buffer.strategy since VDO_BUFFER_STRATEGY_INFINITE is default
@@ -166,16 +326,21 @@ img_provider_t* create_img_provider(unsigned int width,
         panic("%s: Failed to get info map for stream: %s", __func__, error->message);
     }
 
-    provider->pitch               = vdo_map_get_uint32(vdo_info, "pitch", width);
-    provider->height              = vdo_map_get_uint32(vdo_info, "height", height);
-    provider->width               = vdo_map_get_uint32(vdo_info, "width", width);
-    provider->framerate           = vdo_map_get_double(vdo_info, "framerate", framerate);
-    provider->rotation            = vdo_map_get_uint32(vdo_info, "rotation", 0);
+    provider->img_info = (img_info_t*)calloc(1, sizeof(img_info_t));
+    if (!provider->img_info) {
+        panic("%s: Unable to allocate img info: %s", __func__, strerror(errno));
+    }
+    provider->img_info->height = vdo_map_get_uint32(vdo_info, "height", chosen_height);
+    provider->img_info->width  = vdo_map_get_uint32(vdo_info, "width", chosen_width);
+    provider->img_info->pitch  = vdo_map_get_uint32(vdo_info, "pitch", provider->img_info->width);
+    provider->img_info->format = vdo_map_get_uint32(vdo_info, "format", img_info->format);
+    provider->img_info->framerate = vdo_map_get_double(vdo_info, "framerate", framerate);
+    provider->img_info->rotation  = vdo_map_get_uint32(vdo_info, "rotation", 0);
     provider->channel             = vdo_map_get_uint32(vdo_info, "channel", 0);
-    provider->requested_framerate = framerate;
+    provider->wanted_framerate    = framerate;
 
     // Calculate the time between the images from vdo
-    provider->frametime            = (unsigned int)((1 / provider->framerate) * 1000);
+    provider->frametime            = (unsigned int)((1 / provider->img_info->framerate) * 1000);
     provider->mean_analysis_time   = 0;
     provider->analysis_frame_count = 0;
     provider->tot_analysis_time    = 0;
@@ -185,11 +350,12 @@ img_provider_t* create_img_provider(unsigned int width,
     return provider;
 }
 
-void destroy_img_provider(img_provider_t* provider) {
+void img_provider_destroy(img_provider_t* provider) {
     assert(provider);
 
     g_clear_object(&provider->vdo_stream);
 
+    free(provider->img_info);
     free(provider);
 }
 
@@ -295,110 +461,4 @@ void img_provider_flush_all_frames(img_provider_t* provider) {
             }
         }
     }
-}
-
-bool choose_stream_resolution(unsigned int req_width,
-                              unsigned int req_height,
-                              VdoFormat format,
-                              const char* aspect_ratio,
-                              const char* select,
-                              unsigned int* chosen_width,
-                              unsigned int* chosen_height) {
-    g_autoptr(VdoResolutionSet) set     = NULL;
-    g_autoptr(VdoChannel) channel       = NULL;
-    g_autoptr(GError) error             = NULL;
-    g_autoptr(VdoMap) resolution_filter = vdo_map_new();
-
-    assert(chosen_width);
-    assert(chosen_height);
-
-    // Retrieve channel resolutions for the input 1 channel
-    // This channel is normally the one to use since it will be
-    // the image sensor channel
-    g_autoptr(VdoMap) ch_desc = vdo_map_new();
-    vdo_map_set_uint32(ch_desc, "input", VDO_INPUT_CHANNEL);
-    channel = vdo_channel_get_ex(ch_desc, &error);
-    if (!channel) {
-        panic("%s: Failed vdo_channel_get(): %s", __func__, error->message);
-    }
-
-    // Retrieve min max resolutions for this format
-    vdo_map_set_uint32(resolution_filter, "format", format);
-    vdo_map_set_string(resolution_filter, "select", "minmax");
-    if (select != NULL) {
-        vdo_map_set_string(resolution_filter, "select", select);
-    }
-    if (aspect_ratio) {
-        vdo_map_set_string(resolution_filter, "aspect_ratio", aspect_ratio);
-    }
-    set = vdo_channel_get_resolutions(channel, resolution_filter, &error);
-    if (!set) {
-        panic("%s: Failed vdo_channel_get_resolutions(): %s", __func__, error->message);
-    }
-
-    // For all try to find the closest match or an exact match
-    if (select != NULL && !g_strcmp0(select, "all")) {
-        // Find smallest VDO stream resolution that fits the requested size.
-        ssize_t best_resolution_idx       = -1;
-        unsigned int best_resolution_area = UINT_MAX;
-        for (ssize_t i = 0; i < (ssize_t)set->count; ++i) {
-            VdoResolution* res = &set->resolutions[i];
-            if ((res->width >= req_width) && (res->height >= req_height)) {
-                unsigned int area = res->width * res->height;
-                if (area < best_resolution_area) {
-                    best_resolution_idx  = i;
-                    best_resolution_area = area;
-                }
-            }
-        }
-
-        // If we got a reasonable w/h from the VDO channel info we use that
-        // for creating the stream. If that info for some reason was empty we
-        // fall back to trying to create a stream with client-supplied w/h.
-        *chosen_width  = req_width;
-        *chosen_height = req_height;
-        if (best_resolution_idx >= 0) {
-            *chosen_width  = set->resolutions[best_resolution_idx].width;
-            *chosen_height = set->resolutions[best_resolution_idx].height;
-        } else {
-            syslog(LOG_WARNING,
-                   "%s: VDO channel info contains no reslution info. Fallback "
-                   "to client-requested stream resolution.",
-                   __func__);
-        }
-    } else {
-        // Check towards min and max.
-        *chosen_width  = req_width;
-        *chosen_height = req_height;
-
-        // Check the requested width and height towards max resolution
-        if (req_width > set->resolutions[1].width || req_height > set->resolutions[1].height) {
-            *chosen_width  = set->resolutions[1].width;
-            *chosen_height = set->resolutions[1].height;
-            syslog(LOG_WARNING,
-                   "%s: Requested width or height larger than max resolution."
-                   "Limit the requested resolution to max %ux%u.",
-                   __func__,
-                   set->resolutions[1].width,
-                   set->resolutions[1].height);
-        }
-        // Check the requested width and height towards min resolution
-        if (req_width < set->resolutions[0].width || req_height < set->resolutions[0].height) {
-            *chosen_width  = set->resolutions[0].width;
-            *chosen_height = set->resolutions[0].height;
-            syslog(LOG_WARNING,
-                   "%s: Requested width or height smaller than min resolution."
-                   "Limit the requested resolution to min %ux%u.",
-                   __func__,
-                   set->resolutions[0].width,
-                   set->resolutions[0].height);
-        }
-    }
-    syslog(LOG_INFO,
-           "%s: We select stream w/h=%u x %u based on VDO channel info.\n",
-           __func__,
-           *chosen_width,
-           *chosen_height);
-
-    return true;
 }

@@ -27,7 +27,23 @@
 #include "vdo-stream.h"
 #include "vdo-types.h"
 
+// This is a limitation from vdo
 #define MAX_NBR_IMG_PROVIDER_BUFFERS 5
+
+/**
+ * @brief A type representing the buffers from vdo
+ *
+ * Contains information needed by larod to be able to set correct
+ * properties on the imgInputTensors.
+ */
+typedef struct img_info {
+    VdoFormat format;
+    unsigned int width;
+    unsigned int height;
+    unsigned int pitch;
+    double framerate;
+    unsigned int rotation;
+} img_info_t;
 
 /**
  * @brief A type representing a provider of frames from VDO.
@@ -37,7 +53,6 @@
  */
 typedef struct img_provider {
     /// Stream format, typically YUV.
-    VdoFormat format;
 
     /// Vdo stream object.
     VdoStream* vdo_stream;
@@ -48,13 +63,8 @@ typedef struct img_provider {
     // These values are updated from the info map for the stream
     // This means that they will follow rotation and may then differ from the
     // values the stream was created with
-    unsigned int width;
-    unsigned int height;
-    unsigned int pitch;
-    double framerate;
-    double requested_framerate;
-    unsigned int rotation;
     unsigned int channel;
+    img_info_t* img_info;
 
     // Used for chaging framerate if needed
     unsigned int frametime;
@@ -63,6 +73,7 @@ typedef struct img_provider {
     unsigned int tot_analysis_time;
 
     int fd;
+    double wanted_framerate;
 } img_provider_t;
 
 /**
@@ -103,29 +114,13 @@ VdoBuffer* img_provider_get_frame(img_provider_t* provider);
 void img_provider_flush_all_frames(img_provider_t* provider);
 
 /**
- * @brief Find VDO resolution that best fits requirement.
+ * @brief Get metadata about the image
  *
- * Checks is the requested witdh and height is within the valid
- * range reported by vdo. If no valid resolutions are reported
- * by VDO then the original w/h are returned as chosenWidth/chosenHeight.
+ * @param provider  The imageprovider to be used
  *
- * @param req_width      Requested image width.
- * @param req_height     Requested image height.
- * @param format         Requested format for the stream.
- * @param aspect_ratio   Request a specific aspect ratio, can be NULL.
- * @param select         Default is minmax, but could be all or minmax
- * @param chosen_width   Selected image width.
- * @param chosen_height  Selected image height.
- *
- * @return false if any errors occur, otherwise true.
+ * @return img_info_t struct
  */
-bool choose_stream_resolution(unsigned int req_width,
-                              unsigned int req_height,
-                              VdoFormat format,
-                              const char* aspect_ratio,
-                              const char* select,
-                              unsigned int* chosen_width,
-                              unsigned int* chosen_height);
+img_info_t img_provider_get_image_metadata(img_provider_t* provider);
 
 /**
  * @brief Initializes an ImgProvider.
@@ -134,19 +129,19 @@ bool choose_stream_resolution(unsigned int req_width,
  * find resolution of the created stream. These numbers might not match the
  * requested resolution depending on platform properties.
  *
- * @param width       Requested output image width.
- * @param height      Requested ouput image height.
- * @param num_buffers Number of fetched frames to keep inside vdo
- * @param format      Image format to be output by stream.
- * @param framerate   The framerate to retrive images in
+ * @param input_channel   Video input channel to be used
+ * @param img_info        Requested stream properties
+ * @param num_buffers     Number of buffers the vdo will allocate for the stream
+ * @param framerate       Initial framerate of the stream
+ * @param image_fit       String that can be "crop" or "scale"
  *
  * @return Pointer to new ImgProvider, or NULL if failed.
  */
-img_provider_t* create_img_provider(unsigned int width,
-                                    unsigned int height,
-                                    unsigned int num_buffers,
-                                    VdoFormat format,
-                                    double framerate);
+img_provider_t* img_provider_new(unsigned int input_channel,
+                                 img_info_t* img_info,
+                                 unsigned int num_buffers,
+                                 double framerate,
+                                 char* image_fit);
 
 /**
  * @brief Release VDO Stream object and deallocate provider.
@@ -155,4 +150,4 @@ img_provider_t* create_img_provider(unsigned int width,
  *
  * @return void
  */
-void destroy_img_provider(img_provider_t* provider);
+void img_provider_destroy(img_provider_t* provider);
