@@ -19,61 +19,57 @@
  */
 
 #include "argparse.h"
+
+#include "panic.h"
+
 #include <argp.h>
 #include <stdlib.h>
 
 #define KEY_USAGE (127)
 
-static int parsePosInt(char* arg, unsigned long long* i, unsigned long long limit);
-static int parseOpt(int key, char* arg, struct argp_state* state);
+static int parse_pos_int(char* arg, unsigned long long* i, unsigned long long limit);
+static int parse_opt(int key, char* arg, struct argp_state* state);
 
 const struct argp_option opts[] = {
-    {"chip",
-     'c',
-     "CHIP",
+    {"device",
+     'd',
+     "DEVICE",
      0,
-     "Chooses chip CHIP to run on, where CHIP is the enum type larodChip "
-     "from the library. If not specified, the default chip for a new "
-     "connection will be used.",
+     "Could be axis-a8-dlpu-tflite, a9-dlpu-tflite, google-edge-tpu-tflite or cpu-tflite",
      0},
     {"help", 'h', NULL, 0, "Print this help text and exit.", 0},
     {"usage", KEY_USAGE, NULL, 0, "Print short usage message and exit.", 0},
     {0}};
-const struct argp argp = {
-    opts,
-    parseOpt,
-    "MODEL WIDTH HEIGHT QUALITY RAW_WIDTH RAW_HEIGHT THRESHOLD LABELSFILE",
-    "This is an example app which loads an object detection MODEL to "
-    "larod and then uses vdo to fetch frames of size WIDTH x HEIGHT in yuv "
-    "format which are converted to interleaved rgb format and then sent to "
-    "larod for inference on MODEL. RAW_WIDTH x RAW_HEIGHT is the original "
-    "resolution of frames from the camera. QUALITY denotes the desired jpeg "
-    "image quality ranging from 0 to 100. THRESHOLD ranging from 0 to 100 is the "
-    "min score required to show the detected objects and crop them. LABELSFILE "
-    "is the path of a txt where labes names are saved. \n\nExample call: "
-    "\n/usr/local/packages/object_detection/model/converted_model.tflite 300 "
-    "300 80 1920 1080 50 /usr/local/packages/object_detection/label/labels.txt "
-    "-c 4 \nwhere 4 here refers to the Edge TPU backend. The numbers for "
-    "each type of chip can be found at the top of the file larod.h.",
-    NULL,
-    NULL,
-    NULL};
+const struct argp argp = {opts,
+                          parse_opt,
+                          "MODEL THRESHOLD LABELSFILE",
+                          "This is an example app which loads an object detection MODEL to "
+                          "larod and then uses vdo to fetch frames in yuv or rgb"
+                          "format which are converted if needed to rgb."
+                          "and then sent to larod for inference on MODEL."
+                          "THRESHOLD ranging from 0 to 100 is the "
+                          "min score required to show the detected objects."
+                          "LABELSFILE is the path of a txt where labes names are saved."
+                          "\n\nExample call: "
+                          "\n/usr/local/packages/object_detection/model/model.tflite"
+                          "80 /usr/local/packages/object_detection/label/labels.txt ",
+                          NULL,
+                          NULL,
+                          NULL};
 
-bool parseArgs(int argc, char** argv, args_t* args) {
+void parse_args(int argc, char** argv, args_t* args) {
     if (argp_parse(&argp, argc, argv, ARGP_NO_HELP, NULL, args)) {
-        return false;
+        panic("%s: Could not parse arguments", __func__);
     }
-    return true;
 }
 
-int parseOpt(int key, char* arg, struct argp_state* state) {
+int parse_opt(int key, char* arg, struct argp_state* state) {
     args_t* args = state->input;
 
     switch (key) {
-        case 'c': {
-            args->chip = arg;
+        case 'd':
+            args->device_name = arg;
             break;
-        }
         case 'h':
             argp_state_help(state, stdout, ARGP_HELP_STD_HELP);
             break;
@@ -82,68 +78,28 @@ int parseOpt(int key, char* arg, struct argp_state* state) {
             break;
         case ARGP_KEY_ARG:
             if (state->arg_num == 0) {
-                args->modelFile = arg;
+                args->model_file = arg;
             } else if (state->arg_num == 1) {
-                unsigned long long width;
-                int ret = parsePosInt(arg, &width, UINT_MAX);
-                if (ret) {
-                    argp_failure(state, EXIT_FAILURE, ret, "invalid width");
-                }
-                args->width = (unsigned int)width;
-            } else if (state->arg_num == 2) {
-                unsigned long long height;
-                int ret = parsePosInt(arg, &height, UINT_MAX);
-                if (ret) {
-                    argp_failure(state, EXIT_FAILURE, ret, "invalid height");
-                }
-                args->height = (unsigned int)height;
-            } else if (state->arg_num == 3) {
-                unsigned long long quality;
-                int ret = parsePosInt(arg, &quality, UINT_MAX);
-                if (ret) {
-                    argp_failure(state, EXIT_FAILURE, ret, "invalid quality");
-                }
-                args->quality = (unsigned int)quality;
-            } else if (state->arg_num == 4) {
-                unsigned long long raw_width;
-                int ret = parsePosInt(arg, &raw_width, UINT_MAX);
-                if (ret) {
-                    argp_failure(state, EXIT_FAILURE, ret, "invalid raw_width");
-                }
-                args->raw_width = (unsigned int)raw_width;
-            } else if (state->arg_num == 5) {
-                unsigned long long raw_height;
-                int ret = parsePosInt(arg, &raw_height, UINT_MAX);
-                if (ret) {
-                    argp_failure(state, EXIT_FAILURE, ret, "invalid raw_height");
-                }
-                args->raw_height = (unsigned int)raw_height;
-            } else if (state->arg_num == 6) {
                 unsigned long long threshold;
-                int ret = parsePosInt(arg, &threshold, UINT_MAX);
+                int ret = parse_pos_int(arg, &threshold, UINT_MAX);
                 if (ret) {
                     argp_failure(state, EXIT_FAILURE, ret, "invalid threshold");
                 }
                 args->threshold = (unsigned int)threshold;
-            } else if (state->arg_num == 7) {
-                args->labelsFile = arg;
+            } else if (state->arg_num == 2) {
+                args->labels_file = arg;
             } else {
                 argp_error(state, "Too many arguments given");
             }
             break;
         case ARGP_KEY_INIT:
-            args->width      = 0;
-            args->height     = 0;
-            args->quality    = 0;
-            args->raw_width  = 0;
-            args->raw_height = 0;
-            args->threshold  = 0;
-            args->chip       = NULL;
-            args->modelFile  = NULL;
-            args->labelsFile = NULL;
+            args->threshold   = 0;
+            args->device_name = NULL;
+            args->model_file  = NULL;
+            args->labels_file = NULL;
             break;
         case ARGP_KEY_END:
-            if (state->arg_num != 8) {
+            if (state->arg_num < 1 || state->arg_num > 3) {
                 argp_error(state, "Invalid number of arguments given");
             }
             break;
@@ -162,11 +118,11 @@ int parseOpt(int key, char* arg, struct argp_state* state) {
  * param limit Max limit for data type integer will be saved to.
  * return Positive errno style return code (zero means success).
  */
-static int parsePosInt(char* arg, unsigned long long* i, unsigned long long limit) {
-    char* endPtr;
+static int parse_pos_int(char* arg, unsigned long long* i, unsigned long long limit) {
+    char* end_p;
 
-    *i = strtoull(arg, &endPtr, 0);
-    if (*endPtr != '\0') {
+    *i = strtoull(arg, &end_p, 0);
+    if (*end_p != '\0') {
         return EINVAL;
     } else if (arg[0] == '-' || *i == 0) {
         return EINVAL;

@@ -23,30 +23,6 @@ RUN DEBIAN_FRONTEND=noninteractive \
     rm -rf /var/lib/apt/lists/*
 
 #-------------------------------------------------------------------------------
-# Build libjpeg-turbo
-#-------------------------------------------------------------------------------
-
-ARG JPEGTURBO_VERSION=3.0.3
-ARG JPEGTURBO_GIT_REPO=https://github.com/libjpeg-turbo/libjpeg-turbo
-ARG JPEGTURBO_VERSION_DIR=libjpeg-turbo-${JPEGTURBO_VERSION}
-ARG JPEGTURBO_DIR=${BUILD_DIR}/libjpeg-turbo
-ARG JPEGTURBO_SRC_DIR=${JPEGTURBO_DIR}/${JPEGTURBO_VERSION_DIR}
-ARG JPEGTURBO_BUILD_DIR=${JPEGTURBO_DIR}/build
-
-WORKDIR ${JPEGTURBO_DIR}
-SHELL ["/bin/bash", "-o", "pipefail", "-c"]
-RUN curl -fsSL ${JPEGTURBO_GIT_REPO}/releases/download/${JPEGTURBO_VERSION}/${JPEGTURBO_VERSION_DIR}.tar.gz | tar -xz
-
-WORKDIR ${JPEGTURBO_SRC_DIR}
-RUN . /opt/axis/acapsdk/environment-setup* && \
-    pwd && ls -la && \
-    cmake -G"Unix Makefiles" \
-      -DCMAKE_INSTALL_PREFIX:PATH=${JPEGTURBO_BUILD_DIR} \
-      . && \
-      make -j && \
-      make install
-
-#-------------------------------------------------------------------------------
 # Get models and labels
 #-------------------------------------------------------------------------------
 
@@ -64,6 +40,7 @@ RUN if [ "$CHIP" = artpec8 ] || [ "$CHIP" = artpec9 ] || [ "$CHIP" = cpu ]  ; th
         exit 1; \
     fi
 
+# Download labels for model
 WORKDIR /opt/app/label
 RUN curl -L -o labels.txt https://github.com/google-coral/test_data/raw/master/coco_labels.txt
 
@@ -73,7 +50,14 @@ RUN curl -L -o labels.txt https://github.com/google-coral/test_data/raw/master/c
 
 WORKDIR /opt/app
 COPY ./app .
+
 RUN cp /opt/app/manifest.json.${CHIP} /opt/app/manifest.json && \
-    . /opt/axis/acapsdk/environment-setup* && acap-build . \
-    -a 'label/labels.txt' \
-    -a 'model/converted_model.tflite'
+    . /opt/axis/acapsdk/environment-setup* && \
+    if [ "$CHIP" = artpec8 ] || [ "$CHIP" = artpec9 ] || [ "$CHIP" = cpu ] || [ "$CHIP" = edgetpu ]; then \
+        acap-build . -a 'label/labels.txt' \
+        -a 'model/converted_model.tflite'; \
+    else \
+        printf "Error: '%s' is not a valid value for the CHIP variable\n", "$CHIP"; \
+        exit 1; \
+fi
+
