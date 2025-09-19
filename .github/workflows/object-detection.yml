@@ -15,16 +15,16 @@ jobs:
         include:
           - arch: armv7hf
             chip: cpu
-            axis-os: 12.5.56
+            axis-os: 12.6.85
           - arch: armv7hf
             chip: edgetpu
-            axis-os: 12.5.56
+            axis-os: 12.6.85
           - arch: aarch64
             chip: artpec8
-            axis-os: 12.5.56
+            axis-os: 12.6.85
           - arch: aarch64
             chip: artpec9
-            axis-os: 12.5.56
+            axis-os: 12.6.85
     env:
       EXREPO: acap-native-examples
       EXNAME: object-detection

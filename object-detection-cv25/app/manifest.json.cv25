@@ -1,5 +1,5 @@
 {
-    "schemaVersion": "1.7.4",
+    "schemaVersion": "1.8.0",
     "acapPackageConf": {
         "setup": {
             "friendlyName": "object_detection_cv25",
