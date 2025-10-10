@@ -118,12 +118,11 @@ This example uses a YOLOv5n model trained on the [COCO dataset](https://cocodata
 on which `<CHIP>` is provided when [building the application](#build-the-application), either
 [yolov5n_artpec8_coco_640.tflite](https://acap-ml-models.s3.us-east-1.amazonaws.com/yolov5/yolov5n_artpec8_coco_640.tflite)
 or [yolov5n_artpec9_coco_640.tflite](https://acap-ml-models.s3.us-east-1.amazonaws.com/yolov5/yolov5n_artpec9_coco_640.tflite)
-is used. The differences between these models are explained in their respective training guide:
-
-- [YOLOv5 on ARTPEC-8](https://github.com/AxisCommunications/axis-model-zoo/blob/main/docs/yolov5-on-artpec8.md).
-- [YOLOv5 on ARTPEC-9](https://github.com/AxisCommunications/axis-model-zoo/blob/main/docs/yolov5-on-artpec9.md).
-
-To train your own YOLOv5 model, follow the appropriate guide above.
+is used. The differences between these models are explained in the
+[YOLOv5 training guide](https://github.com/AxisCommunications/axis-model-zoo/blob/main/docs/yolov5.md).
+That guide can also be used to train your own YOLOv5 model. Then, see the
+[Dockerfile parameters](#dockerfile-parameters) section to learn how to use your own model in this
+example.
 
 ## Explanation of YOLOv5 output parsing
 
@@ -219,8 +218,12 @@ installed. In order to apply the changes, the ACAP application must be restarted
 
 ### Dockerfile parameters
 
-The model `.tflite` file and the labels `.txt` file are provided through the `Dockerfile`. In this
-example, these files are downloaded using the cURL command.
+The model `.tflite` file and the labels `.txt` file are provided through the
+[Dockerfile](./Dockerfile). In this example, these files are downloaded using the `curl` command.
+
+To use your own YOLOv5 model and labels file, you just have to configure the
+[Dockerfile](./Dockerfile) to download your files, or, if you have the files locally, use the `COPY`
+command instead.
 
 ### Model-specific parameters
 
