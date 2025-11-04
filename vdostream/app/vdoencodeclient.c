@@ -76,9 +76,6 @@ static void handle_sigint(int signum) {
 
 // Determine and log the received frame type
 static void print_frame(VdoFrame* frame) {
-    if (!vdo_frame_get_is_last_buffer(frame))
-        return;
-
     gchar* frame_type;
     switch (vdo_frame_get_frame_type(frame)) {
         case VDO_FRAME_TYPE_H264_IDR:
