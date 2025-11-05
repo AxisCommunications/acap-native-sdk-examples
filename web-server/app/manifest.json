@@ -9,6 +9,7 @@
 			"version": "1.0.0"
 		},
 		"configuration": {
+            "settingPage": "index.html",
 			"reverseProxy": [
 				{
 					"apiPath": "my_web_server",

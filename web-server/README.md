@@ -165,9 +165,9 @@ Where the expected output is
 </html>
 ```
 
-As can be seen it's HTML code, browse to web page
-`http://<AXIS_DEVICE_IP>/local/web_server_rev_proxy/my_web_server`
-for seeing it rendered.
+To view the rendered web page, click on the `Open` button of the application
+from the `Apps` tab of the device GUI. Alternatively, browse directly to
+`http://<AXIS_DEVICE_IP>/local/web_server_rev_proxy/my_web_server`.
 
 The application log can be found by either
 
