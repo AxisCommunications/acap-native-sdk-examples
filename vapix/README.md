@@ -91,7 +91,7 @@ Standing in your working directory run the following commands:
 > [Proxy in build time](https://developer.axis.com/acap/develop/proxy/#proxy-in-build-time).
 
 ```sh
-docker build --tag <APP_IMAGE> --build-arg ARCH=<ARCH> .
+docker build --platform=linux/amd64 --tag <APP_IMAGE> --build-arg ARCH=<ARCH> .
 ```
 
 - `<APP_IMAGE>` is the name to tag the image with, e.g., `vapix_example:1.0`
@@ -100,7 +100,7 @@ docker build --tag <APP_IMAGE> --build-arg ARCH=<ARCH> .
 Copy the result from the container image to a local directory `build`:
 
 ```sh
-docker cp $(docker create <APP_IMAGE>):/opt/app ./build
+docker cp $(docker create --platform=linux/amd64 <APP_IMAGE>):/opt/app ./build
 ```
 
 The `build` directory contains the build artifacts, where the ACAP application
@@ -109,6 +109,10 @@ chosen, one of these files should be found:
 
 - `vapix_example_1_0_0_aarch64.eap`
 - `vapix_example_1_0_0_armv7hf.eap`
+
+> [!NOTE]
+>
+> For detailed information on how to build, install, and run ACAP applications, refer to the official ACAP documentation: [Build, install, and run](https://developer.axis.com/acap/develop/build-install-run/).
 
 #### Install and start the application
 

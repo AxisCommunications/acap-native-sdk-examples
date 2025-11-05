@@ -92,8 +92,8 @@ following commands to build the dev container for the architecture of
 your Axis device:
 
 ```sh
-docker build . --build-arg ARCH=armv7hf -t dev_container:armv7hf
-docker build . --build-arg ARCH=aarch64 -t dev_container:aarch64
+docker build . --platform=linux/amd64 --build-arg ARCH=armv7hf -t dev_container:armv7hf
+docker build . --platform=linux/amd64 --build-arg ARCH=aarch64 -t dev_container:aarch64
 ```
 
 The dev container includes the `gdbserver` binary for remote debugging.

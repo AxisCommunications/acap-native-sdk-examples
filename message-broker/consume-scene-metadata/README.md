@@ -149,7 +149,7 @@ Standing in your working directory run the following commands:
 > settings for Docker. See [Proxy in build time](../DEV.md#proxy-in-build-time).
 
 ```sh
-docker build --tag <APP_IMAGE> --build-arg ARCH=<ARCH> .
+docker build --platform=linux/amd64 --tag <APP_IMAGE> --build-arg ARCH=<ARCH> .
 ```
 
 - `<APP_IMAGE>` is the name to tag the image with, e.g., `consume_scene_metadata:1.0`
@@ -158,7 +158,7 @@ docker build --tag <APP_IMAGE> --build-arg ARCH=<ARCH> .
 Copy the result from the container image to a local directory build:
 
 ```sh
-docker cp $(docker create <APP_IMAGE>):/opt/app ./build
+docker cp $(docker create --platform=linux/amd64 <APP_IMAGE>):/opt/app ./build
 ```
 
 The working directory now contains a build folder with the following files:

@@ -39,7 +39,7 @@ Standing in your working directory run the following commands:
 > [Proxy in build time](https://developer.axis.com/acap/develop/proxy/#proxy-in-build-time).
 
 ```sh
-docker build --tag <APP_IMAGE> .
+docker build --platform=linux/amd64 --tag <APP_IMAGE> .
 ```
 
 `<APP_IMAGE>` is the name to tag the image with, e.g., `axstorage:1.0`
@@ -55,7 +55,7 @@ docker build --build-arg ARCH=aarch64 --tag <APP_IMAGE> .
 Copy the result from the container image to a local directory called `build`:
 
 ```sh
-docker cp $(docker create <APP_IMAGE>):/opt/app ./build
+docker cp $(docker create --platform=linux/amd64 <APP_IMAGE>):/opt/app ./build
 ```
 
 The working directory now contains a build folder with the following files:
@@ -82,6 +82,10 @@ build
 - **axstorage*** - Application executable binary file.
 - **axstorage_1_0_0_armv7hf.eap** - Application package .eap file.
 - **axstorage_1_0_0_LICENSE.txt** - Copy of LICENSE file.
+
+> [!NOTE]
+>
+> For detailed information on how to build, install, and run ACAP applications, refer to the official ACAP documentation: [Build, install, and run](https://developer.axis.com/acap/develop/build-install-run/).
 
 #### Install and start the application
 

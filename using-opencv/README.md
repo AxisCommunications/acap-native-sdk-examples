@@ -40,13 +40,13 @@ building-opencv
    On armv7hf architecture
 
    ```sh
-   docker build --tag <APP_IMAGE> .
+   docker build --platform=linux/amd64 --tag <APP_IMAGE> .
    ```
 
    On aarch64 architecture
 
    ```sh
-   docker build --tag <APP_IMAGE> --build-arg ARCH=aarch64 .
+   docker build --platform=linux/amd64 --tag <APP_IMAGE> --build-arg ARCH=aarch64 .
    ```
 
    <APP_IMAGE> is the name to tag the image with, e.g., opencv-app:1.0
@@ -54,8 +54,12 @@ building-opencv
    Copy the result from the container image to a local directory build:
 
    ```sh
-   docker cp $(docker create <APP_IMAGE>):/opt/app ./build
+   docker cp $(docker create --platform=linux/amd64 <APP_IMAGE>):/opt/app ./build
    ```
+
+    > [!NOTE]
+    >
+    > For detailed information on how to build, install, and run ACAP applications, refer to the official ACAP documentation: [Build, install, and run](https://developer.axis.com/acap/develop/build-install-run/).
 
 2. You should now have a `build` directory. In it is the `.eap` file that is
    your application.  Enable the `Allow unsigned apps` toggle and upload the

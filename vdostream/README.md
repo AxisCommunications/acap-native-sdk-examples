@@ -55,7 +55,7 @@ Standing in your working directory run the following commands:
 > [Proxy in build time](https://developer.axis.com/acap/develop/proxy/#proxy-in-build-time).
 
 ```sh
-docker build --tag <APP_IMAGE> --build-arg VDO_FORMAT=<VDO_FORMAT> .
+docker build --platform=linux/amd64 --tag <APP_IMAGE> --build-arg VDO_FORMAT=<VDO_FORMAT> .
 ```
 
 <!-- textlint-disable terminology -->
@@ -75,7 +75,7 @@ docker build --build-arg ARCH=aarch64 --build-arg VDO_FORMAT=<VDO_FORMAT> --tag 
 Copy the result from the container image to a local directory build:
 
 ```sh
-docker cp $(docker create <APP_IMAGE>):/opt/app ./build
+docker cp $(docker create --platform=linux/amd64 <APP_IMAGE>):/opt/app ./build
 ```
 
 The working dir now contains a build folder with the following files:
@@ -118,6 +118,10 @@ vdostream
 - **build/vdoencodeclient*** - Application executable binary file.
 - **build/vdoencodeclient_1_0_0_armv7hf.eap** - Application package .eap file.
 - **build/vdoencodeclient_1_0_0_LICENSE.txt** - Copy of LICENSE file.
+
+> [!NOTE]
+>
+> For detailed information on how to build, install, and run ACAP applications, refer to the official ACAP documentation: [Build, install, and run](https://developer.axis.com/acap/develop/build-install-run/).
 
 #### Install and start the application
 

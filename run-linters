@@ -67,7 +67,7 @@ done
   if [ "$(uname -m)" = "arm64" ] || [ "$(uname -m)" = "aarch64" ]; then
     printf '%s\n' "Note: Using x86_64 emulation for Super Linter ${SUPER_LINTER_VERSION} on Apple Silicon"
     docker run --rm \
-      --platform linux/amd64 \
+      --platform=linux/amd64 \
       -e RUN_LOCAL=true \
       --env-file .github/super-linter.env \
       -v "$(pwd)":/tmp/lint \

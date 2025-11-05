@@ -43,7 +43,7 @@ Standing in your working directory run the following commands:
 > [Proxy in build time](https://developer.axis.com/acap/develop/proxy/#proxy-in-build-time).
 
 ```sh
-docker build --tag <APP_IMAGE> .
+docker build --platform=linux/amd64 --tag <APP_IMAGE> .
 ```
 
 <APP_IMAGE> is the name to tag the image with, e.g., hello_world:1.0
@@ -59,7 +59,7 @@ docker build --build-arg ARCH=aarch64 --tag <APP_IMAGE> .
 Copy the result from the container image to a local directory build:
 
 ```sh
-docker cp $(docker create <APP_IMAGE>):/opt/app ./build
+docker cp $(docker create --platform=linux/amd64 <APP_IMAGE>):/opt/app ./build
 ```
 
 The working dir now contains a build folder with the following files:
@@ -93,6 +93,10 @@ hello-world
 - **build/package.conf** - Defines the application and its configuration.
 - **build/package.conf.orig** - Defines the application and its configuration, original file.
 - **build/param.conf** - File containing application parameters.
+
+> [!NOTE]
+>
+> For detailed information on how to build, install, and run ACAP applications, refer to the official ACAP documentation: [Build, install, and run](https://developer.axis.com/acap/develop/build-install-run/).
 
 #### Install and start the application
 

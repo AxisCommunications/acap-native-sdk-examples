@@ -123,8 +123,8 @@ installation.
 Building is done using the following commands:
 
 ```sh
-docker build --tag <APP_IMAGE> --build-arg CHIP=<CHIP> .
-docker cp $(docker create <APP_IMAGE>):/opt/app ./build
+docker build --platform=linux/amd64 --tag <APP_IMAGE> --build-arg CHIP=<CHIP> .
+docker cp $(docker create --platform=linux/amd64 <APP_IMAGE>):/opt/app ./build
 ```
 
 - \<APP_IMAGE\> is the name to tag the image with, e.g., `vdo_larod:1.0`.
@@ -139,7 +139,7 @@ To build a package for ARTPEC-8 with Tensorflow Lite, run the following commands
 
 ```sh
 docker build --build-arg ARCH=aarch64 --build-arg CHIP=artpec8 --tag <APP_IMAGE> .
-docker cp $(docker create <APP_IMAGE>):/opt/app ./build
+docker cp $(docker create --platform=linux/amd64 <APP_IMAGE>):/opt/app ./build
 ```
 
 #### Build for ARTPEC-9 with Tensorflow Lite
@@ -148,7 +148,7 @@ To build a package for ARTPEC-9 with Tensorflow Lite, run the following commands
 
 ```sh
 docker build --build-arg ARCH=aarch64 --build-arg CHIP=artpec9 --tag <APP_IMAGE> .
-docker cp $(docker create <APP_IMAGE>):/opt/app ./build
+docker cp $(docker create --platform=linux/amd64 <APP_IMAGE>):/opt/app ./build
 ```
 
 #### Build for CPU with Tensorflow Lite
@@ -157,7 +157,7 @@ To build a package for CPU with Tensorflow Lite, run the following commands stan
 
 ```sh
 docker build --build-arg CHIP=cpu --tag <APP_IMAGE> .
-docker cp $(docker create <APP_IMAGE>):/opt/app ./build
+docker cp $(docker create --platform=linux/amd64 <APP_IMAGE>):/opt/app ./build
 ```
 
 #### Build for Google TPU
@@ -166,7 +166,7 @@ To build a package for Google TPU instead, run the following commands standing i
 
 ```sh
 docker build --build-arg CHIP=edgetpu --tag <APP_IMAGE> .
-docker cp $(docker create <APP_IMAGE>):/opt/app ./build
+docker cp $(docker create --platform=linux/amd64 <APP_IMAGE>):/opt/app ./build
 ```
 
 #### Build for CV25 using DLPU
@@ -175,7 +175,7 @@ To build a package for CV25 run the following commands standing in your working 
 
 ```sh
 docker build --build-arg ARCH=aarch64 --build-arg CHIP=cv25 --tag <APP_IMAGE> .
-docker cp $(docker create <APP_IMAGE>):/opt/app ./build
+docker cp $(docker create --platform=linux/amd64 <APP_IMAGE>):/opt/app ./build
 ```
 
 #### Build output
@@ -237,6 +237,10 @@ vdo-larod
   If chip `cv25` has been built.
 - **build/vdo_larod_cv25_1_0_0_aarch64.eap** - Application package .eap file.
 - **build/vdo_larod_cv25_1_0_0_LICENSE.txt** - Copy of LICENSE file.
+
+> [!NOTE]
+>
+> For detailed information on how to build, install, and run ACAP applications, refer to the official ACAP documentation: [Build, install, and run](https://developer.axis.com/acap/develop/build-install-run/).
 
 #### Install and start the application
 
