@@ -45,7 +45,7 @@ tensorflow_to_larod-artpec8
 In this tutorial, we are going to be working within a Docker container environment. This is done as to get the correct version of Tensorflow installed, as well as the needed tools. The model training is part of the container image build. To start the build and training, run:
 
 ```sh
-docker build --tag <APP_IMAGE> .
+docker build --platform=linux/amd64 --tag <APP_IMAGE> .
 ```
 
 - `<APP_IMAGE>` is the name to tag the image with, e.g., tf-model-training-a8:1.0.
@@ -53,7 +53,7 @@ docker build --tag <APP_IMAGE> .
 To train and tune for a specific amount of epochs, include the following build arguments when running:
 
 ```sh
-docker build --tag <APP_IMAGE> --build-arg TRAIN_EPOCHS=<TRAIN_EPOCHS> --build-arg TUNE_EPOCHS=<TUNE_EPOCHS> .
+docker build --platform=linux/amd64 --tag <APP_IMAGE> --build-arg TRAIN_EPOCHS=<TRAIN_EPOCHS> --build-arg TUNE_EPOCHS=<TUNE_EPOCHS> .
 ```
 
 - `<TRAIN_EPOCHS>` is the number of epochs to train, e.g., 2.
@@ -62,12 +62,16 @@ docker build --tag <APP_IMAGE> --build-arg TRAIN_EPOCHS=<TRAIN_EPOCHS> --build-a
 Copy the model from the container image to a local directory:
 
 ```sh
-docker cp $(docker create <APP_IMAGE>):/env/training/models/converted_model.tflite ./<DESIRED_PATH>/converted_model.tflite
+docker cp $(docker create --platform=linux/amd64 <APP_IMAGE>):/env/training/models/converted_model.tflite ./<DESIRED_PATH>/converted_model.tflite
 ```
 
 Note that the MS COCO 2017 validation dataset is downloaded during the building of the environment. This is roughly 1GB in size which means this could take a few minutes to download.
 
 If your machine doesn't have the hardware requisites, like not enough GPU to train or not enough storage to save the training data, you can take a look at [train-tensorflow-model-using-aws](https://github.com/AxisCommunications/acap-sdk-tools/tree/main/train-tensorflow-model-using-aws), a tool to automatize model training with AWS.
+
+> [!NOTE]
+>
+> For detailed information on how to build, install, and run ACAP applications, refer to the official ACAP documentation: [Build, install, and run](https://developer.axis.com/acap/develop/build-install-run/).
 
 ### The example model
 

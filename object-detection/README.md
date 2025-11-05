@@ -122,7 +122,7 @@ Standing in your working directory run the following commands:
 >
 
 ```sh
-docker build --tag <APP_IMAGE> --build-arg ARCH=<ARCH> --build-arg CHIP=<CHIP> .
+docker build --platform=linux/amd64 --tag <APP_IMAGE> --build-arg ARCH=<ARCH> --build-arg CHIP=<CHIP> .
 ```
 
 - `<APP_IMAGE>` is the name to tag the image with, e.g., `object_detection:1.0`.
@@ -132,7 +132,7 @@ docker build --tag <APP_IMAGE> --build-arg ARCH=<ARCH> --build-arg CHIP=<CHIP> .
 Copy the result from the container image to a local directory `build`:
 
 ```sh
-docker cp $(docker create <APP_IMAGE>):/opt/app ./build
+docker cp $(docker create --platform=linux/amd64 <APP_IMAGE>):/opt/app ./build
 ```
 
 The `build` directory contains the build artifacts, where the ACAP application is found with suffix
@@ -142,6 +142,10 @@ The `build` directory contains the build artifacts, where the ACAP application i
 - `object_detection_artpec9_1_0_0_<ARCH>.eap`.
 - `object_detection_cpu_1_0_0_<ARCH>.eap`.
 - `object_detection_edgetpu_1_0_0_<ARCH>.eap`.
+
+> [!NOTE]
+>
+> For detailed information on how to build, install, and run ACAP applications, refer to the official ACAP documentation: [Build, install, and run](https://developer.axis.com/acap/develop/build-install-run/).
 
 ## Install and start the application
 

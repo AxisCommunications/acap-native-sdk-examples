@@ -54,7 +54,7 @@ Standing in your working directory run the following commands:
 > [Proxy in build time](https://developer.axis.com/acap/develop/proxy/#proxy-in-build-time).
 
 ```sh
-docker build --tag <APP_IMAGE> --build-arg ARCH=<ARCH> .
+docker build --platform=linux/amd64 --tag <APP_IMAGE> --build-arg ARCH=<ARCH> .
 ```
 
 - <APP_IMAGE> is the name to tag the image with, e.g., vdo_cl_filter_demo:1.0
@@ -63,7 +63,7 @@ docker build --tag <APP_IMAGE> --build-arg ARCH=<ARCH> .
 Copy the result from the container image to a local directory build:
 
 ```sh
-docker cp $(docker create <APP_IMAGE>):/opt/app ./build
+docker cp $(docker create --platform=linux/amd64 <APP_IMAGE>):/opt/app ./build
 ```
 
 The working directory now contains a build folder with the following files:
@@ -99,6 +99,10 @@ vdo-opencl-filtering
 - **build/vdo_cl_filter_demo*** - Application executable binary file.
 - **build/vdo_cl_filter_demo_1_0_0_\<ARCH\>.eap** - Application package .eap file.
 - **build/vdo_cl_filter_demo_1_0_0_LICENSE.txt** - Copy of LICENSE file.
+
+> [!NOTE]
+>
+> For detailed information on how to build, install, and run ACAP applications, refer to the official ACAP documentation: [Build, install, and run](https://developer.axis.com/acap/develop/build-install-run/).
 
 #### Install and start the application
 

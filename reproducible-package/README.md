@@ -65,9 +65,28 @@ Start with an ordinary build which will not give a reproducible package and
 copy the result from the container image to a local directory *build1*.
 
 ```sh
-docker build --no-cache --tag rep:1 .
-docker cp $(docker create rep:1):/opt/app ./build1
+docker build --platform=linux/amd64 --tag <APP_IMAGE> --build-arg ARCH=<ARCH> .
 ```
+
+- `<APP_IMAGE>` is the name to tag the image with, e.g., `rep:1.0`
+- `<ARCH>` is the SDK architecture, `armv7hf` or `aarch64`.
+
+Copy the result from the container image to a local directory `build`:
+
+```sh
+docker cp $(docker create --platform=linux/amd64 <APP_IMAGE>):/opt/app ./build
+```
+
+The `build` directory contains the build artifacts, where the ACAP application
+is found with suffix `.eap`, depending on which SDK architecture that was
+chosen, one of these files should be found:
+
+- `rep_1_0_0_aarch64.eap`
+- `rep_1_0_0_armv7hf.eap`
+
+> [!NOTE]
+>
+> For detailed information on how to build, install, and run ACAP applications, refer to the official ACAP documentation: [Build, install, and run](https://developer.axis.com/acap/develop/build-install-run/).
 
 Now let's create a reproducible package. Set the build argument TIMESTAMP which
 in turn set [SOURCE_DATE_EPOCH](https://reproducible-builds.org/docs/source-date-epoch/)
@@ -75,15 +94,15 @@ to a fix time. The chosen timestamp here is the latest commit in the current
 Git repository. Copy the output to *build2*.
 
 ```sh
-docker build --no-cache --build-arg TIMESTAMP="$(git log -1 --pretty=%ct)" --tag rep:2 .
-docker cp $(docker create rep:2):/opt/app ./build2
+docker build --platform=linux/amd64 --no-cache --build-arg TIMESTAMP="$(git log -1 --pretty=%ct)" --tag rep:2 .
+docker cp $(docker create --platform=linux/amd64 rep:2):/opt/app ./build2
 ```
 
 Build a second reproducible application and copy the output to *build3*.
 
 ```sh
-docker build --no-cache --build-arg TIMESTAMP="$(git log -1 --pretty=%ct)" --tag rep:3 .
-docker cp $(docker create rep:3):/opt/app ./build3
+docker build --platform=linux/amd64 --no-cache --build-arg TIMESTAMP="$(git log -1 --pretty=%ct)" --tag rep:3 .
+docker cp $(docker create --platform=linux/amd64 rep:3):/opt/app ./build3
 ```
 
 Now you will have three eap-files in your working directory
@@ -129,6 +148,10 @@ SOURCE_DATE_EPOCH=$(git log -1 --pretty=%ct) acap-build .
 
 **N.b.** To be able to use the Git log as in this example you will have to run
 the Docker container from the top directory where the `.git` directory is placed.
+
+> [!NOTE]
+>
+> For detailed information on how to build, install, and run ACAP applications, refer to the official ACAP documentation: [Build, install, and run](https://developer.axis.com/acap/develop/build-install-run/).
 
 ## License
 

@@ -18,21 +18,38 @@ The following instructions can be executed to simply run the example.
 1. Compile the ACAP application:
 
     ```sh
-    docker build --tag obj_detect:1.0 .
-    docker cp $(docker create obj_detect:1.0):/opt/app ./build
+    docker build --platform=linux/amd64 --tag <APP_IMAGE> --build-arg ARCH=<ARCH> .
     ```
 
-2. Find the ACAP application `.eap` file
+      - `<APP_IMAGE>` is the name to tag the image with, e.g., `obj_detect:1.0`
+      - `<ARCH>` is the SDK architecture, `armv7hf` or `aarch64`
+
+    Copy the result from the container image to a local directory `build`:
+
+    ```sh
+    docker cp $(docker create --platform=linux/amd64 <APP_IMAGE>):/opt/app ./build
+    ```
+
+    The `build` directory contains the build artifacts, where the ACAP application is found with suffix `.eap`, depending on which SDK architecture that was chosen, one of these files should be found:
+
+      - `obj_detect_1_0_0_aarch64.eap`
+      - `obj_detect_1_0_0_armv7hf.eap`
+
+> [!NOTE]
+>
+> For detailed information on how to build, install, and run ACAP applications, refer to the official ACAP documentation: [Build, install, and run](https://developer.axis.com/acap/develop/build-install-run/).
+
+1. Find the ACAP application `.eap` file
 
     ```sh
     build/object_detection_app_1_0_0_cv25.eap
     ```
 
-3. Install and start the ACAP application on your camera through the camera web GUI
+2. Install and start the ACAP application on your camera through the camera web GUI
 
-4. SSH to the camera
+3. SSH to the camera
 
-5. View its log to see the ACAP application output:
+4. View its log to see the ACAP application output:
 
     ```sh
     tail -f /var/volatile/log/info.log | grep object_detection
@@ -239,6 +256,10 @@ The installable `.eap` file is found under:
 ```sh
 build/object_detection_app_1_0_0_cv25.eap
 ```
+
+> [!NOTE]
+>
+> For detailed information on how to build, install, and run ACAP applications, refer to the official ACAP documentation: [Build, install, and run](https://developer.axis.com/acap/develop/build-install-run/).
 
 ## Install and start the application
 

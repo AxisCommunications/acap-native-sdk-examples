@@ -45,7 +45,7 @@ tensorflow_to_larod
 In this tutorial, we are going to be working within a Docker container environment. This is done as to get the correct version of Tensorflow installed, as well as the needed tools. The model training is part of the container image build. To start the build and training, run:
 
 ```sh
-docker build --tag <APP_IMAGE> .
+docker build --platform=linux/amd64 --tag <APP_IMAGE> .
 ```
 
 - `<APP_IMAGE>` is the name to tag the image with, e.g., tf-model-training-cv25:1.0
@@ -53,7 +53,7 @@ docker build --tag <APP_IMAGE> .
 To train and for a specific amount of epochs, include the following build arguments when running:
 
 ```sh
-docker build --tag <APP_IMAGE> --build-arg TRAIN_EPOCHS=<TRAIN_EPOCHS> .
+docker build --platform=linux/amd64 --tag <APP_IMAGE> --build-arg TRAIN_EPOCHS=<TRAIN_EPOCHS> .
 ```
 
 - `<TRAIN_EPOCHS>` is the number of epochs to train, e.g., 2.
@@ -61,8 +61,12 @@ docker build --tag <APP_IMAGE> --build-arg TRAIN_EPOCHS=<TRAIN_EPOCHS> .
 Copy the model from the container image to a local directory:
 
 ```sh
-docker cp $(docker create <APP_IMAGE>):/env/training/models/converted_model.tflite ./<DESIRED_PATH>/converted_model.tflite
+docker cp $(docker create --platform=linux/amd64 <APP_IMAGE>):/env/training/models/converted_model.tflite ./<DESIRED_PATH>/converted_model.tflite
 ```
+
+> [!NOTE]
+>
+> For detailed information on how to build, install, and run ACAP applications, refer to the official ACAP documentation: [Build, install, and run](https://developer.axis.com/acap/develop/build-install-run/).
 
 Compile the model using the [Ambarella toolchain](https://www.ambarella.com/technology/#cvflow)
 

@@ -120,7 +120,7 @@ the application on a device.
 Standing in your working directory run:
 
 ```sh
-docker build --tag <APP_IMAGE> .
+docker build --platform=linux/amd64 --tag <APP_IMAGE> .
 ```
 
 <APP_IMAGE> is the image tag name, for example, openssl_curl_example:1.0
@@ -152,7 +152,7 @@ docker build --build-arg APP_DEBUG=yes --tag <APP_IMAGE> .
 Copy the result from the container image to a local directory build:
 
 ```sh
-docker cp $(docker create <APP_IMAGE>):/opt/app ./build
+docker cp $(docker create --platform=linux/amd64 <APP_IMAGE>):/opt/app ./build
 ```
 
 The working directory now contains a build folder with the following files:
