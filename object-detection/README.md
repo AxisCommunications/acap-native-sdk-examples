@@ -127,7 +127,7 @@ docker build --platform=linux/amd64 --tag <APP_IMAGE> --build-arg ARCH=<ARCH> --
 
 - `<APP_IMAGE>` is the name to tag the image with, e.g., `object_detection:1.0`.
 - `<ARCH>` is the SDK architecture, `armv7hf` or `aarch64`.
-- `<CHIP>` is the chip type, `artpec9`, `artpec8`, `cpu` or `edgetup`
+- `<CHIP>` is the chip type, `artpec9`, `artpec8`, `cpu` or `edgetpu`
 
 Copy the result from the container image to a local directory `build`:
 
