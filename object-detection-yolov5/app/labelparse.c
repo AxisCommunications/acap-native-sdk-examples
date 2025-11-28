@@ -123,8 +123,17 @@ void parse_labels(char*** labels_ptr,
         }
     }
 
+    // Filter out "n/a" entries by compacting the array.
+    size_t valid_label_count = 0;
+    for (size_t i = 0; i < num_lines; i++) {
+        if (strcmp(label_array[i], "n/a") != 0) {
+            label_array[valid_label_count] = label_array[i];
+            valid_label_count++;
+        }
+    }
+
     *labels_ptr        = label_array;
-    *num_labels_ptr    = num_lines;
+    *num_labels_ptr    = valid_label_count;
     *label_file_buffer = labels_data;
 
     close(labels_fd);
