@@ -37,7 +37,7 @@ axoverlay
 
 ### Limitations
 
-- ARTPEC-8, ARTPEC-7 and ARTPEC-6 based devices.
+- ARTPEC-9, ARTPEC-8, ARTPEC-7 and ARTPEC-6 based devices.
 - It is not possible to combine different color spaces for ARTPEC-6.
 
 ### How to run the code

@@ -456,7 +456,7 @@ improve performance, but with some added complexity to the program.
 
 - This is an example of test data, which is dependent on selected device and chip.
 - One full-screen banana has been used for testing.
-- Running inference is much faster on ARTPEC-8 and Google TPU in comparison to CPU.
+- Running inference is much faster on a DLPU in comparison to CPU.
 - Converting images takes almost the same time on all chips.
 - Objects with score less than 60% are generally not good enough to be used as classification results.
 
