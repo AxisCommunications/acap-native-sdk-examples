@@ -29,19 +29,19 @@ build_and_extract() {
   local __arch=$1
 
   # Run first build - without any reproducibility
-  docker build --no-cache --build-arg ARCH="$__arch" --tag rep-"$__arch":1 .
+  docker build --platform=linux/amd64 --no-cache --build-arg ARCH="$__arch" --tag rep-"$__arch":1 .
   # shellcheck disable=SC2046 # Docker container ID never needs to have quotes
-  docker cp $(docker create rep-"$__arch":1):/opt/app ./build1
+  docker cp $(docker create --platform=linux/amd64 rep-"$__arch":1):/opt/app ./build1
 
   # Second build - with reproducibility
-  docker build --no-cache --build-arg ARCH="$__arch" --build-arg TIMESTAMP="$(git log -1 --pretty=%ct)" --tag rep-"$__arch":2 .
+  docker build --platform=linux/amd64 --no-cache --build-arg ARCH="$__arch" --build-arg TIMESTAMP="$(git log -1 --pretty=%ct)" --tag rep-"$__arch":2 .
   # shellcheck disable=SC2046 # Docker container ID never needs to have quotes
-  docker cp $(docker create rep-"$__arch":2):/opt/app ./build2
+  docker cp $(docker create --platform=linux/amd64 rep-"$__arch":2):/opt/app ./build2
 
   # Third build - with reproducibility
-  docker build --no-cache --build-arg ARCH="$__arch" --build-arg TIMESTAMP="$(git log -1 --pretty=%ct)" --tag rep-"$__arch":3 .
+  docker build --platform=linux/amd64 --no-cache --build-arg ARCH="$__arch" --build-arg TIMESTAMP="$(git log -1 --pretty=%ct)" --tag rep-"$__arch":3 .
   # shellcheck disable=SC2046 # Docker container ID never needs to have quotes
-  docker cp $(docker create rep-"$__arch":3):/opt/app ./build3
+  docker cp $(docker create --platform=linux/amd64 rep-"$__arch":3):/opt/app ./build3
 }
 
 check_reproducible_eap() {

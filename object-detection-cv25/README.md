@@ -18,11 +18,10 @@ The following instructions can be executed to simply run the example.
 1. Compile the ACAP application:
 
     ```sh
-    docker build --platform=linux/amd64 --tag <APP_IMAGE> --build-arg ARCH=<ARCH> .
+    docker build --platform=linux/amd64 --tag <APP_IMAGE> .
     ```
 
       - `<APP_IMAGE>` is the name to tag the image with, e.g., `obj_detect:1.0`
-      - `<ARCH>` is the SDK architecture, `armv7hf` or `aarch64`
 
     Copy the result from the container image to a local directory `build`:
 
@@ -30,10 +29,9 @@ The following instructions can be executed to simply run the example.
     docker cp $(docker create --platform=linux/amd64 <APP_IMAGE>):/opt/app ./build
     ```
 
-    The `build` directory contains the build artifacts, where the ACAP application is found with suffix `.eap`, depending on which SDK architecture that was chosen, one of these files should be found:
+    The `build` directory contains the build artifacts, where the ACAP application is found with suffix `.eap`:
 
-      - `obj_detect_1_0_0_aarch64.eap`
-      - `obj_detect_1_0_0_armv7hf.eap`
+      - `object_detection_cv25_1_0_0_aarch64.eap`
 
 > [!NOTE]
 >
@@ -42,7 +40,7 @@ The following instructions can be executed to simply run the example.
 1. Find the ACAP application `.eap` file
 
     ```sh
-    build/object_detection_app_1_0_0_cv25.eap
+    build/object_detection_cv25_1_0_0_aarch64.eap
     ```
 
 2. Install and start the ACAP application on your camera through the camera web GUI
@@ -247,8 +245,8 @@ in the [app](app) directory. Standing in the application directory, run:
 > [Proxy in build time](https://developer.axis.com/acap/develop/proxy/#proxy-in-build-time).
 
 ```sh
-docker build --tag obj_detect:1.0 .
-docker cp $(docker create obj_detect:1.0):/opt/app ./build
+docker build --platform=linux/amd64 --tag obj_detect:1.0 .
+docker cp $(docker --platform=linux/amd64 create obj_detect:1.0):/opt/app ./build
 ```
 
 The installable `.eap` file is found under:

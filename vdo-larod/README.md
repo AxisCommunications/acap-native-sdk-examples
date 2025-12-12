@@ -138,7 +138,7 @@ See the following sections for build commands for each chip.
 To build a package for ARTPEC-8 with Tensorflow Lite, run the following commands standing in your working directory:
 
 ```sh
-docker build --build-arg ARCH=aarch64 --build-arg CHIP=artpec8 --tag <APP_IMAGE> .
+docker build --platform=linux/amd64 --build-arg ARCH=aarch64 --build-arg CHIP=artpec8 --tag <APP_IMAGE> .
 docker cp $(docker create --platform=linux/amd64 <APP_IMAGE>):/opt/app ./build
 ```
 
@@ -147,7 +147,7 @@ docker cp $(docker create --platform=linux/amd64 <APP_IMAGE>):/opt/app ./build
 To build a package for ARTPEC-9 with Tensorflow Lite, run the following commands standing in your working directory:
 
 ```sh
-docker build --build-arg ARCH=aarch64 --build-arg CHIP=artpec9 --tag <APP_IMAGE> .
+docker build --platform=linux/amd64 --build-arg ARCH=aarch64 --build-arg CHIP=artpec9 --tag <APP_IMAGE> .
 docker cp $(docker create --platform=linux/amd64 <APP_IMAGE>):/opt/app ./build
 ```
 
@@ -156,7 +156,7 @@ docker cp $(docker create --platform=linux/amd64 <APP_IMAGE>):/opt/app ./build
 To build a package for CPU with Tensorflow Lite, run the following commands standing in your working directory:
 
 ```sh
-docker build --build-arg CHIP=cpu --tag <APP_IMAGE> .
+docker build --platform=linux/amd64 --build-arg CHIP=cpu --tag <APP_IMAGE> .
 docker cp $(docker create --platform=linux/amd64 <APP_IMAGE>):/opt/app ./build
 ```
 
@@ -165,7 +165,7 @@ docker cp $(docker create --platform=linux/amd64 <APP_IMAGE>):/opt/app ./build
 To build a package for Google TPU instead, run the following commands standing in your working directory:
 
 ```sh
-docker build --build-arg CHIP=edgetpu --tag <APP_IMAGE> .
+docker build --platform=linux/amd64 --build-arg CHIP=edgetpu --tag <APP_IMAGE> .
 docker cp $(docker create --platform=linux/amd64 <APP_IMAGE>):/opt/app ./build
 ```
 
@@ -174,7 +174,7 @@ docker cp $(docker create --platform=linux/amd64 <APP_IMAGE>):/opt/app ./build
 To build a package for CV25 run the following commands standing in your working directory:
 
 ```sh
-docker build --build-arg ARCH=aarch64 --build-arg CHIP=cv25 --tag <APP_IMAGE> .
+docker build --platform=linux/amd64 --build-arg ARCH=aarch64 --build-arg CHIP=cv25 --tag <APP_IMAGE> .
 docker cp $(docker create --platform=linux/amd64 <APP_IMAGE>):/opt/app ./build
 ```
 

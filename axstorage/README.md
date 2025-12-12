@@ -49,7 +49,7 @@ update the *ARCH* variable in the Dockerfile or to set it in the `docker build`
 command via build argument:
 
 ```sh
-docker build --build-arg ARCH=aarch64 --tag <APP_IMAGE> .
+docker build --platform=linux/amd64 --build-arg ARCH=aarch64 --tag <APP_IMAGE> .
 ```
 
 Copy the result from the container image to a local directory called `build`:
