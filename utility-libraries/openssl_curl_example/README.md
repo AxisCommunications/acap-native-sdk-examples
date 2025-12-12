@@ -130,14 +130,14 @@ update the *ARCH* variable in the Dockerfile or to set it in the `docker build`
 command via build argument:
 
 ```sh
-docker build --build-arg ARCH=aarch64 --tag <APP_IMAGE> .
+docker build --platform=linux/amd64 --build-arg ARCH=aarch64 --tag <APP_IMAGE> .
 ```
 
 If the device is inside a network with a proxy, then it can be passed on as a
 build argument:
 
 ```sh
-docker build --build-arg APP_PROXY=<MY_PROXY> --tag <APP_IMAGE> .
+docker build --platform=linux/amd64 --build-arg APP_PROXY=<MY_PROXY> --tag <APP_IMAGE> .
 ```
 
 > **IMPORTANT**
@@ -146,7 +146,7 @@ docker build --build-arg APP_PROXY=<MY_PROXY> --tag <APP_IMAGE> .
 To get more verbose logging from cURL, pass the following build argument:
 
 ```sh
-docker build --build-arg APP_DEBUG=yes --tag <APP_IMAGE> .
+docker build --platform=linux/amd64 --build-arg APP_DEBUG=yes --tag <APP_IMAGE> .
 ```
 
 Copy the result from the container image to a local directory build:
