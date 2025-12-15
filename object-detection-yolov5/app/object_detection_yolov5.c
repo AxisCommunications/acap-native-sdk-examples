@@ -174,7 +174,7 @@ static void non_maximum_suppression(uint8_t* tensor,
 }
 
 static void filter_detections(uint8_t* tensor,
-                              float conf_theshold,
+                              float conf_threshold,
                               float iou_threshold,
                               model_params_t* model_params,
                               int* invalid_detections) {
@@ -184,7 +184,7 @@ static void filter_detections(uint8_t* tensor,
                                    model_params->quantization_zero_point) *
                                   model_params->quantization_scale;
 
-        if (object_likelihood < conf_theshold) {
+        if (object_likelihood < conf_threshold) {
             invalid_detections[i] = 1;
         } else {
             invalid_detections[i] = 0;
