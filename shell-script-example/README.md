@@ -15,7 +15,6 @@ shell-script-example
 ├── app
 │   ├── shell_script_example
 │   ├── LICENSE
-│   ├── Makefile
 │   └── manifest.json
 ├── Dockerfile
 └── README.md
@@ -23,7 +22,6 @@ shell-script-example
 
 - **app/shell_script_example** - Shell script application which writes "Hello World!" to system-log.
 - **app/LICENSE** - Text file which lists all open source licensed source code distributed with the application.
-- **app/Makefile** - Empty Makefile. Necessary for the build process.
 - **app/manifest.json** - Defines the application and its configuration.
 - **Dockerfile** - Docker file with the specified Axis toolchain and API container to build the example specified.
 - **README.md** - Step by step instructions on how to run the example.
@@ -61,14 +59,12 @@ shell-script-example
 ├── app
 │   ├── shell_script_example
 │   ├── LICENSE
-│   ├── Makefile
 │   └── manifest.json
 ├── build
 │   ├── shell_script_example*
-│   ├── shell_script_example_1_0_0_armv7hf.eap
+│   ├── shell_script_example_1_0_0_all.eap
 │   ├── shell_script_example_1_0_0_LICENSE.txt
 │   ├── LICENSE
-│   ├── Makefile
 │   ├── manifest.json
 │   ├── package.conf
 │   ├── package.conf.orig
@@ -78,7 +74,7 @@ shell-script-example
 ```
 
 - **build/shell_script_example*** - Application shell script file.
-- **build/shell_script_example_1_0_0_armv7hf.eap** - Application package .eap file.
+- **build/shell_script_example_1_0_0_all.eap** - Architecture-independent .eap file, compatible with both `armv7hf` and `aarch64` devices.
 - **build/shell_script_example_1_0_0_LICENSE.txt** - Copy of LICENSE file.
 - **build/manifest.json** - Defines the application and its configuration.
 - **build/package.conf** - Defines the application and its configuration.
@@ -100,9 +96,7 @@ http://<AXIS_DEVICE_IP>/index.html#apps
 - Click on the tab `Apps` in the device GUI
 - Enable `Allow unsigned apps` toggle
 - Click `(+ Add app)` button to upload the application file
-- Browse to the newly built ACAP application, depending on architecture:
-  - `shell_script_example_1_0_0_aarch64.eap`
-  - `shell_script_example_1_0_0_armv7hf.eap`
+- Browse to the newly built ACAP application, `shell_script_example_1_0_0_all.eap`
 - Click `Install`
 - Run the application by enabling the `Start` switch
 
