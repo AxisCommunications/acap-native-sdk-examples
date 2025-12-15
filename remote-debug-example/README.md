@@ -191,6 +191,23 @@ ssh acap-remote_debug@<AXIS_DEVICE_IP>
 /tmp/gdbserver :1234 /usr/local/packages/remote_debug/remote_debug
 ```
 
+> [!NOTE]
+> If your `manifest.json` file contains runtime options under
+> `acapPackageConf.setup.runOptions`, these are not automatically propagated to
+> the gdbserver. You must explicity include them when starting the `gdbserver`.
+>
+> For example, if your `manifest.json` contains:
+>
+> ```json
+> "runOptions": "--arg1 value1 --arg2 value2"
+> ```
+>
+> Start the gdbserver with:
+>
+> ```sh
+> /tmp/gdbserver :1234 /usr/local/packages/remote_debug/remote_debug --arg1 value1 --arg2 value2
+> ```
+
 You should see output similar to:
 
 ```sh

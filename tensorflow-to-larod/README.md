@@ -122,11 +122,11 @@ be done using less precision. This generally results in significantly lower
 inference latency and model size with only a slight penalty to the model's
 accuracy.
 
-| Chip      | Supported precision  |
-|---------- |------------------     |
-| Edge TPU  | INT8                  |
-| Common CPUs       | FP32, INT8            |
-| Common GPUs       | FP32, FP16, INT8      |
+| Chip        | Supported precision |
+| ----------- | ------------------- |
+| Edge TPU    | INT8                |
+| Common CPUs | FP32, INT8          |
+| Common GPUs | FP32, FP16, INT8    |
 
 As noted in the first chapter, this example uses a camera equipped with an Edge TPU.
 As the Edge TPU chip **only** uses INT8 precision, the model will need to be quantized from

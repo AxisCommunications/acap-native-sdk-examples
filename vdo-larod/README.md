@@ -276,13 +276,13 @@ Depending on the selected chip, different output is received.
 
 In previous larod versions, the chip was referred to as a number instead of a string. See the table below to understand the mapping:
 
-| Chips | Larod 1 (int) | Larod 3 |
-|-------|--------------|------------------|
-| CPU with TensorFlow Lite | 2 | cpu-tflite |
-| Google TPU | 4 | google-edge-tpu-tflite |
-| Ambarella CVFlow (NN) | 6 | ambarella-cvflow |
-| ARTPEC-8 DLPU | 12 | axis-a8-dlpu-tflite |
-| ARTPEC-9 DLPU | - | a9-dlpu-tflite |
+| Chips                    | Larod 1 (int) | Larod 3                |
+| ------------------------ | ------------- | ---------------------- |
+| CPU with TensorFlow Lite | 2             | cpu-tflite             |
+| Google TPU               | 4             | google-edge-tpu-tflite |
+| Ambarella CVFlow (NN)    | 6             | ambarella-cvflow       |
+| ARTPEC-8 DLPU            | 12            | axis-a8-dlpu-tflite    |
+| ARTPEC-9 DLPU            | -             | a9-dlpu-tflite         |
 
 #### Output - ARTPEC-8 with TensorFlow Lite
 
