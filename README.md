@@ -53,15 +53,15 @@ The examples are organized into logical groups to help you find the most relevan
 #### Train and convert models for Axis devices
 
 - [tensorflow-to-larod](./tensorflow-to-larod/)
-  - An example that shows model conversion, model quantization, image formats and custom models.
+  - A guide of how to train and export machine learning models to make them compatible with ARTPEC-7 devices.
 - [tensorflow-to-larod-artpec8](./tensorflow-to-larod-artpec8/)
-  - An example that shows model conversion, model quantization, image formats and custom models on AXIS ARTPEC-8 devices.
+  - A guide of how to train and export machine learning models to make them compatible with ARTPEC-8 devices.
 - [tensorflow-to-larod-artpec9](./tensorflow-to-larod-artpec9/)
-  - An example that shows model conversion, model quantization, image formats and custom models on AXIS ARTPEC-9 devices. Note that this example is pointing to [tensorflow-to-larod-artpec8](./tensorflow-to-larod-artpec8).
+  - A guide of how to train and export machine learning models to make them compatible with ARTPEC-9 devices. Note that this example is pointing to [tensorflow-to-larod-artpec8](./tensorflow-to-larod-artpec8).
 - [tensorflow-to-larod-cv25](./tensorflow-to-larod-cv25/)
-  - An example that shows model conversion, model quantization, image formats and custom models on AXIS CV25 devices.
+  - A guide of how to train and export machine learning models to make them compatible with CV25 devices.
 - [vdo-larod](./vdo-larod/)
-  - An example in C that loads one of the Tensorflow models trained with the tensorflow-to-larod* examples to the [Machine learning API (Larod)](https://developer.axis.com/acap/api/native-sdk-api/#machine-learning-api-larod) and then uses the [Video capture API (VDO)](https://developer.axis.com/acap/api/native-sdk-api/#video-capture-api-vdo) to fetch video frames in YUV format and finally run inference.
+  - An example in C that runs one of the  machine learning models trained with the tensorflow-to-larod* guides on the video stream of the device.
 
 ### Build custom libraries for an application
 
