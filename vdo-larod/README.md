@@ -7,8 +7,6 @@ This README file explains how to build an ACAP application that uses:
 - the [Video capture API (VDO)](https://developer.axis.com/acap/api/native-sdk-api/#video-capture-api-vdo) to fetch frames from e.g. a camera
 - the [Machine learning API (Larod)](https://developer.axis.com/acap/api/native-sdk-api/#machine-learning-api-larod) to load a graph model and run preprocessing and classification inferences
 
-It is achieved by using the containerized API and toolchain images.
-
 Together with this README file you should be able to find a directory called app. That directory contains the "vdo_larod" application source code, which can easily be compiled and run with the help of the tools and step by step below.
 
 ## Prerequisites
@@ -70,7 +68,7 @@ vdo-larod
 
 - **app/imgprovider.c/h** - Implementation of vdo parts, written in C.
 - **app/LICENSE** - Text file which lists all open source licensed source code distributed with the application.
-- **app/Makefile** - Makefile containing the build and link instructions for building the ACAP application.
+- **app/Makefile** - Build and link instructions for the application.
   <!-- textlint-disable -->
 - **app/manifest.json.artpec8** - Defines the application and its configuration when building for artpec8 DLPU with TensorFlow Lite.
 - **app/manifest.json.artpec9** - Defines the application and its configuration when building for artpec9 DLPU with TensorFlow Lite.
@@ -80,7 +78,7 @@ vdo-larod
 - **app/manifest.json.edgetpu** - Defines the application and its configuration when building chip and model for Google TPU.
 - **app/panic.c/h** - Utility for exiting the program on error
 - **app/vdo_larod.c** - Application using larod, written in C.
-- **Dockerfile** - Docker file with the specified Axis toolchain and API container to build the example specified.
+- **Dockerfile** - Assembles an image containing the ACAP Native SDK and builds the application using it.
 - **README.md** - Step by step instructions on how to run the example.
 
 ## Limitations

@@ -65,7 +65,7 @@ CPU with TensorFlow Lite.
 - **app/panic.c/h** - Utility for exiting the program on error.
 - **app/parameter_finder.py** - Python script to create `model_params.h`, containing model specific
 parameters.
-- **Dockerfile** - Docker file with the specified Axis toolchain and API container to build the
+- **Dockerfile** - Assembles an image containing the ACAP Native SDK and builds the application using it.
 example specified.
 - **README.md** - Step by step instructions on how to run the example.
 

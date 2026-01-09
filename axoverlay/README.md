@@ -2,7 +2,7 @@
 
 # An axoverlay based ACAP application on an edge device
 
-This README file explains how to build an ACAP application that uses the axoverlay API. It is achieved by using the containerized API and toolchain images.
+This README file explains how to build an ACAP application that uses the axoverlay API.
 
 Together with this README file, you should be able to find a directory called app. That directory contains the "axoverlay" application source code which can easily be compiled and run with the help of the tools and step by step below.
 
@@ -30,9 +30,9 @@ axoverlay
 
 - **app/axoverlay.c** - Application to draw overlays using axoverlay in C.
 - **app/LICENSE** - Text file which lists all open source licensed source code distributed with the application.
-- **app/Makefile** - Makefile containing the build and link instructions for building the ACAP application.
+- **app/Makefile** - Build and link instructions for the application.
 - **app/manifest.json** - Defines the application and its configuration.
-- **Dockerfile** - Docker file with the specified Axis toolchain and API container to build the example specified.
+- **Dockerfile** - Assembles an image containing the ACAP Native SDK and builds the application using it.
 - **README.md** - Step by step instructions on how to run the example.
 
 ### Limitations

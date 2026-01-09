@@ -25,7 +25,7 @@ bounding-box
 - **app/LICENSE** - List of all open source licensed source code distributed with the application.
 - **app/Makefile** - Build and link instructions for the application.
 - **app/manifest.json** - Definition of the application and its configuration.
-- **Dockerfile** - Assembles an image containing the ACAP SDK toolchain and builds the application using it.
+- **Dockerfile** - Assembles an image containing the ACAP Native SDK and builds the application using it.
 - **README.md** - Step by step instructions on how to run the example.
 
 ## Program structure and behavior

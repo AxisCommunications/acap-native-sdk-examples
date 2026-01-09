@@ -2,7 +2,7 @@
 
 # A hello-world ACAP application written in shell script using manifest
 
-This README file explains how to build a simple shell script manifest ACAP application. It is achieved by using the containerized API and toolchain images.
+This README file explains how to build a simple shell script manifest ACAP application.
 
 Together with this README file, you should be able to find a directory called app. That directory contains the "shell-script-example" shell script file which can easily be run with the help of the tools and step by step below.
 
@@ -23,7 +23,7 @@ shell-script-example
 - **app/shell_script_example** - Shell script application which writes "Hello World!" to system-log.
 - **app/LICENSE** - Text file which lists all open source licensed source code distributed with the application.
 - **app/manifest.json** - Defines the application and its configuration.
-- **Dockerfile** - Docker file with the specified Axis toolchain and API container to build the example specified.
+- **Dockerfile** - Assembles an image containing the ACAP Native SDK and builds the application using it.
 - **README.md** - Step by step instructions on how to run the example.
 
 ### How to run the code
