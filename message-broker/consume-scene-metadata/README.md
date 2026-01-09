@@ -199,11 +199,16 @@ Browse to the application page of the Axis device:
 http://<AXIS_DEVICE_IP>/index.html#apps
 ```
 
-- Click on the tab `App` in the device GUI
-- Click `(+)` sign to upload the application file
-- Browse to the newly built `consume_scene_metadata_1_0_0_armv7hf.eap`
-- Click `Install`
-- Run the application by enabling the `Start` switch
+1. Click on the tab **Apps** in the device GUI
+2. Enable **Allow unsigned apps** toggle
+3. Click **(+ Add app)** button to upload the application file
+4. Select the newly built application package, depending on architecture:
+
+   - `consume_scene_metadata_1_0_0_aarch64.eap`
+   - `consume_scene_metadata_1_0_0_armv7hf.eap`
+
+5. Click **Install**
+6. Run the application by enabling the **Start** switch
 
 #### The expected output
 
