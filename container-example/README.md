@@ -80,9 +80,9 @@ container-example
 
 - **containerExample** - Application source code in shell script.
 - **docker-compose.yml** - Docker compose file to start a container on the device.
-- **Dockerfile** - Docker file with the specified Axis toolchain and API container to build the example specified.
+- **Dockerfile** - Assembles an image containing the ACAP Native SDK and builds the application using it.
 - **LICENSE** - Text file which lists all open source licensed source code distributed with the application.
-- **Makefile** - Makefile containing the build and link instructions for building the ACAP application.
+- **Makefile** - Build and link instructions for the application.
 - **manifest.json** - Defines the application and its configuration. This includes additional parameters.
 - **postinstall.sh** - Post-install script, running at end of an application installation.
 - **preuninstall.sh** - Pre-uninstall script, running before an application uninstallion.

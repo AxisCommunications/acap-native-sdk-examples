@@ -29,9 +29,9 @@ curl_openssl
 
 - **app/curl_openssl.c** - Application source code.
 - **app/LICENSE** - Text file which lists all open source licensed source code distributed with the application.
-- **app/Makefile** - Makefile containing the build and link instructions for building the ACAP application.
+- **app/Makefile** - Build and link instructions for the application.
 - **app/manifest.json** - Defines the application and its configuration. This includes additional parameters.
-- **Dockerfile** - Docker file with the specified Axis toolchain and API container to build the example specified.
+- **Dockerfile** - Assembles an image containing the ACAP Native SDK and builds the application using it.
 - **README.md** - Step by step instructions on how to run the example.
 
 ## How to run the code

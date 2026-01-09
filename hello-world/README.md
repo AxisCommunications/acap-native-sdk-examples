@@ -2,7 +2,7 @@
 
 # A hello-world ACAP application using manifest
 
-This README file explains how to build a simple Hello World manifest ACAP application. It is achieved by using the containerized API and toolchain images.
+This README file explains how to build a simple Hello World manifest ACAP application.
 
 Together with this README file, you should be able to find a directory called app. That directory contains the "hello-world" application source code which can easily be compiled and run with the help of the tools and step by step below.
 
@@ -23,9 +23,9 @@ hello-world
 
 - **app/hello_world.c** - Hello World application which writes to system-log.
 - **app/LICENSE** - Text file which lists all open source licensed source code distributed with the application.
-- **app/Makefile** - Makefile containing the build and link instructions for building the ACAP application.
+- **app/Makefile** - Build and link instructions for the application.
 - **app/manifest.json** - Defines the application and its configuration.
-- **Dockerfile** - Docker file with the specified Axis toolchain and API container to build the example specified.
+- **Dockerfile** - Assembles an image containing the ACAP Native SDK and builds the application using it.
 - **README.md** - Step by step instructions on how to run the example.
 
 ### How to run the code
