@@ -8,6 +8,15 @@ configuration, where HTTP requests to the application are routed to a web server
 [CivetWeb](https://github.com/civetweb/civetweb) running inside the ACAP application
 and acting as a CGI.
 
+> [!NOTE]
+> The web server runs on the port specified in the application,
+> however there is a possibility that the port already is in use.
+> For more information on common ports used by Axis devices, see the
+> [commonly used network ports](https://help.axis.com/en-us/axis-os-knowledge-base#commonly-used-network-ports)
+> in the AXIS OS knowledge base. To change the port of the application,
+> both the [`web_server_rev_proxy.c`](./app/web_server_rev_proxy.c) and [`manifest.json`](./app/manifest.json] file have to be updated before
+> building the application.
+
 The advantage of a webserver proxy is that when porting existing code to your
 ACAP application, its request handling can remain largely unmodified. This eases
 the task of sharing code between platforms. The webserver proxy method enforces
