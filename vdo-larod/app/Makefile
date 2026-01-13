@@ -1,5 +1,5 @@
 PROG1	= $(shell jq -r '.acapPackageConf.setup.appName' manifest.json)
-OBJS1	= $(PROG1).c imgprovider.c panic.c model.c
+OBJS1	= $(PROG1).c channel_util.c img_util.c panic.c model.c model_preprocessing.c
 PROGS	= $(PROG1)
 DEBUG_DIR = debug
 
@@ -8,8 +8,6 @@ PKGS = gio-2.0 gio-unix-2.0 liblarod vdostream
 CFLAGS += $(shell PKG_CONFIG_PATH=$(PKG_CONFIG_PATH) pkg-config --cflags $(PKGS))
 LDLIBS += $(shell PKG_CONFIG_PATH=$(PKG_CONFIG_PATH) pkg-config --libs $(PKGS))
 
-# This example is based on larod version 3
-CFLAGS += -DLAROD_API_VERSION_3
 LDLIBS += -lm
 
 CFLAGS += -Wall \
