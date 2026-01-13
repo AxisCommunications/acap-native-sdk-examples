@@ -6,7 +6,7 @@
             "appName": "vdo_larod",
             "vendor": "Axis Communications",
             "embeddedSdkVersion": "3.0",
-            "runOptions": "axis-a8-dlpu-tflite /usr/local/packages/vdo_larod/model/model.tflite",
+            "runOptions": "axis-a8-dlpu-tflite /usr/local/packages/vdo_larod/model/model.tflite scale",
             "vendorUrl": "https://www.axis.com",
             "runMode": "never",
             "version": "1.0.0"

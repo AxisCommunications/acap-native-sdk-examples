@@ -18,15 +18,20 @@ Together with this README file you should be able to find a directory called app
 
 This application opens a client to VDO and starts fetching frames in the RGB or YUV format dependent on platform.
 Vdo is used to determine if a format is supported or not.
+The application also tries to show how to retrive frames from a viewarea.
 The application will try to get the same resolution as requested from VDO. The only limit is the min and max
 resolution received from VDO.
+It is possible to select how to adjust the image, if the model resolution can not be retrived from the
+camera without either center crop or scale to fit.
+Scale to fit is the recommended way when using 1:1 resolutions as in this case.
+The frames from vdo will then have black borders at the top and in the bottom.
+The frames will be the whole image scaled down from the native aspect ratio.
 When using this it is important to also check the image so it looks good on the used camera.
 
 Steps in application:
 
 1. Fetch image data from VDO.
-2. If needed preprocess the images (crop to the size required by the neural network (if needed), scale and color convert) using larod with either cpu-proc (libyuv)
-or ambarella-cvflow-proc backend.
+2. If needed preprocess the images (scale and color convert) using larod with cpu-proc (libyuv).
 3. Run inferences using the trained model on a specific chip with the preprocessing output as input on a larod backend specified by a command-line argument.
 4. Measure the total inference time (preprocessing and inference time) and determine if the framerate of the vdo streams needs to be adjusted.
 5. The model's confidence scores for the presence of person and car in the image are printed as the output.
@@ -48,8 +53,10 @@ These instructions will guide you on how to execute the code. Below is the struc
 ```sh
 vdo-larod
 ├── app
-│   ├── imgprovider.c
-│   ├── imgprovider.h
+│   ├── channel_util.c
+│   ├── channel_util.h
+│   ├── img_util.c
+│   ├── img_util.h
 │   ├── LICENSE
 │   ├── Makefile
 │   ├── manifest.json.artpec8
@@ -59,6 +66,8 @@ vdo-larod
 │   ├── manifest.json.edgetpu
 │   ├── model.c
 │   ├── model.h
+│   ├── model_preprocessing.c
+│   ├── model_preprocessing.h
 │   ├── panic.c
 │   ├── panic.h
 │   └── vdo_larod.c
@@ -66,7 +75,8 @@ vdo-larod
 └── README.md
 ```
 
-- **app/imgprovider.c/h** - Implementation of vdo parts, written in C.
+- **app/channel_util.c/h** - Utility functions for wrapping VdoChannel.
+- **app/img_util.c/h** - Handle the update of framerate dependent on the inference time.
 - **app/LICENSE** - Text file which lists all open source licensed source code distributed with the application.
 - **app/Makefile** - Build and link instructions for the application.
   <!-- textlint-disable -->
@@ -76,6 +86,8 @@ vdo-larod
 - **app/manifest.json.cpu** - Defines the application and its configuration when building for CPU with TensorFlow Lite.
 - **app/manifest.json.cv25** - Defines the application and its configuration when building chip and model for cv25 DLPU.
 - **app/manifest.json.edgetpu** - Defines the application and its configuration when building chip and model for Google TPU.
+- **app/model.c/h** - Handle most of the larod functionality
+- **app/model_preprocessing.c/h** - Wrapper for the preprocessing part of larod.
 - **app/panic.c/h** - Utility for exiting the program on error
 - **app/vdo_larod.c** - Application using larod, written in C.
 - **Dockerfile** - Assembles an image containing the ACAP Native SDK and builds the application using it.
@@ -183,8 +195,10 @@ The working directory now contains a build folder with the following files of im
 ```sh
 vdo-larod
 ├── build
-│   ├── imgprovider.c
-│   ├── imgprovider.h
+│   ├── channel_util.c
+│   ├── channel_util.h
+│   ├── img_util.c
+│   ├── img_util.h
 │   ├── lib
 │   ├── LICENSE
 │   ├── Makefile
@@ -194,6 +208,10 @@ vdo-larod
 │   ├── manifest.json.cpu
 │   ├── manifest.json.edgetpu
 │   ├── manifest.json.cv25
+│   ├── model.c
+│   ├── model.h
+│   ├── model_preprocessing.c
+│   ├── model_preprocessing.h
 │   ├── model
 |   │   └── model.tflite / model.bin
 │   ├── package.conf
@@ -293,21 +311,29 @@ vdo_larod[141742]: Starting /usr/local/packages/vdo_larod/vdo_larod
 vdo_larod[141742]: Setting up larod connection with chip axis-a8-dlpu-tflite and model file /usr/local/packages/vdo_larod/model/model.tflite
 vdo_larod[141742]: Loading the model... This might take up to 5 minutes depending on your device model.
 vdo_larod[141742]: Model loaded successfully
-vdo_larod[3991067]: Detected model format RGB and input resolution 256x256
+vdo_larod[141742]: Detected model format RGB and input resolution 256x256
 vdo_larod[141742]: Created mmaped model output 0 with size 1
 vdo_larod[141742]: Created mmaped model output 1 with size 1
-vdo_larod[141742]: choose_stream_resolution: We select stream w/h=256 x 256 with format yuv based on VDO channel info.
+vdo_larod[141742]: [Channel 0] Current global rotation is 180
+vdo_larod[141742]: [Channel 0] Current aspect ratio is 16:9
+vdo_larod[141742]: channel_util_choose_stream_resolution: We select stream w/h=256 x 256 with format yuv based on VDO channel info.
 vdo_larod[141742]: Dump of vdo stream settings map =====
-vdo_larod[141742]: 'buffer.count'-----: <uint32 2>
-vdo_larod[141742]: 'dynamic.framerate': <true>
-vdo_larod[141742]: 'format'-----------: <uint32 3>
-vdo_larod[141742]: 'framerate'--------: <30.0>
-vdo_larod[141742]: 'height'-----------: <uint32 256>
-vdo_larod[141742]: 'input'------------: <uint32 1>
-vdo_larod[141742]: 'socket.blocking'--: <false>
-vdo_larod[141742]: 'width'------------: <uint32 256>
+vdo_larod[141742]: 'buffer.access'-----: <uint32 1>
+vdo_larod[141742]: 'buffer.count'------: <uint32 2>
+vdo_larod[141742]: 'buffer.strategy'---: <uint32 4>
+vdo_larod[141742]: 'channel'-----------: <uint32 0>
+vdo_larod[141742]: 'dynamic.framerate'-: <true>
+vdo_larod[141742]: 'format'------------: <uint32 3>
+vdo_larod[141742]: 'framerate'---------: <30.0>
+vdo_larod[141742]: 'identity'----------: <'vdo-larod'>
+vdo_larod[141742]: 'image.fit'---------: <'scale'>
+vdo_larod[141742]: 'intent'------------: <uint32 5>
+vdo_larod[141742]: 'resolution'--------: <uint32 256, uint32 256>
+vdo_larod[141742]: 'socket.blocking'---: <false>
+vdo_larod[141742]: Stream aspect ratio is 1:1
+vdo_larod[141742]: Start fetching video frames from VDO
+vdo_larod[141742]: Use preprocessing with input format nv12 and output format rgb-interleaved
 
-vdo_larod[141742]: Ran pre-processing for 3 ms
 vdo_larod[141742]: Ran inference for 14 ms
 vdo_larod[141742]: Person detected: 100.00% - Car detected: 3.14%
 
@@ -327,17 +353,25 @@ vdo_larod[3991067]: Model loaded successfully
 vdo_larod[3991067]: Detected model format RGB and input resolution 256x256
 vdo_larod[3991067]: Created mmaped model output 0 with size 1
 vdo_larod[3991067]: Created mmaped model output 1 with size 1
-vdo_larod[3991067]: choose_stream_resolution: We select stream w/h=256 x 256 with format rgb interleaved based on VDO channel info.
+vdo_larod[3991067]: [Channel 1] Current global rotation is 270
+vdo_larod[3991067]: [Channel 1] Current aspect ratio is 16:9
+vdo_larod[3991067]: channel_util_choose_stream_resolution: We select stream w/h=256 x 256 with format yuv based on VDO channel info.
 vdo_larod[3991067]: Dump of vdo stream settings map =====
-vdo_larod[3991067]: 'buffer.count'-----: <uint32 2>
-vdo_larod[3991067]: 'dynamic.framerate': <true>
-vdo_larod[3991067]: 'format'-----------: <uint32 8>
-vdo_larod[3991067]: 'framerate'--------: <30.0>
-vdo_larod[3991067]: 'height'-----------: <uint32 256>
-vdo_larod[3991067]: 'input'------------: <uint32 1>
-vdo_larod[3991067]: 'socket.blocking'--: <false>
-vdo_larod[3991067]: 'width'------------: <uint32 256>
+vdo_larod[3991067]: 'buffer.access'-----: <uint32 1>
+vdo_larod[3991067]: 'buffer.count'------: <uint32 2>
+vdo_larod[3991067]: 'buffer.strategy'---: <uint32 4>
+vdo_larod[3991067]: 'channel'-----------: <uint32 1>
+vdo_larod[3991067]: 'dynamic.framerate'-: <true>
+vdo_larod[3991067]: 'format'------------: <uint32 8>
+vdo_larod[3991067]: 'framerate'---------: <30.0>
+vdo_larod[3991067]: 'identity'----------: <'vdo-larod'>
+vdo_larod[3991067]: 'image.fit'---------: <'scale'>
+vdo_larod[3991067]: 'intent'------------: <uint32 5>
+vdo_larod[3991067]: 'resolution'--------: <uint32 256, uint32 256>
+vdo_larod[3991067]: 'socket.blocking'---: <false>
+vdo_larod[3991067]: Stream aspect ratio is 1:1
 vdo_larod[3991067]: Start fetching video frames from VDO
+
 vdo_larod[3991067]: Ran inference for 5 ms
 vdo_larod[3991067]: Person detected: 100.00% - Car detected: 3.14%
 
@@ -356,17 +390,26 @@ vdo_larod[3991067]: Model loaded successfully
 vdo_larod[3991067]: Detected model format RGB and input resolution 256x256
 vdo_larod[3991067]: Created mmaped model output 0 with size 1
 vdo_larod[3991067]: Created mmaped model output 1 with size 1
-vdo_larod[3991067]: choose_stream_resolution: We select stream w/h=256 x 256 with format rgb interleaved based on VDO channel info.
+vdo_larod[3991067]: [Channel 0] Current global rotation is 180
+vdo_larod[3991067]: [Channel 0] Current aspect ratio is 16:9
+vdo_larod[3991067]: channel_util_choose_stream_resolution: We select stream w/h=256 x 256 with format yuv based on VDO channel info.
 vdo_larod[3991067]: Dump of vdo stream settings map =====
-vdo_larod[3991067]: 'buffer.count'-----: <uint32 2>
-vdo_larod[3991067]: 'dynamic.framerate': <true>
-vdo_larod[3991067]: 'format'-----------: <uint32 8>
-vdo_larod[3991067]: 'framerate'--------: <30.0>
-vdo_larod[3991067]: 'height'-----------: <uint32 256>
-vdo_larod[3991067]: 'input'------------: <uint32 1>
-vdo_larod[3991067]: 'socket.blocking'--: <false>
-vdo_larod[3991067]: 'width'------------: <uint32 256>
+vdo_larod[3991067]: 'buffer.access'-----: <uint32 1>
+vdo_larod[3991067]: 'buffer.count'------: <uint32 2>
+vdo_larod[3991067]: 'buffer.strategy'---: <uint32 4>
+vdo_larod[3991067]: 'channel'-----------: <uint32 0>
+vdo_larod[3991067]: 'dynamic.framerate'-: <true>
+vdo_larod[3991067]: 'format'------------: <uint32 3>
+vdo_larod[3991067]: 'framerate'---------: <30.0>
+vdo_larod[3991067]: 'identity'----------: <'vdo-larod'>
+vdo_larod[3991067]: 'image.fit'---------: <'scale'>
+vdo_larod[3991067]: 'intent'------------: <uint32 5>
+vdo_larod[3991067]: 'resolution'--------: <uint32 256, uint32 256>
+vdo_larod[3991067]: 'socket.blocking'---: <false>
+vdo_larod[3991067]: Stream aspect ratio is 1:1
 vdo_larod[3991067]: Start fetching video frames from VDO
+vdo_larod[3991067]: Use preprocessing with input format nv12 and output format rgb-interleaved
+
 vdo_larod[3991067]: Ran inference for 340 ms
 vdo_larod[3991067]: Person detected: 100.00% - Car detected: 3.14%
 
@@ -385,20 +428,26 @@ vdo_larod[584171]: Model loaded successfully
 vdo_larod[584171]: Detected model format RGB and input resolution 256x256
 vdo_larod[584171]: Created mmaped model output 0 with size 1
 vdo_larod[584171]: Created mmaped model output 1 with size 1
-vdo_larod[584171]: chooseStreamResolution: We select stream w/h=256 x 256 based with format yuv based on VDO channel info.
-vdo_larod[3991067]: Dump of vdo stream settings map =====
-vdo_larod[3991067]: 'buffer.count'-----: <uint32 2>
-vdo_larod[3991067]: 'dynamic.framerate': <true>
-vdo_larod[3991067]: 'format'-----------: <uint32 3>
-vdo_larod[3991067]: 'framerate'--------: <30.0>
-vdo_larod[3991067]: 'height'-----------: <uint32 256>
-vdo_larod[3991067]: 'input'------------: <uint32 1>
-vdo_larod[3991067]: 'socket.blocking'--: <false>
-vdo_larod[3991067]: 'width'------------: <uint32 256>
-vdo_larod[584171]: Use preprocessing with input format yuv and output format rgb-interleaved
+vdo_larod[584171]: [Channel 0] Current global rotation is 180
+vdo_larod[584171]: [Channel 0] Current aspect ratio is 16:9
+vdo_larod[584171]: channel_util_choose_stream_resolution: We select stream w/h=256 x 256 with format yuv based on VDO channel info.
+vdo_larod[584171]: Dump of vdo stream settings map =====
+vdo_larod[584171]: 'buffer.access'-----: <uint32 1>
+vdo_larod[584171]: 'buffer.count'------: <uint32 2>
+vdo_larod[584171]: 'buffer.strategy'---: <uint32 4>
+vdo_larod[584171]: 'channel'-----------: <uint32 0>
+vdo_larod[584171]: 'dynamic.framerate'-: <true>
+vdo_larod[584171]: 'format'------------: <uint32 3>
+vdo_larod[584171]: 'framerate'---------: <30.0>
+vdo_larod[584171]: 'identity'----------: <'vdo-larod'>
+vdo_larod[584171]: 'image.fit'---------: <'scale'>
+vdo_larod[584171]: 'intent'------------: <uint32 5>
+vdo_larod[584171]: 'resolution'--------: <uint32 256, uint32 256>
+vdo_larod[584171]: 'socket.blocking'---: <false>
+vdo_larod[584171]: Stream aspect ratio is 1:1
 vdo_larod[584171]: Start fetching video frames from VDO
+vdo_larod[584171]: Use preprocessing with input format nv12 and output format rgb-interleaved
 
-vdo_larod[584171]: Ran pre-processing for 2 ms
 vdo_larod[584171]: Ran inference for 16 ms
 vdo_larod[584171]: Person detected: 65.14% - Car detected: 11.92%
 
@@ -418,18 +467,25 @@ vdo_larod[584171]: Model loaded successfully
 vdo_larod[584171]: Detected model format PLANAR RGB and input resolution 256x256
 vdo_larod[584171]: Created mmaped model output 0 with size 32
 vdo_larod[584171]: Created mmaped model output 1 with size 32
-vdo_larod[584171]: chooseStreamResolution: We select stream w/h=256 x 256 with format planar rgb based on VDO channel info.
-vdo_larod[3991067]: Dump of vdo stream settings map =====
-vdo_larod[3991067]: 'buffer.count'-----: <uint32 2>
-vdo_larod[3991067]: 'dynamic.framerate': <true>
-vdo_larod[3991067]: 'format'-----------: <uint32 9>
-vdo_larod[3991067]: 'framerate'--------: <30.0>
-vdo_larod[3991067]: 'height'-----------: <uint32 256>
-vdo_larod[3991067]: 'input'------------: <uint32 1>
-vdo_larod[3991067]: 'socket.blocking'--: <false>
-vdo_larod[3991067]: 'width'------------: <uint32 256>
-
+vdo_larod[584171]: [Channel 0] Current global rotation is 0
+vdo_larod[584171]: [Channel 0] Current aspect ratio is 4:3
+vdo_larod[584171]: channel_util_choose_stream_resolution: We select stream w/h=256 x 256 with format planar rgb based on VDO channel info.
+vdo_larod[584171]: Dump of vdo stream settings map =====
+vdo_larod[584171]: 'buffer.access'-----: <uint32 1>
+vdo_larod[584171]: 'buffer.count'------: <uint32 2>
+vdo_larod[584171]: 'buffer.strategy'---: <uint32 4>
+vdo_larod[584171]: 'channel'-----------: <uint32 0>
+vdo_larod[584171]: 'dynamic.framerate'-: <true>
+vdo_larod[584171]: 'format'------------: <uint32 9>
+vdo_larod[584171]: 'framerate'---------: <30.0>
+vdo_larod[584171]: 'identity'----------: <'vdo-larod'>
+vdo_larod[584171]: 'image.fit'---------: <'scale'>
+vdo_larod[584171]: 'intent'------------: <uint32 5>
+vdo_larod[584171]: 'resolution'--------: <uint32 256, uint32 256>
+vdo_larod[584171]: 'socket.blocking'---: <false>
+vdo_larod[584171]: Stream aspect ratio is 1:1
 vdo_larod[584171]: Start fetching video frames from VDO
+
 vdo_larod[584171]: Ran inference for 50 ms
 vdo_larod[584171]: Person detected: 65.14% - Car detected: 11.92%
 
