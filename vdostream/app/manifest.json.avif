@@ -1,0 +1,14 @@
+{
+    "schemaVersion": "1.8.0",
+    "acapPackageConf": {
+        "setup": {
+            "friendlyName": "vdoencodeclient_avif",
+            "appName": "vdoencodeclient",
+            "vendor": "Axis Communications",
+            "embeddedSdkVersion": "3.0",
+            "runOptions": "--format avif --frames 1",
+            "runMode": "never",
+            "version": "1.0.0"
+        }
+    }
+}

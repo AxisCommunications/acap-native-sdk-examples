@@ -2,12 +2,19 @@
 
 # A vdo stream based ACAP application on an edge device
 
-This README file explains how to build an ACAP application that uses the vdostream API.
+This README file explains how to build an ACAP application that uses:
+
+- the [Video capture API (VDO)](https://developer.axis.com/acap/api/native-sdk-api/#video-capture-api-vdo) to fetch frames from e.g. a camera.
 
 Together with this README file, you should be able to find a directory called app. That directory contains the "vdoencodeclient" application source code which can easily
 be compiled and run with the help of the tools and step by step below.
 
-This example illustrates how to continuously capture frames from the vdo service, access the received buffer contents as well as the frame metadata. Captured frames are logged in the Application log.
+This example illustrates two different ways of retrieving video frames from VDO.
+
+- Snapshot, if only one video frame is wanted the vdo_stream_snapshot API is convenient. Typically used for JPEG or AVIF.
+- Continously capturing video frame from the VDO service.
+
+When a video buffer is retrieved, access the received buffer contents as well as the frame metadata. Captured frames are logged in the Application log.
 
 ## Getting started
 
@@ -18,11 +25,14 @@ vdostream
 ├── app
 │   ├── LICENSE
 │   ├── Makefile
+│   ├── manifest.json.avif
 │   ├── manifest.json.h264
 │   ├── manifest.json.h265
 │   ├── manifest.json.jpeg
 │   ├── manifest.json.nv12
 │   ├── manifest.json.y800
+│   └── panic.c
+│   └── panic.h
 │   └── vdoencodeclient.c
 ├── Dockerfile
 └── README.md
@@ -31,6 +41,7 @@ vdostream
 - **app/LICENSE** - Text file which lists all open source licensed source code distributed with the application.
 - **app/Makefile** - Build and link instructions for the application.
 - **app/manifest.json** - Defines the application and its configuration.
+- **app/panic.c/h** - Utility for exiting the program on error
 - **app/vdoencodeclient.c** - Application to capture the frames using vdo service in C.
 - **Dockerfile** - Assembles an image containing the ACAP Native SDK and builds the application using it.
 - **README.md** - Step by step instructions on how to run the example.
@@ -59,7 +70,7 @@ docker build --platform=linux/amd64 --tag <APP_IMAGE> --build-arg VDO_FORMAT=<VD
 ```
 
 <!-- textlint-disable terminology -->
-<VDO_FORMAT> is the video compression format. Supported values are *h264*, *h265*, *jpeg*, *nv12* and *y800*
+<VDO_FORMAT> is the video compression format. Supported values are *avif*, *h264*, *h265*, *jpeg*, *nv12* and *y800*
 <!-- textlint-enable -->
 
 <APP_IMAGE> is the name to tag the image with, e.g., vdoencodeclient:1.0
@@ -85,16 +96,20 @@ vdostream
 ├── app
 │   ├── LICENSE
 │   ├── Makefile
+│   ├── manifest.json.avif
 │   ├── manifest.json.h264
 │   ├── manifest.json.h265
 │   ├── manifest.json.jpeg
 │   ├── manifest.json.nv12
 │   ├── manifest.json.y800
+│   └── panic.c
+│   └── panic.h
 │   └── vdoencodeclient.c
 ├── build
 │   ├── LICENSE
 │   ├── Makefile
 │   ├── manifest.json
+│   ├── manifest.json.avif
 │   ├── manifest.json.h264
 │   ├── manifest.json.h265
 │   ├── manifest.json.jpeg
@@ -148,6 +163,15 @@ Application log can be found directly at:
 
 ```sh
 http://<AXIS_DEVICE_IP>/axis-cgi/admin/systemlog.cgi?appname=vdoencodeclient
+```
+
+#### Output - format avif
+
+```sh
+----- Contents of SYSTEM_LOG for 'vdoencodeclient' -----
+
+vdoencodeclient[49013]: Starting stream: avif, 640x360
+vdoencodeclient[49013]: frame =    0, type = avif, size = 2700
 ```
 
 #### Output - format h264

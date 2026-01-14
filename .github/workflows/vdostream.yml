@@ -15,6 +15,11 @@ jobs:
         axis-os: ["12.7.53"]
         arch: ["armv7hf", "aarch64"]
         vdo-format: ["h264", "h265", "y800", "jpeg", "nv12"]
+        include:
+          - axis-os: "12.7.53"
+            arch: "aarch64"
+            vdo-format: "avif"
+            chip: "artpec9"
     env:
       EXREPO: acap-native-examples
       EXNAME: vdostream
