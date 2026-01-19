@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1
 
 ARG ARCH=aarch64
-ARG VERSION=12.7.0
+ARG VERSION=12.8.0
 ARG UBUNTU_VERSION=24.04
 ARG REPO=axisecp
 
