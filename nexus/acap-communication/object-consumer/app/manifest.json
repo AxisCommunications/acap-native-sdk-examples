@@ -1,0 +1,18 @@
+{
+    "schemaVersion": "1.9.0",
+    "acapPackageConf": {
+        "setup": {
+            "appName": "object_consumer",
+            "vendor": "Axis Communications",
+            "embeddedSdkVersion": "3.0",
+            "vendorUrl": "https://www.axis.com",
+            "runMode": "never",
+            "version": "1.0.0"
+        }
+    },
+    "resources": {
+        "nexus_beta1": {
+            "enabled": true
+        }
+    }
+}

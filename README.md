@@ -118,6 +118,8 @@ The examples are organized into logical groups to help you find the most relevan
   - An example in C that illustrates how to check the licensekey status.
 - [message-broker](./message-broker/)
   - Examples that showcase how to use the Message Broker API.
+- [nexus](./nexus/)
+  - Examples that showcase how to use the Nexus API.
 - [reproducible-package](./reproducible-package/)
   - An example of how to create a reproducible application package.
 - [shell-script-example](./shell-script-example)
