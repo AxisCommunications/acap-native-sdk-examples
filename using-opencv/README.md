@@ -13,8 +13,6 @@ application to demonstrate how to integrate the broad functionality of OpenCV.
 building-opencv
 ├── app
 │   ├── example.cpp - The application running OpenCV code
-│   ├── imgprovider.cpp - Convenience functions for VDO
-│   ├── imgprovider.h - imgprovider headers
 │   ├── LICENSE
 │   ├── Makefile - The Makefile specifying how the ACAP should be built
 │   └── manifest.json - A file specifying execution-related options for the ACAP
@@ -73,11 +71,9 @@ building-opencv
    opencv_app[0]: starting opencv_app
    opencv_app[2211]: Running OpenCV example with VDO as video source
    opencv_app[2211]: Creating VDO image provider and creating stream 1024 x 576
-   opencv_app[2211]: Dump of vdo stream settings map =====
-   opencv_app[2211]: chooseStreamResolution: We select stream w/h=1024 x 576 based on VDO channel info.
    opencv_app[2211]: Start fetching video frames from VDO
    opencv_app[2211]: Motion detected: YES
-   opencv_app[2211]: Motion detected: YES
+   opencv_app[2211]: Ran opencv for 59 ms
    ```
 
 ### Walk-through of application
