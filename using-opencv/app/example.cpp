@@ -23,50 +23,91 @@
 #include <sys/time.h>
 #include <syslog.h>
 
+#include <vdo-error.h>
+#include <vdo-stream.h>
+
+#include <cerrno>
+#include <cstdint>
+#include <cstdlib>
+
+#include <poll.h>
+#include <unistd.h>
+
 #include "panic.h"
 
-#include "imgprovider.h"
 using namespace cv;
 
+volatile sig_atomic_t running = 1;
+
+static void shutdown(int status) {
+    (void)status;
+    running = 0;
+}
+
 int main(void) {
+    g_autoptr(GError) vdo_error = nullptr;
+    auto failed                 = [&vdo_error] {
+        // Maintenance/Installation in progress (e.g. Global-Rotation)
+        if (vdo_error_is_expected(&vdo_error)) {
+            syslog(LOG_INFO, "Expected vdo error %s", vdo_error->message);
+            return EXIT_SUCCESS;
+        } else {
+            panic("Unexpected vdo error %s", vdo_error->message);
+        }
+    };
+
+    // Stop main loop at signal
+    signal(SIGTERM, shutdown);
+    signal(SIGINT, shutdown);
+
+    // The desired width and height of the Y800 frame
+    unsigned int width         = 1024;
+    unsigned int height        = 576;
+    unsigned int input_channel = 1;
+
     syslog(LOG_INFO, "Running OpenCV example with VDO as video source");
-    img_provider_t* image_provider = nullptr;
-    g_autoptr(GError) vdo_error    = nullptr;
 
-    // The desired width and height of the BGR frame
-    unsigned int width  = 1024;
-    unsigned int height = 576;
+    // From vdo-stream.h
+    // AXIS OS 12.8+
+    // Unlike vdo_stream_new(), this API enables automatic framerate adjustment
+    // (to disable this feature, you need to explicitly specify the framerate).
+    // In addition, it applies several other defaults suitable for video analytics.
+    // It's still possible to override options such as 'buffer.count' or 'image.fit'.
+    // This convenience API is roughly equivalent to:
+    // vdo_map_set_boolean(settings, "socket.blocking", false);
+    // vdo_map_set_string(settings,  "image.fit", "scale");
+    // vdo_map_set_uint32(settings,  "buffer.count", 2u);
+    // vdo_map_set_uint32(settings,  "format", VDO_FORMAT_YUV);
+    // vdo_map_set_string(settings,  "subformat", "Y800");
+    // vdo_map_set_uint32(settings,  "input", ...);
+    // vdo_map_set_pair32u(settings, "resolution", ...);
+    //
+    // "image.fit"  "crop" clips to cover the frame and "scale" shrinks to contain the image (AXIS
+    // OS 12.7+ and Artpec-7+) "crop" works on all platforms. On Ambarella CV25, only YUV and RGB
+    // work with "scale".
+    g_autoptr(VdoStream) vdo_stream =
+        vdo_stream_y800_new(nullptr, input_channel, {width, height}, &vdo_error);
+    if (!vdo_stream)
+        return failed();
 
-    VdoFormat vdo_format = VDO_FORMAT_YUV;
-    double vdo_framerate = 30.0;
+    g_autoptr(VdoMap) vdo_info = vdo_stream_get_info(vdo_stream, &vdo_error);
+    if (!vdo_info)
+        return failed();
 
-    // Choose a valid stream resolution
-    unsigned int stream_width  = 0;
-    unsigned int stream_height = 0;
-    if (!choose_stream_resolution(width,
-                                  height,
-                                  vdo_format,
-                                  nullptr,
-                                  "all",
-                                  &stream_width,
-                                  &stream_height)) {
-        panic("%s: Failed choosing stream resolution", __func__);
-    }
+    syslog(LOG_INFO, "Creating VDO image provider and creating stream %u x %u", width, height);
 
-    syslog(LOG_INFO,
-           "Creating VDO image provider and creating stream %u x %u",
-           stream_width,
-           stream_height);
+    int fd = vdo_stream_get_fd(vdo_stream, &vdo_error);
+    if (fd < 0)
+        return failed();
 
-    image_provider = create_img_provider(stream_width, stream_height, 2, vdo_format, vdo_framerate);
-    if (!image_provider) {
-        panic("%s: Could not create image provider", __func__);
-    }
+    pollfd fds = {
+        .fd     = fd,
+        .events = POLL_IN,
+    };
 
     syslog(LOG_INFO, "Start fetching video frames from VDO");
-    if (!img_provider_start(image_provider)) {
-        panic("%s: Could not start image provider", __func__);
-    }
+    if (!vdo_stream_start(vdo_stream, &vdo_error))
+        return failed();
 
     // Create the background subtractor
     Ptr<BackgroundSubtractorMOG2> bgsub = createBackgroundSubtractorMOG2();
@@ -75,66 +116,62 @@ int main(void) {
     // noise, with a bigger size corresponding to more denoising
     Mat kernel = getStructuringElement(MORPH_ELLIPSE, Size(9, 9));
 
-    // Create OpenCV Mats for the camera frame (nv12), the converted frame (bgr)
-    // and the foreground frame that is outputted by the background subtractor
-    Mat bgr_mat  = Mat(height, width, CV_8UC3);
-    Mat nv12_mat = Mat(height * 3 / 2, width, CV_8UC1);
+    // Handle rotation 90/270, the width and height are swapped in the info map
+    // if rotation is 90/270.
+    width  = vdo_map_get_uint32(vdo_info, "width", width);
+    height = vdo_map_get_uint32(vdo_info, "height", height);
+
+    // Create OpenCV Mats for the camera frame (Y800)
+    // The foreground frame that is outputted by the background subtractor
+    Mat gray_image  = Mat(height, width, CV_8UC1);
+    gray_image.step = vdo_map_get_uint32(vdo_info, "pitch", width);
+
     Mat fg;
 
-    while (true) {
+    while (running) {
         struct timeval start_ts, end_ts;
         unsigned int opencv_ms = 0;
+
+        int status = TEMP_FAILURE_RETRY(poll(&fds, 1, -1));
+        if (status < 0)
+            panic("Failed to poll with status %d", status);
+
         // Get frame from vdo
-        g_autoptr(VdoBuffer) vdo_buf = img_provider_get_frame(image_provider);
-        if (!vdo_buf) {
-            // This can only happen if it is global rotation then
-            // the stream has be restarted because rotation has been changed.
-            syslog(LOG_INFO, "No buffer because of global rotation");
-            goto end;
-        }
+        g_autoptr(VdoBuffer) vdo_buf = vdo_stream_get_buffer(vdo_stream, &vdo_error);
+        if (!vdo_buf && g_error_matches(vdo_error, VDO_ERROR, VDO_ERROR_NO_DATA))
+            continue;  // Transient Error -> Retry!
+
+        if (!vdo_buf)
+            return failed();
 
         gettimeofday(&start_ts, nullptr);
-        // Assign the VDO image buffer to the nv12_mat OpenCV Mat.
-        // This specific Mat is used as it is the one we created for NV12,
-        // which has a different layout than e.g., BGR.
-        nv12_mat.data = static_cast<uint8_t*>(vdo_buffer_get_data(vdo_buf));
-
-        // Convert the NV12 data to BGR
-        cvtColor(nv12_mat, bgr_mat, COLOR_YUV2BGR_NV12, 3);
+        // Assign the VDO image buffer to the gray_image OpenCV Mat.
+        gray_image.data = static_cast<uint8_t*>(vdo_buffer_get_data(vdo_buf));
 
         // Perform background subtraction on the bgr image with
         // learning rate 0.005. The resulting image should have
         // pixel intensities > 0 only where changes have occurred
-        bgsub->apply(bgr_mat, fg, 0.005);
+        bgsub->apply(gray_image, fg, 0.005);
 
         // Filter noise from the image with the filtering element
         morphologyEx(fg, fg, MORPH_OPEN, kernel);
 
         // We define movement in the image as any pixel being non-zero
         int nonzero_pixels = countNonZero(fg);
-        if (nonzero_pixels > 0) {
+        if (nonzero_pixels > 0)
             syslog(LOG_INFO, "Motion detected: YES");
-        } else {
+        else
             syslog(LOG_INFO, "Motion detected: NO");
-        }
+
         gettimeofday(&end_ts, nullptr);
         opencv_ms = static_cast<unsigned int>(((end_ts.tv_sec - start_ts.tv_sec) * 1000) +
                                               ((end_ts.tv_usec - start_ts.tv_usec) / 1000));
         syslog(LOG_INFO, "Ran opencv for %u ms", opencv_ms);
         // Check if the framerate from vdo should be changed
-        img_provider_update_framerate(image_provider, opencv_ms);
 
         // This will allow vdo to fill this buffer with data again
-        if (!vdo_stream_buffer_unref(image_provider->vdo_stream, &vdo_buf, &vdo_error)) {
-            if (!vdo_error_is_expected(&vdo_error)) {
-                panic("%s: Unexpexted error: %s", __func__, vdo_error->message);
-            }
-            g_clear_error(&vdo_error);
-        }
-    }
-end:
-    if (image_provider) {
-        destroy_img_provider(image_provider);
+        if (!vdo_stream_buffer_unref(vdo_stream, &vdo_buf, &vdo_error))
+            return failed();
     }
     syslog(LOG_INFO, "Exit opencv_app");
     return EXIT_SUCCESS;
