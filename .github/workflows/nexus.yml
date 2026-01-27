@@ -19,7 +19,7 @@ jobs:
       EXREPO: acap-native-examples
       EXNAME: nexus
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - uses: docker/setup-buildx-action@v3
 
       - name: Build ${{ env.example }} application
