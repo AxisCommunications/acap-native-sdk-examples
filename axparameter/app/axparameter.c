@@ -190,8 +190,22 @@ int main(void) {
     syslog(LOG_INFO, "SerialNumber: '%s'", serial_number);
     g_free(serial_number);
 
+    // Note: Most of axparameter API accepts both:
+    // - short names (e.g., "IsCustomized")
+    // - fully qualified names (e.g., "root.axparameter.IsCustomized").
+    //
+    // Both formats are internally converted to the fully qualified format with the "group" part set
+    // as the app_name passed to ax_parameter_new. The callback will always receive the fully
+    // qualified parameter name.
+    //
+    // Exception: ax_parameter_add() accepts only short names.
+
     // Act on changes to IsCustomized as soon as they happen.
-    if (!ax_parameter_register_callback(handle, "IsCustomized", parameter_changed, handle, &error))
+    if (!ax_parameter_register_callback(handle,
+                                        "root." APP_NAME ".IsCustomized",
+                                        parameter_changed,
+                                        handle,
+                                        &error))
         panic("%s", error->message);
 
     // Register the same callback for CustomValue, even though that parameter does not exist yet!
