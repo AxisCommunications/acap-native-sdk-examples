@@ -28,8 +28,10 @@ object-detection-yolov5
 ├── app
 │   ├── argparse.c
 │   ├── argparse.h
-│   ├── imgprovider.c
-│   ├── imgprovider.h
+│   ├── channel_util.c
+│   ├── channel_util.h
+│   ├── img_util.c
+│   ├── img_util.h
 │   ├── labelparse.c
 │   ├── labelparse.h
 │   ├── LICENSE
@@ -39,6 +41,8 @@ object-detection-yolov5
 │   ├── manifest.json.cpu
 │   ├── model.c
 │   ├── model.h
+│   ├── model_preprocessing.c
+│   ├── model_preprocessing.h
 │   ├── object_detection_yolov5.c
 │   ├── panic.c
 │   ├── panic.h
@@ -48,7 +52,8 @@ object-detection-yolov5
 ```
 
 - **app/argparse.c/h** - Program argument parser.
-- **app/imgprovider.c/h** - Implementation of VDO parts.
+- **app/channel-util.c/h** - Utility function for wrapping VdoChannel.
+- **app/img-util.c/h** - Handle the update of framerate dependent on inference and post processing time..
 - **app/labelparse.c/h** - Parse file of labels.
 - **app/LICENSE** - Text file which lists all open source licensed source code distributed with the
 application.
@@ -61,7 +66,8 @@ ARTPEC-8 DLPU with TensorFlow Lite.
 - **app/manifest.json.cpu** - Defines the application and its configuration when building for
 CPU with TensorFlow Lite.
 - **app/object_detection_yolov5.c** - Application source code in C.
-- **app/model.c/h** - Implementation of Larod parts.
+- **app/model.c/h** - Handle most of the larod functionality.
+- **app/model_preproessing.c/h** - Wrapper for the preprocessing part of larod.
 - **app/panic.c/h** - Utility for exiting the program on error.
 - **app/parameter_finder.py** - Python script to create `model_params.h`, containing model specific
 parameters.
@@ -108,7 +114,7 @@ that has the same aspect ratio as the native aspect ratio.
     1. Fetch image data from VDO.
     2. Convert image data to the correct format with the Larod pre-processing job, if needed.
     3. Run inference with the Larod model inference job.
-    4. Measure the total inference time (preprocessing and inference time) and adjust the framerate of the vdo stream if needed.
+    4. Measure the total inference time (preprocessing, inference time, and parsing time) and adjust the framerate of the vdo stream if needed.
     5. Perform YOLOv5-specific parsing of the output.
     6. Draw bounding boxes and log details about the detected objects.
 

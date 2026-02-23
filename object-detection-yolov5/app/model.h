@@ -16,6 +16,7 @@
 
 #pragma once
 
+#include "img_util.h"
 #include "larod.h"
 #include "vdo-buffer.h"
 #include "vdo-error.h"
@@ -27,35 +28,35 @@ typedef struct model_tensor_output {
     void* data;
     size_t size;
     larodTensorDataType datatype;
+    uint64_t timestamp;
 } model_tensor_output_t;
 
 typedef struct model_provider {
     larodConnection* conn;
-    larodJobRequest* pp_req;
-    larodJobRequest* inf_req;
+    const char* device_name;
 
-    larodTensor** pp_input_tensors;
-    size_t pp_num_inputs;
-    larodTensor** pp_output_tensors;
-    size_t pp_num_outputs;
-    larodTensor** input_tensors;
-    size_t num_inputs;
+    // Inference variables
     larodTensor** output_tensors;
     size_t num_outputs;
-    larodMap* crop_map;
-
-    size_t image_buffer_size;
-
-    int image_input_fd;
-    void* image_input_addr;
+    larodJobRequest* inf_req;
+    larodModel* model;
+    model_tensor_output_t* model_output_tensors;
     int larod_model_fd;
 
+    // Preprocessing variables
     bool use_preprocessing;
 
-    model_tensor_output_t* model_output_tensors;
-} model_provider_t;
+    larodTensor** pp_output_tensors;
+    size_t pp_num_outputs;
+    larodMap* crop_map;
+    larodJobRequest* pp_req;
+    larodModel* pp_model;
 
-bool model_run_preprocessing(model_provider_t* provider, VdoBuffer* vdo_buf);
+    img_info_t* img_info;
+    larodTensor** img_input_tensors[MAX_NBR_IMG_PROVIDER_BUFFERS];
+    int img_tracked_tensors[MAX_NBR_IMG_PROVIDER_BUFFERS];
+    int img_duped_fds[MAX_NBR_IMG_PROVIDER_BUFFERS];
+} model_provider_t;
 
 bool model_run_inference(model_provider_t* provider, VdoBuffer* vdo_buf);
 
@@ -63,16 +64,11 @@ bool model_get_tensor_output_info(model_provider_t* provider,
                                   unsigned int tensor_output_index,
                                   model_tensor_output_t* tensor_output);
 
-model_provider_t* create_model_provider(unsigned int input_width,
-                                        unsigned int input_height,
-                                        unsigned int stream_width,
-                                        unsigned int stream_height,
-                                        unsigned int stream_pitch,
-                                        VdoFormat image_format,
-                                        VdoFormat model_format,
-                                        char* model_file,
-                                        char* device_name,
-                                        bool allow_input_crop,
-                                        size_t* num_output_tensors);
+img_info_t model_provider_get_model_metadata(model_provider_t* provider);
 
-void destroy_model_provider(model_provider_t* provider);
+bool model_provider_update_image_metadata(model_provider_t* provider, VdoMap* image_map);
+
+model_provider_t*
+model_provider_new(char* model_file, char* device_name, size_t* num_output_tensors);
+
+void model_provider_destroy(model_provider_t* provider);

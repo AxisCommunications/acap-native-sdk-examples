@@ -31,7 +31,8 @@
  */
 
 #include "argparse.h"
-#include "imgprovider.h"
+#include "channel_util.h"
+#include "img_util.h"
 #include "labelparse.h"
 #include "model.h"
 #include "model_params.h"  //Generated at build time
@@ -48,6 +49,9 @@
 #include <sys/time.h>
 #include <syslog.h>
 
+#include <poll.h>
+#include <unistd.h>
+
 #define APP_NAME "object_detection_yolov5"
 
 volatile sig_atomic_t running = 1;
@@ -55,6 +59,64 @@ volatile sig_atomic_t running = 1;
 static void shutdown(int status) {
     (void)status;
     running = 0;
+}
+
+static int handle_vdo_failed(GError* error) {
+    // Maintenance/Installation in progress (e.g. Global-Rotation)
+    if (vdo_error_is_expected(&error)) {
+        syslog(LOG_INFO, "Expected vdo error %s", error->message);
+        return EXIT_SUCCESS;
+    } else {
+        panic("Unexpected vdo error %s", error->message);
+    }
+}
+
+static VdoStream* create_new_vdo_stream(unsigned int channel,
+                                        VdoFormat format,
+                                        VdoResolution res,
+                                        unsigned int num_buffers,
+                                        const char* image_fit,
+                                        double framerate) {
+    g_autoptr(VdoMap) vdo_settings = vdo_map_new();
+    g_autoptr(GError) error        = NULL;
+
+    if (!vdo_settings) {
+        panic("%s: Failed to create vdo_map", __func__);
+    }
+
+    vdo_map_set_uint32(vdo_settings, "channel", channel);
+    // format is the image format that is supplied from vdo
+    vdo_map_set_uint32(vdo_settings, "format", format);
+    // Set initial framerate
+    vdo_map_set_double(vdo_settings, "framerate", framerate);
+    VdoPair32u resolution = {
+        .w = res.width,
+        .h = res.height,
+    };
+    vdo_map_set_pair32u(vdo_settings, "resolution", resolution);
+    // Make it possible to change the framerate for the stream after it is started
+    vdo_map_set_boolean(vdo_settings, "dynamic.framerate", true);
+    // It is not needed to set buffer.strategy since VDO_BUFFER_STRATEGY_INFINITE is default
+    // vdo_map_set_uint32(vdo_settings, "buffer.strategy", VDO_BUFFER_STRATEGY_INFINITE);
+
+    // The number of buffers that vdo will allocate for this stream
+    // Normally two buffers are enough and using too many buffers will use
+    // more memory in the product
+    vdo_map_set_uint32(vdo_settings, "buffer.count", num_buffers);
+    // The vdo_stream_get_buffer is non blocking and will return immediately
+    // Then we need to poll instead when it is ok to get a buffer
+    vdo_map_set_boolean(vdo_settings, "socket.blocking", false);
+    vdo_map_set_string(vdo_settings, "image.fit", image_fit);
+
+    // Create a vdo stream using the vdoMap filled in above
+    g_autoptr(VdoStream) vdo_stream = vdo_stream_new(vdo_settings, NULL, &error);
+    if (!vdo_stream) {
+        panic("%s: Failed creating vdo stream: %s", __func__, error->message);
+    }
+    syslog(LOG_INFO, "Dump of vdo stream settings map =====");
+    vdo_map_dump(vdo_settings);
+
+    return g_steal_pointer(&vdo_stream);
 }
 
 typedef struct model_params {
@@ -242,11 +304,14 @@ static void determine_bbox_coordinates(uint8_t* tensor,
 }
 
 int main(int argc, char** argv) {
+    bbox_t* bbox                          = NULL;
     g_autoptr(GError) vdo_error           = NULL;
-    img_provider_t* image_provider        = NULL;
     model_provider_t* model_provider      = NULL;
     model_tensor_output_t* tensor_outputs = NULL;
-    bbox_t* bbox                          = NULL;
+    img_info_t model_metadata             = {0};
+    img_framerate_t image_framerate       = {0};
+    g_autoptr(VdoStream) vdo_stream       = NULL;
+    g_autoptr(VdoMap) vdo_stream_info     = NULL;
 
     // Stop main loop at signal
     signal(SIGTERM, shutdown);
@@ -294,56 +359,93 @@ int main(int argc, char** argv) {
 
     ax_parameter_free(axparameter_handle);
 
-    VdoFormat vdo_format = VDO_FORMAT_YUV;
-    double vdo_framerate = 30.0;
-
-    if (!g_strcmp0(args.device_name, "a9-dlpu-tflite")) {
-        // Possible to run RGB on ARTPEC-9
-        vdo_format = VDO_FORMAT_RGB;
-    }
-
-    // Choose a valid stream resolution since only certain resolutions are allowed
-    unsigned int stream_width  = 0;
-    unsigned int stream_height = 0;
-    if (!choose_stream_resolution(model_params->input_width,
-                                  model_params->input_height,
-                                  vdo_format,
-                                  "native",
-                                  "all",
-                                  &stream_width,
-                                  &stream_height)) {
-        syslog(LOG_ERR, "%s: Failed choosing stream resolution", __func__);
-        goto end;
-    }
-    syslog(LOG_INFO,
-           "Creating VDO image provider and creating stream %u x %u",
-           stream_width,
-           stream_height);
-
-    image_provider = create_img_provider(stream_width, stream_height, 2, vdo_format, vdo_framerate);
-    if (!image_provider) {
-        panic("%s: Could not create image provider", __func__);
-    }
-
+    // Start by loading the model and get the model metadata
     size_t number_output_tensors = 0;
-    model_provider               = create_model_provider(model_params->input_width,
-                                           model_params->input_height,
-                                           image_provider->width,
-                                           image_provider->height,
-                                           image_provider->pitch,
-                                           image_provider->format,
-                                           VDO_FORMAT_RGB,
-                                           args.model_file,
-                                           args.device_name,
-                                           false,
-                                           &number_output_tensors);
+    model_provider = model_provider_new(args.model_file, args.device_name, &number_output_tensors);
     if (!model_provider) {
         panic("%s: Could not create model provider", __func__);
     }
+
     tensor_outputs = calloc(number_output_tensors, sizeof(model_tensor_output_t));
     if (!tensor_outputs) {
         panic("%s: Could not allocate tensor outputs", __func__);
     }
+
+    // Get the model format and model input dimension and pitches
+    model_metadata = model_provider_get_model_metadata(model_provider);
+
+    // Set to a framerate that is sufficient for inference
+    double vdo_stream_framerate = 30.0;
+    // The vdo channel to be used
+    // When using VAPIX and rtsp the camera parameter normally corresponds
+    // to the channel number here.
+    unsigned int vdo_channel = 1;
+
+    // The buffer count will affect memory consumption so keep it as low
+    // as possible
+    unsigned int vdo_stream_buffer_count = 2;
+
+    // Set to false if e.g a view area is wanted instead of the whole sensor
+    bool fetch_from_whole_sensor = true;
+
+    if (fetch_from_whole_sensor) {
+        // Currently only take from the first input channel
+        vdo_channel = channel_util_get_first_input_channel();
+    }
+
+    // Get the current global rotation and print
+    uint32_t rotation = channel_util_get_image_rotation(vdo_channel);
+    syslog(LOG_INFO, "[Channel %u] Current global rotation is %u", vdo_channel, rotation);
+    VdoPair32u channel_ar = channel_util_get_aspect_ratio(vdo_channel);
+    syslog(LOG_INFO,
+           "[Channel %u] Current aspect ratio is %u:%u",
+           vdo_channel,
+           channel_ar.w,
+           channel_ar.h);
+
+    VdoResolution req_res    = {model_metadata.width, model_metadata.height};
+    VdoResolution chosen_req = req_res;
+
+    // Get the a resolution with the same aspect ratio as the channel aspect ratio
+    if (!channel_util_choose_stream_resolution(vdo_channel,
+                                               req_res,
+                                               &chosen_req,
+                                               rotation,
+                                               &model_metadata.format)) {
+        panic("%s: Could not chose a resolution", __func__);
+    }
+    // In this case use default image.fit crop because the resolution
+    // fetched from choose function have the same aspect ratio as the
+    // channel aspect ratio
+    vdo_stream = create_new_vdo_stream(vdo_channel,
+                                       model_metadata.format,
+                                       chosen_req,
+                                       vdo_stream_buffer_count,
+                                       "crop",
+                                       vdo_stream_framerate);
+    if (!vdo_stream) {
+        return handle_vdo_failed(vdo_error);
+    }
+    vdo_stream_info = vdo_stream_get_info(vdo_stream, &vdo_error);
+    if (!vdo_stream_info) {
+        return handle_vdo_failed(vdo_error);
+    }
+    VdoPair32u aspect_ratio_def = {.w = 0u, .h = 0u};
+    VdoPair32u stream_ar = vdo_map_get_pair32u(vdo_stream_info, "aspect_ratio", aspect_ratio_def);
+    syslog(LOG_INFO, "Stream aspect ratio is %u:%u", stream_ar.w, stream_ar.h);
+
+    image_framerate.wanted_framerate = vdo_stream_framerate;
+    double info_framerate = vdo_map_get_double(vdo_stream_info, "framerate", vdo_stream_framerate);
+    image_framerate.frametime = (unsigned int)((1.0 / info_framerate) * 1000.0);
+
+    int fd = vdo_stream_get_fd(vdo_stream, &vdo_error);
+    if (fd < 0) {
+        return handle_vdo_failed(vdo_error);
+    }
+    struct pollfd fds = {
+        .fd     = fd,
+        .events = POLL_IN,
+    };
 
     char** labels = NULL;          // This is the array of label strings. The label
                                    // entries points into the large label_file_data buffer.
@@ -352,12 +454,15 @@ int main(int argc, char** argv) {
 
     parse_labels(&labels, &label_file_data, args.labels_file, &num_labels);
 
-    syslog(LOG_INFO, "Start fetching video frames from VDO");
-    if (!img_provider_start(image_provider)) {
-        panic("%s: Could not start image provider", __func__);
-    }
-
     bbox = setup_bbox();
+
+    if (!vdo_stream_start(vdo_stream, &vdo_error)) {
+        return handle_vdo_failed(vdo_error);
+    }
+    syslog(LOG_INFO, "Start fetching video frames from VDO");
+
+    // Use the vdo info map to update the model metadata
+    model_provider_update_image_metadata(model_provider, vdo_stream_info);
 
     int size_per_detection = model_params->size_per_detection;
     float qt_zero_point    = model_params->quantization_zero_point;
@@ -365,64 +470,42 @@ int main(int argc, char** argv) {
 
     while (running) {
         struct timeval start_ts, end_ts;
-        unsigned int preprocessing_ms = 0;
-        unsigned int inference_ms     = 0;
-        unsigned int total_elapsed_ms = 0;
+        unsigned int inference_ms       = 0;
+        unsigned int post_processing_ms = 0;
+        unsigned int total_elapsed_ms   = 0;
 
-        g_autoptr(VdoBuffer) vdo_buf = img_provider_get_frame(image_provider);
+        int status = 0;
+        do {
+            // If poll returns -1 then errno is set
+            // if the errno is set to EINTR then just
+            // continue this loop
+            status = poll(&fds, 1, -1);
+        } while (status == -1 && errno == EINTR);
+
+        if (status < 0) {
+            panic("Failed to poll with status %d", status);
+        }
+
+        g_autoptr(VdoBuffer) vdo_buf = vdo_stream_get_buffer(vdo_stream, &vdo_error);
+        if (!vdo_buf && g_error_matches(vdo_error, VDO_ERROR, VDO_ERROR_NO_DATA)) {
+            g_clear_error(&vdo_error);
+            continue;
+        }
         if (!vdo_buf) {
-            // This can only happen if it is global rotation then
-            // the stream has to be restarted because rotation has been changed.
-            syslog(
-                LOG_INFO,
-                "No buffer because of changed global rotation. Application needs to be restarted");
-            goto end;
+            return handle_vdo_failed(vdo_error);
         }
-        // If needed convert and scale/crop to correct input format and resolution
-        // Its up to the model provider to decide if needed or not
-        // If not needed the model_run_preprocessing will return true without
-        // any work
         gettimeofday(&start_ts, NULL);
-        if (!model_run_preprocessing(model_provider, vdo_buf)) {
-            // No power
-            if (!vdo_stream_buffer_unref(image_provider->vdo_stream, &vdo_buf, &vdo_error)) {
-                if (!vdo_error_is_expected(&vdo_error)) {
-                    panic("%s: Unexpexted error: %s", __func__, vdo_error->message);
-                }
-                g_clear_error(&vdo_error);
-            }
-            img_provider_flush_all_frames(image_provider);
-            continue;
-        }
-        gettimeofday(&end_ts, NULL);
-
-        preprocessing_ms = (unsigned int)(((end_ts.tv_sec - start_ts.tv_sec) * 1000) +
-                                          ((end_ts.tv_usec - start_ts.tv_usec) / 1000));
-        syslog(LOG_INFO, "Ran pre-processing for %u ms", preprocessing_ms);
-
-        // Retrieve detections from data
-        gettimeofday(&start_ts, NULL);
+        // Run inference and preprocessing if needed
         if (!model_run_inference(model_provider, vdo_buf)) {
-            // No power
-            if (!vdo_stream_buffer_unref(image_provider->vdo_stream, &vdo_buf, &vdo_error)) {
-                if (!vdo_error_is_expected(&vdo_error)) {
-                    panic("%s: Unexpexted error: %s", __func__, vdo_error->message);
-                }
-                g_clear_error(&vdo_error);
+            if (!img_util_flush(vdo_stream, &vdo_buf, &vdo_error)) {
+                return handle_vdo_failed(vdo_error);
             }
-            img_provider_flush_all_frames(image_provider);
             continue;
         }
         gettimeofday(&end_ts, NULL);
+        inference_ms = elapsed_ms(&start_ts, &end_ts);
 
-        inference_ms = (unsigned int)(((end_ts.tv_sec - start_ts.tv_sec) * 1000) +
-                                      ((end_ts.tv_usec - start_ts.tv_usec) / 1000));
-        syslog(LOG_INFO, "Ran inference for %u ms", inference_ms);
-
-        total_elapsed_ms = inference_ms + preprocessing_ms;
-
-        // Check if the framerate from vdo should be changed
-        img_provider_update_framerate(image_provider, total_elapsed_ms);
+        total_elapsed_ms = inference_ms;
 
         for (size_t i = 0; i < number_output_tensors; i++) {
             if (!model_get_tensor_output_info(model_provider, i, &tensor_outputs[i])) {
@@ -439,7 +522,9 @@ int main(int argc, char** argv) {
                           model_params,
                           invalid_detections);
         gettimeofday(&end_ts, NULL);
-        syslog(LOG_INFO, "Ran parsing for %u ms", elapsed_ms(&start_ts, &end_ts));
+        post_processing_ms = elapsed_ms(&start_ts, &end_ts);
+        syslog(LOG_INFO, "Ran parsing for %u ms", post_processing_ms);
+        total_elapsed_ms += post_processing_ms;
 
         bbox_clear(bbox);
 
@@ -493,23 +578,26 @@ int main(int argc, char** argv) {
             panic("Failed to commit box drawer");
         }
 
-        // This will allow vdo to fill this buffer with data again
-        if (!vdo_stream_buffer_unref(image_provider->vdo_stream, &vdo_buf, &vdo_error)) {
-            if (!vdo_error_is_expected(&vdo_error)) {
-                panic("%s: Unexpexted error: %s", __func__, vdo_error->message);
+        // Check if the framerate from vdo should be changed
+        if (img_util_update_framerate(vdo_stream, &image_framerate, total_elapsed_ms)) {
+            if (!img_util_flush(vdo_stream, &vdo_buf, &vdo_error)) {
+                return handle_vdo_failed(vdo_error);
             }
-            g_clear_error(&vdo_error);
+        } else {
+            // This will allow vdo to fill this buffer with data again
+            if (!vdo_stream_buffer_unref(vdo_stream, &vdo_buf, &vdo_error)) {
+                if (!vdo_error_is_expected(&vdo_error)) {
+                    panic("%s: Unexpected error: %s", __func__, vdo_error->message);
+                }
+                g_clear_error(&vdo_error);
+            }
         }
     }
 
-end:
     // Cleanup
     free(model_params);
-    if (image_provider) {
-        destroy_img_provider(image_provider);
-    }
     if (model_provider) {
-        destroy_model_provider(model_provider);
+        model_provider_destroy(model_provider);
     }
     free(tensor_outputs);
     free(labels);

@@ -15,6 +15,7 @@
  */
 
 #include "model.h"
+#include "model_preprocessing.h"
 
 #include "larod.h"
 #include "panic.h"
@@ -28,6 +29,13 @@
 #include <syslog.h>
 #include <unistd.h>
 
+#define MAX_NBR_POWER_RETRIES 50
+
+static unsigned int elapsed_ms(struct timeval* start_ts, struct timeval* end_ts) {
+    return (unsigned int)(((end_ts->tv_sec - start_ts->tv_sec) * 1000) +
+                          ((end_ts->tv_usec - start_ts->tv_usec) / 1000));
+}
+
 bool model_get_tensor_output_info(model_provider_t* provider,
                                   unsigned int tensor_output_index,
                                   model_tensor_output_t* tensor_output) {
@@ -38,51 +46,152 @@ bool model_get_tensor_output_info(model_provider_t* provider,
     return true;
 }
 
-bool model_run_preprocessing(model_provider_t* provider, VdoBuffer* vdo_buf) {
-    larodError* error            = NULL;
-    static int nbr_power_retries = 0;
-
-    if (!provider->use_preprocessing) {
-        return true;
+static void model_job_handle_no_power(int* nbr_of_retries) {
+    // Currently this will only happen when there is no power
+    //  Just a number but if no power available after 50 retries it is time to give up
+    if (*nbr_of_retries == MAX_NBR_POWER_RETRIES) {
+        panic("%s: Still no power available when running larod job %u, giving up",
+              __func__,
+              *nbr_of_retries);
     }
-    uint8_t* data = vdo_buffer_get_data(vdo_buf);
+    syslog(LOG_INFO, "No power available when running larod job, try nbr %u", *nbr_of_retries);
+    *nbr_of_retries = *nbr_of_retries + 1;
+    usleep(250 * 1000 * *nbr_of_retries);
+}
 
-    memcpy(provider->image_input_addr, data, provider->image_buffer_size);
-    if (!larodRunJob(provider->conn, provider->pp_req, &error)) {
-        if (error->code != LAROD_ERROR_POWER_NOT_AVAILABLE) {
-            panic("%s: Unable to run preprocessing job: %s (%d)",
-                  __func__,
-                  error->msg,
-                  error->code);
+static int setup_tracked_tensors(model_provider_t* provider, VdoBuffer* vdo_buf) {
+    larodError* error    = NULL;
+    static int tensor_id = 0;
+    int tracked_id       = -1;
+
+    int64_t vdo_buf_offset = vdo_buffer_get_offset(vdo_buf);
+    int vdo_buf_fd         = vdo_buffer_get_fd(vdo_buf);
+    int buf_fd             = vdo_buf_fd;
+
+    tracked_id                   = tensor_id;
+    larodTensor** tracked_tensor = provider->img_input_tensors[tracked_id];
+
+    if (!provider->img_info->dmabuf) {
+        buf_fd = larodConvertVmemFdToDmabuf(vdo_buf_fd, vdo_buf_offset, &error);
+        if (buf_fd == LAROD_INVALID_FD) {
+            panic("%s: Failed to get fd from larod: %s", __func__, error->msg);
         }
-        larodClearError(&error);
-        // Currently this will only happen when there is no power
-        //  Just a number but if no power available after 50 retries it is time to give up
-        if (nbr_power_retries == 50) {
-            panic("Still no power available when running larod job %u, giving up",
-                  nbr_power_retries);
-        }
-        syslog(LOG_INFO,
-               "No power available when running larod job, try nbr %u",
-               nbr_power_retries);
-        nbr_power_retries++;
-        usleep(250 * 1000 * nbr_power_retries);
-        return false;
+        vdo_buf_offset = 0;
     }
-    nbr_power_retries = 0;
-    return true;
+    int duped_fd = dup(buf_fd);
+    if (duped_fd < 0) {
+        panic("%s: Failed to dup fd", __func__);
+    }
+    if (!larodSetTensorFd(tracked_tensor[0], duped_fd, &error)) {
+        panic("%s: Failed to set fd for tensor: %s", __func__, error->msg);
+    }
+    if (!larodSetTensorFdOffset(tracked_tensor[0], vdo_buf_offset, &error)) {
+        panic("%s: Failed to set offset for tensor: %s", __func__, error->msg);
+    }
+    size_t vdo_buf_capacity = vdo_buffer_get_capacity(vdo_buf);
+    if (!larodSetTensorFdSize(tracked_tensor[0], vdo_buf_capacity, &error)) {
+        panic("%s: Failed to set size for tensor: %s", __func__, error->msg);
+    }
+    if (!larodTrackTensor(provider->conn, tracked_tensor[0], &error)) {
+        panic("%s: Failed to track tensor: %s", __func__, error->msg);
+    }
+    provider->img_input_tensors[tracked_id]   = tracked_tensor;
+    provider->img_duped_fds[tracked_id]       = duped_fd;
+    provider->img_tracked_tensors[tracked_id] = vdo_buf_fd;
+    tensor_id++;
+    return tracked_id;
 }
 
 bool model_run_inference(model_provider_t* provider, VdoBuffer* vdo_buf) {
     larodError* error            = NULL;
     static int nbr_power_retries = 0;
+    int tracked_id               = -1;
+    struct timeval start_ts, end_ts;
 
-    if (!provider->use_preprocessing) {
-        uint8_t* data = vdo_buffer_get_data(vdo_buf);
-
-        memcpy(provider->image_input_addr, data, provider->image_buffer_size);
+    int vdo_buf_fd = vdo_buffer_get_fd(vdo_buf);
+    if (vdo_buf_fd < 0) {
+        panic("%s: fd from vdo_buffer_get_fd is negative", __func__);
+    }
+    for (size_t i = 0; i < provider->img_info->nbr_buffers; i++) {
+        if (provider->img_tracked_tensors[i] == vdo_buf_fd) {
+            tracked_id = i;
+            break;
+        }
+    }
+    if (tracked_id == -1) {
+        tracked_id = setup_tracked_tensors(provider, vdo_buf);
     }
 
+    larodTensor** input_tensors  = provider->img_input_tensors[tracked_id];
+    larodJobRequest* input_req   = provider->inf_req;
+    larodModel* input_model      = provider->model;
+    larodTensor** output_tensors = provider->output_tensors;
+    size_t num_outputs           = provider->num_outputs;
+
+    if (provider->use_preprocessing) {
+        input_req      = provider->pp_req;
+        input_model    = provider->pp_model;
+        output_tensors = provider->pp_output_tensors;
+        num_outputs    = provider->pp_num_outputs;
+    }
+
+    if (!input_req) {
+        input_req = larodCreateJobRequest(input_model,
+                                          input_tensors,
+                                          1,
+                                          output_tensors,
+                                          num_outputs,
+                                          provider->crop_map,
+                                          &error);
+        if (!input_req) {
+            panic("%s: Failed to create input job request: %s", __func__, error->msg);
+        }
+    } else {
+        if (!larodSetJobRequestInputs(input_req, input_tensors, 1, &error)) {
+            panic("%s: Failed to set input job request: %s", __func__, error->msg);
+        }
+    }
+    if (provider->use_preprocessing) {
+        provider->pp_req = input_req;
+    } else {
+        provider->inf_req = input_req;
+    }
+
+    // If the inference failed because of no power no need to run
+    // the preprocssing job again
+    if (provider->use_preprocessing) {
+        gettimeofday(&start_ts, NULL);
+        if (!larodRunJob(provider->conn, provider->pp_req, &error)) {
+            if (error->code != LAROD_ERROR_POWER_NOT_AVAILABLE) {
+                panic("%s: Unable to run preprocessing job: %s (%d)",
+                      __func__,
+                      error->msg,
+                      error->code);
+            }
+            larodClearError(&error);
+            model_job_handle_no_power(&nbr_power_retries);
+            return false;
+        }
+        gettimeofday(&end_ts, NULL);
+        syslog(LOG_INFO, "Ran pre-processing for %u ms", elapsed_ms(&start_ts, &end_ts));
+        nbr_power_retries = 0;
+        if (!provider->inf_req) {
+            provider->inf_req = larodCreateJobRequest(provider->model,
+                                                      provider->pp_output_tensors,
+                                                      provider->pp_num_outputs,
+                                                      provider->output_tensors,
+                                                      provider->num_outputs,
+                                                      NULL,
+                                                      &error);
+            if (!provider->inf_req) {
+                panic("%s: Failed creating inference job request: %s", __func__, error->msg);
+            }
+        }
+    } else {
+        syslog(LOG_INFO, "Ran pre-processing for 0 ms");
+    }
+
+    gettimeofday(&start_ts, NULL);
     if (!larodRunJob(provider->conn, provider->inf_req, &error)) {
         if (error->code != LAROD_ERROR_POWER_NOT_AVAILABLE) {
             panic("%s: Unable to run inference on model: %s (%d)",
@@ -91,60 +200,18 @@ bool model_run_inference(model_provider_t* provider, VdoBuffer* vdo_buf) {
                   error->code);
         }
         larodClearError(&error);
-        // Currently this will only happen when there is no power
-        //  Just a number but if no power available after 50 retries it is time to give up
-        if (nbr_power_retries == 50) {
-            panic("Still no power available when running larod job %u, giving up",
-                  nbr_power_retries);
-        }
-        syslog(LOG_INFO,
-               "No power available when running larod job, try nbr %u",
-               nbr_power_retries);
-        nbr_power_retries++;
-        usleep(250 * 1000 * nbr_power_retries);
+        model_job_handle_no_power(&nbr_power_retries);
         return false;
     }
+    gettimeofday(&end_ts, NULL);
+    syslog(LOG_INFO, "Ran inference for %u ms", elapsed_ms(&start_ts, &end_ts));
+    VdoFrame* frame = vdo_buffer_get_frame(vdo_buf);
+    uint64_t pts    = vdo_frame_get_timestamp(frame);
+    // Update the tensor outputs with the timestamp
+    for (size_t i = 0; i < provider->num_outputs; i++) {
+        provider->model_output_tensors[i].timestamp = pts;
+    }
     nbr_power_retries = 0;
-    return true;
-}
-
-static bool setup_input_tensor_metadata(unsigned int pitch,
-                                        unsigned int height,
-                                        larodTensorLayout model_layout,
-                                        larodTensor* tensor) {
-    larodError* error          = NULL;
-    larodTensorPitches pitches = {0};
-
-    // Update the pitch dependent on the layout used
-    switch (model_layout) {
-        case LAROD_TENSOR_LAYOUT_420SP:
-            pitches.len        = 3;
-            pitches.pitches[2] = pitch;
-            pitches.pitches[1] = height * pitches.pitches[2];
-            pitches.pitches[0] = 3 * pitches.pitches[1] / 2;
-            break;
-        case LAROD_TENSOR_LAYOUT_NHWC:
-            pitches.len        = 4;
-            pitches.pitches[3] = 3;
-            pitches.pitches[2] = pitch;
-            pitches.pitches[1] = height * pitches.pitches[2];
-            pitches.pitches[0] = 1 * pitches.pitches[1];
-            break;
-        case LAROD_TENSOR_LAYOUT_NCHW:
-            pitches.len        = 4;
-            pitches.pitches[3] = pitch;
-            pitches.pitches[2] = height * pitches.pitches[3];
-            pitches.pitches[1] = 3 * pitches.pitches[2];
-            pitches.pitches[0] = 1 * pitches.pitches[1];
-            break;
-        default:
-            break;
-    }
-
-    if (!larodSetTensorPitches(tensor, &pitches, &error)) {
-        panic("%s: Failed to set tensor pitches: %s", __func__, error->msg);
-    }
-
     return true;
 }
 
@@ -160,7 +227,12 @@ static void setup_tensors(larodConnection* conn,
     if (!*input_tensors) {
         panic("%s: Failed retrieving input tensors: %s", __func__, error->msg);
     }
-    *output_tensors = larodAllocModelOutputs(conn, model, 0, num_outputs, NULL, &error);
+    *output_tensors = larodAllocModelOutputs(conn,
+                                             model,
+                                             LAROD_FD_PROP_READWRITE | LAROD_FD_PROP_MAP,
+                                             num_outputs,
+                                             NULL,
+                                             &error);
     if (!*output_tensors) {
         panic("%s: Failed retrieving output tensors: %s", __func__, error->msg);
     }
@@ -175,6 +247,29 @@ create_inference_model(model_provider_t* provider, char* model_file, char* devic
     if (provider->larod_model_fd < 0) {
         panic("%s: Unable to open model file %s: %s", __func__, model_file, strerror(errno));
     }
+
+    bool found_device  = false;
+    size_t num_devices = 0;
+    const larodDevice** devices;
+    devices = larodListDevices(provider->conn, &num_devices, &error);
+    if (num_devices == 0) {
+        panic("%s: Unable to list devices: %s", __func__, error->msg);
+    }
+
+    const char* device_str = NULL;
+    // Check for the supplied device name in all devices supported
+    for (size_t i = 0; i < num_devices; ++i) {
+        device_str = larodGetDeviceName(devices[i], &error);
+        if (!g_strcmp0(device_str, device_name)) {
+            found_device = true;
+            break;
+        }
+    }
+
+    if (!found_device) {
+        panic("%s: No device found for %s", __func__, device_name);
+    }
+    provider->device_name = device_name;
 
     syslog(LOG_INFO, "Setting up larod connection with device %s", device_name);
     const larodDevice* device = larodGetDevice(provider->conn, device_name, 0, &error);
@@ -204,7 +299,7 @@ create_inference_model(model_provider_t* provider, char* model_file, char* devic
         // Sleep between retries
         usleep(250 * 1000 * nbr_power_retries);
         nbr_power_retries++;
-        if (nbr_power_retries == 50) {
+        if (nbr_power_retries == MAX_NBR_POWER_RETRIES) {
             panic(
                 "%s: Still no power available "
                 "when trying to load model %u, giving up",
@@ -213,136 +308,22 @@ create_inference_model(model_provider_t* provider, char* model_file, char* devic
         }
     }
     if (!model) {
-        panic("%s: Unable to load model with device %s: %s", __func__, device_name, error->msg);
+        panic("%s: Unable to load model with device %s: %s", __func__, device_str, error->msg);
     }
     syslog(LOG_INFO, "Model loaded successfully");
 
     return model;
 }
 
-static larodModel* create_preprocessing_model(model_provider_t* provider,
-                                              char* device_name,
-                                              bool allow_input_crop,
-                                              VdoFormat input_format,
-                                              VdoFormat output_format,
-                                              unsigned int input_width,
-                                              unsigned int input_height,
-                                              unsigned int input_pitch,
-                                              unsigned int stream_width,
-                                              unsigned int stream_pitch,
-                                              unsigned int stream_height) {
-    larodError* error = NULL;
-    char* input_format_str;
-    char* output_format_str;
-
-    switch (input_format) {
-        case VDO_FORMAT_YUV:
-            input_format_str = "nv12";
-            break;
-        case VDO_FORMAT_RGB:
-            input_format_str = "rgb-interleaved";
-            break;
-        case VDO_FORMAT_PLANAR_RGB:
-            input_format_str = "rgb-planar";
-            break;
-        default:
-            panic("%s: Invalid input format %u", __func__, input_format);
-    }
-    switch (output_format) {
-        case VDO_FORMAT_YUV:
-            output_format_str = "nv12";
-            break;
-        case VDO_FORMAT_RGB:
-            output_format_str = "rgb-interleaved";
-            break;
-        case VDO_FORMAT_PLANAR_RGB:
-            output_format_str = "rgb-planar";
-            break;
-        default:
-            panic("%s: Invalid output format %u", __func__, output_format);
-    }
-
-    // Create preprocessing maps
-    larodMap* map = larodCreateMap(&error);
-    if (!map) {
-        panic("%s: Could not create preprocessing larodMap %s", __func__, error->msg);
-    }
-    if (!larodMapSetStr(map, "image.input.format", input_format_str, &error)) {
-        panic("%s: Failed setting preprocessing parameters: %s", __func__, error->msg);
-    }
-    if (!larodMapSetIntArr2(map, "image.input.size", stream_width, stream_height, &error)) {
-        panic("%s: Failed setting preprocessing parameters: %s", __func__, error->msg);
-    }
-    if (!larodMapSetInt(map, "image.input.row-pitch", stream_pitch, &error)) {
-        panic("%s: Failed setting preprocessing parameters: %s", __func__, error->msg);
-    }
-    if (!larodMapSetStr(map, "image.output.format", output_format_str, &error)) {
-        panic("%s: Failed setting preprocessing parameters: %s", __func__, error->msg);
-    }
-    if (!larodMapSetIntArr2(map, "image.output.size", input_width, input_height, &error)) {
-        panic("%s: Failed setting preprocessing parameters: %s", __func__, error->msg);
-    }
-    if (!larodMapSetInt(map, "image.output.row-pitch", input_pitch, &error)) {
-        panic("%s: Failed setting preprocessing parameters: %s", __func__, error->msg);
-    }
-
-    char* pre_processing_device_str = "cpu-proc";
-
-    // Use libyuv as image preprocessing backend
-    const larodDevice* pp_device =
-        larodGetDevice(provider->conn, pre_processing_device_str, 0, &error);
-    larodModel* model =
-        larodLoadModel(provider->conn, -1, pp_device, LAROD_ACCESS_PRIVATE, "", map, &error);
-    if (!model) {
-        panic("%s: Unable to load preprocessing model with device %s: %s",
-              __func__,
-              device_name,
-              error->msg);
-    }
-
-    larodDestroyMap(&map);
-    if (allow_input_crop && (input_width != stream_width || input_height != stream_height)) {
-        // Calculate crop image
-        // 1. The crop area shall fill the input image either horizontally or
-        //    vertically.
-        // 2. The crop area shall have the same aspect ratio as the output image.
-        syslog(LOG_INFO, "Calculate crop image");
-        float dest_WH_ratio = (float)input_width / (float)input_height;
-        float crop_w        = (float)stream_width;
-        float crop_h        = crop_w / dest_WH_ratio;
-        if (crop_h > (float)stream_height) {
-            crop_h = (float)stream_height;
-            crop_w = crop_h * dest_WH_ratio;
-        }
-        unsigned int clip_w = (unsigned int)crop_w;
-        unsigned int clip_h = (unsigned int)crop_h;
-        unsigned int clip_x = (stream_width - clip_w) / 2;
-        unsigned int clip_y = (stream_height - clip_h) / 2;
-        syslog(LOG_INFO, "Crop input image X=%d Y=%d (%d x %d)", clip_x, clip_y, clip_w, clip_h);
-        provider->crop_map = larodCreateMap(&error);
-        if (!provider->crop_map) {
-            panic("Could not create preprocessing crop larodMap %s", error->msg);
-        }
-        if (!larodMapSetIntArr4(provider->crop_map,
-                                "image.input.crop",
-                                clip_x,
-                                clip_y,
-                                clip_w,
-                                clip_h,
-                                &error)) {
-            panic("Failed setting preprocessing parameters: %s", error->msg);
-        }
-    }
-
-    return model;
-}
-
-void destroy_model_provider(model_provider_t* provider) {
+void model_provider_destroy(model_provider_t* provider) {
     larodError* error = NULL;
     if (!provider) {
         panic("%s: Invalid pointer to model_provider_t", __func__);
     }
 
+    larodDestroyMap(&provider->crop_map);
+
+    larodDestroyModel(&provider->model);
     // Only the model handle is released here. We count on larod service to
     // release the privately loaded model when the session is disconnected in
     // larodDisconnect().
@@ -350,12 +331,6 @@ void destroy_model_provider(model_provider_t* provider) {
 
     if (provider->larod_model_fd >= 0) {
         close(provider->larod_model_fd);
-    }
-    if (provider->image_input_addr != MAP_FAILED) {
-        munmap(provider->image_input_addr, provider->image_buffer_size);
-    }
-    if (provider->image_input_fd >= 0) {
-        close(provider->image_input_fd);
     }
     for (size_t i = 0; i < provider->num_outputs; i++) {
         if (provider->model_output_tensors[i].data != MAP_FAILED) {
@@ -369,16 +344,20 @@ void destroy_model_provider(model_provider_t* provider) {
     if (provider->model_output_tensors) {
         free(provider->model_output_tensors);
     }
+    for (size_t i = 0; i < provider->img_info->nbr_buffers; i++) {
+        larodDestroyTensors(provider->conn, &provider->img_input_tensors[i], 1, &error);
+        if (provider->img_duped_fds[i] >= 0) {
+            close(provider->img_duped_fds[i]);
+        }
+    }
+    if (provider->img_info) {
+        free(provider->img_info);
+    }
 
-    larodDestroyTensors(provider->conn,
-                        &provider->pp_input_tensors,
-                        provider->pp_num_inputs,
-                        &error);
     larodDestroyTensors(provider->conn,
                         &provider->pp_output_tensors,
                         provider->pp_num_outputs,
                         &error);
-    larodDestroyTensors(provider->conn, &provider->input_tensors, provider->num_inputs, &error);
     larodDestroyTensors(provider->conn, &provider->output_tensors, provider->num_outputs, &error);
 
     larodDestroyJobRequest(&(provider->pp_req));
@@ -387,17 +366,8 @@ void destroy_model_provider(model_provider_t* provider) {
     free(provider);
 }
 
-model_provider_t* create_model_provider(unsigned int input_width,
-                                        unsigned int input_height,
-                                        unsigned int stream_width,
-                                        unsigned int stream_height,
-                                        unsigned int stream_pitch,
-                                        VdoFormat image_format,
-                                        VdoFormat model_format,
-                                        char* model_file,
-                                        char* device_name,
-                                        bool allow_input_crop,
-                                        size_t* num_output_tensors) {
+model_provider_t*
+model_provider_new(char* model_file, char* device_name, size_t* num_output_tensors) {
     model_provider_t* provider = calloc(1, sizeof(model_provider_t));
     if (!provider) {
         panic("%s: Unable to allocate model_provider_t: %s", __func__, strerror(errno));
@@ -409,149 +379,60 @@ model_provider_t* create_model_provider(unsigned int input_width,
         panic("%s: Could not connect to larod: %s", __func__, error->msg);
     }
 
-    provider->crop_map   = NULL;
-    larodModel* pp_model = NULL;
-    larodModel* model    = create_inference_model(provider, model_file, device_name);
+    provider->crop_map = NULL;
+    provider->pp_req   = NULL;
+    provider->inf_req  = NULL;
+    // setup a temporary input tensor to be able to
+    // get the model information
+    // The output tensors will be used for the inference job request
+    larodTensor** input_tensors = NULL;
+    size_t num_inputs           = 0;
+    provider->model             = create_inference_model(provider, model_file, device_name);
     setup_tensors(provider->conn,
-                  model,
-                  &provider->input_tensors,
-                  &provider->num_inputs,
+                  provider->model,
+                  &input_tensors,
+                  &num_inputs,
                   &provider->output_tensors,
                   &provider->num_outputs);
-    if (provider->num_inputs > 1) {
-        panic("%s Currently only 1 input tensor is supported but %zu was received",
+    if (num_inputs > 1) {
+        panic("%s: Currently only 1 input tensor is supported but %zu was received",
               __func__,
-              provider->num_inputs);
+              num_inputs);
     }
 
-    const larodTensorDims* input_dims = larodGetTensorDims(provider->input_tensors[0], &error);
+    const larodTensorDims* input_dims = larodGetTensorDims(input_tensors[0], &error);
     if (!input_dims) {
         panic("%s: Failed retrieving dim for input tensor: %s", __func__, error->msg);
     }
-    uint32_t expected_input_width  = 0;
-    uint32_t expected_input_height = 0;
-    larodTensorLayout model_layout = LAROD_TENSOR_LAYOUT_UNSPECIFIED;
-    if (model_format == VDO_FORMAT_RGB) {
-        expected_input_width  = input_dims->dims[2];
-        expected_input_height = input_dims->dims[1];
-        model_layout          = LAROD_TENSOR_LAYOUT_NHWC;
-    } else if (model_format == VDO_FORMAT_PLANAR_RGB) {
-        expected_input_width  = input_dims->dims[3];
-        expected_input_height = input_dims->dims[2];
-        model_layout          = LAROD_TENSOR_LAYOUT_NCHW;
-    } else {
-        panic("%s Invalid model format %u", __func__, model_format);
+    provider->img_info = (img_info_t*)calloc(1, sizeof(img_info_t));
+    if (!provider->img_info) {
+        panic("%s: Unable to allocate img info: %s", __func__, strerror(errno));
     }
-    if (expected_input_width != input_width || expected_input_height != input_height) {
-        panic("%s: Incorrect input resolution %ux%u != %ux%u",
-              __func__,
-              input_width,
-              input_height,
-              expected_input_width,
-              expected_input_height);
+
+    if (input_dims->len != 4) {
+        panic("%s: Only input dim = 4 supported %zu", __func__, input_dims->len);
     }
-    const larodTensorPitches* input_pitches =
-        larodGetTensorPitches(provider->input_tensors[0], &error);
+    const char* model_format_str = "RGB";
+    provider->img_info->format   = VDO_FORMAT_RGB;
+    provider->img_info->width    = input_dims->dims[2];
+    provider->img_info->height   = input_dims->dims[1];
+    syslog(LOG_INFO,
+           "Detected model format %s and input resolution %ux%u",
+           model_format_str,
+           provider->img_info->width,
+           provider->img_info->height);
+    const larodTensorPitches* input_pitches = larodGetTensorPitches(input_tensors[0], &error);
     if (!input_pitches) {
         panic("%s: Failed retrieving pitches for input tensor: %s", __func__, error->msg);
     }
-    uint32_t expected_input_pitch = 0;
-    if (model_format == VDO_FORMAT_RGB) {
-        expected_input_pitch = input_pitches->pitches[2];
-    } else if (model_format == VDO_FORMAT_PLANAR_RGB) {
-        expected_input_pitch = input_pitches->pitches[3];
+
+    if (provider->img_info->format == VDO_FORMAT_RGB) {
+        provider->img_info->pitch = input_pitches->pitches[2];
+    } else if (provider->img_info->format == VDO_FORMAT_PLANAR_RGB) {
+        provider->img_info->pitch = input_pitches->pitches[3];
     } else {
-        panic("%s Invalid model format %u", __func__, model_format);
+        panic("%s: Invalid model format %u", __func__, provider->img_info->format);
     }
-
-    provider->use_preprocessing = false;
-    if (image_format != model_format || input_width != stream_width ||
-        input_height != stream_height) {
-        provider->use_preprocessing = true;
-    }
-
-    if (provider->use_preprocessing) {
-        pp_model = create_preprocessing_model(provider,
-                                              device_name,
-                                              allow_input_crop,
-                                              image_format,
-                                              model_format,
-                                              input_width,
-                                              input_height,
-                                              expected_input_pitch,
-                                              stream_width,
-                                              stream_pitch,
-                                              stream_height);
-        setup_tensors(provider->conn,
-                      pp_model,
-                      &provider->pp_input_tensors,
-                      &provider->pp_num_inputs,
-                      &provider->pp_output_tensors,
-                      &provider->pp_num_outputs);
-        if (provider->pp_num_inputs > 1) {
-            panic("%s Currently only 1 pp input tensor is supported but %zu was received",
-                  __func__,
-                  provider->pp_num_inputs);
-        }
-        if (provider->pp_num_outputs > 1) {
-            panic("%s Currently only 1 pp output tensor is supported but %zu was received",
-                  __func__,
-                  provider->pp_num_outputs);
-        }
-
-        // Needed to be used for copying data
-        // No need to setup input tensor metadata since it will all be handled by the map
-        // that is setup in the create_preprocessing_model function.
-        provider->image_input_fd = larodGetTensorFd(provider->pp_input_tensors[0], &error);
-        if (provider->image_input_fd != LAROD_INVALID_FD) {
-            // Determine tensor buffer sizes
-            if (!larodGetTensorFdSize(provider->pp_input_tensors[0],
-                                      &provider->image_buffer_size,
-                                      &error)) {
-                panic("%s: Could not get byte size of tensor: %s", __func__, error->msg);
-            }
-            provider->image_input_addr = mmap(NULL,
-                                              provider->image_buffer_size,
-                                              PROT_READ | PROT_WRITE,
-                                              MAP_SHARED,
-                                              provider->image_input_fd,
-                                              0);
-            if (provider->image_input_addr == MAP_FAILED) {
-                panic("%s: Could not map pp input tensors fd: %s", __func__, strerror(errno));
-            }
-        }
-    } else {
-        if (expected_input_pitch != stream_pitch) {
-            panic("%s: Incorrect stream pitch %u != %u",
-                  __func__,
-                  stream_pitch,
-                  expected_input_pitch);
-        }
-        setup_input_tensor_metadata(stream_pitch,
-                                    stream_height,
-                                    model_layout,
-                                    provider->input_tensors[0]);
-        // Needed to be used for copying data
-        provider->image_input_fd = larodGetTensorFd(provider->input_tensors[0], &error);
-        if (provider->image_input_fd != LAROD_INVALID_FD) {
-            // Determine tensor buffer sizes
-            if (!larodGetTensorFdSize(provider->input_tensors[0],
-                                      &provider->image_buffer_size,
-                                      &error)) {
-                panic("%s: Could not get byte size of tensor: %s", __func__, error->msg);
-            }
-            provider->image_input_addr = mmap(NULL,
-                                              provider->image_buffer_size,
-                                              PROT_READ | PROT_WRITE,
-                                              MAP_SHARED,
-                                              provider->image_input_fd,
-                                              0);
-            if (provider->image_input_addr == MAP_FAILED) {
-                panic("%s: Could not map input tensors fd: %s", __func__, strerror(errno));
-            }
-        }
-    }
-
     provider->model_output_tensors = calloc(provider->num_outputs, sizeof(model_tensor_output_t));
     // To be able to get the data from the output tensors get the fd and mmap the memory
     for (size_t i = 0; i < provider->num_outputs; i++) {
@@ -580,49 +461,104 @@ model_provider_t* create_model_provider(unsigned int input_width,
         provider->model_output_tensors[i].datatype = datatype;
         syslog(LOG_INFO, "Created mmaped model output %zu with size %zu", i, output_size);
     }
-
-    if (provider->use_preprocessing) {
-        // Create job requests
-        provider->pp_req = larodCreateJobRequest(pp_model,
-                                                 provider->pp_input_tensors,
-                                                 provider->pp_num_inputs,
-                                                 provider->pp_output_tensors,
-                                                 provider->pp_num_outputs,
-                                                 provider->crop_map,
-                                                 &error);
-        if (!provider->pp_req) {
-            panic("%s: Failed creating preprocessing job request: %s", __func__, error->msg);
-        }
-        larodDestroyMap(&provider->crop_map);
-
-        // App supports only one input/output tensor.
-        provider->inf_req = larodCreateJobRequest(model,
-                                                  provider->pp_output_tensors,
-                                                  provider->pp_num_outputs,
-                                                  provider->output_tensors,
-                                                  provider->num_outputs,
-                                                  NULL,
-                                                  &error);
-        if (!provider->inf_req) {
-            panic("%s: Failed creating inference job request: %s", __func__, error->msg);
-        }
-    } else {
-        // App supports only one input/output tensor.
-        provider->inf_req = larodCreateJobRequest(model,
-                                                  provider->input_tensors,
-                                                  provider->num_inputs,
-                                                  provider->output_tensors,
-                                                  provider->num_outputs,
-                                                  NULL,
-                                                  &error);
-        if (!provider->inf_req) {
-            panic("%s: Failed creating inference job request: %s", __func__, error->msg);
-        }
-    }
-
     *num_output_tensors = provider->num_outputs;
-    larodDestroyModel(&pp_model);
-    larodDestroyModel(&model);
+    larodDestroyTensors(provider->conn, &input_tensors, num_inputs, &error);
 
     return provider;
+}
+
+img_info_t model_provider_get_model_metadata(model_provider_t* provider) {
+    return *provider->img_info;
+}
+
+bool model_provider_update_image_metadata(model_provider_t* provider, VdoMap* image_map) {
+    larodError* error   = NULL;
+    img_info_t img_info = {0};
+
+    const char* buffer_type = vdo_map_get_string(image_map, "buffer.type", NULL, "memfd");
+    img_info.format         = vdo_map_get_uint32(image_map, "format", 0);
+    img_info.width          = vdo_map_get_uint32(image_map, "width", 0);
+    img_info.height         = vdo_map_get_uint32(image_map, "height", 0);
+    img_info.pitch          = vdo_map_get_uint32(image_map, "pitch", 0);
+    img_info.nbr_buffers    = vdo_map_get_uint32(image_map, "buffer.count", 0);
+    img_info.dmabuf         = true;
+    if (!g_strcmp0(buffer_type, "vmem")) {
+        img_info.dmabuf = false;
+    }
+
+    provider->use_preprocessing = false;
+    if (img_info.format != provider->img_info->format ||
+        provider->img_info->width != img_info.width ||
+        provider->img_info->height != img_info.height) {
+        provider->use_preprocessing = true;
+    }
+
+    larodTensorLayout tensor_layout = LAROD_TENSOR_LAYOUT_UNSPECIFIED;
+    if (img_info.format == VDO_FORMAT_RGB) {
+        tensor_layout = LAROD_TENSOR_LAYOUT_NHWC;
+    } else if (img_info.format == VDO_FORMAT_PLANAR_RGB) {
+        tensor_layout = LAROD_TENSOR_LAYOUT_NCHW;
+    } else if (img_info.format == VDO_FORMAT_YUV) {
+        tensor_layout = LAROD_TENSOR_LAYOUT_420SP;
+    }
+    if (tensor_layout == LAROD_TENSOR_LAYOUT_UNSPECIFIED) {
+        panic("%s: Tensor layout unspecified for format %u", __func__, img_info.format);
+    }
+    provider->img_info->nbr_buffers = img_info.nbr_buffers;
+    provider->img_info->dmabuf      = img_info.dmabuf;
+
+    if (!provider->use_preprocessing) {
+        if (provider->img_info->pitch != img_info.pitch) {
+            panic("%s: Incorrect stream pitch %u != %u",
+                  __func__,
+                  img_info.pitch,
+                  provider->img_info->pitch);
+        }
+    } else {
+        if (!model_preprocessing_setup(provider, &img_info)) {
+            panic("%s: Failed to setup preprocessing", __func__);
+        }
+    }
+    // Create the input tensor for the images from vdo
+    for (size_t i = 0; i < img_info.nbr_buffers; i++) {
+        larodTensor** input_tensors = NULL;
+        // Create one input tensor for each buffer from the img provider
+        // These input tensors will be used either
+        // 1. as input to preprocssing
+        // 2. as input to the inference if preprocessing is not needed
+        input_tensors = larodCreateTensors(1, &error);
+        if (!input_tensors) {
+            panic("%s: Failed to create model input [%zu] %s", __func__, i, error->msg);
+        }
+        if (!larodSetTensorDataType(input_tensors[0], LAROD_TENSOR_DATA_TYPE_UINT8, &error)) {
+            panic("%s: Failed to set data type [%zu] %s", __func__, i, error->msg);
+        }
+        if (!larodSetTensorLayout(input_tensors[0], tensor_layout, &error)) {
+            panic("%s: Failed to set tensor layout [%zu] %s", __func__, i, error->msg);
+        }
+        if (!larodBuildTensorDims(input_tensors[0],
+                                  tensor_layout,
+                                  img_info.width,
+                                  img_info.height,
+                                  3,
+                                  &error)) {
+            panic("%s: Failed to build tensor dims [%zu] %s", __func__, i, error->msg);
+        }
+        if (!larodBuildTensorPitches(input_tensors[0],
+                                     tensor_layout,
+                                     img_info.pitch,
+                                     img_info.height,
+                                     3,
+                                     &error)) {
+            panic("%s: Failed to build tensor pitches [%zu] %s", __func__, i, error->msg);
+        }
+        if (!larodSetTensorFdProps(input_tensors[0],
+                                   LAROD_FD_PROP_MAP | LAROD_FD_PROP_DMABUF,
+                                   &error)) {
+            panic("%s: Failed to set fd props [%zu] %s", __func__, i, error->msg);
+        }
+        provider->img_input_tensors[i] = input_tensors;
+    }
+
+    return true;
 }

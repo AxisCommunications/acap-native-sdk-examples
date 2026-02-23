@@ -25,8 +25,10 @@ object-detection
 ├── app
 │   ├── argparse.c
 │   ├── argparse.h
-│   ├── imgprovider.c
-│   ├── imgprovider.h
+│   ├── channel_util.c
+│   ├── channel_util.h
+│   ├── img_util.c
+│   ├── img_util.h
 │   ├── labelparse.c
 │   ├── labelparse.h
 │   ├── LICENSE
@@ -37,6 +39,8 @@ object-detection
 │   ├── manifest.json.edgetpu
 │   ├── model.c
 │   ├── model.h
+│   ├── model_preprocessing.c
+│   ├── model_preprocessing.h
 │   ├── object_detection.c
 │   ├── panic.c
 │   ├── panic.h
@@ -45,7 +49,8 @@ object-detection
 ```
 
 - **app/argparse.c/h** - Program argument parser.
-- **app/imgprovider.c/h** - Implementation of VDO parts.
+- **app/channel-util.c/h** - Utility function for wrapping VdoChannel.
+- **app/img-util.c/h** - Handle the update of framerate dependent on inference and post processing time..
 - **app/labelparse.c/h** - Parse file of labels.
 - **app/LICENSE** - Text file which lists all open source licensed source code distributed with the
 application.
@@ -60,7 +65,8 @@ CPU with TensorFlow Lite.
 - **app/manifest.json.edgetpu** - Defines the application and its configuration when building for
 ARTPEC-7 DLPU (Using Google EdgeTPU) cameras with TensorFlow Lite.
 - **app/object_detection.c** - Application source code in C.
-- **app/model.c/h** - Implementation of Larod parts.
+- **app/model.c/h** - Handle most of the larod functionality.
+- **app/model_preproessing.c/h** - Wrapper for the preprocessing part of larod.
 - **app/panic.c/h** - Utility for exiting the program on error.
 - **Dockerfile** -  Assembles an image containing the ACAP Native SDK and builds the application using it.
 - **README.md** - Step by step instructions on how to run the example.
@@ -83,8 +89,8 @@ ARTPEC-7 DLPU (Using Google EdgeTPU) cameras with TensorFlow Lite.
 
 1. Load the model using [Larod](https://developer.axis.com/acap/api/native-sdk-api/#machine-learning-api-larod)
 to determine the width and height and the number of output tensors.
-2. Create a stream from [VDO](https://developer.axis.com/acap/api/native-sdk-api/#video-capture-api-vdo) in order to get frames that can be sent to Larod for inference.
-3. A Larod model inference job is created. If the image provided by VDO doesn't match the input format or resolution needed for the inference job, a pre-processing job is also created.
+2. Create a stream from [VDO](https://developer.axis.com/acap/api/native-sdk-api/#video-capture-api-vdo) in order to get frames that can be sent to Larod for inference. The stream resolution will have the same aspect ratio as the vdo channel that is used. Then if needed larod will perform preprocssing and scale the resolution down to the model resolution.
+3. A Larod model inference job is created. If the image provided by VDO doesn't match the input format needed for the inference job, a preprocessing job is also created.
 4. Setup the style of bounding boxes using the
 [Bounding Box API](https://developer.axis.com/acap/api/native-sdk-api/#bounding-box-api).
 5. Run the main program loop:
