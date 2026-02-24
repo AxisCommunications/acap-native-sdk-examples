@@ -20,6 +20,18 @@ jobs:
             arch: "aarch64"
             vdo-format: "avif"
             chip: "artpec9"
+          - axis-os: "12.8.54"
+            arch: "aarch64"
+            vdo-format: "av1"
+            chip: "artpec9"
+          - axis-os: "12.8.54"
+            arch: "aarch64"
+            vdo-format: "rgb"
+            chip: "artpec9"
+          - axis-os: "12.8.54"
+            arch: "aarch64"
+            vdo-format: "rgb"
+            chip: "cv25"
     env:
       EXREPO: acap-native-examples
       EXNAME: vdostream
