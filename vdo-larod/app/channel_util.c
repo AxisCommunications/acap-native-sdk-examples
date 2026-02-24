@@ -106,10 +106,13 @@ bool channel_util_choose_stream_resolution(unsigned int channel_id,
     // Check the requested width and height towards min resolution
     if (chosen_req->width < set->resolutions[0].width ||
         chosen_req->height < set->resolutions[0].height) {
-        panic("%s: Requested width or height smaller than min resolution %ux%u",
-              __func__,
-              set->resolutions[0].width,
-              set->resolutions[0].height);
+        // It is likely that the requested resolution will work but print so if
+        // vdo_stream_new fails this could be the reason.
+        syslog(LOG_INFO,
+               "%s: Requested width or height smaller than min resolution %ux%u",
+               __func__,
+               set->resolutions[0].width,
+               set->resolutions[0].height);
     }
     const char* format_str = "rgb interleaved";
     switch (*chosen_format) {
