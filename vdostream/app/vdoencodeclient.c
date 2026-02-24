@@ -27,7 +27,7 @@
  * order: format frames output.
  *
  * First argument, format, is a string describing the video compression format.
- * Possible values are avif, h264 (default), h265, jpeg, nv12, and y800.
+ * Possible values are av1, avif, h264 (default), h265, jpeg, nv12, rgb and y800.
  *
  * Second argument, frames, is an integer for number of captured frames.
  *
@@ -84,10 +84,12 @@ static void print_frame(VdoFrame* frame) {
         case VDO_FRAME_TYPE_H265_IDR:
         case VDO_FRAME_TYPE_H264_I:
         case VDO_FRAME_TYPE_H265_I:
+        case VDO_FRAME_TYPE_AV1_KEY:
             frame_type = "I";
             break;
         case VDO_FRAME_TYPE_H264_P:
         case VDO_FRAME_TYPE_H265_P:
+        case VDO_FRAME_TYPE_AV1_INTER:
             frame_type = "P";
             break;
         case VDO_FRAME_TYPE_JPEG:
@@ -95,6 +97,9 @@ static void print_frame(VdoFrame* frame) {
             break;
         case VDO_FRAME_TYPE_YUV:
             frame_type = "yuv";
+            break;
+        case VDO_FRAME_TYPE_RGB:
+            frame_type = "rgb";
             break;
         default:
             frame_type = "NA";
@@ -109,7 +114,9 @@ static void print_frame(VdoFrame* frame) {
 
 // Set vdo format from input parameter
 static void set_format(VdoMap* settings, gchar* format) {
-    if (g_strcmp0(format, "avif") == 0) {
+    if (g_strcmp0(format, "av1") == 0) {
+        vdo_map_set_uint32(settings, "format", VDO_FORMAT_AV1);
+    } else if (g_strcmp0(format, "avif") == 0) {
         vdo_map_set_uint32(settings, "format", VDO_FORMAT_AVIF);
     } else if (g_strcmp0(format, "h264") == 0) {
         vdo_map_set_uint32(settings, "format", VDO_FORMAT_H264);
@@ -123,6 +130,8 @@ static void set_format(VdoMap* settings, gchar* format) {
     } else if (g_strcmp0(format, "y800") == 0) {
         vdo_map_set_uint32(settings, "format", VDO_FORMAT_YUV);
         vdo_map_set_string(settings, "subformat", "Y800");
+    } else if (g_strcmp0(format, "rgb") == 0) {
+        vdo_map_set_uint32(settings, "format", VDO_FORMAT_RGB);
     } else {
         panic("%s: Format \"%s\" is not supported\n", __func__, format);
     }

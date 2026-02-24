@@ -26,10 +26,12 @@ vdostream
 │   ├── LICENSE
 │   ├── Makefile
 │   ├── manifest.json.avif
+│   ├── manifest.json.av1
 │   ├── manifest.json.h264
 │   ├── manifest.json.h265
 │   ├── manifest.json.jpeg
 │   ├── manifest.json.nv12
+│   ├── manifest.json.rgb
 │   ├── manifest.json.y800
 │   └── panic.c
 │   └── panic.h
@@ -70,7 +72,7 @@ docker build --platform=linux/amd64 --tag <APP_IMAGE> --build-arg VDO_FORMAT=<VD
 ```
 
 <!-- textlint-disable terminology -->
-<VDO_FORMAT> is the video compression format. Supported values are *avif*, *h264*, *h265*, *jpeg*, *nv12* and *y800*
+<VDO_FORMAT> is the video compression format. Supported values are *av1*, *avif*, *h264*, *h265*, *jpeg*, *nv12*, *rgb* and *y800*
 <!-- textlint-enable -->
 
 <APP_IMAGE> is the name to tag the image with, e.g., vdoencodeclient:1.0
@@ -96,11 +98,13 @@ vdostream
 ├── app
 │   ├── LICENSE
 │   ├── Makefile
+│   ├── manifest.json.av1
 │   ├── manifest.json.avif
 │   ├── manifest.json.h264
 │   ├── manifest.json.h265
 │   ├── manifest.json.jpeg
 │   ├── manifest.json.nv12
+│   ├── manifest.json.rgb
 │   ├── manifest.json.y800
 │   └── panic.c
 │   └── panic.h
@@ -109,11 +113,13 @@ vdostream
 │   ├── LICENSE
 │   ├── Makefile
 │   ├── manifest.json
+│   ├── manifest.json.av1
 │   ├── manifest.json.avif
 │   ├── manifest.json.h264
 │   ├── manifest.json.h265
 │   ├── manifest.json.jpeg
 │   ├── manifest.json.nv12
+│   ├── manifest.json.rgb
 │   ├── manifest.json.y800
 │   ├── package.conf
 │   ├── package.conf.orig
@@ -163,6 +169,39 @@ Application log can be found directly at:
 
 ```sh
 http://<AXIS_DEVICE_IP>/axis-cgi/admin/systemlog.cgi?appname=vdoencodeclient
+```
+
+#### Output - format av1
+
+```sh
+----- Contents of SYSTEM_LOG for 'vdoencodeclient' -----
+
+vdoencodeclient[37322]: Starting stream: av1, 640x360, 30 fps
+vdoencodeclient[37322]: frame =    0, type = I, size = 4109
+vdoencodeclient[37322]: frame =    1, type = P, size = 63
+vdoencodeclient[37322]: frame =    2, type = P, size = 63
+vdoencodeclient[37322]: frame =    3, type = P, size = 63
+vdoencodeclient[37322]: frame =    4, type = P, size = 63
+vdoencodeclient[37322]: frame =    5, type = P, size = 63
+vdoencodeclient[37322]: frame =    6, type = P, size = 63
+vdoencodeclient[37322]: frame =    7, type = P, size = 63
+vdoencodeclient[37322]: frame =    8, type = P, size = 63
+vdoencodeclient[37322]: frame =    9, type = P, size = 63
+vdoencodeclient[37322]: frame =   10, type = P, size = 63
+vdoencodeclient[37322]: frame =   11, type = P, size = 63
+vdoencodeclient[37322]: frame =   12, type = P, size = 67
+vdoencodeclient[37322]: frame =   13, type = P, size = 64
+vdoencodeclient[37322]: frame =   14, type = P, size = 64
+vdoencodeclient[37322]: frame =   15, type = P, size = 64
+vdoencodeclient[37322]: frame =   16, type = P, size = 64
+vdoencodeclient[37322]: frame =   17, type = P, size = 63
+vdoencodeclient[37322]: frame =   18, type = P, size = 63
+vdoencodeclient[37322]: frame =   19, type = P, size = 63
+vdoencodeclient[37322]: frame =   20, type = P, size = 63
+vdoencodeclient[37322]: frame =   21, type = P, size = 63
+vdoencodeclient[37322]: frame =   22, type = P, size = 63
+vdoencodeclient[37322]: frame =   23, type = P, size = 63
+vdoencodeclient[37322]: frame =   24, type = P, size = 63
 ```
 
 #### Output - format avif
@@ -306,6 +345,41 @@ vdoencodeclient[31151]: frame =   21, type = yuv, size = 345600
 vdoencodeclient[31151]: frame =   22, type = yuv, size = 345600
 vdoencodeclient[31151]: frame =   23, type = yuv, size = 345600
 vdoencodeclient[31151]: frame =   24, type = yuv, size = 345600
+```
+
+<!-- textlint-disable terminology -->
+#### Output - format rgb
+<!-- textlint-enable -->
+
+```sh
+----- Contents of SYSTEM_LOG for 'vdoencodeclient' -----
+
+vdoencodeclient[31151]: Starting stream: rgb, 640x360, 30 fps
+vdoencodeclient[31151]: frame =    0, type = rgb, size = 691200
+vdoencodeclient[31151]: frame =    1, type = rgb, size = 691200
+vdoencodeclient[31151]: frame =    2, type = rgb, size = 691200
+vdoencodeclient[31151]: frame =    3, type = rgb, size = 691200
+vdoencodeclient[31151]: frame =    4, type = rgb, size = 691200
+vdoencodeclient[31151]: frame =    5, type = rgb, size = 691200
+vdoencodeclient[31151]: frame =    6, type = rgb, size = 691200
+vdoencodeclient[31151]: frame =    7, type = rgb, size = 691200
+vdoencodeclient[31151]: frame =    8, type = rgb, size = 691200
+vdoencodeclient[31151]: frame =    9, type = rgb, size = 691200
+vdoencodeclient[31151]: frame =   10, type = rgb, size = 691200
+vdoencodeclient[31151]: frame =   11, type = rgb, size = 691200
+vdoencodeclient[31151]: frame =   12, type = rgb, size = 691200
+vdoencodeclient[31151]: frame =   13, type = rgb, size = 691200
+vdoencodeclient[31151]: frame =   14, type = rgb, size = 691200
+vdoencodeclient[31151]: frame =   15, type = rgb, size = 691200
+vdoencodeclient[31151]: frame =   16, type = rgb, size = 691200
+vdoencodeclient[31151]: frame =   17, type = rgb, size = 691200
+vdoencodeclient[31151]: frame =   18, type = rgb, size = 691200
+vdoencodeclient[31151]: frame =   19, type = rgb, size = 691200
+vdoencodeclient[31151]: frame =   20, type = rgb, size = 691200
+vdoencodeclient[31151]: frame =   21, type = rgb, size = 691200
+vdoencodeclient[31151]: frame =   22, type = rgb, size = 691200
+vdoencodeclient[31151]: frame =   23, type = rgb, size = 691200
+vdoencodeclient[31151]: frame =   24, type = rgb, size = 691200
 ```
 
 #### Output - format y800
