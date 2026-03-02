@@ -17,3 +17,6 @@ param.conf
 // Ignore files from eap-install.sh
 **/*var_log_messages.*
 **/.eap-install.cfg
+
+// Ignore files and directories starting with "staging-only"
+**/staging-only*
