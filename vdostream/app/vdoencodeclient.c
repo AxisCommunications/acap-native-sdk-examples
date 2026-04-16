@@ -165,7 +165,7 @@ static int handle_vdo_failed(GError* error) {
 /**
  * Main function that starts a stream with the following options:
  *
- * --format [avif, h264, h265, jpeg, nv12, y800]
+ * --format [av1, avif, h264, h265, jpeg, nv12, rgb, y800]
  * --frames [number of frames]
  * --output [output filename]
  */
@@ -185,7 +185,7 @@ int main(int argc, char* argv[]) {
          0,
          G_OPTION_ARG_STRING,
          &format,
-         "format (avif, h264, h265, jpeg, nv12, y800)",
+         "format (av1, avif, h264, h265, jpeg, nv12, rgb, y800)",
          NULL},
         {"frames", 'n', 0, G_OPTION_ARG_INT, &frames, "number of frames", NULL},
         {"output", 'o', 0, G_OPTION_ARG_FILENAME, &output_file, "output filename", NULL},
