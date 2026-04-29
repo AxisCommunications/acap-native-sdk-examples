@@ -1,5 +1,5 @@
 // Ignore directories which start with "build", but allow files.
-// N.b. the dot '.' in the regexp is sensitive to being last in []
+// N.b. the dot '.' in the regexp is sensitive to being last in \[\]
 **/build/
 **/build[a-z0-9._-]*/
 
