@@ -4,7 +4,7 @@
         "linux": {
             "user": {
                 "groups": [
-                    "gpu"
+                    "gpu", "video"
                 ]
             }
         }
