@@ -58,6 +58,7 @@
 // Needed for g_autoptr
 #include <glib-object.h>
 #include <signal.h>
+#include <stdbool.h>
 #include <stdlib.h>
 #include <syslog.h>
 
@@ -135,20 +136,33 @@ static void set_format(VdoMap* settings, gchar* format) {
     } else {
         panic("%s: Format \"%s\" is not supported\n", __func__, format);
     }
+    vdo_map_set_boolean(settings, "frame.chunks", true);
 }
 
 static void save_frame_to_file(VdoBuffer* buffer, FILE* dest_f) {
+    g_autoptr(GError) error = NULL;
     // Lifetimes of buffer and frame are linked, no need to free frame
     VdoFrame* frame = vdo_buffer_get_frame(buffer);
 
     print_frame(frame);
 
-    gpointer data = vdo_buffer_get_data(buffer);
-    if (!data)
-        panic("%s: Failed to get data: %m", __func__);
-
-    if (!fwrite(data, vdo_frame_get_size(frame), 1, dest_f))
-        panic("%s: Failed to write frame: %m", __func__);
+    if (vdo_buffer_is_contiguous(frame)) {
+        VdoChunk chunk = vdo_frame_take_chunk(frame, &error);
+        if (chunk.type == VDO_CHUNK_ERROR)
+            panic("%s: Failed to get chunk: %m", __func__);
+        if (!fwrite(chunk.data, chunk.size, 1, dest_f))
+            panic("%s: Failed to write frame: %m", __func__);
+    } else {
+        while (true) {
+            VdoChunk chunk = vdo_frame_take_chunk(frame, &error);
+            if (chunk.type == VDO_CHUNK_ERROR)
+                panic("%s: Failed to get chunk: %m", __func__);
+            if (chunk.size == 0u)
+                break;
+            if (!fwrite(chunk.data, chunk.size, 1, dest_f))
+                panic("%s: Failed to write frame: %m", __func__);
+        }
+    }
 }
 
 static int handle_vdo_failed(GError* error) {
