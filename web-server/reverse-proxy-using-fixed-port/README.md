@@ -1,0 +1,208 @@
+*Copyright (C) 2021, Axis Communications AB, Lund, Sweden. All Rights Reserved.*
+
+# Serve HTTP requests through reverse proxy
+
+This example demonstrates how to setup the Axis device web server (Apache) in a
+[Reverse Proxy](https://httpd.apache.org/docs/2.4/howto/reverse_proxy.html)
+configuration, where HTTP requests to the application are routed to a web server
+[CivetWeb](https://github.com/civetweb/civetweb) running inside the ACAP application
+and acting as a CGI.
+
+> [!NOTE]
+> Since the web server runs on a specific port,
+> there is a risk that this port is already in use,
+> either by an AXIS OS service or by another ACAP application.
+> For more information on common ports used by Axis devices, see the
+> [commonly used network ports](https://help.axis.com/en-us/axis-os-knowledge-base#commonly-used-network-ports)
+> in the AXIS OS knowledge base. To change the port of the application,
+> both the [`web_server_rev_proxy.c`](./app/web_server_rev_proxy.c) and [`manifest.json`](./app/manifest.json) file have to be updated before
+> building the application.
+
+The advantage of a webserver proxy is that when reusing existing code,
+the request handling can remain largely unmodified.
+This eases the task of sharing code between platforms.
+
+The webserver proxy method enforces a URL routing scheme as follows:
+
+`http://<AXIS_DEVICE_IP>/local/<appName>/<apiPath>`
+
+With `<appName>` and `<apiPath>` as defined in the manifest.
+
+Note that this example shows the reverse proxy concept using CivetWeb, but you are
+free to use any webserver of your choice.
+
+## Alternative approach
+
+Another example that serves HTTP requests is
+[http-requests-using-fastcgi](../http-requests-using-fastcgi), where the Axis device
+web server and the supported ACAP API
+[FastCGI](https://developer.axis.com/acap/api/native-sdk-api/#fastcgi)
+are used.
+
+## Project structure
+
+These instructions will guide you on how to execute the code. Below is the
+structure used in the example:
+
+```sh
+reverse-proxy-using-fixed-port
+├── app
+│   └── html
+│   │   ├── app.js
+│   │   ├── axis_logo.svg
+│   │   ├── index.html
+│   │   └── style.css
+│   ├── LICENSE
+│   ├── Makefile
+│   ├── manifest.json
+│   └── web_server_rev_proxy.c
+├── Dockerfile
+└── README.md
+```
+
+- **html/** - Files to be served by the application.
+- **app/LICENSE** - Lists open source licensed source code in the application.
+- **app/Makefile** - Build and link instructions for the application.
+- **app/manifest.json** - Defines the application and its configuration.
+- **app/web_server_rev_proxy.c** - The application source code.
+- **Dockerfile** - Builds an Axis container image and the specified example.
+- **README.md** - Step by step instructions on how to run the example.
+
+## Reverse proxy configuration in Apache server
+
+A reverse proxy configuration provides a flexible way for an ACAP application
+to expose an external API through the Apache Server in AXIS OS and internally
+route the requests to a web server running in the ACAP application.
+
+The Apache server is configured using the `manifest.json` file in an ACAP
+application. In `manifest.json` under `configuration`, it is possible to specify
+a `settingPage` and a `reverseProxy` where the latter will connect the CivetWeb
+server to the Apache server.
+
+The `settingPage` field creates an **Open** button in the device GUI.
+When clicked, a new tab with will be opened with URL:
+
+```text
+<AXIS_DEVICE_IP>/local/<appName/<settingPage>
+```
+
+Prior to manifest 1.5.0, reverse proxy was only supported through the
+postinstall script. The manifest based method is more strict on URLs in order to
+avoid name clashes that could occur in the old mechanism. When upgrading, your
+URLs will change to the format shown in
+[Serve HTTP requests through reverse proxy](#serve-http-requests-through-reverse-proxy).
+
+The web server running in the ACAP application can also be exposed directly to
+the network by allowing external access to the port in the network
+configuration for the device. There are disadvantages with exposing Web
+Server directly to the network such as non standard ports and no reuse of
+authentication, TLS and other features that comes with Apache Server.
+
+## CivetWeb web server
+
+CivetWeb is an embeddable C web server for Linux. It is a great solution
+for running a web server on embedded Linux. Apart from being a
+HTTP server, it has a C API which can be extended as desired. The CivetWeb Web
+Server [documentation](https://github.com/civetweb/civetweb/) describes the
+configuration in detail. CivetWeb is open source, and will contain different
+licenses depending on the features you build it with. Please see
+[CivetWeb's repository](https://github.com/civetweb/civetweb/) for more information.
+
+## Limitations
+
+- Apache Reverse Proxy can not translate content with absolute addresses (i.e.
+  /image.png) in the HTML page. Use only relative content (i.e. image.png or
+../image.png). See [how to handle relative URLs correctly with a reverse proxy](https://serverfault.com/questions/561892/how-to-handle-relative-urls-correctly-with-a-reverse-proxy)
+for more information.
+
+## Build the application
+
+Standing in your working directory run the following commands:
+
+> [!NOTE]
+>
+> Depending on the network your local build machine is connected to,
+you may need to add proxy
+> settings for Docker. See
+> [Proxy in build time](https://developer.axis.com/acap/develop/proxy/#proxy-in-build-time).
+
+```sh
+docker build --platform=linux/amd64 --tag <APP_IMAGE> --build-arg ARCH=<ARCH> .
+```
+
+- `<APP_IMAGE>` is the name to tag the image with, e.g., `web-server:1.0`
+- `<ARCH>` is the SDK architecture, `armv7hf` or `aarch64`.
+
+Copy the result from the container image to a local directory `build`:
+
+```sh
+docker cp $(docker create --platform=linux/amd64 <APP_IMAGE>):/opt/app ./build
+```
+
+The `build` directory contains the build artifacts, where the ACAP application
+is found with suffix `.eap`, depending on which SDK architecture that was
+chosen, one of these files should be found:
+
+- `web_server_rev_proxy_1_0_0_aarch64.eap`
+- `web_server_rev_proxy_1_0_0_armv7hf.eap`
+
+> [!NOTE]
+>
+> For detailed information on how to build, install, and run ACAP applications, refer to the official ACAP documentation: [Build, install, and run](https://developer.axis.com/acap/develop/build-install-run/).
+
+## Install and start the application
+
+Browse to the application page of the Axis device:
+
+```sh
+http://<AXIS_DEVICE_IP>/index.html#apps
+```
+
+1. Click on the tab **Apps** in the device GUI
+2. Enable **Allow unsigned apps** toggle
+3. Click **(+ Add app)** button to upload the application file
+4. Select the newly built application package, depending on architecture:
+
+   - `web_server_rev_proxy_1_0_0_aarch64.eap`
+   - `web_server_rev_proxy_1_0_0_armv7hf.eap`
+
+5. Click **Install**
+6. Run the application by enabling the **Start** switch
+
+## Expected output
+
+To view the rendered web page, click on the `Open` button of the application
+from the `Apps` tab of the device GUI, which directs you to:
+
+```text
+<AXIS_DEVICE_IP>/local/web_server_rev_proxy/my_web_server
+```
+
+A user can make a HTTP request to the application API using e.g. cURL
+
+```sh
+curl -u <USER>:<PASSWORD> --anyauth http://<AXIS_DEVICE_IP>/local/web_server_rev_proxy/my_web_server
+```
+
+Where the expected output should match the contents of
+[./app/html/index.html](./app/html/index.html)
+
+The application log can be found by either
+
+- Browse to `http://<AXIS_DEVICE_IP>/axis-cgi/admin/systemlog.cgi?appname=web_server_rev_proxy`.
+- Browse to the application page and click the `App log`.
+
+```text
+----- Contents of SYSTEM_LOG for 'web_server_rev_proxy' -----
+
+[ INFO    ] web_server_rev_proxy[1436867]: Server has started
+[ INFO    ] web_server_rev_proxy[1436867]: Serving file: html/index.html
+[ INFO    ] web_server_rev_proxy[1436867]: Serving file: html/style.css
+[ INFO    ] web_server_rev_proxy[1436867]: Serving file: html/axis_logo.svg
+[ INFO    ] web_server_rev_proxy[1436867]: Serving file: html/app.js
+[ INFO    ] web_server_rev_proxy[1436867]: API callback invoked
+```
+
+## License
+
+**[Apache License 2.0](../LICENSE)**

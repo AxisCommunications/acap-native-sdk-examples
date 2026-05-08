@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>ACAP Web Server Example</title>
+        <link rel="stylesheet" href="/local/web_server_rev_proxy/my_web_server/style.css" />
+    </head>
+    <body>
+        <main class="page-shell">
+            <header class="brand-header" aria-label="Axis brand header">
+                <img
+                    class="axis-logo"
+                    src="/local/web_server_rev_proxy/my_web_server/axis_logo.svg"
+                    alt="Axis logo"
+                />
+                <div class="brand-accent" aria-hidden="true"></div>
+            </header>
+
+            <section class="content-card" aria-label="Web server demo">
+                <p class="kicker">ACAP Native SDK Example</p>
+                <h1>Web Server with CivetWeb</h1>
+                <p class="intro">
+                    This sample exposes a lightweight web UI and backend API built with
+                    <a href="https://github.com/civetweb/civetweb">CivetWeb</a>.
+                </p>
+
+                <div class="actions">
+                    <button id="fetchBtn" type="button">Call API</button>
+                </div>
+
+                <section class="api-output" aria-live="polite">
+                    <p id="message"></p>
+                    <p id="count"></p>
+                </section>
+            </section>
+        </main>
+
+        <script src="/local/web_server_rev_proxy/my_web_server/app.js"></script>
+    </body>
+</html>

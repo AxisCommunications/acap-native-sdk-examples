@@ -9,11 +9,11 @@
 			"version": "1.0.0"
 		},
 		"configuration": {
-            "settingPage": "index.html",
+            "settingPage": "my_web_server",
 			"reverseProxy": [
 				{
 					"apiPath": "my_web_server",
-					"target": "http://localhost:2001",
+					"target": "http://localhost:2001/",
 					"access": "admin"
 				}
 			]

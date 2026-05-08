@@ -4,7 +4,10 @@ PROGS = $(PROG1)
 LIBDIR = lib
 DEBUG_DIR = debug
 
-PKGS = glib-2.0 civetweb
+PKGS = gio-2.0 glib-2.0
+
+CFLAGS += $(shell PKG_CONFIG_PATH=$(PKG_CONFIG_PATH) pkg-config --cflags $(PKGS))
+LDLIBS += $(shell PKG_CONFIG_PATH=$(PKG_CONFIG_PATH) pkg-config --libs $(PKGS))
 
 LDLIBS += -lcivetweb
 CFLAGS += -I/opt/build/civetweb/include

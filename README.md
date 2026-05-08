@@ -83,10 +83,12 @@ The examples are organized into logical groups to help you find the most relevan
 
 - [curl-openssl](./curl-openssl/)
   - An example that use cURL and OpenSSL libraries to retrieve a file securely from an external server.
-- [web-server](./web-server/)
-  - An example in C that serves HTTP requests by setting up the Axis device web server in a reverse proxy configuration and route to a custom web server running in the ACAP application.
-- [web-server-using-fastcgi](./web-server-using-fastcgi/)
-  - An example in C and explains how to build an ACAP application that can handle HTTP requests sent to the Axis device, using the device's own web server.
+
+- Web server examples:
+  - [reverse-proxy-using-fixed-port](./web-server/reverse-proxy-using-fixed-port/)
+    - An example in C that serves HTTP requests by setting up the Axis device web server in a reverse proxy configuration and routing to a custom web server running in the ACAP application.
+  - [http-requests-using-fastcgi](./web-server/http-requests-using-fastcgi/)
+    - An example in C and explains how to build an ACAP application that can handle HTTP requests sent to the Axis device, using the device's own web server.
 
 ### Event handling
 
