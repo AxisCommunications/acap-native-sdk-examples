@@ -72,8 +72,12 @@ The examples are organized into logical groups to help you find the most relevan
 
 ### Graphical components
 
+- [axoverlay2](./axoverlay2/)
+  - An example in C that illustrates how to draw icons as overlays in a stream using the modern
+    [Overlay API](https://developer.axis.com/acap/api#overlay2-API).
 - [axoverlay](./axoverlay/)
-  - An example in C that illustrates how to draw plain boxes and text as overlays in a stream.
+  - An example in C that illustrates how to draw plain boxes and text as overlays in a stream using
+    the [Axoverlay API (Legacy)](https://developer.axis.com/acap/api#axoverlay-api-legacy).
 - [bounding-box](./bounding-box/)
   - An example in C that demonstrates how to portably draw burnt-in bounding boxes on selected video sources or channels.
 - [vdo-opencl-filtering](./vdo-opencl-filtering/)
