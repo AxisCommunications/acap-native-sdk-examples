@@ -1,0 +1,188 @@
+:root {
+    --axis-yellow: #ffcc33;
+    --axis-red: #ff0033;
+    --axis-black: #121212;
+    --axis-surface: #ffffff;
+    --axis-background: #f4f4f1;
+    --axis-muted: #575757;
+    --axis-border: #d9d9d3;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    color: var(--axis-black);
+    font-family: "Avenir Next", "Gill Sans", "Trebuchet MS", sans-serif;
+    background:
+        radial-gradient(circle at 85% 10%, rgb(255 204 51 / 14%), transparent 42%),
+        linear-gradient(145deg, #f9f9f6 0%, var(--axis-background) 58%, #efefeb 100%);
+}
+
+.page-shell {
+    width: min(920px, 92vw);
+    margin: 3rem auto;
+    border: 1px solid var(--axis-border);
+    border-radius: 18px;
+    overflow: hidden;
+    background: var(--axis-surface);
+    box-shadow: 0 12px 24px rgb(0 0 0 / 9%);
+}
+
+.brand-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1.1rem 1.4rem;
+    background: linear-gradient(90deg, #fff 0%, #fbfbf8 72%, #f6f6f2 100%);
+    border-bottom: 3px solid var(--axis-black);
+}
+
+.axis-logo {
+    width: clamp(130px, 24vw, 210px);
+    height: auto;
+    display: block;
+}
+
+.brand-accent {
+    width: 30%;
+    min-width: 120px;
+    height: 12px;
+    border-radius: 999px;
+    background: linear-gradient(90deg, var(--axis-yellow) 0%, var(--axis-red) 100%);
+}
+
+.content-card {
+    padding: 2rem 1.4rem 2.3rem;
+}
+
+.kicker {
+    margin: 0;
+    font-size: 0.82rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--axis-muted);
+    font-weight: 700;
+}
+
+h1 {
+    margin: 0.4rem 0 0.8rem;
+    font-size: clamp(1.8rem, 4vw, 2.55rem);
+    line-height: 1.1;
+}
+
+.intro {
+    margin: 0;
+    max-width: 65ch;
+    line-height: 1.6;
+    color: #222;
+}
+
+a {
+    color: #8d0022;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 2px;
+}
+
+a:hover {
+    color: var(--axis-red);
+}
+
+.actions {
+    margin-top: 1.4rem;
+}
+
+#fetchBtn {
+    appearance: none;
+    border: 0;
+    border-radius: 10px;
+    padding: 0.78rem 1.2rem;
+    font-size: 1rem;
+    font-weight: 700;
+    color: #fff;
+    background: linear-gradient(120deg, #d8002d 0%, var(--axis-red) 100%);
+    cursor: pointer;
+    transition: transform 140ms ease, box-shadow 140ms ease;
+    box-shadow: 0 7px 12px rgb(255 0 51 / 20%);
+}
+
+#fetchBtn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 10px 16px rgb(255 0 51 / 24%);
+}
+
+#fetchBtn:active {
+    transform: translateY(0);
+}
+
+.api-output {
+    margin-top: 1.1rem;
+    border-left: 4px solid var(--axis-yellow);
+    background: #fffdf5;
+    border-radius: 8px;
+    padding: 0.8rem 0.9rem;
+}
+
+#message,
+#count {
+    margin: 0.35rem 0;
+    min-height: 1.3em;
+}
+
+#message {
+    font-size: 1.06rem;
+    line-height: 1.5;
+    font-weight: 700;
+    color: #3b0012;
+    letter-spacing: 0.01em;
+}
+
+#count {
+    display: none;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.22rem 0.6rem;
+    border: 1px solid #f0d7a1;
+    border-radius: 999px;
+    background: #fff6df;
+    color: #694500;
+    font-size: 0.9rem;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+}
+
+#count.visible {
+    display: inline-flex;
+}
+
+#count::before {
+    content: "";
+    width: 0.42rem;
+    height: 0.42rem;
+    border-radius: 50%;
+    background: linear-gradient(120deg, var(--axis-yellow) 0%, #f5a200 100%);
+}
+
+@media (max-width: 640px) {
+    .page-shell {
+        margin: 1rem auto;
+        border-radius: 12px;
+    }
+
+    .brand-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .brand-accent {
+        width: 100%;
+    }
+
+    .content-card {
+        padding: 1.2rem;
+    }
+}

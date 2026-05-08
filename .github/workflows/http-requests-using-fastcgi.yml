@@ -1,11 +1,11 @@
-name: Build web-server-using-fastcgi application
+name: Build http-requests-using-fastcgi application
 on:
   workflow_dispatch:
   push:
     paths:
-      - 'web-server-using-fastcgi/**'
-      - '!web-server-using-fastcgi/README.md'
-      - '.github/workflows/web-server-using-fastcgi.yml'
+      - 'web-server/http-requests-using-fastcgi/**'
+      - '!web-server/http-requests-using-fastcgi/README.md'
+      - '.github/workflows/http-requests-using-fastcgi.yml'
 jobs:
   test-app:
     name: Test app
@@ -16,7 +16,7 @@ jobs:
         arch: ["armv7hf", "aarch64"]
     env:
       EXREPO: acap-native-examples
-      EXNAME: web-server-using-fastcgi
+      EXNAME: web-server/http-requests-using-fastcgi
     steps:
       - uses: actions/checkout@v6
       - uses: docker/setup-buildx-action@v4

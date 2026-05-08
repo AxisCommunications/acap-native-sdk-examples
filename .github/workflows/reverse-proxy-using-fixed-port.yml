@@ -1,11 +1,11 @@
-name: Build web-server application
+name: Build reverse-proxy-using-fixed-port application
 on:
   workflow_dispatch:
   push:
     paths:
-      - 'web-server/**'
-      - '!web-server/README.md'
-      - '.github/workflows/web-server.yml'
+      - 'web-server/reverse-proxy-using-fixed-port/**'
+      - '!web-server/reverse-proxy-using-fixed-port/README.md'
+      - '.github/workflows/reverse-proxy-using-fixed-port.yml'
 jobs:
   test-app:
     name: Test app
@@ -16,7 +16,7 @@ jobs:
         arch: ["armv7hf", "aarch64"]
     env:
       EXREPO: acap-native-examples
-      EXNAME: web-server
+      EXNAME: web-server/reverse-proxy-using-fixed-port
     steps:
       - uses: actions/checkout@v6
       - uses: docker/setup-buildx-action@v4

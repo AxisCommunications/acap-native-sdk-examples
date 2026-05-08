@@ -3,8 +3,8 @@
 # How to integrate the device's Apache web server in an ACAP application
 
 This guide explains how to build an ACAP application that can handle HTTP requests sent to the Axis device. The application uses [FastCGI](https://fastcgi-archives.github.io/FastCGI_A_High-Performance_Web_Server_Interface_FastCGI.html) to handle the request and response, and [uriparser](https://uriparser.github.io/) to parse the received query parameters.
-This example addresses a similar problem as the [web-server](../web-server) example but it is better integrated with the Axis device. It builds upon the Apache web server that is already present in the Axis device, eliminating the need for running an additional web server.
-By utilizing the built-in web server, the API can be exposed on the same port as VAPIX. Users are authenticated in the same manner as when using VAPIX and the user pool is the same, providing significant advantages compared to the [web-server](../web-server) example.
+This example addresses a similar problem as the [reverse-proxy-using-fixed-port](../reverse-proxy-using-fixed-port) example but it is better integrated with the Axis device. It builds upon the Apache web server that is already present in the Axis device, eliminating the need for running an additional web server.
+By utilizing the built-in web server, the API can be exposed on the same port as VAPIX. Users are authenticated in the same manner as when using VAPIX and the user pool is the same, providing significant advantages compared to the [reverse-proxy-using-fixed-port](../reverse-proxy-using-fixed-port) example.
 
 ## Use case
 
@@ -21,12 +21,14 @@ The FastCGI integration with the device's Apache web server can be used for:
 These instructions will guide you on how to execute the code. Below is the structure and scripts used in the example:
 
 ```sh
-using-fastcgi
+http-requests-using-fastcgi
 ├── app
 │   ├── fastcgi_example.c
 │   ├── LICENSE
 │   ├── Makefile
 │   └── manifest.json
+├── assets
+│   └── fcgi.svg
 ├── Dockerfile
 └── README.md
 ```
@@ -36,6 +38,7 @@ using-fastcgi
 - **app/Makefile** - Build and link instructions for the application.
 - **app/manifest.json** - Defines the application and its FastCGI configuration.
 - **Dockerfile** - Assembles an image containing the ACAP Native SDK and builds the application using it.
+- **assets/fcgi.svg** - Image used in README.md.
 - **README.md** - Step by step instructions on how to run the example.
 
 ### Manifest schema HTTP configuration
