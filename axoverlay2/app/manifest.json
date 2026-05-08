@@ -1,0 +1,27 @@
+{
+    "schemaVersion": "2.0.0",
+    "resources": {
+        "dbus": {
+            "requiredMethods": [
+                "com.axis.Graphics2.*",
+                "com.axis.Overlay2.*"
+            ]
+        }
+    },
+    "acapPackageConf": {
+        "setup": {
+            "friendlyName": "Axoverlay2 example application",
+            "appName": "axoverlay2",
+            "vendor": "Axis Communications",
+            "vendorId": "0123456789",
+            "vendorUrl": "https://www.axis.com",
+            "runMode": "never",
+            "version": "1.0.0",
+            "compatibleOsVersions": [
+                {
+                    "max": "13"
+                }
+            ]
+        }
+    }
+}
