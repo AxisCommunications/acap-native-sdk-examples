@@ -1,13 +1,18 @@
 {
-    "schemaVersion": "1.9.0",
+    "schemaVersion": "2.0.0",
     "acapPackageConf": {
         "setup": {
             "appName": "containerExample",
             "friendlyName": "Container Example",
             "vendor": "Axis Communications",
-            "embeddedSdkVersion": "3.0",
+            "vendorId": "1234567890",
             "runMode": "never",
-            "version": "1.0.0"
+            "version": "1.0.0",
+            "compatibleOsVersions": [
+                {
+                    "max": "13"
+                }
+            ]
         },
         "installation": {
             "postInstallScript": "postinstall.sh"

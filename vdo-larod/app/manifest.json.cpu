@@ -1,5 +1,5 @@
 {
-    "schemaVersion": "1.9.0",
+    "schemaVersion": "2.0.0",
     "resources": {
         "linux": {
             "user": {
@@ -12,11 +12,16 @@
             "friendlyName": "vdo_larod_cpu",
             "appName": "vdo_larod",
             "vendor": "Axis Communications",
-            "embeddedSdkVersion": "3.0",
+            "vendorId": "1234567890",
             "runOptions": "cpu-tflite /usr/local/packages/vdo_larod/model/model.tflite scale",
             "vendorUrl": "https://www.axis.com",
             "runMode": "never",
-            "version": "1.0.0"
+            "version": "1.0.0",
+            "compatibleOsVersions": [
+                {
+                    "max": "13"
+                }
+            ]
         }
     }
 }

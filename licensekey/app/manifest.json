@@ -1,14 +1,19 @@
 {
-    "schemaVersion": "1.9.0",
+    "schemaVersion": "2.0.0",
     "acapPackageConf": {
         "setup": {
             "friendlyName": "licensekey_handler",
             "appName": "licensekey_handler",
             "appId": "0",
             "vendor": "-",
-            "embeddedSdkVersion": "3.0",
+            "vendorId": "1234567890",
             "runMode": "never",
-            "version": "1.0.0"
+            "version": "1.0.0",
+            "compatibleOsVersions": [
+                {
+                    "max": "13"
+                }
+            ]
         },
         "copyProtection": {
             "method": "axis"

@@ -1,12 +1,16 @@
 {
-    "schemaVersion": "1.9.0",
+    "schemaVersion": "2.0.0",
     "acapPackageConf": {
         "setup": {
             "appName": "remote_debug",
             "vendor": "Axis Communications",
             "version": "1.0.0",
-            "runMode": "never",
-            "embeddedSdkVersion": "3.0"
-        }
+            "vendorId": "1234567890",
+            "compatibleOsVersions": [
+                {
+                    "max": "13"
+                }
+            ],
+            "runMode": "never"        }
     }
 }

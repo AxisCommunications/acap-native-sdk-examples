@@ -1,5 +1,5 @@
 {
-    "schemaVersion": "1.9.0",
+    "schemaVersion": "2.0.0",
     "resources": {
         "dbus": {
             "requiredMethods": [
@@ -11,6 +11,10 @@
             "user": {
                 "groups": ["video"]
             }
+        },
+        "deepLearningProcessor": {
+            "enabled": true,
+            "required": true
         }
     },
     "acapPackageConf": {
@@ -18,11 +22,16 @@
             "friendlyName": "object_detection_yolov5_artpec8",
             "appName": "object_detection_yolov5",
             "vendor": "Axis Communications",
-            "embeddedSdkVersion": "3.0",
+            "vendorId": "1234567890",
             "runOptions": "/usr/local/packages/object_detection_yolov5/model/model.tflite /usr/local/packages/object_detection_yolov5/label/labels.txt  -c axis-a8-dlpu-tflite",
             "vendorUrl": "https://www.axis.com",
             "runMode": "never",
-            "version": "1.0.0"
+            "version": "1.0.0",
+            "compatibleOsVersions": [
+                {
+                    "max": "13"
+                }
+            ]
         },
         "configuration": {
             "paramConfig": [
