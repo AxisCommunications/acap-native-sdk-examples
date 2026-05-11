@@ -1,11 +1,9 @@
 {
     "schemaVersion": "2.0.0",
     "resources": {
-        "dbus": {
-            "requiredMethods": [
-                "com.axis.Graphics2.*",
-                "com.axis.Overlay2.*"
-            ]
+        "overlay": {
+            "enabled": true,
+            "required": true
         }
     },
     "acapPackageConf": {

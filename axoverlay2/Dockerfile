@@ -1,7 +1,7 @@
 ARG ARCH=armv7hf
-ARG VERSION=12.10.0-rc.5
+ARG VERSION=12.10.0
 ARG UBUNTU_VERSION=24.04
-ARG REPO=docker-prod.se.axis.com/axisecp
+ARG REPO=axisecp
 ARG SDK=acap-native-sdk
 
 FROM ${REPO}/${SDK}:${VERSION}-${ARCH}-ubuntu${UBUNTU_VERSION}
