@@ -1,0 +1,47 @@
+{
+    "schemaVersion": "2.0.0",
+    "acapPackageConf": {
+        "setup": {
+            "appName": "object_detector",
+            "vendor": "Axis Communications",
+            "vendorId": "0123456789",
+            "vendorUrl": "https://www.axis.com",
+            "runMode": "never",
+            "version": "1.0.0",
+            "compatibleOsVersions": [
+                {
+                    "max": "13"
+                }
+            ]
+        }
+    },
+    "resources": {
+        "deviceDataHub_beta2": {
+            "enabled": true,
+            "accessControlList": [
+                {
+                    "topics": [
+                        "com.example.object_detector"
+                    ],
+                    "usernames": [
+                        "acap-object_consumer"
+                    ],
+                    "operations": [
+                        "read"
+                    ]
+                },
+                {
+                    "topics": [
+                        "com.example.object_detector"
+                    ],
+                    "usernames": [
+                        "acap-object_detector"
+                    ],
+                    "operations": [
+                        "all"
+                    ]
+                }
+            ]
+        }
+    }
+}
