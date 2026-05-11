@@ -1,5 +1,5 @@
 {
-    "schemaVersion": "1.9.0",
+    "schemaVersion": "2.0.0",
     "resources": {
         "linux": {
             "user": {
@@ -12,11 +12,16 @@
             "friendlyName": "object_detection_cpu",
             "appName": "object_detection",
             "vendor": "Axis Communications",
-            "embeddedSdkVersion": "3.0",
+            "vendorId": "1234567890",
             "runOptions": "/usr/local/packages/object_detection/model/converted_model.tflite 50 /usr/local/packages/object_detection/label/labels.txt -d cpu-tflite",
             "vendorUrl": "https://www.axis.com",
             "runMode": "never",
-            "version": "1.0.0"
+            "version": "1.0.0",
+            "compatibleOsVersions": [
+                {
+                    "max": "13"
+                }
+            ]
         }
     }
 }
