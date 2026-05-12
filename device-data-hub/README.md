@@ -2,7 +2,7 @@
 
 # ACAP applications using the Device Data Hub API
 
-This directory contains ACAP application examples that interact with the [Device Data Hub API] (https://developer.axis.com/acap/api/#device-data-hub-api).
+This directory contains ACAP application examples that interact with the [Device Data Hub API](https://developer.axis.com/acap/api/#device-data-hub-api).
 
 ## About the Device Data Hub API
 
