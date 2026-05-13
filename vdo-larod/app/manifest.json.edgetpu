@@ -5,10 +5,6 @@
             "user": {
                 "groups": ["video"]
             }
-        },
-        "deepLearningProcessor": {
-            "enabled": true,
-            "required": true
         }
     },
     "acapPackageConf": {
