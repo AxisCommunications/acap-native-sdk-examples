@@ -1,0 +1,40 @@
+{
+    "schemaVersion": "2.0.0",
+    "acapPackageConf": {
+        "setup": {
+            "appName": "trustreport",
+            "compatibleOsVersions": [
+                {
+                    "min": "12.10.68",
+                    "max": "13"
+                }
+            ],
+            "vendor": "Axis Communications",
+            "vendorId": "fb1e17fd95",
+            "version": "1.0.0",
+            "runMode": "never"
+        },
+        "configuration": {
+            "settingPage": "trustreport.cgi",
+            "httpConfig": [
+                {
+                    "access": "viewer",
+                    "name": "trustreport.cgi",
+                    "type": "fastCgi"
+                }
+            ]
+        }
+    },
+    "resources": {
+        "dbus":{
+            "conditionalMethods": [
+                "com.axis.Certificate1.CertSet.Create",
+                "com.axis.Certificate1.CertSet.Update",
+                "com.axis.Certificate1.CertSet.Delete",
+                "com.axis.Certificate1.CertSet.GetPath",
+                "com.axis.Certificate1.CertSet.GetCertPath",
+                "com.axis.Certificate1.CertSet.List"
+            ]
+        }
+    }
+}
