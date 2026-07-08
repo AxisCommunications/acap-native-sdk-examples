@@ -1,0 +1,26 @@
+{
+    "schemaVersion": "2.0.0",
+    "acapPackageConf": {
+        "setup": {
+            "appName": "recording_playback",
+            "vendor": "Axis Communications",
+            "vendorId": "1234567890",
+            "runMode": "never",
+            "version": "1.0.0",
+            "compatibleOsVersions": [
+                {
+                    "max": "13"
+                }
+            ]
+        }
+    },
+    "resources": {
+        "dbus": {
+            "requiredMethods": [
+                "com.axis.RecordingSearch1.Search1.ListSpans",
+                "com.axis.RecordingSearch1.Search1.GetSpanAttributes",
+                "com.axis.RecordingPlayback1.Playback1.GetSegment"
+            ]
+        }
+    }
+}
