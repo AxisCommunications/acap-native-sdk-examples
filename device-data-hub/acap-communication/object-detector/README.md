@@ -46,7 +46,8 @@ description, and data schema. The schema specifies that data is a JSON object wi
 
 ### Publishing data
 
-The application creates a topic data writer with a `on_consumer_match_update` to receive notifications
+The application creates a topic data writer and registers an `on_consumer_match_update` callback
+using `dh_writer_set_consumer_match_update_callback` to receive notifications
 when subscribers connect or disconnect. When `DH_CONSUMER_MATCH` is received, consumers
 exist; when `DH_CONSUMER_NO_MATCH` is received, there are no subscribers.
 Data is only written when matching consumers exist, and must conform to the topic's data schema.
@@ -76,7 +77,7 @@ the manifest that handles Device Data Hub:
 
 ```json
 "resources": {
-    "deviceDataHub_beta2": {
+    "deviceDataHub": {
         "enabled": true,
         "accessControlList": [
             {

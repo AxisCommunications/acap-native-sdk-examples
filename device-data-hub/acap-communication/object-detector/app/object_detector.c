@@ -10,12 +10,11 @@
 #include <stdlib.h>
 #include <string.h>
 #include <syslog.h>
-#include <time.h>
 #include <unistd.h>
 
 // Configuration flags
 #define PUBLISH_INTERVAL_SEC 1
-#define TOPIC_NAME           "com.example.object_detector"
+#define TOPIC_NAME           "com.example.objectdetector"
 #define NUM_OBJECTS          3
 
 /* Topic definition as a JSON string (C style) */
@@ -45,18 +44,20 @@ static atomic_bool start_producing        = ATOMIC_VAR_INIT(false);
 static DHClient* client                   = NULL;
 static DHWriter* data_writer              = NULL;
 static DHTopic* topic                     = NULL;
-static dh_production_id registered_id;
+static DHProductionId registered_id;
 
 // Forward declarations
 static void cleanup_resources(void);
-static bool handle_client_error(DHClientError* err, const char* context);
+static bool handle_client_error(DHError* err, const char* context);
 static bool initialize_client(void);
 static bool setup_topic(void);
 static bool setup_writer(void);
 static void publish_fake_object_detections(void);
 
 // Consumer match update callback
-static void on_consumer_match_update(dh_production_id recv_id, DHConsumerMatchStatus status) {
+static void
+on_consumer_match_update(DHProductionId recv_id, DHConsumerMatchStatus status, void* user_data) {
+    (void)user_data;
     syslog(LOG_INFO,
            "Consumer match update - Production ID: %llu, Status: %s\n",
            (unsigned long long)recv_id,
@@ -69,10 +70,10 @@ static void on_consumer_match_update(dh_production_id recv_id, DHConsumerMatchSt
 }
 
 // error handling
-static bool handle_client_error(DHClientError* err, const char* context) {
+static bool handle_client_error(DHError* err, const char* context) {
     if (err) {
-        syslog(LOG_ERR, "Error in %s: %s\n", context, dh_client_error_to_string(err));
-        dh_client_destroy_error(err);
+        syslog(LOG_ERR, "Error in %s: %s\n", context, dh_error_to_string(err));
+        dh_error_destroy(err);
         return true;
     }
     return false;
@@ -86,12 +87,12 @@ static void cleanup_resources(void) {
     }
 
     if (client) {
-        DHClientError* err = NULL;
+        DHError* err = NULL;
         dh_client_disconnect(client, &err);
         handle_client_error(err, "client disconnect");
 
         if (topic) {
-            dh_client_destroy_topic(topic);
+            dh_topic_destroy(topic);
             topic = NULL;
         }
 
@@ -102,18 +103,18 @@ static void cleanup_resources(void) {
 
 // Initialize client and connect
 static bool initialize_client(void) {
-    DHClientOptions* opts = dh_client_options_create();
-    dh_client_options_set_log_level(opts, DH_LOG_INFO);
-    dh_client_options_set_log_target(opts, DH_LOG_TARGET_CONSOLE);
-
-    client = dh_client_create("Client for object_detector", opts);
-    dh_client_options_destroy(opts);
+    DHError* conn_cb_err = NULL;
+    client               = dh_client_create("Client for object_detector", &conn_cb_err);
     if (!client) {
-        syslog(LOG_ERR, "Failed to create client");
+        handle_client_error(conn_cb_err, "create client");
         return false;
     }
 
-    DHClientError* err = NULL;
+    if (!dh_client_set_logging(client, DH_LOG_INFO, DH_LOG_TARGET_CONSOLE, &conn_cb_err)) {
+        handle_client_error(conn_cb_err, "set logging");
+    }
+
+    DHError* err = NULL;
     dh_client_connect(client, &err);
     if (handle_client_error(err, "client connect")) {
         return false;
@@ -125,17 +126,17 @@ static bool initialize_client(void) {
 
 // Setup topic (get existing or create new)
 static bool setup_topic(void) {
-    DHClientError* err = NULL;
-    topic              = dh_client_get_topic(client, TOPIC_NAME, &err);
+    DHError* err = NULL;
+    topic        = dh_client_get_topic(client, TOPIC_NAME, &err);
 
     if (!err) {
         syslog(LOG_DEBUG, "Topic is available on the server");
         return true;
     }
 
-    if (dh_client_error_get_code(err) == DH_ERR_INVALID_TOPIC) {
+    if (dh_error_get_code(err) == DH_ERR_INVALID_TOPIC) {
         syslog(LOG_DEBUG, "Invalid Topic detected, creating the topic");
-        dh_client_destroy_error(err);
+        dh_error_destroy(err);
         err   = NULL;
         topic = dh_client_create_topic(client, topic_definition, &err);
         if (handle_client_error(err, "create topic")) {
@@ -152,43 +153,21 @@ static bool setup_topic(void) {
 
 // Setup writer and topic instance
 static bool setup_writer(void) {
-    // Create topic datawriter
-    DHClientError* err = NULL;
-    data_writer        = dh_client_create_writer(client, "producer_writer", &err);
+    // Create topic datawriter initialized for the topic
+    DHError* err = NULL;
+    data_writer  = dh_client_create_writer(client, "producer_writer", TOPIC_NAME, &err);
     if (handle_client_error(err, "create topic datawriter")) {
         return false;
     }
 
     syslog(LOG_DEBUG, "TopicDataWriter created successfully");
 
-    // Initialize the writer with a topic
-    dh_writer_initialize(data_writer, dh_topic_get_name(topic), &err);
-    if (handle_client_error(err, "initialize writer")) {
-        return false;
-    }
+    // Set up callback for consumer match updates
+    dh_writer_set_consumer_match_update_callback(data_writer, on_consumer_match_update, NULL);
 
-    // Set up listener for consumer match updates
-    DHWriterListener* writer_listener = dh_writer_listener_create(on_consumer_match_update);
-    if (!writer_listener) {
-        syslog(LOG_ERR, "Failed to create writer listener");
-        return false;
-    }
-    dh_writer_set_listener(data_writer, writer_listener, NULL);
-    dh_writer_listener_destroy(writer_listener);
-
-    // Register production
-    DHTopicData* data = NULL;
-    data              = dh_topic_data_create_from_json_str("{}");
-    if (data == NULL) {
-        syslog(LOG_ERR, "Failed to create topic data for production registration");
-        return false;
-    }
-    dh_writer_register_production(data_writer, data, &registered_id, &err);
-    // Clean up data after use
-    if (data) {
-        dh_topic_data_destroy(data);
-    }
-    if (handle_client_error(err, "register production")) {
+    // Register production (no instance keys for this topic)
+    if (!dh_writer_register_production(data_writer, NULL, &registered_id, &err)) {
+        handle_client_error(err, "register production");
         return false;
     }
 
@@ -232,15 +211,17 @@ static void publish_fake_object_detections(void) {
             continue;
         }
 
-        DHTopicData* topic_data = dh_topic_data_create_from_json_str(json_buffer);
-        if (!topic_data) {
-            syslog(LOG_ERR, "Failed to create topic data from JSON");
+        DHTopicData* topic_data = dh_topic_data_create();
+        if (!dh_topic_data_set_json_data(topic_data, json_buffer, NULL)) {
+            dh_topic_data_destroy(topic_data);
+            syslog(LOG_ERR, "Failed to set JSON data on topic data");
             continue;
         }
 
-        time_t current_time = time(NULL);
-        DHClientError* err  = NULL;
-        dh_writer_write_data(data_writer, topic_data, &current_time, &err);
+        DHTimestamp* ts = dh_timestamp_create();
+        DHError* err    = NULL;
+        dh_writer_write_data(data_writer, NULL, topic_data, ts, &err);
+        dh_timestamp_destroy(ts);
         handle_client_error(err, "write fake object data");
 
         dh_topic_data_destroy(topic_data);
@@ -273,7 +254,7 @@ int main(void) {
 
     // Disconnect does not delete the topic; call DeleteTopic to remove it.
     // Subscribers with topic updates enabled will be notified.
-    DHClientError* err = NULL;
+    DHError* err = NULL;
     dh_client_delete_topic(client, TOPIC_NAME, &err);
     handle_client_error(err, "Topic delete failed");
     syslog(LOG_INFO, "Application terminated");
