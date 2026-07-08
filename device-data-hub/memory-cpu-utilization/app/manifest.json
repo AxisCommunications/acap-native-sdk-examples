@@ -1,5 +1,5 @@
 {
-    "schemaVersion": "2.0.0",
+    "schemaVersion": "2.2.0",
     "acapPackageConf": {
         "setup": {
             "appName": "memory_cpu_utilization",
@@ -16,7 +16,7 @@
         }
     },
     "resources": {
-        "deviceDataHub_beta2": {
+        "deviceDataHub": {
             "enabled": true
         }
     }

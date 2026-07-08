@@ -20,17 +20,17 @@ static DHSubscriber* data_subscriber      = NULL;
 
 // Forward declarations
 static void cleanup_resources(void);
-static bool handle_client_error(DHClientError* err, const char* context);
+static bool handle_client_error(DHError* err, const char* context);
 static bool initialize_client(void);
 static bool setup_subscription(const char* topics[], unsigned int topics_count);
 static void signal_handler(int sig);
-static void on_data_received(DHTopicSample* sample, void* user_data);
+static void on_data_received(const DHTopicSample* sample, void* user_data);
 
 // error handling
-static bool handle_client_error(DHClientError* err, const char* context) {
+static bool handle_client_error(DHError* err, const char* context) {
     if (err) {
-        syslog(LOG_ERR, "Error in %s: %s\n", context, dh_client_error_to_string(err));
-        dh_client_destroy_error(err);
+        syslog(LOG_ERR, "Error in %s: %s\n", context, dh_error_to_string(err));
+        dh_error_destroy(err);
         return true;
     }
     return false;
@@ -38,18 +38,18 @@ static bool handle_client_error(DHClientError* err, const char* context) {
 
 // Initialize client and connect
 static bool initialize_client(void) {
-    DHClientOptions* opts = dh_client_options_create();
-    dh_client_options_set_log_level(opts, DH_LOG_INFO);
-    dh_client_options_set_log_target(opts, DH_LOG_TARGET_CONSOLE);
-
-    client = dh_client_create("Client for consume-scene-metadata", opts);
-    dh_client_options_destroy(opts);
-    if (!client) {
-        syslog(LOG_ERR, "Failed to create client");
+    DHError* conn_cb_err = NULL;
+    client               = dh_client_create("Client for consume-scene-metadata", &conn_cb_err);
+    if (!client && !handle_client_error(conn_cb_err, "create client")) {
         return false;
     }
 
-    DHClientError* err = NULL;
+    conn_cb_err = NULL;
+    if (!dh_client_set_logging(client, DH_LOG_INFO, DH_LOG_TARGET_CONSOLE, &conn_cb_err)) {
+        handle_client_error(conn_cb_err, "set logging");
+    }
+
+    DHError* err = NULL;
     dh_client_connect(client, &err);
     if (handle_client_error(err, "client connect")) {
         return false;
@@ -59,10 +59,10 @@ static bool initialize_client(void) {
 }
 
 // Data received callback
-static void on_data_received(DHTopicSample* sample, void* user_data) {
+static void on_data_received(const DHTopicSample* sample, void* user_data) {
     syslog(LOG_INFO, "User data: %s\n", (const char*)user_data);
-    const DHTopicData* topic_data = dh_topic_sample_get_topic_data(sample);
-    const char* data              = dh_topic_data_get_json_str(topic_data);
+    const DHTopicData* topic_data = dh_topic_sample_get_data(sample);
+    const char* data              = dh_topic_data_get_json_data(topic_data);
     if (data) {
         syslog(LOG_INFO, "Received consumer-scene-metadata: %s\n", data);
     }
@@ -71,58 +71,81 @@ static void on_data_received(DHTopicSample* sample, void* user_data) {
 // Subscribe to a topic
 static bool setup_subscription(const char* topics[], unsigned int topics_count) {
     // Create subscriber
-    DHClientError* err = NULL;
+    DHError* err = NULL;
     data_subscriber =
         dh_client_create_subscriber(client, "Data subscriber for consumer-scene-metadata", &err);
     if (handle_client_error(err, "create subscriber")) {
         return false;
     }
 
-    // Set up listener callbacks
-    DHSubscriberListener* sub_listener =
-        dh_subscriber_listener_create(NULL, NULL, on_data_received, "consume_scene_metadata_data");
-    if (!sub_listener) {
-        syslog(LOG_ERR, "Failed to create subscriber listener");
+    // Register data callback
+    dh_subscriber_set_data_callback(data_subscriber,
+                                    on_data_received,
+                                    "consume_scene_metadata_data",
+                                    &err);
+    if (handle_client_error(err, "set data callback")) {
         return false;
     }
 
-    dh_subscriber_set_listener(data_subscriber, sub_listener, NULL);
-    dh_subscriber_listener_destroy(sub_listener);
-
-    // Subscribe to topic
-    DHSubscriptionConfig* updates = dh_subscription_config_create();
-    if (!updates) {
-        syslog(LOG_ERR, "Failed to create subscription update config");
+    // Build subscription filter
+    DHFilter* filter = dh_filter_create();
+    if (!filter) {
+        syslog(LOG_ERR, "Failed to create filter");
         return false;
     }
-    dh_subscription_config_set(updates, false, false, true);
 
-    // Create instance key to only receive data for channel_id 1
-    DHTopicData* instance_key           = dh_topic_data_create_from_json_str("{\"channel_id\":1}");
-    const DHTopicData* instance_keys[1] = {instance_key};
+    // Add topic names to filter
+    for (unsigned int i = 0; i < topics_count; i++) {
+        dh_filter_add_topic_name(filter, topics[i], &err);
+        if (handle_client_error(err, "add topic name to filter")) {
+            dh_filter_destroy(filter);
+            return false;
+        }
+    }
 
-    err = NULL;
-    dh_subscriber_subscribe(data_subscriber,
-                            topics,
-                            topics_count,   // topic_count
-                            instance_keys,  // instance_keys
-                            1,              // instance_key_count
-                            NULL,           // content_filter
-                            false,          // get_history
-                            updates,
-                            &err);
+    // Add instance key filter to only receive data for channel_id 1
+    DHInstanceKeys* instance_keys = dh_instance_keys_create();
+    dh_instance_keys_add_integer(instance_keys, "channel_id", 1, &err);
+    if (handle_client_error(err, "add instance key")) {
+        dh_instance_keys_destroy(instance_keys);
+        dh_filter_destroy(filter);
+        return false;
+    }
+    dh_filter_add_instance(filter, instance_keys, &err);
+    dh_instance_keys_destroy(instance_keys);
+    if (handle_client_error(err, "add instance keys to filter")) {
+        dh_filter_destroy(filter);
+        return false;
+    }
 
+    // Create subscription options and add filter
+    DHSubscribeOptions* options = dh_subscribe_options_create();
+    if (!options) {
+        syslog(LOG_ERR, "Failed to create subscription options");
+        dh_filter_destroy(filter);
+        return false;
+    }
+
+    dh_subscribe_options_add_filter(options, filter, &err);
+    dh_filter_destroy(filter);
+    if (handle_client_error(err, "add filter to options")) {
+        dh_subscribe_options_destroy(options);
+        return false;
+    }
+
+    dh_subscribe_options_set_enable_data_updates(options, true);
+
+    // Subscribe with the above configured options
+    dh_subscriber_subscribe(data_subscriber, options, &err);
+    dh_subscribe_options_destroy(options);
     if (handle_client_error(err, "subscribe to topic")) {
         return false;
     }
 
-    dh_topic_data_destroy(instance_key);
-    dh_subscription_config_destroy(updates);
-
     return true;
 }
 
-// Cleanup the resources before exit
+// Cleanup all allocated resources
 static void cleanup_resources(void) {
     if (data_subscriber) {
         dh_subscriber_destroy(data_subscriber);
@@ -130,7 +153,7 @@ static void cleanup_resources(void) {
     }
 
     if (client) {
-        DHClientError* err = NULL;
+        DHError* err = NULL;
         dh_client_disconnect(client, &err);
         handle_client_error(err, "client disconnect");
         dh_client_destroy(client);

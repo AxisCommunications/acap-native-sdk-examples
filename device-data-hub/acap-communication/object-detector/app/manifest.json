@@ -1,5 +1,5 @@
 {
-    "schemaVersion": "2.0.0",
+    "schemaVersion": "2.2.0",
     "acapPackageConf": {
         "setup": {
             "appName": "object_detector",
@@ -16,12 +16,12 @@
         }
     },
     "resources": {
-        "deviceDataHub_beta2": {
+        "deviceDataHub": {
             "enabled": true,
             "accessControlList": [
                 {
                     "topics": [
-                        "com.example.object_detector"
+                        "com.example.objectdetector"
                     ],
                     "usernames": [
                         "acap-object_consumer"
@@ -32,7 +32,7 @@
                 },
                 {
                     "topics": [
-                        "com.example.object_detector"
+                        "com.example.objectdetector"
                     ],
                     "usernames": [
                         "acap-object_detector"

@@ -36,7 +36,7 @@ The application creates a Device Data Hub client and connects to the service. Th
 ### Subscribing to a topic
 
 The application creates a `DHSubscriber` to subscribe to *acap.object_detector*.
-The functions of `DHSubscriberListener` listener struct handles incoming data by logging it.
+A data callback registered with `dh_subscriber_set_data_callback` handles incoming data by logging it.
 
 > [!NOTE]
 > You can subscribe to topics that don't exist yet. Data will arrive once the topic is created and
@@ -57,7 +57,7 @@ To be able to connect to Device Data Hub, enable Device Data Hub in the manifest
 
 ```json
 "resources": {
-    "deviceDataHub_beta2": {
+    "deviceDataHub": {
         "enabled": true
     }
 }

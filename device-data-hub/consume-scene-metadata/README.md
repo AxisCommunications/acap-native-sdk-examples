@@ -38,7 +38,7 @@ The application begins by creating a Device Data Hub client and connecting. The 
 
 ### Subscribing to a topic
 
-The application then creates a `DHSubscriber` and uses it to subscribe to the Device Data Hub topic described above. It also creates a `DHSubscriberListener`, which is used to receive data written to the subscribed topic. The received JSON data is printed as-is.
+It then creates a `DHSubscriber` and subscribes to the two topics described above. A data callback registered with `dh_subscriber_set_data_callback` is used to receive data published on those subscribed topics. The received JSON data is printed as-is.
 
 ### Output JSON data structure of the topics
 
@@ -157,7 +157,7 @@ This application subscribes to public topics. To enable that behavior, Device Da
 
 ```json
 "resources": {
-    "deviceDataHub_beta2": {
+    "deviceDataHub": {
         "enabled": true
     }
 }
