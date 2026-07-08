@@ -128,6 +128,8 @@ The examples are organized into logical groups to help you find the most relevan
   - Examples that showcase how to use the Device Data Hub API (https://developer.axis.com/acap/api/#device-data-hub-api).
 - [reproducible-package](./reproducible-package/)
   - An example of how to create a reproducible application package.
+- [recording-playback](./recording-playback/)
+  - An example in C that shows how to search for existing recordings, retrieve the recording files and monitor when new ones are completed.
 - [shell-script-example](./shell-script-example)
   - A simple hello world shell script application.
   <!-- textlint-disable terminology -->
