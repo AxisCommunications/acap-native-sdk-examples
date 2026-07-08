@@ -1,0 +1,33 @@
+name: Build axoverlay2_skia application
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'axoverlay2-skia/**'
+      - '!axoverlay2-skia/README.md'
+      - '.github/workflows/axoverlay2-skia.yml'
+jobs:
+  test-app:
+    name: Test app
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        axis-os: ["12.11.72"]
+        arch: ["armv7hf", "aarch64"]
+    env:
+      EXREPO: acap-native-examples
+      EXNAME: axoverlay2-skia
+    steps:
+      - uses: actions/checkout@v6
+      - uses: docker/setup-buildx-action@v4
+
+      - name: Build ${{ env.EXNAME }} application
+        env:
+          imagetag: ${{ env.EXREPO }}_${{ env.EXNAME }}:${{ matrix.arch }}
+        run: |
+          cd $EXNAME
+          docker build --no-cache --tag $imagetag --build-arg ARCH=${{ matrix.arch }} .
+          docker cp $(docker create $imagetag):/opt/app ./build
+          cd ..
+          docker image rm -f $imagetag

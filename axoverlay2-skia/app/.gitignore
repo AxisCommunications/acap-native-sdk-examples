@@ -1,0 +1,12 @@
+/build_skia
+/axoverlay2_skia
+/skia
+/*.eap
+/package.conf
+/param.conf
+/*_LICENSE.txt
+/*.old
+/*.orig
+/tmp*
+/*.d
+/debug

@@ -75,6 +75,8 @@ The examples are organized into logical groups to help you find the most relevan
 - [axoverlay2](./axoverlay2/)
   - An example in C that illustrates how to draw icons as overlays in a stream using the modern
     [Overlay API](https://developer.axis.com/acap/api#overlay2-API).
+- [axoverlay2-skia](./axoverlay2-skia/)
+  - An example in C++ that illustrates how to draw overlays with GPU acceleration using the the Skia graphics toolkit.
 - [axoverlay](./axoverlay/)
   - An example in C that illustrates how to draw plain boxes and text as overlays in a stream using
     the [Axoverlay API (Legacy)](https://developer.axis.com/acap/api#axoverlay-api-legacy).
