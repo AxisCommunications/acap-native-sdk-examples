@@ -72,9 +72,9 @@ Compile the model using the [Ambarella toolchain](https://www.ambarella.com/tech
 
 > **Note**
 > It is required to be an Ambarella partner to access Ambarella tools. Visit
-> [this](https://customer.ambarella.com/ng/login?refid=EAAAALA9%2fIfpWDCn53oQJDd5FKfzsrI0fWXYseVTpgnkJHV1)
-> web page to access the tools. If you are not an Ambarella partner, you can
-> get login credentials by registering in the same link.
+> [ambarella.com](https://www.ambarella.com/)
+> to access the tools. If you are not yet an Ambarella partner, you can
+> get login credentials by navigating to Ambarella Developer Zone and registering there.
 
 Note that the MS COCO 2017 validation dataset is downloaded during the building of the environment. This is roughly 1GB in size which means this could take a few minutes to download.
 
@@ -150,7 +150,7 @@ This process can take a few minutes as the validation dataset is quite large.
 
 #### Compiling for CV25 DLPU
 
-After conversion to the `.tflite` format, the `.tflite` model needs to be compiled for the CV25 chip using the [Ambarella toolchain](https://customer.ambarella.com/ng/).
+After conversion to the `.tflite` format, the `.tflite` model needs to be compiled for the CV25 chip using the [Ambarella toolchain](https://www.ambarella.com/technology/#cvflow).
 Together with the tools, you should receive some documents that explain how to compile your model with the toolchain.
 To convert our `.tflite` model first we will need an subsample of the train dataset to use for quantization. We can run the following command:
 
@@ -202,7 +202,7 @@ Finally, we produce the cavalry file `car_human_model_cavalry.bin`, that can be 
   -f car_human_model_cavalry.bin
 ```
 
-For more information about how to convert your specific model, please refer to the [Ambarella documentation](https://customer.ambarella.com/ng/).
+For more information about how to convert your specific model, please refer to the documentation found in the [Ambarella toolchain](https://www.ambarella.com/technology/#cvflow).
 
 ### The expected output
 
