@@ -128,6 +128,8 @@ The examples are organized into logical groups to help you find the most relevan
   - Examples that showcase how to use the Message Broker API.
 - [device-data-hub](./device-data-hub/)
   - Examples that showcase how to use the Device Data Hub API (https://developer.axis.com/acap/api/#device-data-hub-api).
+- [ptz-control-ws-api](./ptz-control-ws-api/)
+  - An example demonstrating PTZ (Pan-Tilt-Zoom) control using the [PTZ Control WS API](https://developer.axis.com/acap/reference/supported-apis/ptz-control-ws-api).
 - [reproducible-package](./reproducible-package/)
   - An example of how to create a reproducible application package.
 - [recording-playback](./recording-playback/)

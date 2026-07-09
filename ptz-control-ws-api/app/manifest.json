@@ -1,0 +1,27 @@
+{
+    "schemaVersion": "2.2.0",
+    "acapPackageConf": {
+        "setup": {
+            "appName": "ptz_control_ws_api_example",
+            "vendor": "Axis Communications",
+			"vendorId": "1234567890",
+            "vendorUrl": "https://www.axis.com",
+            "runMode": "never",
+            "version": "1.0.0",
+			"compatibleOsVersions": [
+				{
+					"min": "12.11",
+					"max": "13"
+				}
+			]
+        }
+    },
+    "resources": {
+        "dbus": {
+            "requiredMethods": ["com.axis.HTTPConf1.VAPIXServiceAccounts1.GetCredentials"]
+        },
+        "deviceDataHub_beta2": {
+            "enabled": true
+        }
+    }
+}
