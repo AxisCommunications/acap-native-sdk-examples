@@ -14,14 +14,36 @@ ACAP application. Some examples:
 - Call [list installed applications](https://www.axis.com/vapix-library/subjects/t10102231/section/t10036126/display?section=t10036126-t10010644)
   API to get installed ACAP applications.
 
-## Outline of example
+## Project structure
+
+The files for building the application are organized in the following structure.
+
+```sh
+vapix
+├── app
+│   ├── vapix_example.c
+│   ├── LICENSE
+│   ├── Makefile
+│   └── manifest.json
+├── Dockerfile
+└── README.md
+```
+
+- **app/vapix_example.c** - Application source code in C.
+- **app/LICENSE** - Text file which lists all open source licensed source code distributed with the application.
+- **app/Makefile** - Build and link instructions for the application.
+- **app/manifest.json** - Defines the application and its configuration. This includes additional parameters.
+- **Dockerfile** - Assembles an image containing the ACAP Native SDK and builds the application using it.
+- **README.md** - Step by step instructions on how to run the example.
+
+## Application description
+
+### Outline of example
 
 1. Retrieve VAPIX credentials through a D-Bus API.
 2. Use cURL to make a HTTP POST request to VAPIX API **Basic device
    information** on dedicated local host IP `127.0.0.12`.
 3. Parse out fields from the answer
-
-## Practical information
 
 ### API to get VAPIX credentials
 
@@ -51,36 +73,7 @@ ACAP application. Some examples:
   as described in
   [Configure global device proxy](https://developer.axis.com/acap/develop/proxy/#configure-global-device-proxy).
 
-## Getting started
-
-These instructions will guide you on how to execute the code. Below is the
-structure and scripts used in the example:
-
-```sh
-vapix
-├── app
-│   ├── vapix_example.c
-│   ├── LICENSE
-│   ├── Makefile
-│   └── manifest.json
-├── Dockerfile
-└── README.md
-```
-
-- **app/vapix_example.c** - Application source code in C.
-- **app/LICENSE** - Text file which lists all open source licensed source code distributed with the application.
-- **app/Makefile** - Build and link instructions for the application.
-- **app/manifest.json** - Defines the application and its configuration. This includes additional parameters.
-- **Dockerfile** - Assembles an image containing the ACAP Native SDK and builds the application using it.
-- **README.md** - Step by step instructions on how to run the example.
-
-### How to run the code
-
-Below is the step by step instructions on how to execute the program. So
-basically starting with the generation of the .eap file to running it on a
-device.
-
-#### Build the application
+## Build the application
 
 Standing in your working directory run the following commands:
 
@@ -114,7 +107,7 @@ chosen, one of these files should be found:
 >
 > For detailed information on how to build, install, and run ACAP applications, refer to the official ACAP documentation: [Build, install, and run](https://developer.axis.com/acap/develop/build-install-run/).
 
-#### Install and start the application
+## Install and start the application
 
 Browse to the application page of the Axis device:
 
@@ -133,12 +126,12 @@ http://<AXIS_DEVICE_IP>/index.html#apps
 5. Click **Install**
 6. Run the application by enabling the **Start** switch
 
-#### The expected output
+## Expected output
 
 The application log can be found by either
 
 - Browse to `http://<AXIS_DEVICE_IP>/axis-cgi/admin/systemlog.cgi?appname=vapix_example`.
-- Browse to the application page and click the `App log`.
+- Browse to the **Apps** page and select **App log**.
 
 The log shows a few parsed values from the VAPIX API response.
 

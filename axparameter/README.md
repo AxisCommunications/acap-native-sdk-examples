@@ -28,7 +28,7 @@ axparameter
 - **Dockerfile** - Assembles an image containing the ACAP Native SDK and builds the application using it.
 - **README.md** - Step by step instructions on how to run the example.
 
-## Program structure and behavior
+## Application description
 
 In the `paramConfig` section of `manifest.json`, two parameters have been defined;
 `IsCustomized` and `BackupValue`.
@@ -126,7 +126,7 @@ http://<AXIS_DEVICE_IP>/index.html#apps
 The application log can be found by either
 
 - Browsing to `http://<AXIS_DEVICE_IP>/axis-cgi/admin/systemlog.cgi?appname=axparameter`.
-- Browsing to the *Apps* page and select `App log`.
+- Browsing to the **Apps** page and select **App log**.
 
 Initially, the log will show the device serial number, read from the system parameters.
 

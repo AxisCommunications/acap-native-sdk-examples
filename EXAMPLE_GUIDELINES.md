@@ -46,13 +46,39 @@ example-name
     maintenance hard.
   - For example, instead of ACAP Native SDK 12, use ACAP Native SDK.
 - **Add copyright license**
-  - The standard license is Apache 2.0
-  - Copy LICENSE file and year in line `Copyright 2025 Axis Communications`.
   - All source code should have a copyright header.
 - **Dockerfile**
   - Don't add proxy variables like `http_proxy` and `https_proxy` in the
     example. See the [Proxy](https://developer.axis.com/acap/develop/proxy)
     section for how to work with proxy in build time.
+
+### LICENSE
+
+The standard license is MIT. The LICENSE file should contain (insert year):
+
+```text
+MIT License
+
+Copyright (c) <PUBLISH_YEAR> Axis Communications AB
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+```
 
 ### README
 
@@ -60,13 +86,20 @@ A key to make a good example is to put effort in making the example name, title
 and introduction as clear and concise as possible.
 
 - Describe the use case.
+- Reference the APIs used and point to API documentation.
 - An image, graph or code snippet might be helpful in some cases.
 
-After the introduction
+Use headers:
 
-- Reference the APIs used and point to API documentation.
-- For larger examples it's useful to make an outline of what the program does
-  to help the reader.
+```text
+# <Title describing use case>
+## Project structure
+## Application description
+## Build the application
+## Install and start the application
+## Expected output
+## License
+```
 
 ### Makefile
 
