@@ -13,7 +13,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        axis-os: ["12.11.58"]
+        axis-os: ["12.11.72"]
         arch: ["armv7hf"]
     env:
       EXREPO: acap-native-examples
