@@ -54,7 +54,7 @@ WORKDIR ${BUILD_DIR}/skia
 #   is_component_build: Produce a static Skia library.
 RUN git clone https://skia.googlesource.com/skia.git . \
         --branch ${SKIA_VERSION} --depth 1 && \
-    python3 tools/git-sync-deps && \
+    GIT_SYNC_DEPS_SKIP_EMSDK=1 python3 tools/git-sync-deps && \
     . /opt/axis/acapsdk/environment-setup* && \
     gn gen --root=. --args=" \
         cc=\"$CC\" \
