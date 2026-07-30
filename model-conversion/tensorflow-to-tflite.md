@@ -18,7 +18,7 @@ Usually around 100-200 images are used for best results, but fewer can be used, 
     ```python
     # tried and working dependencies:
     #   tensorflow==2.19.0
-    #   numpy==2.4.6
+    #   numpy==1.26.4
     #   pillow==12.2.0
 
     import tensorflow as tf
