@@ -1,6 +1,6 @@
 *Copyright (C) 2026, Axis Communications AB, Lund, Sweden. All Rights Reserved.*
 
-# PyTorch model -> .tflite
+# PyTorch model -> .onnx
 
 This example shows how a model created with the PyTorch framework can be converted to the .onnx format.
 Note that modifications to the steps may need to be made for more complex models.
