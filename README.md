@@ -62,6 +62,18 @@ The examples are organized into logical groups to help you find the most relevan
   - A guide of how to train and export machine learning models to make them compatible with CV25 devices.
 - [vdo-larod](./vdo-larod/)
   - An example in C that runs one of the  machine learning models trained with the tensorflow-to-larod* guides on the video stream of the device.
+- [pytorch-to-tflite](./model-conversion/pytorch-to-tflite.md)
+  - A small example of how to quantize and convert a Pytorch model to .tflite.
+- [tensorflow-to-tflite](./model-conversion/tensorflow-to-tflite.md)
+  - A small example of how to quantize and convert a TensorFlow model to .tflite.
+- [pytorch-to-onnx](./model-conversion/pytorch-to-onnx.md)
+  - A small example of how to convert a Pytorch model to .onnx.
+- [tensorflow-to-onnx](./model-conversion/tensorflow-to-onnx.md)
+  - A small example of how to convert a TensorFlow model to .onnx.
+- [onnx-to-cv25](./model-conversion/onnx-to-cv25.md)
+  - A small example of how to convert a .onnx model to a native cv25 model.
+- [onnx-to-cv75](./model-conversion/onnx-to-cv75.md)
+  - A small example of how to convert a .onnx model to a native cv75 model.
 
 ### Build custom libraries for an application
 
