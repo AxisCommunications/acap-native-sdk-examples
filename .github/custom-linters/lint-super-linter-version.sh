@@ -14,16 +14,17 @@ check_super_linter_version_aligned_in_all_places() {
   local local_version=
   local lines_with_super_linter_image=
   local super_linter_repo=super-linter/super-linter
-  local super_linter_action_name="$super_linter_repo/slim@v"
+  local super_linter_action_name="$super_linter_repo/slim@"
   local super_linter_image_name="$super_linter_repo:slim-v"
   local exclude_list="--exclude-dir=.git"
 
   print_section "Verify that version of super-linter is aligned in workflow, linters and docs"
 
+  # The action is pinned to a commit SHA, so the version is taken from the trailing "# vX.Y.Z" comment
   workflow_file_entry="$(cd "$workflow_dir" || print_line "Error: Can't cd to $workflow_dir" && exit 1 |
                          grep -rnIE $super_linter_action_name $exclude_list)"
   workflow_version="$(echo "$workflow_file_entry" |
-                      grep -oE '@v[0-9]+' |
+                      grep -oE '# v[0-9]+' |
                       grep -oE '[0-9]+')"
   lines_with_super_linter_image="$(grep -rnIE $super_linter_image_name $exclude_list)"
   while read -r line; do
