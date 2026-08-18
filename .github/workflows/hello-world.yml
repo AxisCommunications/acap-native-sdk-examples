@@ -6,6 +6,9 @@ on:
       - 'hello-world/**'
       - '!hello-world/README.md'
       - '.github/workflows/hello-world.yml'
+permissions:
+  contents: read
+
 jobs:
   test-app:
     name: Test app

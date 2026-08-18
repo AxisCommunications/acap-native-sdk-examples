@@ -6,6 +6,9 @@ on:
       - 'curl-openssl/**'
       - '!curl-openssl/README.md'
       - '.github/workflows/curl-openssl.yml'
+permissions:
+  contents: read
+
 jobs:
   build:
     runs-on: ubuntu-latest

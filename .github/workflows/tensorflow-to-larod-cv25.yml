@@ -6,6 +6,9 @@ on:
       - 'tensorflow-to-larod-cv25/**'
       - '!tensorflow-to-larod-cv25/README.md'
       - '.github/workflows/tensorflow-to-larod-cv25.yml'
+permissions:
+  contents: read
+
 jobs:
   test-app:
     name: Test app

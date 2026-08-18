@@ -6,6 +6,9 @@ on:
       - 'bounding-box/**'
       - '!bounding-box/README.md'
       - '.github/workflows/bounding-box.yml'
+permissions:
+  contents: read
+
 jobs:
   test-app:
     name: Test app

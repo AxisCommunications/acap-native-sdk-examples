@@ -6,6 +6,9 @@ on:
       - 'ptz-control-ws-api/**'
       - '!ptz-control-ws-api/README.md'
       - '.github/workflows/ptz-control-ws-api.yml'
+permissions:
+  contents: read
+
 jobs:
   test-app:
     name: Test app

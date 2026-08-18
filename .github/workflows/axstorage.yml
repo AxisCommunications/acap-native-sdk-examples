@@ -6,6 +6,9 @@ on:
       - 'axstorage/**'
       - '!axstorage/README.md'
       - '.github/workflows/axstorage.yml'
+permissions:
+  contents: read
+
 jobs:
   test-app:
     name: Test app

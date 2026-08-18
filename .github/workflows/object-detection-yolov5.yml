@@ -6,6 +6,9 @@ on:
       - 'object-detection-yolov5/**'
       - '!object-detection-yolov5/README.md'
       - '.github/workflows/object-detection-yolov5.yml'
+permissions:
+  contents: read
+
 jobs:
   test-app:
     name: Test app

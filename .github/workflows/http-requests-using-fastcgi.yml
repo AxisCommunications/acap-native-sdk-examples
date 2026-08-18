@@ -6,6 +6,9 @@ on:
       - 'web-server/http-requests-using-fastcgi/**'
       - '!web-server/http-requests-using-fastcgi/README.md'
       - '.github/workflows/http-requests-using-fastcgi.yml'
+permissions:
+  contents: read
+
 jobs:
   test-app:
     name: Test app

@@ -6,6 +6,9 @@ on:
       - 'reproducible-package/**'
       - '!reproducible-package/README.md'
       - '.github/workflows/reproducible-package.yml'
+permissions:
+  contents: read
+
 jobs:
   test-app:
     name: Test app

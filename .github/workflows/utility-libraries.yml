@@ -6,6 +6,9 @@ on:
       - 'utility-libraries/**'
       - '!utility-libraries/**/README.md'
       - '.github/workflows/utility-libraries.yml'
+permissions:
+  contents: read
+
 jobs:
   test-app:
     name: Test app

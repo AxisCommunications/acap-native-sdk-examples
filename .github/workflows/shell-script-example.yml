@@ -6,6 +6,9 @@ on:
       - 'shell-script-example/**'
       - '!shell-script-example/README.md'
       - '.github/workflows/shell-script-example.yml'
+permissions:
+  contents: read
+
 jobs:
   test-app:
     name: Test app

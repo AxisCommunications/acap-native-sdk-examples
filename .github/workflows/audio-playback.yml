@@ -6,6 +6,9 @@ on:
       - 'audio-playback/**'
       - '!audio-playback/README.md'
       - '.github/workflows/audio-playback.yml'
+permissions:
+  contents: read
+
 jobs:
   test-app:
     name: Test app

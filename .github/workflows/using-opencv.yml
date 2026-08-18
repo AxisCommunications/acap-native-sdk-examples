@@ -6,6 +6,9 @@ on:
       - 'using-opencv/**'
       - '!using-opencv/README.md'
       - '.github/workflows/using-opencv.yml'
+permissions:
+  contents: read
+
 jobs:
   test-app:
     name: Test app

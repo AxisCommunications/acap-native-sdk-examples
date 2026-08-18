@@ -6,6 +6,9 @@ on:
       - 'axserialport/**'
       - '!axserialport/README.md'
       - '.github/workflows/axserialport.yml'
+permissions:
+  contents: read
+
 jobs:
   test-app:
     name: Test app

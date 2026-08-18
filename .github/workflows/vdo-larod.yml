@@ -6,6 +6,9 @@ on:
       - 'vdo-larod/**'
       - '!vdo-larod/README.md'
       - '.github/workflows/vdo-larod.yml'
+permissions:
+  contents: read
+
 jobs:
   test-app:
     name: Test app

@@ -7,6 +7,9 @@ on:
       - '.github/renovate.json'
       - '.github/workflows/linter-renovate-config.yml'
 
+permissions:
+  contents: read
+
 jobs:
   test:
     name: Lint Renovate config file

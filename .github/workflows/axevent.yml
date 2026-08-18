@@ -6,6 +6,9 @@ on:
       - 'axevent/**'
       - '!axevent/**/README.md'
       - '.github/workflows/axevent.yml'
+permissions:
+  contents: read
+
 jobs:
   test-app:
     name: Test app

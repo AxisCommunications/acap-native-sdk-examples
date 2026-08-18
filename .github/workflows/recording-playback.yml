@@ -6,6 +6,9 @@ on:
       - 'recording-playback/**'
       - '!recording-playback/README.md'
       - '.github/workflows/recording-playback.yml'
+permissions:
+  contents: read
+
 jobs:
   test-app:
     name: Test app

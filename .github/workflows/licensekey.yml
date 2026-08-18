@@ -6,6 +6,9 @@ on:
       - 'licensekey/**'
       - '!licensekey/README.md'
       - '.github/workflows/licensekey.yml'
+permissions:
+  contents: read
+
 jobs:
   test-app:
     name: Test app

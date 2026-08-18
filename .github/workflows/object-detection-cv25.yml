@@ -6,6 +6,9 @@ on:
       - 'object-detection-cv25/**'
       - '!object-detection-cv25/README.md'
       - '.github/workflows/object-detection-cv25.yml'
+permissions:
+  contents: read
+
 jobs:
   test-app:
     name: Test app
