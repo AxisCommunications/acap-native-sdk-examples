@@ -6,6 +6,9 @@ on:
       - "container-example/**"
       - "!container-example/README.md"
       - ".github/workflows/container-example.yml"
+permissions:
+  contents: read
+
 jobs:
   test-app:
     name: Test app

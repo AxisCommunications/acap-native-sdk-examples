@@ -6,6 +6,9 @@ on:
       - 'message-broker/**'
       - '!message-broker/README.md'
       - '.github/workflows/message-broker.yml'
+permissions:
+  contents: read
+
 jobs:
   test-app:
     name: Test app

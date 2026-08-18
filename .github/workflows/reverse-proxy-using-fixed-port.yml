@@ -6,6 +6,9 @@ on:
       - 'web-server/reverse-proxy-using-fixed-port/**'
       - '!web-server/reverse-proxy-using-fixed-port/README.md'
       - '.github/workflows/reverse-proxy-using-fixed-port.yml'
+permissions:
+  contents: read
+
 jobs:
   test-app:
     name: Test app

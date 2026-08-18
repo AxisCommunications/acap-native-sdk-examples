@@ -6,6 +6,9 @@ on:
       - 'device-data-hub/**'
       - '!device-data-hub/README.md'
       - '.github/workflows/device-data-hub.yml'
+permissions:
+  contents: read
+
 jobs:
   test-app:
     name: Test app

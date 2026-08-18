@@ -6,6 +6,9 @@ on:
       - 'axoverlay2/**'
       - '!axoverlay2/README.md'
       - '.github/workflows/axoverlay2.yml'
+permissions:
+  contents: read
+
 jobs:
   test-app:
     name: Test app

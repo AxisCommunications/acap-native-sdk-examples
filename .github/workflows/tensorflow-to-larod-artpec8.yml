@@ -6,6 +6,9 @@ on:
       - 'tensorflow-to-larod-artpec8/**'
       - '!tensorflow-to-larod-artpec8/README.md'
       - '.github/workflows/tensorflow-to-larod-artpec8.yml'
+permissions:
+  contents: read
+
 jobs:
   test-app:
     name: Test app

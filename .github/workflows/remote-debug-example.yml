@@ -6,6 +6,9 @@ on:
       - 'remote-debug-example/**'
       - '!remote-debug-example/README.md'
       - '.github/workflows/remote-debug-example.yml'
+permissions:
+  contents: read
+
 jobs:
   test-app:
     name: Test app
