@@ -7,9 +7,10 @@ recordings stored on an SD card, then monitor for new recording segments as they
 are written. This is useful for applications that need to process recordings,
 for example, for uploading to a cloud service.
 
-A recording is logically organized into spans and segments:
+A recording represents continuously captured media stored on an edge storage
+device. It is logically organized into spans and segments:
 
-- A span is a logical grouping of recording segments with a duration
+- A span is a logical grouping of recording segments with a target duration
   defined by the `spanDuration` property in the recording group configuration.
 
 - A segment is an individual recording file within a span with a duration
@@ -19,7 +20,7 @@ A recording is logically organized into spans and segments:
   muxed together in a segment or stored in separate segments depending on the
   `containerFormat` property.
 
-For more information on the recording group configuration, refer to the
+For more information on the recording group configuration, please refer to the
 [Recording group API](https://developer.axis.com/vapix/device-configuration/recording-group/).
 
 The example covers the following case:
