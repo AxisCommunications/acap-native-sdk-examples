@@ -6,6 +6,9 @@ on:
       - 'axoverlay2-skia/**'
       - '!axoverlay2-skia/README.md'
       - '.github/workflows/axoverlay2-skia.yml'
+permissions:
+  contents: read
+
 jobs:
   test-app:
     name: Test app

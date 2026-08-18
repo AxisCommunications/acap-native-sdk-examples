@@ -6,6 +6,9 @@ on:
       - 'tensorflow-to-larod/**'
       - '!tensorflow-to-larod/README.md'
       - '.github/workflows/tensorflow-to-larod.yml'
+permissions:
+  contents: read
+
 jobs:
   test-app:
     name: Test app

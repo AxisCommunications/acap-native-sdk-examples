@@ -6,6 +6,9 @@ on:
       - 'vdo-opencl-filtering/**'
       - '!vdo-opencl-filtering/README.md'
       - '.github/workflows/vdo-opencl-filtering.yml'
+permissions:
+  contents: read
+
 jobs:
   test-app:
     name: Test app

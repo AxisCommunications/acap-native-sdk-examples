@@ -6,6 +6,9 @@ on:
       - 'vdostream/**'
       - '!vdostream/README.md'
       - '.github/workflows/vdostream.yml'
+permissions:
+  contents: read
+
 jobs:
   test-app:
     name: Test app

@@ -6,6 +6,9 @@ on:
       - 'audio-capture/**'
       - '!audio-capture/README.md'
       - '.github/workflows/audio-capture.yml'
+permissions:
+  contents: read
+
 jobs:
   test-app:
     name: Test app

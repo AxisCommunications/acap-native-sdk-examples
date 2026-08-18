@@ -6,6 +6,9 @@ on:
       - 'axparameter/**'
       - '!axparameter/README.md'
       - '.github/workflows/axparameter.yml'
+permissions:
+  contents: read
+
 jobs:
   test-app:
     name: Test app
