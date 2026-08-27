@@ -14,8 +14,8 @@ ARG BUILD_DIR=/opt/build
 ARG PEM_CERT_FILE=cacert.pem
 
 # Library versions
-ARG OPENSSL_VER=1.1.1m
-ARG CURL_VER=7_83_1
+ARG OPENSSL_VER=3.5.7
+ARG CURL_VER=8_6_0
 
 # (Optional) If the network has a proxy
 ARG APP_PROXY
@@ -116,6 +116,8 @@ RUN . /opt/axis/acapsdk/environment-setup* && \
       --with-openssl \
       --without-zlib \
       --without-zstd \
+      --without-libpsl \
+      --disable-ntlm \
       --prefix="${CURL_INSTALL_DIR}" \
       ${CONFIGURE_FLAGS} && \
     make && \
