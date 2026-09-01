@@ -12,7 +12,7 @@
             "friendlyName": "vdoencodeclient_h265",
             "appName": "vdoencodeclient",
             "vendor": "Axis Communications",
-            "vendorId": "1234567890",
+            "vendorId": "12345abcde",
             "runOptions": "--format h265 --frames 25",
             "runMode": "never",
             "version": "1.0.0",

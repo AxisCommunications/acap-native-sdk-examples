@@ -12,7 +12,7 @@
             "friendlyName": "vdoencodeclient_avif",
             "appName": "vdoencodeclient",
             "vendor": "Axis Communications",
-            "vendorId": "1234567890",
+            "vendorId": "12345abcde",
             "runOptions": "--format avif --frames 1",
             "runMode": "never",
             "version": "1.0.0",

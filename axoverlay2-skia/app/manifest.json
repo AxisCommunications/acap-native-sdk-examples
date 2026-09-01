@@ -16,7 +16,7 @@
             "friendlyName": "Axoverlay2 example Skia application",
             "appName": "axoverlay2_skia",
             "vendor": "Axis Communications",
-            "vendorId": "0123456789",
+            "vendorId": "12345abcde",
             "vendorUrl": "https://www.axis.com",
             "runMode": "never",
             "version": "1.0.0",

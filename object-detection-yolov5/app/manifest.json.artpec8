@@ -22,7 +22,7 @@
             "friendlyName": "object_detection_yolov5_artpec8",
             "appName": "object_detection_yolov5",
             "vendor": "Axis Communications",
-            "vendorId": "1234567890",
+            "vendorId": "12345abcde",
             "runOptions": "/usr/local/packages/object_detection_yolov5/model/model.tflite /usr/local/packages/object_detection_yolov5/label/labels.txt  -c axis-a8-dlpu-tflite",
             "vendorUrl": "https://www.axis.com",
             "runMode": "never",
