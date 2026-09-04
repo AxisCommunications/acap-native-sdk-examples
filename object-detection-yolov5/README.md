@@ -250,12 +250,15 @@ Standing in your working directory run the following commands:
 
 > [!NOTE]
 >
+> - You need to
+>   [Set your vendorId in the manifest](../DEV.md#set-your-vendorid-in-the-manifest)
+>   in order to run the examples unsigned with
+>   [Developer Mode](https://developer.axis.com/acap/get-started/set-up-developer-environment/set-up-device-advanced/#developer-mode).
 > - Depending on the network your local build machine is connected to, you may need to add proxy
-> settings for Docker. See
-> [Proxy in build time](https://developer.axis.com/acap/develop/proxy).
->
+>   settings for Docker. See
+>   [Proxy in build time](https://developer.axis.com/acap/develop/proxy/#proxy-in-build-time).
 > - To comply with the [licensing terms of Ultralytics](https://github.com/ultralytics/yolov5?tab=readme-ov-file#license),
-> the YOLOv5 model file integrated into this ACAP application is licensed under AGPL-3.0-only. See [LICENSE](app/LICENSE).
+>   the YOLOv5 model file integrated into this ACAP application is licensed under AGPL-3.0-only. See [LICENSE](app/LICENSE).
 
 ```sh
 docker build --platform=linux/amd64 --tag <APP_IMAGE> --build-arg ARCH=<ARCH> --build-arg CHIP=<CHIP> .

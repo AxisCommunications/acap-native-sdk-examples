@@ -240,9 +240,13 @@ in the [app](app) directory. Standing in the application directory, run:
 
 > [!NOTE]
 >
-> Depending on the network your local build machine is connected to, you may need to add proxy
-> settings for Docker. See
-> [Proxy in build time](https://developer.axis.com/acap/develop/proxy/#proxy-in-build-time).
+> - You need to
+>   [Set your vendorId in the manifest](../DEV.md#set-your-vendorid-in-the-manifest)
+>   in order to run the examples unsigned with
+>   [Developer Mode](https://developer.axis.com/acap/get-started/set-up-developer-environment/set-up-device-advanced/#developer-mode).
+> - Depending on the network your local build machine is connected to, you may need to add proxy
+>   settings for Docker. See
+>   [Proxy in build time](https://developer.axis.com/acap/develop/proxy/#proxy-in-build-time).
 
 ```sh
 docker build --platform=linux/amd64 --tag obj_detect:1.0 .
