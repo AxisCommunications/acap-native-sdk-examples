@@ -76,9 +76,6 @@ The working dir now contains a build folder with the following files:
 │   ├── LICENSE
 │   ├── Makefile
 │   ├── manifest.json
-│   ├── package.conf
-│   ├── package.conf.orig
-│   ├── param.conf
 │   ├── customlib_example*
 │   ├── lib
 │   │   ├── libcustom.so@
@@ -91,9 +88,6 @@ The working dir now contains a build folder with the following files:
 
 ```
 
-- **build/package.conf** - Defines the application and its configuration.
-- **build/package.conf.orig** - Defines the application and its configuration, original file.
-- **build/param.conf** - File containing application parameters.
 - **build/customlib_example*** - Application executable binary file.
 - **build/lib** - Folder containing compiled library files for custom library
 - **build/customlib_example_1_0_0_armv7hf.eap** - Application package .eap file.

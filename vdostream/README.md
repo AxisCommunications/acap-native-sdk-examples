@@ -125,9 +125,6 @@ vdostream
 │   ├── manifest.json.nv12
 │   ├── manifest.json.rgb
 │   ├── manifest.json.y800
-│   ├── package.conf
-│   ├── package.conf.orig
-│   ├── param.conf
 │   ├── vdoencodeclient*
 │   ├── vdoencodeclient_1_0_0_armv7hf.eap
 │   ├── vdoencodeclient_1_0_0_LICENSE.txt
@@ -137,9 +134,6 @@ vdostream
 ```
 
 - **build/manifest.json** - Defines the application and its configuration.
-- **build/package.conf** - Defines the application and its configuration.
-- **build/package.conf.orig** - Defines the application and its configuration, original file.
-- **build/param.conf** - File containing application parameters.
 - **build/vdoencodeclient*** - Application executable binary file.
 - **build/vdoencodeclient_1_0_0_armv7hf.eap** - Application package .eap file.
 - **build/vdoencodeclient_1_0_0_LICENSE.txt** - Copy of LICENSE file.

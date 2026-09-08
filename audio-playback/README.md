@@ -83,9 +83,6 @@ audio-playback
 │   ├── LICENSE
 │   ├── Makefile
 │   ├── manifest.json
-│   ├── package.conf
-│   ├── package.conf.orig
-│   ├── param.conf
 │   ├── audioplayback*
 │   ├── Audio_playback_1_0_0_armv7hf.eap
 │   ├── Audio_playback_1_0_0_LICENSE.txt
@@ -95,9 +92,6 @@ audio-playback
 ```
 
 - **build/manifest.json** - Defines the application and its configuration.
-- **build/package.conf** - Defines the application and its configuration.
-- **build/package.conf.orig** - Defines the application and its configuration, original file.
-- **build/param.conf** - File containing application parameters.
 - **build/audioplayback*** - Application executable binary file.
 - **build/Audio_playback_1_0_0_armv7hf.eap** - Application package .eap file.
 - **build/Audio_playback_1_0_0_LICENSE.txt** - Copy of LICENSE file.

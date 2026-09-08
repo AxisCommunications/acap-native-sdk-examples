@@ -90,9 +90,6 @@ send_event
 │   ├── LICENSE
 │   ├── Makefile
 │   ├── manifest.json
-│   ├── package.conf
-│   ├── package.conf.orig
-│   ├── param.conf
 │   ├── send_event*
 │   ├── send_event_1_0_0_armv7hf.eap
 │   ├── send_event_1_0_0_LICENSE.txt
@@ -102,9 +99,6 @@ send_event
 ```
 
 - **build/manifest.json** - Defines the application and its configuration.
-- **build/package.conf** - Defines the application and its configuration.
-- **build/package.conf.orig** - Defines the application and its configuration, original file.
-- **build/param.conf** - File containing application parameters.
 - **build/send_event*** - Application executable binary file.
 - **build/send_event_1_0_0_armv7hf.eap** - Application package .eap file for "send_event".
 - **build/send_event_1_0_0_LICENSE.txt** - Copy of LICENSE file.

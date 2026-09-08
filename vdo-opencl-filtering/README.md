@@ -84,9 +84,6 @@ vdo-opencl-filtering
 │   ├── LICENSE
 │   ├── Makefile
 │   ├── manifest.json
-│   ├── package.conf
-│   ├── package.conf.orig
-│   ├── param.conf
 │   ├── sobel_nv12.cl
 │   ├── vdo_cl_filter_demo*
 │   ├── vdo_cl_filter_demo_1_0_0_<ARCH>.eap
@@ -97,9 +94,6 @@ vdo-opencl-filtering
 ```
 
 - **build/manifest.json** - Defines the application and its configuration.
-- **build/package.conf** - Defines the application and its configuration.
-- **build/package.conf.orig** - Defines the application and its configuration, original file.
-- **build/param.conf** - File containing application parameters.
 - **build/vdo_cl_filter_demo*** - Application executable binary file.
 - **build/vdo_cl_filter_demo_1_0_0_\<ARCH\>.eap** - Application package .eap file.
 - **build/vdo_cl_filter_demo_1_0_0_LICENSE.txt** - Copy of LICENSE file.

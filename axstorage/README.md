@@ -69,9 +69,6 @@ axstorage
 build
 ├── Makefile
 ├── manifest.json
-├── package.conf
-├── package.conf.orig
-├── param.conf
 ├── axstorage*
 ├── axstorage_1_0_0_armv7hf.eap
 ├── axstorage_1_0_0_LICENSE.txt
@@ -80,9 +77,6 @@ build
 ```
 
 - **manifest.json** - Defines the application and its configuration.
-- **package.conf** - Defines the application and its configuration.
-- **package.conf.orig** - Defines the application and its configuration, original file.
-- **param.conf** - File containing additional application parameters.
 - **axstorage*** - Application executable binary file.
 - **axstorage_1_0_0_armv7hf.eap** - Application package .eap file.
 - **axstorage_1_0_0_LICENSE.txt** - Copy of LICENSE file.

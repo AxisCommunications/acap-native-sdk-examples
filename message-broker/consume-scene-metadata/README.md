@@ -179,8 +179,6 @@ consume-scene-metadata
 │   ├── LICENSE
 │   ├── Makefile
 │   ├── manifest.json
-│   ├── package.conf
-│   ├── param.conf
 │   ├── consume_scene_metadata*
 │   ├── consume_scene_metadata_1_0_0_armv7hf.eap
 │   ├── consume_scene_metadata_1_0_0_LICENSE.txt
@@ -190,8 +188,6 @@ consume-scene-metadata
 ```
 
 - **build/manifest.json** - Defines the application and its configuration.
-- **build/package.conf** - Defines the application and its configuration.
-- **build/param.conf** - File containing application parameters.
 - **build/consume_scene_metadata*** - Application executable binary file.
 - **build/consume_scene_metadata_1_0_0_armv7hf.eap** - Application package .eap file.
 - **build/consume_scene_metadata_1_0_0_LICENSE.txt** - Copy of LICENSE file.

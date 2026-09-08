@@ -32,5 +32,5 @@ $(PROG1): $(OBJS1)
 	cp $(DEBUG_DIR)/$@ .
 	$(STRIP) $@
 
-clean: 
-	rm -rf $(PROGS) *.o *.eap* *_LICENSE.txt package.conf* param.conf tmp* $(DEBUG_DIR)
+clean:
+	rm -rf $(PROGS) *.o *.eap* *_LICENSE.txt tmp* $(DEBUG_DIR)

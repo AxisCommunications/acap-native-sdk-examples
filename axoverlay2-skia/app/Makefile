@@ -46,4 +46,4 @@ $(prog): $(sources) $(SKIA_LIB)
 
 .PHONY: clean
 clean:
-	rm -rf $(prog) build_skia *.eap *_LICENSE.txt package.conf* param.conf tmp* debug *.d
+	rm -rf $(prog) build_skia *.eap *_LICENSE.txt tmp* debug *.d
