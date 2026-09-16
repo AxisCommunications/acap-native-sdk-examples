@@ -33,14 +33,7 @@ WORKDIR ${BUILD_DIR}/skia
 
 # Clone Skia, fetch its third-party dependencies, configure with GN and build
 # with Ninja in a single layer.
-#
-# git-sync-deps fetches Skia's third-party dependencies. On a slow or
-# unreliable network this step may fail. git-sync-deps starts one thread per
-# dependency with no concurrency limit, which can overload the connection or
-# trigger server-side rate limiting (HTTP 429). If that happens, serialize the
-# fetches by joining each worker thread right after starting it, for example
-# by prepending:
-#   sed -i 's/^\( *\)thread.start()/\1thread.start()\n\1thread.join()/' tools/git-sync-deps
+
 # git-sync-deps is idempotent and skips already fetched dependencies, so
 # simply re-running it also lets a partial download converge.
 #
@@ -52,8 +45,14 @@ WORKDIR ${BUILD_DIR}/skia
 #   target_cpu:         Prevent GN from guessing the target CPU and injecting
 #                       the wrong -march option.
 #   is_component_build: Produce a static Skia library.
+#
+# If download takes too much time for this example, please remove the line below which
+# serialize the download:
+# sed -i 's/^\( *\)thread.start()/\1thread.start()\n\1thread.join()/' tools/git-sync-deps
+#
 RUN git clone https://skia.googlesource.com/skia.git . \
         --branch ${SKIA_VERSION} --depth 1 && \
+    sed -i 's/^\( *\)thread.start()/\1thread.start()\n\1thread.join()/' tools/git-sync-deps && \
     GIT_SYNC_DEPS_SKIP_EMSDK=1 python3 tools/git-sync-deps && \
     . /opt/axis/acapsdk/environment-setup* && \
     gn gen --root=. --args=" \
@@ -93,7 +92,7 @@ RUN git clone https://skia.googlesource.com/skia.git . \
         skia_use_xps=false \
         skia_use_zlib=false \
         " build_skia && \
-    ninja -C build_skia
+        ninja -C build_skia
 
 #-------------------------------------------------------------------------------
 # Build the ACAP application
