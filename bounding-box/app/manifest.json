@@ -1,12 +1,6 @@
 {
     "schemaVersion": "2.2.0",
     "resources": {
-        "dbus": {
-            "requiredMethods": [
-                "com.axis.Graphics2.*",
-                "com.axis.Overlay2.*"
-            ]
-        },
         "linux": {
             "user": {
                 "groups": ["video"]
