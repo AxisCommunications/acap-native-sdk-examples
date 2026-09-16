@@ -210,7 +210,6 @@ http://<AXIS_DEVICE_IP>/index.html#apps
 ```
 
 - Click on the tab `Apps` in the device GUI
-- Enable `Allow unsigned apps` toggle
 - Click `(+ Add app)` button to upload the application file
 - Browse to the newly built ACAP application, and select it
 - Click `Install`

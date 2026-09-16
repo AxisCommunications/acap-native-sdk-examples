@@ -154,9 +154,7 @@ chosen, one of these files should be found:
 
 ### Install the ACAP application to device
 
-To install the ACAP application on your device, make sure to enable the
-`Allow unsigned apps` toggle through the web interface and run the following
-command from the same terminal:
+To install the ACAP application on your device, run the following command from the same terminal:
 
 ```sh
 eap-install.sh <AXIS_DEVICE_IP> <ADMIN_ACCOUNT> <PASSWORD> install

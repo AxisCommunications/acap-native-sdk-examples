@@ -125,15 +125,14 @@ http://<AXIS_DEVICE_IP>/index.html#apps
 ```
 
 1. Click **Apps**.
-2. Enable **Allow unsigned apps**.
-3. Click **(+ Add app)** and upload the package.
-4. Select one package:
+2. Click **(+ Add app)** and upload the package.
+3. Select one package:
 
    - `recording_playback_1_0_0_aarch64.eap`
    - `recording_playback_1_0_0_armv7hf.eap`
 
-5. Click **Install**.
-6. Start the application.
+4. Click **Install**.
+5. Start the application.
 
 ### Expected output
 

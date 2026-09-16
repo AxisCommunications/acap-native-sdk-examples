@@ -64,7 +64,7 @@ building-opencv
     > For detailed information on how to build, install, and run ACAP applications, refer to the official ACAP documentation: [Build, install, and run](https://developer.axis.com/acap/develop/build-install-run/).
 
 2. You should now have a `build` directory. In it is the `.eap` file that is
-   your application.  Enable the `Allow unsigned apps` toggle and upload the
+   your application.  Upload the
    application to your camera.
 3. Start the application. In the `App log`, a printout from the application
    should be seen. The same log with continuous scroll can be seen by SSHing to

@@ -83,15 +83,14 @@ http://<AXIS_DEVICE_IP>/index.html#apps
 ```
 
 1. Click on the tab **Apps** in the device GUI
-2. Enable the **Allow unsigned apps** toggle
-3. Click the **(+ Add app)** button to upload the application file
-4. Select the newly built application package, depending on architecture:
+2. Click the **(+ Add app)** button to upload the application file
+3. Select the newly built application package, depending on architecture:
 
    - `Axoverlay2_example_application_1_0_0_aarch64.eap`
    - `Axoverlay2_example_application_1_0_0_armv7hf.eap`
 
-5. Click **Install**
-6. Run the application by enabling the **Start** switch.
+4. Click **Install**
+5. Run the application by enabling the **Start** switch.
 
 ## Expected output
 
