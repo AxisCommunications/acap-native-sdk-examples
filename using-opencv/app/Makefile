@@ -1,5 +1,5 @@
 PROGS = $(shell jq -r '.acapPackageConf.setup.appName' manifest.json)
-OBJECTS = $(wildcard *.cpp)
+OBJECTS = $(patsubst %.cpp,%.o,$(wildcard *.cpp))
 DEBUG_DIR = debug
 
 PKGS = gio-2.0 gio-unix-2.0 vdostream
