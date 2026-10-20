@@ -377,13 +377,13 @@ static void create_overlay(unsigned stream_id, unsigned stream_width, unsigned s
     /* Create and store a record of this overlay in the overlay table */
     struct overlay* overlay = g_malloc(sizeof(*overlay));
     *overlay                = (struct overlay){
-                       .overlay_id  = overlay_id,
-                       .stream_id   = stream_id,
-                       .used_width  = overlay_used_width,
-                       .used_height = overlay_used_height,
-                       .full_width  = overlay_full_width,
-                       .full_height = overlay_full_height,
-                       .surface     = surface,
+        .overlay_id  = overlay_id,
+        .stream_id   = stream_id,
+        .used_width  = overlay_used_width,
+        .used_height = overlay_used_height,
+        .full_width  = overlay_full_width,
+        .full_height = overlay_full_height,
+        .surface     = surface,
     };
 
     g_hash_table_insert(overlay_table, GINT_TO_POINTER(stream_id), overlay);
