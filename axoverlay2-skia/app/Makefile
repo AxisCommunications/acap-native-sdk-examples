@@ -36,6 +36,7 @@ dep_ldlibs := $(shell pkg-config --libs-only-l $(deps))
 
 -include $(depfiles)
 
+.PHONY: all
 all: $(prog)
 
 $(prog): $(sources) $(SKIA_LIB)

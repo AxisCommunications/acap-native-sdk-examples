@@ -21,6 +21,7 @@ CFLAGS += -Wall \
 CFLAGS += $(shell PKG_CONFIG_PATH=$(PKG_CONFIG_PATH) pkg-config --cflags $(PKGS))
 LDLIBS += $(shell PKG_CONFIG_PATH=$(PKG_CONFIG_PATH) pkg-config --libs $(PKGS))
 
+.PHONY: all
 all: $(PROGS)
 
 $(PROG1): $(OBJS1)
@@ -29,5 +30,6 @@ $(PROG1): $(OBJS1)
 	cp $(DEBUG_DIR)/$@ .
 	$(STRIP) $@
 
+.PHONY: clean
 clean:
 	rm -rf $(PROGS) *.o *.eap* *_LICENSE.txt tmp* $(DEBUG_DIR)

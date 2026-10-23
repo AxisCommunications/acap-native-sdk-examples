@@ -21,6 +21,7 @@ CFLAGS += -Wall \
           -W \
           -Werror
 
+.PHONY: all
 all: $(PROGS)
 
 $(PROG1): $(OBJS1)
@@ -29,5 +30,6 @@ $(PROG1): $(OBJS1)
 	cp $(DEBUG_DIR)/$@ .
 	$(STRIP) $@
 
+.PHONY: clean
 clean:
 	rm -rf $(PROGS) *.o *.eap* *_LICENSE.txt tmp* manifest.json $(DEBUG_DIR)
