@@ -13,7 +13,7 @@
             "appName": "vdo_larod",
             "vendor": "Axis Communications",
             "vendorId": "12345abcde",
-            "runOptions": "cpu-tflite /usr/local/packages/vdo_larod/model/model.tflite scale",
+            "runOptions": "cpu-tflite model/model.tflite scale",
             "vendorUrl": "https://www.axis.com",
             "runMode": "never",
             "version": "1.0.0",

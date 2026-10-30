@@ -17,7 +17,7 @@
             "appName": "object_detection",
             "vendor": "Axis Communications",
             "vendorId": "12345abcde",
-            "runOptions": "/usr/local/packages/object_detection/model/converted_model.tflite 50 /usr/local/packages/object_detection/label/labels.txt -d axis-a8-dlpu-tflite",
+            "runOptions": "model/converted_model.tflite 50 label/labels.txt -d axis-a8-dlpu-tflite",
             "vendorUrl": "https://www.axis.com",
             "runMode": "never",
             "version": "1.0.0",

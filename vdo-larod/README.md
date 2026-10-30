@@ -287,7 +287,7 @@ In previous larod versions, the chip was referred to as a number instead of a st
 ----- Contents of SYSTEM_LOG for 'vdo_larod' -----
 
 vdo_larod[141742]: Starting /usr/local/packages/vdo_larod/vdo_larod
-vdo_larod[141742]: Setting up larod connection with chip axis-a8-dlpu-tflite and model file /usr/local/packages/vdo_larod/model/model.tflite
+vdo_larod[141742]: Setting up larod connection with chip axis-a8-dlpu-tflite and model file model/model.tflite
 vdo_larod[141742]: Loading the model... This might take up to 5 minutes depending on your device model.
 vdo_larod[141742]: Model loaded successfully
 vdo_larod[141742]: Detected model format RGB and input resolution 256x256
@@ -326,7 +326,7 @@ vdo_larod[141742]: Exit /usr/local/packages/vdo_larod/vdo_larod
 
 
 vdo_larod[3991067]: Starting /usr/local/packages/vdo_larod/vdo_larod
-vdo_larod[3991067]: Setting up larod connection with chip a9-dlpu-tflite and model file /usr/local/packages/vdo_larod/model/model.tflite
+vdo_larod[3991067]: Setting up larod connection with chip a9-dlpu-tflite and model file model/model.tflite
 vdo_larod[3991067]: Loading the model... This might take up to 5 minutes depending on your device model.
 vdo_larod[3991067]: Model loaded successfully
 vdo_larod[3991067]: Detected model format RGB and input resolution 256x256
@@ -363,7 +363,7 @@ vdo_larod[3991067]: Exit /usr/local/packages/vdo_larod/vdo_larod
 ----- Contents of SYSTEM_LOG for 'vdo_larod' -----
 
 vdo_larod[145071]: Starting /usr/local/packages/vdo_larod/vdo_larod
-vdo_larod[145071]: Setting up larod connection with chip cpu-tflite and model file /usr/local/packages/vdo_larod/model/model.tflite
+vdo_larod[145071]: Setting up larod connection with chip cpu-tflite and model file model/model.tflite
 vdo_larod[3991067]: Loading the model... This might take up to 5 minutes depending on your device model.
 vdo_larod[3991067]: Model loaded successfully
 vdo_larod[3991067]: Detected model format RGB and input resolution 256x256
@@ -402,7 +402,7 @@ vdo_larod[145071]: Exit /usr/local/packages/vdo_larod/vdo_larod
 
 
 vdo_larod[584171]: Starting /usr/local/packages/vdo_larod/vdo_larod
-vdo_larod[584171]: Setting up larod connection with chip ambarella-cvflow and model file /usr/local/packages/vdo_larod/model/model.bin
+vdo_larod[584171]: Setting up larod connection with chip ambarella-cvflow and model file model/model.bin
 vdo_larod[584171]: Loading the model... This might take up to 5 minutes depending on your device model.
 vdo_larod[584171]: Model loaded successfully
 vdo_larod[584171]: Detected model format PLANAR RGB and input resolution 256x256

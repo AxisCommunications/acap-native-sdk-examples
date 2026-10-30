@@ -45,9 +45,8 @@ const struct argp argp = {opts,
                           "THRESHOLD ranging from 0 to 100 is the "
                           "min score required to show the detected objects."
                           "LABELSFILE is the path of a txt where labes names are saved."
-                          "\n\nExample call: "
-                          "\n/usr/local/packages/object_detection/model/model.tflite"
-                          "80 /usr/local/packages/object_detection/label/labels.txt ",
+                          "\n\n"
+                          "Example call: model/model.tflite 80 label/labels.txt",
                           NULL,
                           NULL,
                           NULL};
