@@ -21,9 +21,9 @@
 #pragma once
 
 typedef struct args_t {
-    char* model_file;
-    char* labels_file;
-    char* device_name;
+    const char* model_file;
+    const char* labels_file;
+    const char* device_name;
 } args_t;
 
 void parse_args(int argc, char** argv, args_t* args);

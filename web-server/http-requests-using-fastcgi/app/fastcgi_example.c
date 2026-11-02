@@ -34,7 +34,7 @@ static int fcgi_run(void) {
     int count = 0;  // counter of requests
     int sock;
     FCGX_Request request;
-    char* socket_path = NULL;
+    const char* socket_path = NULL;
     int status;
 
     socket_path = getenv(FCGI_SOCKET_NAME);

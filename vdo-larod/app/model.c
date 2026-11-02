@@ -224,8 +224,9 @@ static void setup_tensors(larodConnection* conn,
     }
 }
 
-static larodModel*
-create_inference_model(model_provider_t* provider, char* model_file, char* device_name) {
+static larodModel* create_inference_model(model_provider_t* provider,
+                                          const char* model_file,
+                                          const char* device_name) {
     larodError* error = NULL;
 
     // Create larod models
@@ -356,7 +357,7 @@ void model_provider_destroy(model_provider_t* provider) {
 }
 
 model_provider_t*
-model_provider_new(char* model_file, char* device_name, size_t* num_output_tensors) {
+model_provider_new(const char* model_file, const char* device_name, size_t* num_output_tensors) {
     model_provider_t* provider = calloc(1, sizeof(model_provider_t));
     if (!provider) {
         panic("%s: Unable to allocate model_provider_t: %s", __func__, strerror(errno));

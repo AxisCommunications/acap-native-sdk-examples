@@ -68,8 +68,8 @@ img_info_t model_provider_get_model_metadata(model_provider_t* provider);
 
 bool model_provider_update_image_metadata(model_provider_t* provider, VdoMap* image_map);
 
-model_provider_t* model_provider_new(char* model_file,
-                                     char* device_name,
+model_provider_t* model_provider_new(const char* model_file,
+                                     const char* device_name,
                                      const char* labels_file,
                                      size_t* num_output_tensors);
 

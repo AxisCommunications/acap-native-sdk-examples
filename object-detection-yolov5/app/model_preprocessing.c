@@ -20,8 +20,8 @@
 
 static larodModel* create_preprocessing_model(model_provider_t* provider, img_info_t* img_info) {
     larodError* error = NULL;
-    char* input_format_str;
-    char* output_format_str;
+    const char* input_format_str;
+    const char* output_format_str;
 
     switch (img_info->format) {
         case VDO_FORMAT_YUV:

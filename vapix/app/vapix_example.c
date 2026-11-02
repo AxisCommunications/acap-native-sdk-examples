@@ -13,9 +13,9 @@ panic(const char* format, ...) {
 }
 
 static char* parse_credentials(GVariant* result) {
-    char* credentials_string = NULL;
-    char* id                 = NULL;
-    char* password           = NULL;
+    const char* credentials_string = NULL;
+    char* id                       = NULL;
+    char* password                 = NULL;
 
     g_variant_get(result, "(&s)", &credentials_string);
     if (sscanf(credentials_string, "%m[^:]:%ms", &id, &password) != 2)
