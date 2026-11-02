@@ -1,7 +1,7 @@
-PROG1	= $(shell jq -r '.acapPackageConf.setup.appName' manifest.json)
-OBJS1	= $(PROG1).o
+PROG1 = $(shell jq -r '.acapPackageConf.setup.appName' manifest.json)
+OBJS1 = $(PROG1).o
 
-PROGS	= $(PROG1)
+PROGS = $(PROG1)
 DEBUG_DIR = debug
 
 PKGS      = glib-2.0
@@ -24,7 +24,7 @@ CFLAGS += -Wall \
 LDLIBS   += -Wl,-Bstatic,-llicensekey_stat,-Bdynamic,-llicensekey -ldl
 
 .PHONY: all
-all:	 $(PROGS)
+all: $(PROGS)
 
 $(PROG1): $(OBJS1)
 	install -d $(DEBUG_DIR)

@@ -22,7 +22,7 @@ CFLAGS += -Wall \
           -Werror
 
 .PHONY: all
-all:	$(PROGS)
+all: $(PROGS)
 
 $(PROG1): $(OBJS1)
 	install -d $(DEBUG_DIR)

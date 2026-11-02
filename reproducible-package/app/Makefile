@@ -1,8 +1,8 @@
-PROG1	= $(shell jq -r '.acapPackageConf.setup.appName' manifest.json)
-OBJS1	= $(PROG1).o
+PROG1 = $(shell jq -r '.acapPackageConf.setup.appName' manifest.json)
+OBJS1 = $(PROG1).o
 DEBUG_DIR = debug
 
-PROGS	= $(PROG1)
+PROGS = $(PROG1)
 
 CFLAGS += -Wall \
           -Wextra \
@@ -22,14 +22,14 @@ DATE_FMT = +%Y-%m-%d
 ifdef SOURCE_DATE_EPOCH
     BUILD_DATE ?= $(shell \
         date -u -d "@$(SOURCE_DATE_EPOCH)" "$(DATE_FMT)" 2>/dev/null || \
-				date -u -r "$(SOURCE_DATE_EPOCH)" "$(DATE_FMT)" 2>/dev/null || \
-				date -u "$(DATE_FMT)")
+        date -u -r "$(SOURCE_DATE_EPOCH)" "$(DATE_FMT)" 2>/dev/null || \
+        date -u "$(DATE_FMT)")
 else
     BUILD_DATE ?= $(shell date "$(DATE_FMT)")
 endif
 
 .PHONY: all
-all:	$(PROGS)
+all: $(PROGS)
 
 $(PROG1): $(OBJS1)
 	# Additional prints for visibility

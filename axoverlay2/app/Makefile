@@ -1,4 +1,4 @@
-PROG1	= $(shell jq -r '.acapPackageConf.setup.appName' manifest.json)
+PROG1 = $(shell jq -r '.acapPackageConf.setup.appName' manifest.json)
 
 PKGS = gio-2.0 glib-2.0 cairo vdostream axoverlay2
 CFLAGS += $(shell pkg-config --cflags $(PKGS))
