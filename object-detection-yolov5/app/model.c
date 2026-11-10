@@ -344,13 +344,13 @@ void model_provider_destroy(model_provider_t* provider) {
     if (provider->model_output_tensors) {
         free(provider->model_output_tensors);
     }
-    for (size_t i = 0; i < provider->img_info->nbr_buffers; i++) {
-        larodDestroyTensors(provider->conn, &provider->img_input_tensors[i], 1, &error);
-        if (provider->img_duped_fds[i] >= 0) {
-            close(provider->img_duped_fds[i]);
-        }
-    }
     if (provider->img_info) {
+        for (size_t i = 0; i < provider->img_info->nbr_buffers; i++) {
+            larodDestroyTensors(provider->conn, &provider->img_input_tensors[i], 1, &error);
+            if (provider->img_duped_fds[i] >= 0) {
+                close(provider->img_duped_fds[i]);
+            }
+        }
         free(provider->img_info);
     }
 
