@@ -25,8 +25,6 @@ to run the application on an Axis device.
   - This example consists of two applications that communicate with each other.
 - [Consume Scene Metadata](./consume-scene-metadata/README.md)
   - This example subscribes to an object track topic and prints the scene metadata.
-- [Memory and CPU Utilization](./memory-cpu-utilization/README.md)
-  - This example subscribes to two topics and prints the memory and CPU utilization.
 
 ## Device Data Hub API documentation
 
