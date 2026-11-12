@@ -60,15 +60,3 @@ jobs:
           docker cp $(docker create $imagetag):/opt/app ./build
           cd ../..
           docker image rm -f $imagetag
-
-      - name: Build ${{ env.example }} application
-        env:
-          example: memory-cpu-utilization
-          imagetag: ${{ env.EXREPO }}_memory-cpu-utilization:${{ matrix.arch }}
-        run: |
-          docker image rm -f $imagetag
-          cd $EXNAME/$example
-          docker build --no-cache --tag $imagetag --build-arg ARCH=${{ matrix.arch }} .
-          docker cp $(docker create $imagetag):/opt/app ./build
-          cd ../..
-          docker image rm -f $imagetag
