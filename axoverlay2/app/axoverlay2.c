@@ -542,6 +542,6 @@ static void render_frame(struct overlay* overlay, char* target_buffer) {
     /* Finish and copy the resulting image to the overlay target buffer */
     cairo_destroy(cr);
 
-    unsigned byte_size = overlay->full_width * overlay->full_height * sizeof(uint32_t);
+    size_t byte_size = (size_t)overlay->full_width * overlay->full_height * sizeof(uint32_t);
     memcpy(target_buffer, cairo_image_surface_get_data(overlay->surface), byte_size);
 }
