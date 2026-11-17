@@ -140,7 +140,7 @@ or complement each other in functionality.
   - An example in C that illustrates how to check the licensekey status.
 - [device-data-hub](./device-data-hub/)
   - Examples that showcase how to use the
-    Device Data Hub API (https://developer.axis.com/acap/api/#device-data-hub-api).
+    [Device Data Hub API](https://developer.axis.com/acap/api/#device-data-hub-api).
 - [ptz-control-ws-api](./ptz-control-ws-api/)
   - An example demonstrating PTZ (Pan-Tilt-Zoom) control using the
     [PTZ Control WS API](https://developer.axis.com/acap/reference/supported-apis/ptz-control-ws-api).
