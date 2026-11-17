@@ -10,7 +10,7 @@ such as cameras, speakers and intercoms.
 
 The ACAP Native SDK is targeted towards users
 that want to develop plug-in style, event generating applications
-that fit well into a VMS centric system.
+that fit well into a VMS-centric system.
 This SDK offers high performance by integrating closely with AXIS OS and hardware.
 Already existing ACAP users should feel at home using this SDK
 and migrating from previous version ACAP 3 to this SDK should be straightforward.
@@ -24,10 +24,10 @@ Please check the following guidelines for ACAP application development:
 ## Getting started with the repository
 
 This repository contains a set of application examples
-which aims to enrich the developers analytics experience.
+which aims to enrich the developer's analytics experience.
 All examples are using Docker framework
-and has a README file in its directory which shows overview, example directory structure
-and step-by-step instructions on how to run applications on the camera.
+and each has a README file in its directory which shows overview, example directory structure
+and step-by-step instructions on how to run the application on the camera.
 
 ## Example applications
 
@@ -76,7 +76,7 @@ or complement each other in functionality.
 - [using-opencv](./using-opencv/)
   - An example that shows how to build, bundle and use OpenCV in an application.
 - [utility-libraries](./utility-libraries/)
-  - These examples covers how to build, bundle and use external libraries.
+  - These examples cover how to build, bundle and use external libraries.
 
 ### Graphical components
 
@@ -85,7 +85,7 @@ or complement each other in functionality.
     [Overlay API](https://developer.axis.com/acap/api#overlay2-API).
 - [axoverlay2-skia](./axoverlay2-skia/)
   - An example in C++ that illustrates how to draw overlays with GPU acceleration
-    using the the Skia graphics toolkit.
+    using the Skia graphics toolkit.
 - [axoverlay](./axoverlay/)
   - An example in C that illustrates how to draw plain boxes and text as overlays in a stream
     using the [Axoverlay API (Legacy)](https://developer.axis.com/acap/api#axoverlay-api-legacy).
@@ -100,7 +100,7 @@ or complement each other in functionality.
 ### Networking and web interface
 
 - [curl-openssl](./curl-openssl/)
-  - An example that use cURL and OpenSSL libraries
+  - An example that uses cURL and OpenSSL libraries
     to retrieve a file securely from an external server.
 
 - Web server examples:
@@ -109,7 +109,7 @@ or complement each other in functionality.
       by setting up the Axis device web server in a reverse proxy configuration
       and routing to a custom web server running in the ACAP application.
   - [http-requests-using-fastcgi](./web-server/http-requests-using-fastcgi/)
-    - An example in C and explains how to build an ACAP application
+    - An example in C that explains how to build an ACAP application
       that can handle HTTP requests sent to the Axis device,
       using the device's own web server.
 
@@ -162,7 +162,7 @@ or complement each other in functionality.
 The ACAP Native SDK image can be used as a basis for custom built images to run your application
 or as a developer environment inside the container.
 
-- [ACAP Native SDK](https://hub.docker.com/r/axisecp/acap-native-sdk)
+- [ACAP Native SDK](https://hub.docker.com/r/axisecp/acap-native-sdk):
   This image is based on Ubuntu
   and contains the environment needed for building an
   AXIS Camera Application Platform (ACAP) Native application.
