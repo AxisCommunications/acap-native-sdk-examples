@@ -34,8 +34,14 @@ void parse_labels(char*** labels_ptr,
     char* labels_data         = NULL;  // Buffer containing the label file contents.
     char** label_array        = NULL;  // Pointers to each line in the labels text.
 
+    int labels_fd = open(labels_path, O_RDONLY);
+    if (labels_fd < 0) {
+        panic("%s: Could not open labels file %s: %s", __func__, labels_path, strerror(errno));
+    }
+
+    // Use fstat on the opened descriptor to avoid a check/use race on the path.
     struct stat file_stats = {0};
-    if (stat(labels_path, &file_stats) < 0) {
+    if (fstat(labels_fd, &file_stats) < 0) {
         panic("%s: Unable to get stats for label file %s: %s",
               __func__,
               labels_path,
@@ -49,11 +55,6 @@ void parse_labels(char*** labels_ptr,
     // able to represent 10 megabytes on both 32-bit and 64-bit systems.
     if (file_stats.st_size > (10 * 1024 * 1024)) {
         panic("%s: failed sanity check on labels file size", __func__);
-    }
-
-    int labels_fd = open(labels_path, O_RDONLY);
-    if (labels_fd < 0) {
-        panic("%s: Could not open labels file %s: %s", __func__, labels_path, strerror(errno));
     }
 
     size_t labels_file_size = (size_t)file_stats.st_size;
