@@ -1,5 +1,5 @@
 {
-    "schemaVersion": "2.2.0",
+    "schemaVersion": "2.3.0",
     "resources": {
         "overlay": {
             "enabled": true,
