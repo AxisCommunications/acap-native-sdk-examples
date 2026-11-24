@@ -111,11 +111,6 @@ The examples are organized into logical groups to help you find the most relevan
 - [remote-debug-example](./remote-debug-example/)
   - An example of how to remote debug an ACAP application.
 
-### Container applications
-
-- [container-example](./container-example/)
-  - An example that demonstrates the use of containers in a native ACAP application.
-
 ### Miscellaneous
 
 - [axserialport](./axserialport/)
