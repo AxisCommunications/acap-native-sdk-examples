@@ -100,9 +100,13 @@ Standing in your working directory run the following commands:
 
 > [!NOTE]
 >
-> Depending on the network your local build machine is connected to, you may need to add proxy
-> settings for Docker. See
-> [Proxy in build time](https://developer.axis.com/acap/develop/proxy/#proxy-in-build-time).
+> - You need to
+>   [Set your vendorId in the manifest](../DEV.md#set-your-vendorid-in-the-manifest)
+>   in order to run the examples unsigned with
+>   [Developer Mode](https://developer.axis.com/acap/get-started/set-up-developer-environment/set-up-device-advanced/#developer-mode).
+> - Depending on the network your local build machine is connected to, you may need to add proxy
+>   settings for Docker. See
+>   [Proxy in build time](https://developer.axis.com/acap/develop/proxy/#proxy-in-build-time).
 
 Pull the [Alpine Linux container image][alpine] and save it to a .tar file.
 

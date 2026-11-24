@@ -9,6 +9,7 @@ development.
 
 - [Access the device](#access-the-device)
 - [Developer Mode](#developer-mode)
+  - [Set your vendor ID in the manifest](#set-your-vendorid-in-the-manifest)
 - [Logs and reports](#logs-and-reports)
   - [Access the system log](#access-the-system-log)
   - [Access the application log](#access-the-application-log)
@@ -24,17 +25,27 @@ SSH][access-device-through-ssh].
 
 ## Developer Mode
 
-Developer Mode is a feature introduced in AXIS OS 11.11 that grants SSH access
-to an ACAP application's dynamic user on an Axis device. When Developer Mode is
-enabled, the ACAP application's dynamic user is added to the `ssh` group.
+Starting with AXIS OS 13.0, all ACAP applications must be signed to be installed
+on an Axis device. During development, this requirement can be bypassed by
+enabling Developer Mode, which also provides SSH access for the application's
+respective user.
 
-To enable Developer Mode on Axis devices running AXIS OS 11.11 or later, install
-the `axis-unlock-acap-devmode` Custom Firmware Certificate (CFC) on the Axis
-device.
+For detailed instructions on how to request, enable, and disable Developer Mode,
+refer to the [Developer Mode][developer-mode] section in the ACAP documentation.
 
-For detailed instructions on how to obtain and install the CFC, as well as how to
-verify and disable Developer Mode, please refer to the [Developer Mode][developer-mode]
-section in the ACAP documentation.
+### Set your vendorId in the manifest
+
+To run an example from this repository as an unsigned ACAP application using the Developer Mode setup,
+you need to set the `vendorId` field in the example's `manifest.json` file.
+Replace the `vendorId` with the **case-sensitive** value shown on the Developer Mode ACAP application page provided by the ACAP Service Portal.
+See [Get vendorId to use][get-vendorid] for more information.
+
+Update the manifest file in all examples by standing in the root of this
+repository and running:
+
+```sh
+find . -type f -name "*manifest*" -exec sed -i -e 's/12345abcde/<VENDOR_ID>/g' {} \;
+```
 
 ## Logs and reports
 
@@ -89,7 +100,8 @@ specifically in the [Proxy in build time][proxy-in-build-time] and
 <!-- Links to external references -->
 <!-- markdownlint-disable MD034 -->
 [access-device-through-ssh]: https://developer.axis.com/acap/get-started/set-up-developer-environment/set-up-device-advanced/#access-the-device-through-ssh
-[developer-mode]: https://developer.axis.com/acap/get-started/set-up-developer-environment/set-up-device-advanced/#disable-developer-mode
+[developer-mode]: https://developer.axis.com/acap/get-started/set-up-developer-environment/set-up-device-advanced/#developer-mode
+[get-vendorid]: https://developer.axis.com/acap/get-started/set-up-developer-environment/set-up-device-advanced/#step-2-get-vendorid-to-use
 [server-report-cgi]: https://www.axis.com/vapix-library/subjects/t10175981/section/t10036044/display?section=t10036044-t10003915
 [system-log-cgi]: https://www.axis.com/vapix-library/subjects/t10175981/section/t10036044/display?section=t10036044-t10003913
 [proxy]: https://developer.axis.com/acap/develop/proxy

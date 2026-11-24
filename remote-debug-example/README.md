@@ -124,6 +124,16 @@ the dev container started in previous section.
 
 To build the ACAP application, run the following command from the same terminal:
 
+> [!NOTE]
+>
+> - You need to
+>   [Set your vendorId in the manifest](../DEV.md#set-your-vendorid-in-the-manifest)
+>   in order to run the examples unsigned with
+>   [Developer Mode](https://developer.axis.com/acap/get-started/set-up-developer-environment/set-up-device-advanced/#developer-mode).
+> - Depending on the network your local build machine is connected to, you may need to add proxy
+>   settings for Docker. See
+>   [Proxy in build time](https://developer.axis.com/acap/develop/proxy/#proxy-in-build-time).
+
    ```sh
    acap-build .
    ```

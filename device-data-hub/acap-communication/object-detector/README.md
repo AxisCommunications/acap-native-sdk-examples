@@ -102,13 +102,13 @@ the topic *acap.object_detector*.
 
 > [!NOTE]
 >
-> For detailed information on how to build, install, and run ACAP applications, refer to the official ACAP documentation: [Build, install, and run](https://developer.axis.com/acap/develop/build-install-run/).
->
-> Depending on the network your local build machine is connected to, you may need to add proxy
-> settings for Docker. See
-> [Proxy in build time](https://developer.axis.com/acap/develop/proxy/#proxy-in-build-time).
-
-Standing in your working directory, run the following commands:
+> - You need to
+>   [Set your vendorId in the manifest](../DEV.md#set-your-vendorid-in-the-manifest)
+>   in order to run the examples unsigned with
+>   [Developer Mode](https://developer.axis.com/acap/get-started/set-up-developer-environment/set-up-device-advanced/#developer-mode).
+> - Depending on the network your local build machine is connected to, you may need to add proxy
+>   settings for Docker. See
+>   [Proxy in build time](https://developer.axis.com/acap/develop/proxy/#proxy-in-build-time).
 
 ```sh
 docker build --platform=linux/amd64 --build-arg ARCH=<ARCH> --tag <APP_IMAGE> .
@@ -129,6 +129,10 @@ chosen, one of the following files should be found:
 
 - `object_detector_1_0_0_aarch64.eap`
 - `object_detector_1_0_0_armv7hf.eap`
+
+> [!NOTE]
+>
+> For detailed information on how to build, install, and run ACAP applications, refer to the official ACAP documentation: [Build, install, and run](https://developer.axis.com/acap/develop/build-install-run/).
 
 ## Install and start the application
 
