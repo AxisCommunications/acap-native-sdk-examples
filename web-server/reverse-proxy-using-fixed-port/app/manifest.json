@@ -1,27 +1,27 @@
 {
-	"schemaVersion": "2.2.0",
-	"acapPackageConf": {
-		"setup": {
-			"appName": "web_server_rev_proxy",
-			"vendor": "Axis Communications",
+    "schemaVersion": "2.2.0",
+    "acapPackageConf": {
+        "setup": {
+            "appName": "web_server_rev_proxy",
+            "vendor": "Axis Communications",
             "vendorId": "12345abcde",
-			"runMode": "never",
-			"version": "1.0.0",
+            "runMode": "never",
+            "version": "1.0.0",
             "compatibleOsVersions": [
                 {
                     "max": "13"
                 }
             ]
-		},
-		"configuration": {
+        },
+        "configuration": {
             "settingPage": "my_web_server",
-			"reverseProxy": [
-				{
-					"apiPath": "my_web_server",
-					"target": "http://localhost:2001/",
-					"access": "admin"
-				}
-			]
-		}
-	}
+            "reverseProxy": [
+                {
+                    "apiPath": "my_web_server",
+                    "target": "http://localhost:2001/",
+                    "access": "admin"
+                }
+            ]
+        }
+    }
 }
