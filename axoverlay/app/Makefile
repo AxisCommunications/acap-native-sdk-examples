@@ -4,10 +4,9 @@ OBJS1	= $(PROG1).o
 PROGS	= $(PROG1)
 DEBUG_DIR = debug
 
-PKGS = gio-2.0 glib-2.0 cairo
+PKGS = gio-2.0 glib-2.0 cairo axoverlay
 CFLAGS += $(shell PKG_CONFIG_PATH=$(PKG_CONFIG_PATH) pkg-config --cflags $(PKGS))
 LDLIBS += $(shell PKG_CONFIG_PATH=$(PKG_CONFIG_PATH) pkg-config --libs $(PKGS))
-LDFLAGS  += -laxoverlay
 
 CFLAGS += -Wall \
           -Wextra \
