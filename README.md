@@ -124,8 +124,6 @@ The examples are organized into logical groups to help you find the most relevan
   - An example in C that shows how to use available storage devices.
 - [licensekey](./licensekey/)
   - An example in C that illustrates how to check the licensekey status.
-- [message-broker](./message-broker/)
-  - Examples that showcase how to use the Message Broker API.
 - [device-data-hub](./device-data-hub/)
   - Examples that showcase how to use the Device Data Hub API (https://developer.axis.com/acap/api/#device-data-hub-api).
 - [ptz-control-ws-api](./ptz-control-ws-api/)
