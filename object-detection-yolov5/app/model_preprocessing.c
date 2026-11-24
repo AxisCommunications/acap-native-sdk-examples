@@ -140,7 +140,7 @@ bool model_preprocessing_setup(model_provider_t* provider, img_info_t* img_info)
         panic("%s: Only output pitches = 4 supported %zu", __func__, output_pitches->len);
     }
     size_t rgb_buffer_size = 0;
-    size_t expected_size   = 3 * provider->img_info->width * provider->img_info->height;
+    size_t expected_size   = 3 * (size_t)provider->img_info->width * provider->img_info->height;
     if (!larodGetTensorByteSize(provider->pp_output_tensors[0], &rgb_buffer_size, &error)) {
         panic("%s: Could not get byte size for pp output tensor: %s", __func__, error->msg);
     }
