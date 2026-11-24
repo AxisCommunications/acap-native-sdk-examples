@@ -5,7 +5,7 @@
             "appName": "remote_debug",
             "vendor": "Axis Communications",
             "version": "1.0.0",
-            "vendorId": "1234567890",
+            "vendorId": "12345abcde",
             "compatibleOsVersions": [
                 {
                     "max": "13"

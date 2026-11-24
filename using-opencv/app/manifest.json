@@ -5,7 +5,7 @@
             "friendlyName": "opencv_example",
             "appName": "opencv_app",
             "vendor": "Axis Communications",
-            "vendorId": "1234567890",
+            "vendorId": "12345abcde",
             "vendorUrl": "https://www.axis.com",
             "runMode": "never",
             "version": "1.0.0",

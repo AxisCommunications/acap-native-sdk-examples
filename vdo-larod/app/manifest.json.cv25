@@ -16,7 +16,7 @@
             "friendlyName": "vdo_larod_cv25",
             "appName": "vdo_larod",
             "vendor": "Axis Communications",
-            "vendorId": "1234567890",
+            "vendorId": "12345abcde",
             "runOptions": "ambarella-cvflow /usr/local/packages/vdo_larod/model/model.bin scale",
             "vendorUrl": "https://www.axis.com",
             "runMode": "never",

@@ -12,7 +12,7 @@
             "friendlyName": "vdo_larod_edgetpu",
             "appName": "vdo_larod",
             "vendor": "Axis Communications",
-            "vendorId": "1234567890",
+            "vendorId": "12345abcde",
             "runOptions": "google-edge-tpu-tflite /usr/local/packages/vdo_larod/model/model.tflite scale",
             "vendorUrl": "https://www.axis.com",
             "runMode": "never",

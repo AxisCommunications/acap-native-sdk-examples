@@ -14,7 +14,7 @@
             "friendlyName": "vdo_cl_filter_demo",
             "appName": "vdo_cl_filter_demo",
             "vendor": "Axis Communications",
-            "vendorId": "1234567890",
+            "vendorId": "12345abcde",
             "runMode": "never",
             "version": "1.0.0",
             "compatibleOsVersions": [

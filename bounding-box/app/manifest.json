@@ -18,7 +18,7 @@
             "friendlyName": "Axis Bounding Box Example",
             "appName": "bounding_box_example",
             "vendor": "Axis Communications",
-            "vendorId": "1234567890",
+            "vendorId": "12345abcde",
             "runMode": "never",
             "version": "1.0.0",
             "compatibleOsVersions": [

@@ -6,7 +6,7 @@
             "appName": "licensekey_handler",
             "appId": "0",
             "vendor": "-",
-            "vendorId": "1234567890",
+            "vendorId": "12345abcde",
             "runMode": "never",
             "version": "1.0.0",
             "compatibleOsVersions": [

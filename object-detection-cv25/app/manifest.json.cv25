@@ -16,7 +16,7 @@
             "friendlyName": "object_detection_cv25",
             "appName": "object_detection",
             "vendor": "Axis Communications",
-            "vendorId": "1234567890",
+            "vendorId": "12345abcde",
             "runOptions": "/usr/local/packages/object_detection/model/model.bin 300 300 20 80 640 360 70 /usr/local/packages/object_detection/label/labels.txt 91 1917 /usr/local/packages/object_detection/model/anchor_boxes.bin -c ambarella-cvflow",
             "vendorUrl": "https://www.axis.com",
             "runMode": "never",
