@@ -3,7 +3,6 @@ OBJS1	= $(PROG1).o
 PROGS	= $(PROG1)
 DEBUG_DIR = debug
 
-LDLIBS += -Llib
 CFLAGS += -Icustom_build
 CFLAGS += -Wall \
           -Wextra \
@@ -20,13 +19,13 @@ CFLAGS += -Wall \
 
 SHLIB_DIR = ./lib
 LDFLAGS = -L$(SHLIB_DIR) -Wl,-rpath,'$$ORIGIN/lib'
-SHLIBS += -lcustom
+LDLIBS += -lcustom
 
 all:	$(PROGS)
 
 $(PROG1): $(OBJS1)
 	install -d $(DEBUG_DIR)
-	$(CC) $(CFLAGS) $(LDFLAGS) $(LDLIBS)  $^ $(LIBS) $(LDLIBS) $(SHLIBS) -o $(DEBUG_DIR)/$@
+	$(CC) $^ $(CFLAGS) $(LIBS) $(LDFLAGS) $(LDLIBS) -o $(DEBUG_DIR)/$@
 	cp $(DEBUG_DIR)/$@ .
 	$(STRIP) $@
 
