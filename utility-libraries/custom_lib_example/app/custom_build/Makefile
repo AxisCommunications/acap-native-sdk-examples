@@ -33,4 +33,4 @@ custom_link:
 	ln -sf libcustom.so.$(MAJORVER) libcustom.so
 
 clean:
-	rm -rf libcustom* $(DEBUG_DIR)
+	rm -rf libcustom* *.o $(DEBUG_DIR)
