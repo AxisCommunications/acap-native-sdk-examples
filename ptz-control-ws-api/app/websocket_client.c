@@ -61,14 +61,14 @@ static char* get_credentials(void) {
     sd_bus_error bus_error = SD_BUS_ERROR_NULL;
     sd_bus_message* reply  = NULL;
     result                 = sd_bus_call_method(bus,
-                                "com.axis.HTTPConf1",
-                                "/com/axis/HTTPConf1/VAPIXServiceAccounts1",
-                                "com.axis.HTTPConf1.VAPIXServiceAccounts1",
-                                "GetCredentials",
-                                &bus_error,
-                                &reply,
-                                "s",
-                                "testuser");
+                                                "com.axis.HTTPConf1",
+                                                "/com/axis/HTTPConf1/VAPIXServiceAccounts1",
+                                                "com.axis.HTTPConf1.VAPIXServiceAccounts1",
+                                                "GetCredentials",
+                                                &bus_error,
+                                                &reply,
+                                                "s",
+                                                "testuser");
     if (result < 0) {
         panic("Failed to call GetCredentials on D-Bus: %s",
               bus_error.message != NULL ? bus_error.message : strerror(-result));
