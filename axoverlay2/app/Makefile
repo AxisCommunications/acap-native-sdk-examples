@@ -17,6 +17,7 @@ CFLAGS += -Wall \
           -W \
           -Werror
 
+.PHONY: all
 all: $(PROG1)
 
 $(PROG1): $(PROG1).o

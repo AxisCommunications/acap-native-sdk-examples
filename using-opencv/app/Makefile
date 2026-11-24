@@ -12,8 +12,7 @@ CXXFLAGS += -I$(SDKTARGETSYSROOT)/usr/include/opencv4
 LDFLAGS = -L./lib -Wl,--no-as-needed,-rpath,'$$ORIGIN/lib'
 LDLIBS += -lm -lopencv_video -lopencv_imgproc -lopencv_core
 
-.PHONY: all clean
-
+.PHONY: all
 all: $(PROGS)
 
 $(PROGS): $(OBJECTS)
@@ -22,5 +21,6 @@ $(PROGS): $(OBJECTS)
 	cp $(DEBUG_DIR)/$@ .
 	$(STRIP) --strip-unneeded $@
 
+.PHONY: clean
 clean:
 	rm -rf $(PROGS) *.o *.eap* *_LICENSE.txt tmp* $(DEBUG_DIR)

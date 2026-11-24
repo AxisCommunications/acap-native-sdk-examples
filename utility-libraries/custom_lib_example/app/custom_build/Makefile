@@ -20,6 +20,7 @@ CFLAGS += -Wall \
 	  -Werror \
 	  -fPIC
 
+.PHONY: all
 all: $(TARGET) custom_link
 
 $(TARGET): $(OBJS)
@@ -28,9 +29,11 @@ $(TARGET): $(OBJS)
 	cp $(DEBUG_DIR)/$@ .
 	$(STRIP) $@
 
+.PHONY: custom_link
 custom_link:
 	ln -sf libcustom.so.$(MAJORVER).$(MINORVER).$(PATCH) libcustom.so.$(MAJORVER)
 	ln -sf libcustom.so.$(MAJORVER) libcustom.so
 
+.PHONY: clean
 clean:
 	rm -rf libcustom* *.o $(DEBUG_DIR)
