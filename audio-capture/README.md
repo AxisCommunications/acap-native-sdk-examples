@@ -109,15 +109,14 @@ http://<AXIS_DEVICE_IP>/index.html#apps
 ```
 
 1. Click on the tab **Apps** in the device GUI
-2. Enable **Allow unsigned apps** toggle
-3. Click **(+ Add app)** button to upload the application file
-4. Select the newly built application package, depending on architecture:
+2. Click **(+ Add app)** button to upload the application file
+3. Select the newly built application package, depending on architecture:
 
    - `Audio_capture_1_0_0_aarch64.eap`
    - `Audio_capture_1_0_0_armv7hf.eap`
 
-5. Click **Install**
-6. Run the application by enabling the **Start** switch
+4. Click **Install**
+5. Run the application by enabling the **Start** switch
 
 #### The expected output
 
