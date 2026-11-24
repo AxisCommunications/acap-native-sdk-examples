@@ -3,7 +3,10 @@
 <!-- omit from toc -->
 # Remote debug an ACAP application
 
-This guide will walk you through the process of debugging an ACAP application running on an Axis device using GDB and Visual Studio Code.
+This guide will walk you through the process of debugging an ACAP application
+running on an Axis device using GDB, either from Visual Studio Code or from a
+plain terminal. Follow the shared steps and choose your method in steps 2
+and 5.
 
 ## Project structure
 
@@ -47,16 +50,21 @@ remote-debug-example
 - [Project structure](#project-structure)
 - [The setup](#the-setup)
 - [Prerequisites](#prerequisites)
-- [Build and start a dev container](#build-and-start-a-dev-container)
-  - [Build dev container](#build-dev-container)
-  - [Start dev container](#start-dev-container)
-- [Build and install ACAP application](#build-and-install-acap-application)
+- [1. Build the container image (both methods)](#1-build-the-container-image-both-methods)
+- [2. Open a container shell (choose your method)](#2-open-a-container-shell-choose-your-method)
+  - [Visual Studio Code: open a dev container](#visual-studio-code-open-a-dev-container)
+  - [Terminal: start a container shell](#terminal-start-a-container-shell)
+- [3. Build and install the application (both methods)](#3-build-and-install-the-application-both-methods)
   - [Build the ACAP application](#build-the-acap-application)
   - [Install the ACAP application to device](#install-the-acap-application-to-device)
-- [Upload and start gdbserver](#upload-and-start-gdbserver)
+- [4. Upload and start gdbserver (both methods)](#4-upload-and-start-gdbserver-both-methods)
   - [Upload gdbserver to device via SCP](#upload-gdbserver-to-device-via-scp)
   - [Start gdbserver on device](#start-gdbserver-on-device)
-- [Start debugging in dev container](#start-debugging-in-dev-container)
+- [5. Connect the debugger (choose your method)](#5-connect-the-debugger-choose-your-method)
+  - [Visual Studio Code: start the graphical debugger](#visual-studio-code-start-the-graphical-debugger)
+  - [Terminal: connect with gdb-multiarch](#terminal-connect-with-gdb-multiarch)
+  - [Terminal: debug session walk-through](#terminal-debug-session-walk-through)
+- [6. Rebuild and restart (both methods)](#6-rebuild-and-restart-both-methods)
 - [Cleanup](#cleanup)
 - [Troubleshooting](#troubleshooting)
 - [License](#license)
@@ -68,27 +76,26 @@ remote-debug-example
 - **Axis device** (also referred to as **device** or **target** in this guide)
   - Will run `gdbserver` and attach to an installed ACAP application to debug.
 - **User machine** (also referred to as **desktop** in this guide)
-  - Use Visual Studio Code to run `gdb-multiarch` and connect to the `gdbserver` on the device.
+  - Runs `gdb-multiarch` in a container built from this example and connects
+    to the `gdbserver` on the device.
   - Needs access to the application binary with debug symbols (not stripped).
-  - Debugging is done in a [dev container](https://code.visualstudio.com/docs/devcontainers/containers)
-    (also referred to as *development container* and the extension is called  *Dev Container*) in Visual Studio Code.
+- **Container** is used either as a
+    [dev container](https://code.visualstudio.com/docs/devcontainers/containers)
+    in Visual Studio Code, or directly from a terminal with `docker run`.
 
 ## Prerequisites
 
-- [Visual Studio Code](https://code.visualstudio.com) installed on desktop.
+- [Docker](https://docs.docker.com/get-docker/) installed on desktop.
 - [Developer Mode](../DEV.md#developer-mode) enabled in the target device.
-- Install Visual Studio Code extensions
-  - [Dev Containers](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers) (ms-vscode-remote.remote-containers)
+- Only when debugging in Visual Studio Code:
+  - [Visual Studio Code](https://code.visualstudio.com) installed on desktop.
+  - The [Dev Containers](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers)
+    extension (ms-vscode-remote.remote-containers).
 
-## Build and start a dev container
-
-A **dev container** can be attached to Visual Studio Code and simplifies
-the debugging process.
-
-### Build dev container
+## 1. Build the container image (both methods)
 
 Open a terminal, move to the example directory and run one or both of the
-following commands to build the dev container for the architecture of
+following commands to build the container image for the architecture of
 your Axis device:
 
 ```sh
@@ -96,11 +103,22 @@ docker build . --platform=linux/amd64 --build-arg ARCH=armv7hf -t dev_container:
 docker build . --platform=linux/amd64 --build-arg ARCH=aarch64 -t dev_container:aarch64
 ```
 
-The dev container includes the `gdbserver` binary for remote debugging.
+The container image includes the `gdbserver` binary for remote debugging.
 
-### Start dev container
+## 2. Open a container shell (choose your method)
 
-1. Start Visual Studio Code and run `Dev Containers: Open Folder in Container...`
+Choose one of the following methods. Both provide a shell in `/opt/app`
+for the shared build, installation and gdbserver steps.
+
+Both methods will use two terminals:
+
+1. **Terminal A** builds and installs the application. In the terminal method,
+   it also runs the `gdb-multiarch` client.
+2. **Terminal B** runs `gdbserver` over SSH from the same container.
+
+### Visual Studio Code: open a dev container
+
+1. In Visual Studio Code, run `Dev Containers: Open Folder in Container...`
    via the Command Palette available by pressing `F1` or `Ctrl+Shift+P`.
 2. Browse to the `app` folder in the repository and choose `Open`.
 3. In the dev container, make sure to install the recommended Visual Studio Code
@@ -112,13 +130,27 @@ The dev container includes the `gdbserver` binary for remote debugging.
    architecture of the dev container when prompted.
 5. If you don't have a terminal open by default in Visual Studio Code, open one
    via the `Terminal → New Terminal` menu.
-6. The terminal will open inside the dev container in the `/opt/app` directory
+6. Terminal A will open inside the dev container in the `/opt/app` directory
    and is now ready for development.
 
-## Build and install ACAP application
+### Terminal: start a container shell
 
-This part shows how to build and install the ACAP application of the example in
-the dev container started in previous section.
+In **terminal A**, from the example directory on the desktop, run one of the
+following commands for your device architecture. The `app` directory is mounted
+so the debug binary ends up on the desktop:
+
+```sh
+docker run --name remote-debug --rm -it -v "$PWD/app":/opt/app -w /opt/app dev_container:aarch64
+
+docker run --name remote-debug --rm -it -v "$PWD/app":/opt/app -w /opt/app dev_container:armv7hf
+```
+
+Keep this container running throughout the debugging session. You will open
+terminal B in step 4.
+
+## 3. Build and install the application (both methods)
+
+Run the following commands in terminal A, opened in step 2.
 
 ### Build the ACAP application
 
@@ -145,6 +177,10 @@ chosen, one of these files should be found:
 - `remote_debug_1_0_0_aarch64.eap`
 - `remote_debug_1_0_0_armv7hf.eap`
 
+The `Makefile` keeps the unstripped binary in `debug/`, so
+`app/debug/remote_debug` is what the debugger loads while the `.eap` ships the
+stripped binary.
+
 > [!NOTE]
 > When developing interactively in a dev container, the build files will end up
 > in the source code directory of the repository, here called `app`. It's
@@ -160,7 +196,7 @@ To install the ACAP application on your device, run the following command from t
 eap-install.sh <AXIS_DEVICE_IP> <ADMIN_ACCOUNT> <PASSWORD> install
 ```
 
-## Upload and start gdbserver
+## 4. Upload and start gdbserver (both methods)
 
 Before uploading the `gdbserver` to your device, ensure that [Developer
 Mode](../DEV.md#developer-mode) is enabled. Developer Mode grants SSH access to
@@ -175,22 +211,26 @@ next section.
 
 ### Upload gdbserver to device via SCP
 
-1. Open a new terminal in Visual Studio Code, using either
-   `Terminal → New Terminal` or `Terminal → Split Terminal`. This terminal will
-   also be running inside the dev container, just like the existing terminal.
-   Using a second terminal allows for better visualization and keeps the
-   debugging process within the IDE.
+For Visual Studio Code, open a second terminal, **terminal B**, inside the dev container using
+`Terminal → New Terminal` or `Terminal → Split Terminal`.
 
-2. In the new terminal, upload the `gdbserver` binary to the Axis device
-   directory `/tmp` by using `scp`:
+For the terminal method, open a second terminal, **terminal B**, and start a second
+shell in the same container used in terminal A:
 
-   ```sh
-   scp /opt/build/gdb/bin/gdbserver acap-remote_debug@<AXIS_DEVICE_IP>:/tmp/
-   ```
+```sh
+docker exec -it remote-debug bash
+```
+
+From that container shell, upload the `gdbserver` binary to the Axis device
+directory `/tmp` by using `scp`:
+
+```sh
+scp /opt/build/gdb/bin/gdbserver acap-remote_debug@<AXIS_DEVICE_IP>:/tmp/
+```
 
 ### Start gdbserver on device
 
-In the same terminal (used for `scp` in previous section), log into the device
+In terminal B (used for `scp` in previous section), log into the device
 with `ssh`, start the `gdbserver` with the application binary, and open a TCP
 connection to a debug port on the Axis device, here port `1234`:
 
@@ -223,11 +263,9 @@ Process /usr/local/packages/remote_debug/remote_debug created; pid = 7423
 Listening on port 1234
 ```
 
-> [!TIP]
-> Keep both terminals open during the debugging process: one for building and
-> installing the application, and one for the SSH connection to the device.
+## 5. Connect the debugger (choose your method)
 
-## Start debugging in dev container
+### Visual Studio Code: start the graphical debugger
 
 > [!NOTE]
 > The `launch.json` file contains a hardcoded IP address (`192.168.0.90`) for
@@ -241,14 +279,77 @@ Listening on port 1234
    debugging.
 2. You can now set breakpoints, step through the code, and inspect variables
    using Visual Studio Code's debugging features.
-3. In the SSH session, you should see output similar to:
+3. In terminal B, you should see output similar to:
 
    ```text
    Remote debugging from host ::ffff:192.1.2.3, port 1234
    ```
 
-To rebuild and reinstall the ACAP application after making changes, run the
-following commands in the dev container terminal:
+### Terminal: connect with gdb-multiarch
+
+In **terminal A**, connect the debug client to the device:
+
+```sh
+gdb-multiarch -q debug/remote_debug \
+  -ex "set sysroot $SDKTARGETSYSROOT" \
+  -ex "target remote <AXIS_DEVICE_IP>:1234"
+```
+
+`set sysroot` points the debugger at the SDK sysroot so symbols for the device
+libraries are resolved. Terminal B now prints similar to:
+
+```text
+Remote debugging from host ::ffff:192.1.2.3, port 33556
+```
+
+### Terminal: debug session walk-through
+
+These `gdb` commands replace the buttons of a graphical debugger.
+
+| Command | Purpose |
+| ------- | ------- |
+| `break <function or file:line>` | Set a breakpoint |
+| `continue` | Run until the next breakpoint or signal |
+| `next` | Step over the current line |
+| `step` | Step into a function call |
+| `print <expression>` | Inspect a variable |
+| `info locals` | List the local variables of the current frame |
+| `backtrace` | Show the call stack |
+| `detach` / `quit` | End the session |
+
+Run them at the `(gdb)` prompt to reach the bug in this example:
+
+```text
+(gdb) break main
+Breakpoint 1 at 0x5555550760: file remote_debug.c, line 21.
+(gdb) continue
+Continuing.
+Breakpoint 1, main () at remote_debug.c:21
+21          char* message = "Hello World!";
+(gdb) next
+22          message[0]    = 'h';  // This will cause a segmentation fault
+(gdb) print message
+$1 = 0x55555507b8 "Hello World!"
+(gdb) next
+Program received signal SIGSEGV, Segmentation fault.
+0x0000005555550774 in main () at remote_debug.c:22
+22          message[0]    = 'h';  // This will cause a segmentation fault
+(gdb) backtrace
+#0  0x0000005555550774 in main () at remote_debug.c:22
+(gdb) quit
+A debugging session is active.
+
+        Inferior 1 [process 344661] will be killed.
+```
+
+The fault is the write to a string literal, which lives in read-only memory.
+To try a fix, edit the source, then follow step 6.
+
+## 6. Rebuild and restart (both methods)
+
+Stop the current debug session with `Shift+F5` in Visual Studio Code or `quit`
+at the `(gdb)` prompt. After making changes, run the following commands in the
+container shell in `/opt/app`, not in the SSH session on the device:
 
 ```sh
 make clean
@@ -256,17 +357,28 @@ acap-build .
 eap-install.sh <AXIS_DEVICE_IP> <ADMIN_ACCOUNT> <PASSWORD> install
 ```
 
+Restart `gdbserver` on the device as described in
+[Start gdbserver on device](#start-gdbserver-on-device), then reconnect using
+your method in [step 5](#5-connect-the-debugger-choose-your-method).
+
 > [!NOTE]
 > If this simple example is fixed, it will run once and exit, which will also
-> exit the `gdbserver` running on the Axis device. To run a new remote
-> debug the `gdbserver` needs to be restarted.
+> exit the `gdbserver` running on the Axis device. Restart `gdbserver` for each
+> new debug session.
 
 ## Cleanup
 
 To remove the built files and stop the debugging session:
 
-1. Press `Shift+F5` in Visual Studio Code to stop debugging.
-2. In the dev container terminal, run the following command to remove the built files:
+1. Press `Shift+F5` in Visual Studio Code to stop debugging, or type `quit` at
+   the `(gdb)` prompt when debugging from the terminal.
+2. Remove the uploaded `gdbserver` from the device:
+
+   ```sh
+   ssh acap-remote_debug@<AXIS_DEVICE_IP> rm /tmp/gdbserver
+   ```
+
+3. Remove the built files from terminal A:
 
    ```sh
    make clean
