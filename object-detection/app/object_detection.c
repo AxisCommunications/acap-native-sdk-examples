@@ -244,8 +244,8 @@ int main(int argc, char** argv) {
     args_t args;
     parse_args(argc, argv, &args);
 
-    char* device_name        = args.device_name;
-    char* model_file         = args.model_file;
+    const char* device_name  = args.device_name;
+    const char* model_file   = args.model_file;
     const char* labels_file  = args.labels_file;
     const int threshold      = args.threshold;
     size_t number_of_classes = 0;

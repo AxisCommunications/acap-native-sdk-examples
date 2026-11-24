@@ -123,9 +123,9 @@ static VdoStream* create_new_vdo_stream(unsigned int channel,
  * @brief Main function that starts a stream with different options.
  */
 int main(int argc, char** argv) {
-    char* device_name                     = argv[1];
-    char* model_file                      = argv[2];
-    char* image_fit                       = argv[3];
+    const char* device_name               = argv[1];
+    const char* model_file                = argv[2];
+    const char* image_fit                 = argv[3];
     g_autoptr(GError) vdo_error           = NULL;
     model_provider_t* model_provider      = NULL;
     model_tensor_output_t* tensor_outputs = NULL;

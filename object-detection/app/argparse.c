@@ -27,7 +27,7 @@
 
 #define KEY_USAGE (127)
 
-static int parse_pos_int(char* arg, unsigned long long* i, unsigned long long limit);
+static int parse_pos_int(const char* arg, unsigned long long* i, unsigned long long limit);
 static int parse_opt(int key, char* arg, struct argp_state* state);
 
 const struct argp_option opts[] = {
@@ -112,7 +112,7 @@ int parse_opt(int key, char* arg, struct argp_state* state) {
  * param limit Max limit for data type integer will be saved to.
  * return Positive errno style return code (zero means success).
  */
-static int parse_pos_int(char* arg, unsigned long long* i, unsigned long long limit) {
+static int parse_pos_int(const char* arg, unsigned long long* i, unsigned long long limit) {
     char* end_p;
 
     *i = strtoull(arg, &end_p, 0);

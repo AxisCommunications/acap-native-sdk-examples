@@ -225,8 +225,8 @@ static void setup_tensors(larodConnection* conn,
 }
 
 static larodModel* create_inference_model(model_provider_t* provider,
-                                          char* model_file,
-                                          char* device_name,
+                                          const char* model_file,
+                                          const char* device_name,
                                           const char* labels_file) {
     larodError* error = NULL;
 
@@ -358,8 +358,8 @@ void model_provider_destroy(model_provider_t* provider) {
     free(provider);
 }
 
-model_provider_t* model_provider_new(char* model_file,
-                                     char* device_name,
+model_provider_t* model_provider_new(const char* model_file,
+                                     const char* device_name,
                                      const char* labels_file,
                                      size_t* num_output_tensors) {
     model_provider_t* provider = calloc(1, sizeof(model_provider_t));
