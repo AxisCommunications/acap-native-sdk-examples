@@ -17,7 +17,7 @@ CFLAGS += -Wall \
           -W \
           -Werror
 
-all: axoverlay2
+all: $(PROG1)
 
 $(PROG1): $(PROG1).c
 	mkdir -p debug
