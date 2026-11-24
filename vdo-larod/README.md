@@ -32,7 +32,7 @@ Steps in application:
 
 1. Fetch image data from VDO.
 2. If needed preprocess the images (scale and color convert) using larod with cpu-proc (libyuv).
-3. Run inferences using the trained model on a specific chip with the preprocessing output as input on a larod backend specified by a command-line argument.
+3. Run inference using the model for the selected chip, with the preprocessed image as input on the Larod backend specified by a command-line argument.
 4. Measure the total inference time (preprocessing and inference time) and determine if the framerate of the vdo streams needs to be adjusted.
 5. The model's confidence scores for the presence of person and car in the image are printed as the output.
 6. Repeat until the user ends the application.
@@ -97,7 +97,7 @@ vdo-larod
   performance it's recommended to use products with DLPU. See links to search
   for products with DLPU support in [Axis device compatibility](https://www.axis.com/support/tools/product-selector/shared/%5B%7B%22index%22%3A%5B10%2C1%5D%2C%22value%22%3A%22DLPU%22%7D%5D).
 - This application was not written to optimize performance
-- The pretrained models only outputs the confidence of two classes i.e., person and car. For options on pretrained models that classify a higher number of classes, visit the  [Axis Model Zoo](https://github.com/AxisCommunications/axis-model-zoo).
+- The provided pretrained models output confidence scores for only two classes: person and car. For pretrained models that classify more classes, visit the [Axis Model Zoo](https://github.com/AxisCommunications/axis-model-zoo).
 
 ## How to run the code
 
@@ -216,8 +216,8 @@ vdo-larod
 
 - **build/manifest.json** - Defines the application and its configuration.
 - **build/model** - Folder containing models used in this application.
-- **build/model/model.tflite** - Trained model file used for ARTPEC-8, ARTPEC-9, and CPU, depending on `<CHIP>`.
-- **build/model/model.bin** - Trained model file used for CV25.
+- **build/model/model.tflite** - Pretrained model file used for ARTPEC-8, ARTPEC-9, and CPU, depending on `<CHIP>`.
+- **build/model/model.bin** - Pretrained model file used for CV25.
 - **build/vdo_larod** - Application executable binary file.
 
   If chip `artpec8` has been built.

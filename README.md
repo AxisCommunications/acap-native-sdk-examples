@@ -47,19 +47,8 @@ The examples are organized into logical groups to help you find the most relevan
   - An example of object detection, drawing bounding boxes around detected objects on the video stream.
 - [object-detection-yolov5](./object-detection-yolov5/)
   - An example of object detection using YOLOv5, drawing bounding boxes around detected objects on the video stream.
-
-#### Train and convert models for Axis devices
-
-- [tensorflow-to-larod](./tensorflow-to-larod/)
-  - A guide of how to train and export machine learning models to make them compatible with ARTPEC-7 devices.
-- [tensorflow-to-larod-artpec8](./tensorflow-to-larod-artpec8/)
-  - A guide of how to train and export machine learning models to make them compatible with ARTPEC-8 devices.
-- [tensorflow-to-larod-artpec9](./tensorflow-to-larod-artpec9/)
-  - A guide of how to train and export machine learning models to make them compatible with ARTPEC-9 devices. Note that this example is pointing to [tensorflow-to-larod-artpec8](./tensorflow-to-larod-artpec8).
-- [tensorflow-to-larod-cv25](./tensorflow-to-larod-cv25/)
-  - A guide of how to train and export machine learning models to make them compatible with CV25 devices.
 - [vdo-larod](./vdo-larod/)
-  - An example in C that runs one of the  machine learning models trained with the tensorflow-to-larod* guides on the video stream of the device.
+  - Captures video frames with VDO and runs person and car classification inference using Larod on the device's CPU or DLPU.
 
 ### Build custom libraries for an application
 
