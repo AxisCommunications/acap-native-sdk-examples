@@ -23,4 +23,4 @@ $(PROGS): $(OBJECTS)
 	$(STRIP) --strip-unneeded $@
 
 clean:
-	rm -rf $(PROGS) *.o *.eap* *_LICENSE.txt package.conf* param.conf tmp* $(DEBUG_DIR)
+	rm -rf $(PROGS) *.o *.eap* *_LICENSE.txt tmp* $(DEBUG_DIR)

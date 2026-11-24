@@ -178,10 +178,7 @@ The working directory now contains a build folder with the following files:
 │   ├── openssl_curl_example*
 │   ├── openssl_curl_example.c
 │   ├── openssl_curl_example_1_0_0_LICENSE.txt
-│   ├── openssl_curl_example_1_0_0_armv7hf.eap
-│   ├── package.conf
-│   ├── package.conf.orig
-│   └── param.conf
+│   └── openssl_curl_example_1_0_0_armv7hf.eap
 ```
 
 - **build/cacert.pem** - CA certificate file for remote server verification.
@@ -189,9 +186,6 @@ The working directory now contains a build folder with the following files:
 - **build/openssl_curl_example** - Application executable binary file.
 - **build/openssl_curl_example_1_0_0_LICENSE.txt** - Copy of LICENSE file.
 - **build/openssl_curl_example_1_0_0_armv7hf.eap** - Application package .eap file.
-- **build/package.conf** - Defines the application and its configuration.
-- **build/package.conf.orig** - Defines the application and its configuration, original file.
-- **build/param.conf** - File containing application parameters.
 
 #### Install and start the application
 

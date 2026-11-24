@@ -82,10 +82,7 @@ hello-world
 │   ├── hello_world.c
 │   ├── LICENSE
 │   ├── Makefile
-│   ├── manifest.json
-│   ├── package.conf
-│   ├── package.conf.orig
-│   └── param.conf
+│   └── manifest.json
 ├── Dockerfile
 └── README.md
 ```
@@ -94,9 +91,6 @@ hello-world
 - **build/hello_world_1_0_0_armv7hf.eap** - Application package .eap file.
 - **build/hello_world_1_0_0_LICENSE.txt** - Copy of LICENSE file.
 - **build/manifest.json** - Defines the application and its configuration.
-- **build/package.conf** - Defines the application and its configuration.
-- **build/package.conf.orig** - Defines the application and its configuration, original file.
-- **build/param.conf** - File containing application parameters.
 
 > [!NOTE]
 >

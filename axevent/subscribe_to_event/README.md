@@ -80,9 +80,6 @@ subscribe_to_event
 │   ├── LICENSE
 │   ├── Makefile
 │   ├── manifest.json
-│   ├── package.conf
-│   ├── package.conf.orig
-│   ├── param.conf
 │   ├── subscribe_to_event*
 │   ├── subscribe_to_event_1_0_0_armv7hf.eap
 │   ├── subscribe_to_event_1_0_0_LICENSE.txt
@@ -92,9 +89,6 @@ subscribe_to_event
 ```
 
 - **build/manifest.json** - Defines the application and its configuration.
-- **build/package.conf** - Defines the application and its configuration.
-- **build/package.conf.orig** - Defines the application and its configuration, original file.
-- **build/param.conf** - File containing application parameters.
 - **build/subscribe_to_event*** - Application executable binary file.
 - **build/subscribe_to_event_1_0_0_armv7hf.eap** - Application package .eap file for "subscribe_to_event".
 - **build/subscribe_to_event_1_0_0_LICENSE.txt** - Copy of LICENSE file.

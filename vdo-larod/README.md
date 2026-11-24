@@ -217,12 +217,9 @@ vdo-larod
 │   ├── model_preprocessing.c
 │   ├── model_preprocessing.h
 │   ├── model
-|   │   └── model.tflite / model.bin
-│   ├── package.conf
-│   ├── package.conf.orig
-│   └── panic.c
-│   └── panic.h
-│   ├── param.conf
+│   │   └── model.tflite / model.bin
+│   ├── panic.c
+│   ├── panic.h
 │   ├── vdo_larod*
 │   ├── vdo_larod_{cpu,edgetpu}_1_0_0_armv7hf.eap / vdo_larod_{cv25,artpec8,artpec9}_1_0_0_aarch64.eap
 │   ├── vdo_larod_{cpu,edgetpu}_1_0_0_LICENSE.txt / vdo_larod_{cv25,artpec8,artpec9}_1_0_0_LICENSE.txt
@@ -233,9 +230,6 @@ vdo-larod
 - **build/model** - Folder containing models used in this application.
 - **build/model/model.tflite** - Trained model file used for ARTPEC-8, ARTPEC-9, and CPU, or trained model file used for Google TPU, depending on `<CHIP>`.
 - **build/model/model.bin** - Trained model file used for CV25.
-- **build/package.conf** - Defines the application and its configuration.
-- **build/package.conf.orig** - Defines the application and its configuration, original file.
-- **build/param.conf** - File containing application parameters.
 - **build/vdo_larod** - Application executable binary file.
 
   If chip `artpec8` has been built.

@@ -83,9 +83,6 @@ audio-capture
 │   ├── LICENSE
 │   ├── Makefile
 │   ├── manifest.json
-│   ├── package.conf
-│   ├── package.conf.orig
-│   ├── param.conf
 │   ├── audiocapture*
 │   ├── Audio_capture_1_0_0_armv7hf.eap
 │   ├── Audio_capture_1_0_0_LICENSE.txt
@@ -95,9 +92,6 @@ audio-capture
 ```
 
 - **build/manifest.json** - Defines the application and its configuration.
-- **build/package.conf** - Defines the application and its configuration.
-- **build/package.conf.orig** - Defines the application and its configuration, original file.
-- **build/param.conf** - File containing application parameters.
 - **build/audiocapture*** - Application executable binary file.
 - **build/Audio_capture_1_0_0_armv7hf.eap** - Application package .eap file.
 - **build/Audio_capture_1_0_0_LICENSE.txt** - Copy of LICENSE file.

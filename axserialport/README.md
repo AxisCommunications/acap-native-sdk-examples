@@ -72,9 +72,6 @@ axserialport
 build
 ├── Makefile
 ├── manifest.json
-├── package.conf
-├── package.conf.orig
-├── param.conf
 ├── axserialport*
 ├── axserialport_1_0_0_armv7hf.eap
 ├── axserialport_1_0_0_LICENSE.txt
@@ -83,9 +80,6 @@ build
 ```
 
 - **manifest.json** - Defines the application and its configuration.
-- **package.conf** - Defines the application and its configuration.
-- **package.conf.orig** - Defines the application and its configuration, original file.
-- **param.conf** - File containing additional application parameters.
 - **axserialport*** - Application executable binary file.
 - **axserialport_1_0_0_armv7hf.eap** - Application package .eap file.
 - **axserialport_1_0_0_LICENSE.txt** - Copy of LICENSE file.

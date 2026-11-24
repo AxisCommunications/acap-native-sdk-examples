@@ -69,10 +69,7 @@ shell-script-example
 │   ├── shell_script_example_1_0_0_all.eap
 │   ├── shell_script_example_1_0_0_LICENSE.txt
 │   ├── LICENSE
-│   ├── manifest.json
-│   ├── package.conf
-│   ├── package.conf.orig
-│   └── param.conf
+│   └── manifest.json
 ├── Dockerfile
 └── README.md
 ```
@@ -81,9 +78,6 @@ shell-script-example
 - **build/shell_script_example_1_0_0_all.eap** - Architecture-independent .eap file, compatible with both `armv7hf` and `aarch64` devices.
 - **build/shell_script_example_1_0_0_LICENSE.txt** - Copy of LICENSE file.
 - **build/manifest.json** - Defines the application and its configuration.
-- **build/package.conf** - Defines the application and its configuration.
-- **build/package.conf.orig** - Defines the application and its configuration, original file.
-- **build/param.conf** - File containing application parameters.
 
 > [!NOTE]
 >

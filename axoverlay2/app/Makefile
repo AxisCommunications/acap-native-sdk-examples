@@ -27,4 +27,4 @@ $(PROG1): $(PROG1).c
 
 .PHONY: clean
 clean:
-	rm -rf $(PROG1) *.o *.eap* *_LICENSE.txt package.conf* param.conf tmp* debug
+	rm -rf $(PROG1) *.o *.eap* *_LICENSE.txt tmp* debug

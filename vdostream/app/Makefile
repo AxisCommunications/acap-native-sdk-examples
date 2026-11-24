@@ -30,4 +30,4 @@ $(PROG1): $(OBJS1)
 	$(STRIP) $@
 
 clean:
-	rm -rf $(PROGS) *.o *.eap* *_LICENSE.txt package.conf* param.conf tmp* manifest.json $(DEBUG_DIR)
+	rm -rf $(PROGS) *.o *.eap* *_LICENSE.txt tmp* manifest.json $(DEBUG_DIR)
