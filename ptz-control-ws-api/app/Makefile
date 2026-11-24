@@ -1,9 +1,5 @@
 PROG1 = $(shell jq -r '.acapPackageConf.setup.appName' manifest.json)
-OBJS1 = main.c \
-        listener.c \
-        subscriber.c \
-        utils.c \
-        websocket_client.c
+OBJS1 = $(patsubst %.c,%.o,$(wildcard *.c))
 PROGS = $(PROG1)
 DEBUG_DIR = debug
 
