@@ -32,9 +32,6 @@ ARG CHIP=
 RUN if [ "$CHIP" = artpec8 ] || [ "$CHIP" = artpec9 ] || [ "$CHIP" = cpu ]  ; then \
         curl -L -o converted_model.tflite \
             https://github.com/google-coral/test_data/raw/master/ssd_mobilenet_v2_coco_quant_postprocess.tflite ; \
-    elif [ "$CHIP" = edgetpu ]; then \
-        curl -L -o converted_model.tflite \
-            https://github.com/google-coral/test_data/raw/master/ssd_mobilenet_v2_coco_quant_postprocess_edgetpu.tflite ; \
     else \
         printf "Error: '%s' is not a valid value for the CHIP variable\n", "$CHIP"; \
         exit 1; \
@@ -53,7 +50,7 @@ COPY ./app .
 
 RUN cp /opt/app/manifest.json.${CHIP} /opt/app/manifest.json && \
     . /opt/axis/acapsdk/environment-setup* && \
-    if [ "$CHIP" = artpec8 ] || [ "$CHIP" = artpec9 ] || [ "$CHIP" = cpu ] || [ "$CHIP" = edgetpu ]; then \
+    if [ "$CHIP" = artpec8 ] || [ "$CHIP" = artpec9 ] || [ "$CHIP" = cpu ]; then \
         acap-build . -a 'label/labels.txt' \
         -a 'model/converted_model.tflite'; \
     else \

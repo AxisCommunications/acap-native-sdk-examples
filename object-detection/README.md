@@ -36,7 +36,6 @@ object-detection
 │   ├── manifest.json.artpec8
 │   ├── manifest.json.artpec9
 │   ├── manifest.json.cpu
-│   ├── manifest.json.edgetpu
 │   ├── model.c
 │   ├── model.h
 │   ├── model_preprocessing.c
@@ -62,8 +61,6 @@ ARTPEC-8 DLPU cameras with TensorFlow Lite.
 ARTPEC-9 DLPU cameras with TensorFlow Lite.
 - **app/manifest.json.cpu** - Defines the application and its configuration when building for
 CPU with TensorFlow Lite.
-- **app/manifest.json.edgetpu** - Defines the application and its configuration when building for
-ARTPEC-7 DLPU (Using Google EdgeTPU) cameras with TensorFlow Lite.
 - **app/object_detection.c** - Application source code in C.
 - **app/model.c/h** - Handle most of the larod functionality.
 - **app/model_preproessing.c/h** - Wrapper for the preprocessing part of larod.
@@ -137,7 +134,7 @@ docker build --platform=linux/amd64 --tag <APP_IMAGE> --build-arg ARCH=<ARCH> --
 
 - `<APP_IMAGE>` is the name to tag the image with, e.g., `object_detection:1.0`.
 - `<ARCH>` is the SDK architecture, `armv7hf` or `aarch64`.
-- `<CHIP>` is the chip type, `artpec9`, `artpec8`, `cpu` or `edgetpu`
+- `<CHIP>` is the chip type, `artpec9`, `artpec8`, or `cpu`.
 
 Copy the result from the container image to a local directory `build`:
 
@@ -146,12 +143,11 @@ docker cp $(docker create --platform=linux/amd64 <APP_IMAGE>):/opt/app ./build
 ```
 
 The `build` directory contains the build artifacts, where the ACAP application is found with suffix
-`.eap`, depending on ARTPEC-8, ARTPEC-9, edgetpu or CPU:
+`.eap`, depending on ARTPEC-8, ARTPEC-9, or CPU:
 
 - `object_detection_artpec8_1_0_0_<ARCH>.eap`.
 - `object_detection_artpec9_1_0_0_<ARCH>.eap`.
 - `object_detection_cpu_1_0_0_<ARCH>.eap`.
-- `object_detection_edgetpu_1_0_0_<ARCH>.eap`.
 
 > [!NOTE]
 >

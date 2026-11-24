@@ -31,12 +31,7 @@ static int parse_pos_int(char* arg, unsigned long long* i, unsigned long long li
 static int parse_opt(int key, char* arg, struct argp_state* state);
 
 const struct argp_option opts[] = {
-    {"device",
-     'd',
-     "DEVICE",
-     0,
-     "Could be axis-a8-dlpu-tflite, a9-dlpu-tflite, google-edge-tpu-tflite or cpu-tflite",
-     0},
+    {"device", 'd', "DEVICE", 0, "Could be axis-a8-dlpu-tflite, a9-dlpu-tflite or cpu-tflite", 0},
     {"help", 'h', NULL, 0, "Print this help text and exit.", 0},
     {"usage", KEY_USAGE, NULL, 0, "Print short usage message and exit.", 0},
     {0}};

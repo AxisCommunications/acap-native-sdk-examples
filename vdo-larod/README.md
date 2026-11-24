@@ -63,7 +63,6 @@ vdo-larod
 │   ├── manifest.json.artpec9
 │   ├── manifest.json.cpu
 │   ├── manifest.json.cv25
-│   ├── manifest.json.edgetpu
 │   ├── model.c
 │   ├── model.h
 │   ├── model_preprocessing.c
@@ -85,7 +84,6 @@ vdo-larod
   <!-- textlint-enable -->
 - **app/manifest.json.cpu** - Defines the application and its configuration when building for CPU with TensorFlow Lite.
 - **app/manifest.json.cv25** - Defines the application and its configuration when building chip and model for cv25 DLPU.
-- **app/manifest.json.edgetpu** - Defines the application and its configuration when building chip and model for Google TPU.
 - **app/model.c/h** - Handle most of the larod functionality
 - **app/model_preprocessing.c/h** - Wrapper for the preprocessing part of larod.
 - **app/panic.c/h** - Utility for exiting the program on error
@@ -142,7 +140,7 @@ docker cp $(docker create --platform=linux/amd64 <APP_IMAGE>):/opt/app ./build
 ```
 
 - \<APP_IMAGE\> is the name to tag the image with, e.g., `vdo_larod:1.0`.
-- \<CHIP\> is the chip type. Supported values are `artpec9`, `artpec8`, `cpu`, `cv25` and `edgetpu`.
+- \<CHIP\> is the chip type. Supported values are `artpec9`, `artpec8`, `cpu`, and `cv25`.
 - \<ARCH\> is the architecture. Supported values are `armv7hf` (default) and `aarch64`.
 
 See the following sections for build commands for each chip.
@@ -174,15 +172,6 @@ docker build --platform=linux/amd64 --build-arg CHIP=cpu --tag <APP_IMAGE> .
 docker cp $(docker create --platform=linux/amd64 <APP_IMAGE>):/opt/app ./build
 ```
 
-#### Build for Google TPU
-
-To build a package for Google TPU instead, run the following commands standing in your working directory:
-
-```sh
-docker build --platform=linux/amd64 --build-arg CHIP=edgetpu --tag <APP_IMAGE> .
-docker cp $(docker create --platform=linux/amd64 <APP_IMAGE>):/opt/app ./build
-```
-
 #### Build for CV25 using DLPU
 
 To build a package for CV25 run the following commands standing in your working directory:
@@ -210,7 +199,6 @@ vdo-larod
 │   ├── manifest.json.artpec8
 │   ├── manifest.json.artpec9
 │   ├── manifest.json.cpu
-│   ├── manifest.json.edgetpu
 │   ├── manifest.json.cv25
 │   ├── model.c
 │   ├── model.h
@@ -221,14 +209,14 @@ vdo-larod
 │   ├── panic.c
 │   ├── panic.h
 │   ├── vdo_larod*
-│   ├── vdo_larod_{cpu,edgetpu}_1_0_0_armv7hf.eap / vdo_larod_{cv25,artpec8,artpec9}_1_0_0_aarch64.eap
-│   ├── vdo_larod_{cpu,edgetpu}_1_0_0_LICENSE.txt / vdo_larod_{cv25,artpec8,artpec9}_1_0_0_LICENSE.txt
+│   ├── vdo_larod_cpu_1_0_0_armv7hf.eap / vdo_larod_{cv25,artpec8,artpec9}_1_0_0_aarch64.eap
+│   ├── vdo_larod_cpu_1_0_0_LICENSE.txt / vdo_larod_{cv25,artpec8,artpec9}_1_0_0_LICENSE.txt
 │   └── vdo_larod.c
 ```
 
 - **build/manifest.json** - Defines the application and its configuration.
 - **build/model** - Folder containing models used in this application.
-- **build/model/model.tflite** - Trained model file used for ARTPEC-8, ARTPEC-9, and CPU, or trained model file used for Google TPU, depending on `<CHIP>`.
+- **build/model/model.tflite** - Trained model file used for ARTPEC-8, ARTPEC-9, and CPU, depending on `<CHIP>`.
 - **build/model/model.bin** - Trained model file used for CV25.
 - **build/vdo_larod** - Application executable binary file.
 
@@ -243,10 +231,6 @@ vdo-larod
   If chip `cpu` has been built.
 - **build/vdo_larod_cpu_1_0_0_armv7hf.eap** - Application package .eap file.
 - **build/vdo_larod_cpu_1_0_0_LICENSE.txt** - Copy of LICENSE file.
-
-  If chip `edgetpu` has been built.
-- **build/vdo_larod_edgetpu_1_0_0_armv7hf.eap** - Application package .eap file.
-- **build/vdo_larod_edgetpu_1_0_0_LICENSE.txt** - Copy of LICENSE file.
 
   If chip `cv25` has been built.
 - **build/vdo_larod_cv25_1_0_0_aarch64.eap** - Application package .eap file.
@@ -272,7 +256,6 @@ http://<AXIS_DEVICE_IP>/index.html#apps
    - `vdo_larod_artpec8_1_0_0_aarch64.eap`
    - `vdo_larod_artpec9_1_0_0_aarch64.eap`
    - `vdo_larod_cpu_1_0_0_armv7hf.eap`
-   - `vdo_larod_edgetpu_1_0_0_armv7hf.eap`
 
 4. Click **Install**
 5. Run the application by enabling the **Start** switch
@@ -294,7 +277,6 @@ In previous larod versions, the chip was referred to as a number instead of a st
 | Chips                    | Larod 1 (int) | Larod 3                |
 | ------------------------ | ------------- | ---------------------- |
 | CPU with TensorFlow Lite | 2             | cpu-tflite             |
-| Google TPU               | 4             | google-edge-tpu-tflite |
 | Ambarella CVFlow (NN)    | 6             | ambarella-cvflow       |
 | ARTPEC-8 DLPU            | 12            | axis-a8-dlpu-tflite    |
 | ARTPEC-9 DLPU            | -             | a9-dlpu-tflite         |
@@ -411,44 +393,6 @@ vdo_larod[3991067]: Ran inference for 340 ms
 vdo_larod[3991067]: Person detected: 100.00% - Car detected: 3.14%
 
 vdo_larod[145071]: Exit /usr/local/packages/vdo_larod/vdo_larod
-```
-
-#### Output - Google TPU
-
-```sh
------ Contents of SYSTEM_LOG for 'vdo_larod' -----
-
-vdo_larod[584171]: Starting /usr/local/packages/vdo_larod/vdo_larod
-vdo_larod[584171]: Setting up larod connection with chip google-edge-tpu-tflite and model file /usr/local/packages/vdo_larod/model/model.tflite
-vdo_larod[584171]: Loading the model... This might take up to 5 minutes depending on your device model.
-vdo_larod[584171]: Model loaded successfully
-vdo_larod[584171]: Detected model format RGB and input resolution 256x256
-vdo_larod[584171]: Created mmaped model output 0 with size 1
-vdo_larod[584171]: Created mmaped model output 1 with size 1
-vdo_larod[584171]: [Channel 0] Current global rotation is 180
-vdo_larod[584171]: [Channel 0] Current aspect ratio is 16:9
-vdo_larod[584171]: channel_util_choose_stream_resolution: We select stream w/h=256 x 256 with format yuv based on VDO channel info.
-vdo_larod[584171]: Dump of vdo stream settings map =====
-vdo_larod[584171]: 'buffer.access'-----: <uint32 1>
-vdo_larod[584171]: 'buffer.count'------: <uint32 2>
-vdo_larod[584171]: 'buffer.strategy'---: <uint32 4>
-vdo_larod[584171]: 'channel'-----------: <uint32 0>
-vdo_larod[584171]: 'dynamic.framerate'-: <true>
-vdo_larod[584171]: 'format'------------: <uint32 3>
-vdo_larod[584171]: 'framerate'---------: <30.0>
-vdo_larod[584171]: 'identity'----------: <'vdo-larod'>
-vdo_larod[584171]: 'image.fit'---------: <'scale'>
-vdo_larod[584171]: 'intent'------------: <uint32 5>
-vdo_larod[584171]: 'resolution'--------: <uint32 256, uint32 256>
-vdo_larod[584171]: 'socket.blocking'---: <false>
-vdo_larod[584171]: Stream aspect ratio is 1:1
-vdo_larod[584171]: Start fetching video frames from VDO
-vdo_larod[584171]: Use preprocessing with input format nv12 and output format rgb-interleaved
-
-vdo_larod[584171]: Ran inference for 16 ms
-vdo_larod[584171]: Person detected: 65.14% - Car detected: 11.92%
-
-vdo_larod[4165]: Exit /usr/local/packages/vdo_larod/vdo_larod
 ```
 
 #### Output - CV25

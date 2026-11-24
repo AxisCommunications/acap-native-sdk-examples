@@ -17,8 +17,6 @@ ARG CHIP
 ARG MODEL_BUCKET=https://acap-ml-models.s3.amazonaws.com/tensorflow_to_larod_resnet
 RUN if [ "$CHIP" = artpec8 ] || [ "$CHIP" = artpec9 ] || [ "$CHIP" = cpu ]  ; then \
         curl -o model.tflite $MODEL_BUCKET/custom_resnet_artpec8_car_human_256.tflite ; \
-    elif [ "$CHIP" = edgetpu ]; then \
-        curl -o model.tflite $MODEL_BUCKET/custom_resnet_edgetpu_car_human_256.tflite ; \
     elif [ "$CHIP" = cv25 ]; then \
         curl -o model.bin $MODEL_BUCKET/custom_resnet_cv25_car_human_256.bin ; \
     else \
@@ -33,7 +31,7 @@ COPY ./app .
 # Build the ACAP application
 RUN cp /opt/app/manifest.json.${CHIP} /opt/app/manifest.json && \
     . /opt/axis/acapsdk/environment-setup* && \
-    if [ "$CHIP" = artpec8 ] || [ "$CHIP" = artpec9 ] || [ "$CHIP" = cpu ] || [ "$CHIP" = edgetpu ]; then \
+    if [ "$CHIP" = artpec8 ] || [ "$CHIP" = artpec9 ] || [ "$CHIP" = cpu ]; then \
         acap-build . -a 'model/model.tflite'; \
     elif [ "$CHIP" = cv25 ]; then \
         acap-build . -a 'model/model.bin'; \
