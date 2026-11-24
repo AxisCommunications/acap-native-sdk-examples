@@ -14,8 +14,8 @@ ARG BUILD_DIR=/opt/build
 ARG PEM_CERT_FILE=cacert.pem
 
 # Library versions
-ARG OPENSSL_VER=3.5.7
-ARG CURL_VER=8_6_0
+ARG OPENSSL_VER=3.5.8
+ARG CURL_VER=8_22_0
 
 # (Optional) If the network has a proxy
 ARG APP_PROXY
