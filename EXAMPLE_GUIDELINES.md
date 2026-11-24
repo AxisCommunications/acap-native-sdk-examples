@@ -1,10 +1,10 @@
 # Example guidelines
 
-Main guiding principles
+Main guiding principles:
 
-- focus on explaining a use case.
-- the code structure should be easy to understand.
-- the examples should aim at being short.
+- Focus on explaining a use case.
+- The code structure should be easy to understand.
+- The examples should aim at being short.
 
 ## Guiding examples
 
@@ -12,7 +12,7 @@ This repository has many ACAP application examples which makes it important to
 keep a common structure for both maintenance and familiarity for users.
 
 New examples must follow the general example format. Most examples are aligned,
-but not all, therefore it's recommended to follow one of these guiding examples:
+but not all. It's therefore recommended to follow one of these guiding examples:
 
 - [axparameter](./axparameter/)
   <!-- textlint-disable terminology -->
@@ -33,7 +33,7 @@ example-name
 ├── Dockerfile
 └── README.md
 
-(*) Makefile is not necessary when architecture equals `all`.
+(*) Makefile is not necessary when the architecture is `all`.
 ```
 
 - **Don't use build scripts like `build.sh`**
@@ -45,8 +45,8 @@ example-name
   - Don't use versions in text that will need future updates, making
     maintenance hard.
   - For example, instead of ACAP Native SDK 12, use ACAP Native SDK.
-- **Add copyright license**
-  - All source code should have a copyright header.
+- **Add copyright and license**
+  - All source code should have a copyright and license header.
 - **Dockerfile**
   - Don't add proxy variables like `http_proxy` and `https_proxy` in the
     example. See the [Proxy](https://developer.axis.com/acap/develop/proxy)
@@ -80,7 +80,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ```
 
-### README
+### README.md
 
 A key to make a good example is to put effort in making the example name, title
 and introduction as clear and concise as possible.
@@ -106,41 +106,41 @@ Use headers:
 For C and C++ files, use as minimum the same amount of GCC warning options as
 the other examples and `-Werror` to make them into build errors.
 
-### C or C++
+### C or C++?
 
-- C is preferred, it tends to make examples clearer, especially shorter ones.
+- C is preferred. It tends to make examples clearer, especially shorter ones.
 - C++ could be used in larger more advanced examples.
 - Use the language that makes the shortest and easiest to read example
 
-#### C-code style
+#### C code style
 
 All C and C++ files are linted by clang and should also be autoformatted by
-clang, see [LINT.md](./LINT.md) for more details.
+clang-format, see [LINT.md](./LINT.md) for more details.
 
 - **General**
-  - Assume knowledge in C, examples should not explain basic functionality.
-- **libc or glib?**
+  - Assume knowledge in C. Examples should not explain basic functionality.
+- **libc or GLib?**
   - Use standard libc as default.
-  - Use glib when it saves time, lines, is safer or easier to read.
+  - Use GLib when it saves time, lines, is safer or easier to read.
 - **Functions**
-  - The function name is very important, it should explain what is done.
+  - The function name is very important. It should explain what is done.
   - Functions should strive to do *one* thing.
   - Don't use function descriptions.
   - Avoid functions with many arguments. Use `structs` instead for such cases.
 - **Function prototypes**
   - Try to avoid them to make examples shorter.
   - Place main function last.
-    Place functions without dependencies at the top
-    If possible, no forward declarations within the file
+  - Place functions without dependencies at the top.
+  - Avoid forward declarations within the file.
 - **Comments**
   - Don't repeat the code in comments.
-  - Comments should explain **why** and the code show **how**.
-  - Use `//` as in `// An explaining comment` for all comments.
+  - Comments should explain **why** and the code shows **how**.
+  - Use `//` instead of `/* */` for all comments.
 - **Error handling**
     <!-- textlint-disable terminology -->
-  - At errors, use function `panic()` as in the [vapix](./vapix/) example. This
+  - At errors, use the function `panic()` as in the [vapix](./vapix/) example. This
     function logs to syslog and exit with 1 directly without cleanup.
     <!-- textlint-enable -->
   - The examples should not focus on error handling via error propagation.
-    By crashing early errors are caught on first occurrence and avoids lengthy
-    code not suitable for example code.
+    By crashing early, errors are caught on first occurrence and avoids lengthy
+    code not suitable for these examples.
