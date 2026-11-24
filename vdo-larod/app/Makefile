@@ -1,6 +1,6 @@
-PROG1	= $(shell jq -r '.acapPackageConf.setup.appName' manifest.json)
-OBJS1	= $(patsubst %.c,%.o,$(wildcard *.c))
-PROGS	= $(PROG1)
+PROG1 = $(shell jq -r '.acapPackageConf.setup.appName' manifest.json)
+OBJS1 = $(patsubst %.c,%.o,$(wildcard *.c))
+PROGS = $(PROG1)
 DEBUG_DIR = debug
 
 PKGS = gio-2.0 gio-unix-2.0 liblarod vdostream
@@ -24,7 +24,7 @@ CFLAGS += -Wall \
           -Werror
 
 .PHONY: all
-all:	$(PROGS)
+all: $(PROGS)
 
 $(PROG1): $(OBJS1)
 	install -d $(DEBUG_DIR)

@@ -1,6 +1,6 @@
-PROG1	= $(shell jq -r '.acapPackageConf.setup.appName' manifest.json)
-OBJS1	= $(PROG1).o
-PROGS	= $(PROG1)
+PROG1 = $(shell jq -r '.acapPackageConf.setup.appName' manifest.json)
+OBJS1 = $(PROG1).o
+PROGS = $(PROG1)
 DEBUG_DIR = debug
 
 PKGS = openssl libcurl
@@ -27,7 +27,7 @@ CFLAGS += -DAPP_DEBUG="\"$(APP_DEBUG)\""
 endif
 
 .PHONY: all
-all:	$(PROGS)
+all: $(PROGS)
 
 $(PROG1): $(OBJS1)
 	install -d $(DEBUG_DIR)
