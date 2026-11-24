@@ -18,7 +18,7 @@ all: $(PROGS)
 
 $(PROGS): $(OBJECTS)
 	install -d $(DEBUG_DIR)
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) $(LDLIBS) $^ -o $(DEBUG_DIR)/$@
+	$(CXX) $^ $(CXXFLAGS) $(LDFLAGS) $(LDLIBS) -o $(DEBUG_DIR)/$@
 	cp $(DEBUG_DIR)/$@ .
 	$(STRIP) --strip-unneeded $@
 
