@@ -19,7 +19,7 @@ CFLAGS += -Wall \
 
 all: $(PROG1)
 
-$(PROG1): $(PROG1).c
+$(PROG1): $(PROG1).o
 	mkdir -p debug
 	$(CC) $^ $(CFLAGS) $(LDFLAGS) $(LDLIBS) -o debug/$@
 	cp debug/$@ .

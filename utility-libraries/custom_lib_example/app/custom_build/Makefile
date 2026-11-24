@@ -1,5 +1,5 @@
 PROG     = hello_world
-OBJS     = $(PROG).c
+OBJS     = $(PROG).o
 MAJORVER = 1
 MINORVER = 0
 PATCH    = 0

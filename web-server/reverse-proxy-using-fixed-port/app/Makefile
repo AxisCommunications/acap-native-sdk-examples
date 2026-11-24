@@ -1,5 +1,5 @@
 PROG1 = $(shell jq -r '.acapPackageConf.setup.appName' manifest.json)
-OBJS1 = $(PROG1).c
+OBJS1 = $(PROG1).o
 PROGS = $(PROG1)
 LIBDIR = lib
 DEBUG_DIR = debug
